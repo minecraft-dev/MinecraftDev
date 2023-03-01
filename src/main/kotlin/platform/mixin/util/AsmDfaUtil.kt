@@ -39,8 +39,8 @@ object AsmDfaUtil {
                         Type.getObjectType(clazz.name),
                         clazz.superName?.let { Type.getObjectType(it) },
                         clazz.interfaces?.map { Type.getObjectType(it) } ?: emptyList(),
-                        clazz.hasAccess(Opcodes.ACC_INTERFACE)
-                    )
+                        clazz.hasAccess(Opcodes.ACC_INTERFACE),
+                    ),
                 ).analyze(clazz.name, method)
             } catch (e: AnalyzerException) {
                 LOGGER.warn("AsmDfaUtil.analyzeMethod failed", e)
@@ -54,7 +54,7 @@ object AsmDfaUtil {
         clazz: ClassNode,
         method: MethodNode,
         insn: AbstractInsnNode,
-        slot: Int
+        slot: Int,
     ): Type? {
         val insns = method.instructions ?: return null
         val frames = analyzeMethod(project, clazz, method) ?: return null
@@ -67,7 +67,7 @@ object AsmDfaUtil {
         project: Project,
         clazz: ClassNode,
         method: MethodNode,
-        insn: AbstractInsnNode
+        insn: AbstractInsnNode,
     ): Array<Type?>? {
         val insns = method.instructions ?: return null
         val frames = analyzeMethod(project, clazz, method) ?: return null
@@ -80,7 +80,7 @@ object AsmDfaUtil {
         clazz: ClassNode,
         method: MethodNode,
         insn: AbstractInsnNode,
-        depth: Int
+        depth: Int,
     ): Type? {
         val insns = method.instructions ?: return null
         val frames = analyzeMethod(project, clazz, method) ?: return null
@@ -93,7 +93,7 @@ object AsmDfaUtil {
         project: Project,
         clazz: ClassNode,
         method: MethodNode,
-        insn: AbstractInsnNode
+        insn: AbstractInsnNode,
     ): Array<Type?>? {
         val insns = method.instructions ?: return null
         val frames = analyzeMethod(project, clazz, method) ?: return null
@@ -106,7 +106,7 @@ object AsmDfaUtil {
         private val currentClass: Type,
         private val currentSuperClass: Type?,
         currentClassInterfaces: List<Type>,
-        private val isInterface: Boolean
+        private val isInterface: Boolean,
     ) : SimpleVerifier(Opcodes.ASM7, currentClass, currentSuperClass, currentClassInterfaces, isInterface) {
         override fun getClass(type: Type?): Class<*> {
             // should never be called given we have overridden the other methods

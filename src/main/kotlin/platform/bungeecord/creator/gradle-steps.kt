@@ -35,7 +35,7 @@ class BungeeGradleSupport : BuildSystemSupport {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> BungeeGradleFilesStep(parent).chain(
                 ::BungeePatchBuildGradleStep,
-                ::GradleWrapperStep
+                ::GradleWrapperStep,
             )
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)

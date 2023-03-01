@@ -269,7 +269,7 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     val file = PsiFileFactory.getInstance(project).createFileFromText(
         "$outerClassSimpleName.java",
         JavaFileType.INSTANCE,
-        text
+        text,
     ) as? PsiJavaFile ?: return null
 
     var clazz = file.classes.firstOrNull() ?: return null
@@ -278,7 +278,7 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     (
         JavaPsiFacade.getInstance(project).findClass(
             outerClassName.replace('/', '.'),
-            GlobalSearchScope.allScope(project)
+            GlobalSearchScope.allScope(project),
         ) as? PsiCompiledElement
         )?.let { originalClass ->
         clazz.putUserData(ClsElementImpl.COMPILED_ELEMENT, originalClass)
@@ -426,7 +426,7 @@ val FieldNode.memberReference
 
 fun FieldNode.getGenericType(
     clazz: ClassNode,
-    project: Project
+    project: Project,
 ): PsiType {
     if (this.signature != null) {
         return findOrConstructSourceField(clazz, project, canDecompile = false).type
@@ -439,7 +439,7 @@ inline fun <T> FieldNode.cached(
     clazz: ClassNode,
     project: Project,
     vararg dependencies: Any,
-    crossinline compute: () -> T
+    crossinline compute: () -> T,
 ): T {
     return findStubField(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
 }
@@ -457,7 +457,7 @@ fun FieldNode.findOrConstructSourceField(
     clazz: ClassNode?,
     project: Project,
     scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
-    canDecompile: Boolean = false
+    canDecompile: Boolean = false,
 ): PsiField {
     clazz?.let { findSourceField(it, project, scope, canDecompile = canDecompile) }?.let { return it }
 
@@ -475,7 +475,7 @@ fun FieldNode.findOrConstructSourceField(
     }
     val psiField = elementFactory.createField(
         this.name.toJavaIdentifier(),
-        type
+        type,
     )
     psiField.realName = this.name
     val modifierList = psiField.modifierList!!
@@ -496,7 +496,7 @@ fun FieldNode.findSourceField(
     clazz: ClassNode,
     project: Project,
     scope: GlobalSearchScope,
-    canDecompile: Boolean = false
+    canDecompile: Boolean = false,
 ): PsiField? {
     return clazz.findSourceClass(project, scope, canDecompile)?.findField(memberReference)
 }
@@ -645,7 +645,7 @@ private fun findAssociatedLambda(psiClass: PsiClass, clazz: ClassNode, lambdaMet
                         }
                     }
                 }
-            }
+            },
         )
         result
     }
@@ -655,7 +655,7 @@ inline fun <T> MethodNode.cached(
     clazz: ClassNode,
     project: Project,
     vararg dependencies: Array<Any>,
-    crossinline compute: () -> T
+    crossinline compute: () -> T,
 ): T {
     return findStubMethod(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
 }
@@ -691,7 +691,7 @@ fun MethodNode.findOrConstructSourceMethod(
     clazz: ClassNode?,
     project: Project,
     scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
-    canDecompile: Boolean = false
+    canDecompile: Boolean = false,
 ): PsiMethod {
     val sourceElement = clazz?.let { findSourceElement(it, project, scope, canDecompile = canDecompile) }
     if (sourceElement is PsiMethod) {
@@ -825,8 +825,8 @@ fun MethodNode.findOrConstructSourceMethod(
     if (exceptions != null) {
         psiMethod.throwsList.replace(
             elementFactory.createReferenceList(
-                exceptions.mapToArray { elementFactory.createReferenceFromText(it.replace('/', '.'), null) }
-            )
+                exceptions.mapToArray { elementFactory.createReferenceFromText(it.replace('/', '.'), null) },
+            ),
         )
     }
 
@@ -856,7 +856,7 @@ fun MethodNode.findSourceElement(
     clazz: ClassNode,
     project: Project,
     scope: GlobalSearchScope,
-    canDecompile: Boolean = false
+    canDecompile: Boolean = false,
 ): PsiElement? {
     val psiClass = clazz.findSourceClass(project, scope, canDecompile) ?: return null
     if (isClinit) {

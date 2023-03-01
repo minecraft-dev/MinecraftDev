@@ -98,8 +98,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
-        val environment = data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE
-        val envName = when (environment) {
+        val envName = when (data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE) {
             Side.CLIENT -> "client"
             Side.SERVER -> "server"
             else -> "*"
@@ -222,7 +221,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
             // find the class, and create it if it doesn't exist
             val clazz = JavaPsiFacade.getInstance(project).findClass(
                 entryPoint.className,
-                GlobalSearchScope.projectScope(project)
+                GlobalSearchScope.projectScope(project),
             ) ?: run {
                 val packageName = entryPoint.className.substringBeforeLast('.', missingDelimiterValue = "")
                 val className = entryPoint.className.substringAfterLast('.')
@@ -236,12 +235,12 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
                         val message = MCDevBundle.message(
                             "intention.error.cannot.create.class.message",
                             className,
-                            e.localizedMessage
+                            e.localizedMessage,
                         )
                         Messages.showErrorDialog(
                             project,
                             message,
-                            MCDevBundle.message("intention.error.cannot.create.class.title")
+                            MCDevBundle.message("intention.error.cannot.create.class.title"),
                         )
                     }
                     return
@@ -289,7 +288,7 @@ class FabricBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemS
 }
 
 class FabricPostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, FabricBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

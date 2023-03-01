@@ -25,7 +25,7 @@ class TrimKeyIntention : PsiElementBaseIntentionAction() {
 
     override fun isAvailable(project: Project, editor: Editor, element: PsiElement): Boolean {
         val translation = TranslationFiles.toTranslation(
-            TranslationFiles.seekTranslation(element) ?: return false
+            TranslationFiles.seekTranslation(element) ?: return false,
         ) ?: return false
 
         return translation.key != translation.trimmedKey

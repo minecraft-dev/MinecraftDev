@@ -45,10 +45,10 @@ class ShadowHandler : MixinMemberAnnotationHandler {
         return when (member) {
             is PsiMethod -> listOfNotNull(
                 targetClass.findMethod(MemberReference(name, member.descriptor))
-                    ?.let { MethodTargetMember(targetClass, it) }
+                    ?.let { MethodTargetMember(targetClass, it) },
             )
             is PsiField -> listOfNotNull(
-                targetClass.findFieldByName(name)?.let { FieldTargetMember(targetClass, it) }
+                targetClass.findFieldByName(name)?.let { FieldTargetMember(targetClass, it) },
             )
             else -> emptyList()
         }
@@ -79,13 +79,13 @@ class ShadowHandler : MixinMemberAnnotationHandler {
                 shadowTarget.classAndField.clazz,
                 member.project,
                 member.resolveScope,
-                canDecompile = false
+                canDecompile = false,
             )
             is MethodTargetMember -> shadowTarget.classAndMethod.method.findSourceElement(
                 shadowTarget.classAndMethod.clazz,
                 member.project,
                 member.resolveScope,
-                canDecompile = false
+                canDecompile = false,
             )
         }?.createSmartPointer()
     }
@@ -98,13 +98,13 @@ class ShadowHandler : MixinMemberAnnotationHandler {
                 shadowTarget.classAndField.clazz,
                 member.project,
                 member.resolveScope,
-                canDecompile = false
+                canDecompile = false,
             )
             is MethodTargetMember -> shadowTarget.classAndMethod.method.findOrConstructSourceMethod(
                 shadowTarget.classAndMethod.clazz,
                 member.project,
                 member.resolveScope,
-                canDecompile = false
+                canDecompile = false,
             )
         }.createSmartPointer()
     }

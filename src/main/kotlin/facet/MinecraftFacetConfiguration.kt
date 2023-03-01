@@ -39,5 +39,5 @@ data class MinecraftFacetConfigurationData(
     @XCollection(elementName = "platformType", valueAttributeName = "", style = XCollection.Style.v2)
     var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf(),
     @Tag("forgePatcher")
-    var forgePatcher: Boolean = false
+    var forgePatcher: Boolean = false,
 )

@@ -17,7 +17,7 @@ import com.intellij.openapi.externalSystem.model.project.ModuleData
 
 data class VanillaGradleData(
     val module: ModuleData,
-    val decompileTaskName: String
+    val decompileTaskName: String,
 ) : AbstractExternalEntityData(module.owner) {
     companion object {
         val KEY = Key.create(VanillaGradleData::class.java, ProjectKeys.TASK.processingWeight + 1)

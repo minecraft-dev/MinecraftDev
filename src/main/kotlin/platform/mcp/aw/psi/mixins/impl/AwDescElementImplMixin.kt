@@ -50,9 +50,11 @@ abstract class AwDescElementImplMixin(node: ASTNode) : ASTWrapperPsiElement(node
     }
 
     private fun asQualifiedName(): String? =
-        if (text.length > 1)
+        if (text.length > 1) {
             text.substring(1, text.length - 1).replace('/', '.')
-        else null
+        } else {
+            null
+        }
 
     override fun isSoft(): Boolean = false
 }

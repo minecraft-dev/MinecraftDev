@@ -147,7 +147,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
 
         if (useMixins) {
             assets.addTemplateProperties(
-                "MIXINS" to "true"
+                "MIXINS" to "true",
             )
             val commonMixinsFile = "common/src/main/resources/${buildSystemProps.artifactId}-common.mixins.json"
             val forgeMixinsFile = "forge/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
@@ -173,7 +173,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
 
 abstract class ArchitecturyMainClassStep(
     parent: NewProjectWizardStep,
-    phase: Int
+    phase: Int,
 ) : AbstractLongRunningAssetsStep(parent) {
     abstract val projectDir: String
     abstract val template: String
@@ -231,7 +231,7 @@ class ArchitecturyBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildS
 }
 
 class ArchitecturyPostBuildSystemStep(
-    parent: NewProjectWizardStep
+    parent: NewProjectWizardStep,
 ) : AbstractRunBuildSystemStep(parent, ArchitecturyBuildSystemStep::class.java) {
     override val step = BuildSystemSupport.POST_STEP
 }

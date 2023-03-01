@@ -30,8 +30,8 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 list.add(
                     InlayInfo(
                         "$size ${if (size == 1) "child" else "children"}",
-                        element.textRange.startOffset + 1
-                    )
+                        element.textRange.startOffset + 1,
+                    ),
                 )
             }
             is NbttList -> {
@@ -40,8 +40,8 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 list.add(
                     InlayInfo(
                         "$size ${if (size == 1) "child" else "children"}",
-                        element.textRange.startOffset + 1
-                    )
+                        element.textRange.startOffset + 1,
+                    ),
                 )
 
                 if (size > 5) {
@@ -56,8 +56,8 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 list.add(
                     InlayInfo(
                         "$size ${if (size == 1) "child" else "children"}",
-                        element.node.getChildren(null)[1].textRange.startOffset + 1
-                    )
+                        element.node.getChildren(null)[1].textRange.startOffset + 1,
+                    ),
                 )
 
                 if (size > 5) {
@@ -72,8 +72,8 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 list.add(
                     InlayInfo(
                         "$size ${if (size == 1) "child" else "children"}",
-                        element.node.getChildren(null)[1].textRange.startOffset + 1
-                    )
+                        element.node.getChildren(null)[1].textRange.startOffset + 1,
+                    ),
                 )
 
                 if (size > 5) {
@@ -88,8 +88,8 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 list.add(
                     InlayInfo(
                         "$size ${if (size == 1) "child" else "children"}",
-                        element.node.getChildren(null)[1].textRange.startOffset + 1
-                    )
+                        element.node.getChildren(null)[1].textRange.startOffset + 1,
+                    ),
                 )
 
                 // Index hints

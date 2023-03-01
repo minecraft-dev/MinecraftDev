@@ -12,6 +12,7 @@ package com.demonwav.mcdev.translations.index
 
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.Consumer
 import com.intellij.util.indexing.FileBasedIndex
@@ -19,7 +20,7 @@ import com.intellij.util.indexing.FileBasedIndex
 object TranslationInputFilter : FileBasedIndex.FileTypeSpecificInputFilter {
     override fun registerFileTypesUsedForIndexing(fileTypeSink: Consumer<in FileType>) {
         for (fileType in TranslationProvider.INSTANCES.keys) {
-            fileTypeSink.consume(fileType)
+            fileTypeSink.consume(FileTypeManager.getInstance().findFileTypeByName(fileType))
         }
     }
 

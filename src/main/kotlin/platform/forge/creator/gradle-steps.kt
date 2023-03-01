@@ -123,7 +123,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         WriteAction.runAndWait<Throwable> {
             val dir = VfsUtil.createDirectoryIfMissing(
                 LocalFileSystem.getInstance(),
-                "${assets.outputDirectory}/.gradle"
+                "${assets.outputDirectory}/.gradle",
             )
                 ?: throw IllegalStateException("Unable to create .gradle directory")
             val file = dir.findOrCreateChildData(this, MAGIC_RUN_CONFIGS_FILE)

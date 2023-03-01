@@ -38,7 +38,7 @@ class NbttBraceMatcher : PairedBraceMatcher {
     override fun getPairs() = arrayOf(
         BracePair(NbttTypes.LPAREN, NbttTypes.RPAREN, true),
         BracePair(NbttTypes.LBRACE, NbttTypes.RBRACE, true),
-        BracePair(NbttTypes.LBRACKET, NbttTypes.RBRACKET, true)
+        BracePair(NbttTypes.LBRACKET, NbttTypes.RBRACKET, true),
     )
 
     override fun isPairedBracesAllowedBeforeType(lbraceType: IElementType, contextType: IElementType?) = true

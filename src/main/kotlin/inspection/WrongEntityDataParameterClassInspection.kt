@@ -60,7 +60,7 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
                 holder.registerProblem(
                     expression,
                     "Entity class does not match this entity class",
-                    QuickFix(firstParameter)
+                    QuickFix(firstParameter),
                 )
             }
         }
@@ -77,8 +77,8 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
             firstParameter.replace(
                 factory.createExpressionFromText(
                     "${containingClass.name}.class",
-                    firstParameter
-                )
+                    firstParameter,
+                ),
             )
         }
 
@@ -93,12 +93,12 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
         private val ENTITY_DATA_MANAGER_CLASSES = setOf(
             "net.minecraft.network.datasync.EntityDataManager",
             "net.minecraft.network.syncher.SynchedEntityData",
-            "net.minecraft.entity.data.DataTracker"
+            "net.minecraft.entity.data.DataTracker",
         )
         private val DEFINE_ID_METHODS = setOf(
             "defineId",
             "createKey",
-            "registerData"
+            "registerData",
         )
 
         private fun isEntitySubclass(clazz: PsiClass): Boolean =

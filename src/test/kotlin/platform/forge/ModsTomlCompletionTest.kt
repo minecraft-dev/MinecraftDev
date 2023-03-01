@@ -42,7 +42,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "loaderVersion",
             "license",
             "showAsResourcePack",
-            "issueTrackerURL"
+            "issueTrackerURL",
         )
     }
 
@@ -61,7 +61,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "credits",
             "authors",
             "displayTest",
-            "description"
+            "description",
         )
     }
 
@@ -74,7 +74,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "mandatory",
             "versionRange",
             "ordering",
-            "side"
+            "side",
         )
     }
 
@@ -98,7 +98,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "MATCH_VERSION",
             "IGNORE_SERVER_VERSION",
             "IGNORE_ALL_VERSION",
-            "NONE"
+            "NONE",
         )
     }
 
@@ -119,7 +119,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
     fun stringCompletionFromNothing() {
         myFixture.testCompletion(
             "stringCompletionFromNothing/mods.toml",
-            "stringCompletionFromNothing/mods.toml.after"
+            "stringCompletionFromNothing/mods.toml.after",
         )
     }
 
@@ -128,7 +128,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
     fun stringCompletion() {
         myFixture.testCompletion(
             "stringCompletion/mods.toml",
-            "stringCompletion/mods.toml.after"
+            "stringCompletion/mods.toml.after",
         )
     }
 }

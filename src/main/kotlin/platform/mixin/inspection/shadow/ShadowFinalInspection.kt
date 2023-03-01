@@ -40,7 +40,7 @@ class ShadowFinalInspection : MixinInspection() {
                 holder.registerProblem(
                     expression,
                     "@Final fields cannot be modified",
-                    AddAnnotationFix(MUTABLE, resolved)
+                    AddAnnotationFix(MUTABLE, resolved),
                 )
             }
         }

@@ -23,7 +23,7 @@ class AnonymousFeedbackTask(
     private val params: LinkedHashMap<String, String?>,
     private val attachments: List<Attachment>,
     private val callback: (String, Int, Boolean) -> Unit,
-    private val errorCallback: (Exception) -> Unit
+    private val errorCallback: (Exception) -> Unit,
 ) : Task.Backgroundable(project, title, canBeCancelled) {
 
     override fun run(indicator: ProgressIndicator) {

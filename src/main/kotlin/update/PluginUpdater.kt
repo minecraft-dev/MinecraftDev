@@ -138,7 +138,7 @@ object PluginUpdater {
                         e.printStackTrace()
                     }
                 }
-            }
+            },
         )
     }
 }

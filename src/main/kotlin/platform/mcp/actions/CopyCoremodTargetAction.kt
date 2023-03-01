@@ -35,7 +35,7 @@ class CopyCoremodTargetAction : SrgActionBase() {
                     data.element,
                     Pair("target", "FIELD"),
                     Pair("class", classSrg),
-                    Pair("fieldName", srg.name)
+                    Pair("fieldName", srg.name),
                 )
             }
             is PsiMethod -> {
@@ -49,7 +49,7 @@ class CopyCoremodTargetAction : SrgActionBase() {
                     Pair("target", "METHOD"),
                     Pair("class", classSrg),
                     Pair("methodName", srg.name),
-                    Pair("methodDesc", srgDescriptor)
+                    Pair("methodDesc", srgDescriptor),
                 )
             }
             is PsiClass -> {

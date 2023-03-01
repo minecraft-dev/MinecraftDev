@@ -22,11 +22,11 @@ data class BuildDependency(
     val artifactId: String = "",
     val version: String = "",
     val mavenScope: String? = null,
-    val gradleConfiguration: String? = null
+    val gradleConfiguration: String? = null,
 )
 
 data class BuildRepository(
     var id: String = "",
     var url: String = "",
-    val buildSystems: EnumSet<BuildSystemType> = EnumSet.allOf(BuildSystemType::class.java)
+    val buildSystems: EnumSet<BuildSystemType> = EnumSet.allOf(BuildSystemType::class.java),
 )

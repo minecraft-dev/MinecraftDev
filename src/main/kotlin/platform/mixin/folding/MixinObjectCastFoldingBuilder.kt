@@ -42,7 +42,7 @@ class MixinObjectCastFoldingBuilder : CustomFoldingBuilder() {
         descriptors: MutableList<FoldingDescriptor>,
         root: PsiElement,
         document: Document,
-        quick: Boolean
+        quick: Boolean,
     ) {
         if (root !is PsiJavaFile || !MixinModuleType.isInModule(root)) {
             return
@@ -73,8 +73,8 @@ class MixinObjectCastFoldingBuilder : CustomFoldingBuilder() {
                 descriptors.add(
                     FoldingDescriptor(
                         expression.node,
-                        TextRange(start.startOffset, end.startOffset + end.textLength)
-                    )
+                        TextRange(start.startOffset, end.startOffset + end.textLength),
+                    ),
                 )
             }
         }

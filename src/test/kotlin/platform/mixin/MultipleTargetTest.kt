@@ -55,7 +55,7 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 
@@ -78,7 +78,7 @@ class MultipleTargetTest : BaseMixinTest() {
                 public void onMethod() {
                 }
             }
-            """
+            """,
         )
     }
 }

@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.synchronize
+import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -80,7 +81,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                 val insns = handler.resolveInstructions(
                                     annotation,
                                     targetMethod.clazz,
-                                    targetMethod.method
+                                    targetMethod.method,
                                 )
                                 shouldBeStatic = insns.any {
                                     methodInsns.indexOf(it.insn) <= methodInsns.indexOf(superCtorCall)
@@ -97,8 +98,8 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     modifiers,
                                     PsiModifier.STATIC,
                                     true,
-                                    false
-                                )
+                                    false,
+                                ),
                             )
                         }
                     }
@@ -109,7 +110,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         val possibleSignatures = handler.expectedMethodSignature(
                             annotation,
                             targetMethod.clazz,
-                            targetMethod.method
+                            targetMethod.method,
                         ) ?: continue
 
                         val annotationName = annotation.nameReferenceElement?.referenceName
@@ -118,7 +119,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             reportedSignature = true
                             holder.registerProblem(
                                 parameters,
-                                "There are no possible signatures for this injector"
+                                "There are no possible signatures for this injector",
                             )
                             continue
                         }
@@ -149,7 +150,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     "Method parameters do not match expected parameters for $annotationName"
                                 val quickFix = ParametersQuickFix(
                                     expectedParameters,
-                                    handler is InjectAnnotationHandler
+                                    handler is InjectAnnotationHandler,
                                 )
                                 if (checkResult == CheckResult.ERROR) {
                                     holder.registerProblem(parameters, description, quickFix)
@@ -158,7 +159,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                         parameters,
                                         description,
                                         ProblemHighlightType.WARNING,
-                                        quickFix
+                                        quickFix,
                                     )
                                 }
                             }
@@ -176,8 +177,8 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     QuickFixFactory.getInstance().createMethodReturnFix(
                                         method,
                                         expectedReturnType,
-                                        false
-                                    )
+                                        false,
+                                    ),
                                 )
                             }
                         }
@@ -211,7 +212,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             expectedReturnType: PsiType,
             methodReturnType: PsiType,
             method: PsiMethod,
-            allowCoerce: Boolean
+            allowCoerce: Boolean,
         ): Boolean {
             val expectedErasure = TypeConversionUtil.erasure(expectedReturnType)
             val returnErasure = TypeConversionUtil.erasure(methodReturnType)
@@ -230,7 +231,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
         private fun checkParameters(
             parameterList: PsiParameterList,
             expected: List<ParameterGroup>,
-            allowCoerce: Boolean
+            allowCoerce: Boolean,
         ): CheckResult {
             val parameters = parameterList.parameters
             val parametersWithoutSugar = parameters.dropLastWhile { it.isMixinExtrasSugar }.toTypedArray()
@@ -279,8 +280,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
     }
 
     private class ParametersQuickFix(
+        @SafeFieldForPreview
         private val expected: List<ParameterGroup>,
-        isInject: Boolean
+        isInject: Boolean,
     ) : LocalQuickFix {
 
         private val fixName = if (isInject) {
@@ -311,7 +313,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             p.name ?: JavaCodeStyleManager.getInstance(project)
                                 .suggestVariableName(VariableKind.PARAMETER, null, null, p.type).names
                                 .firstOrNull() ?: "var$i",
-                            p.type
+                            p.type,
                         )
                     }
                 } else {

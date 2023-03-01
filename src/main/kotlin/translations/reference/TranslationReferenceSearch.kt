@@ -63,7 +63,7 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
                     }
                     true
                 },
-                FindUsagesProcessPresentation(UsageViewPresentation())
+                FindUsagesProcessPresentation(UsageViewPresentation()),
             )
         }
         return true

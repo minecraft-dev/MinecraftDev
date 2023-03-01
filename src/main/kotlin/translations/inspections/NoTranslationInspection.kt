@@ -39,7 +39,7 @@ class NoTranslationInspection : TranslationInspection() {
                     "The given translation key does not exist",
                     ProblemHighlightType.GENERIC_ERROR,
                     CreateTranslationQuickFix,
-                    ChangeTranslationQuickFix("Use existing translation")
+                    ChangeTranslationQuickFix("Use existing translation"),
                 )
             }
         }
@@ -57,7 +57,7 @@ class NoTranslationInspection : TranslationInspection() {
                 val result = Messages.showInputDialog(
                     "Enter default value for \"$key\":",
                     "Create Translation",
-                    Messages.getQuestionIcon()
+                    Messages.getQuestionIcon(),
                 )
                 if (result != null) {
                     TranslationFiles.add(literal, key, result)

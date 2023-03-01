@@ -77,14 +77,14 @@ class MixinCancellableInspection : MixinInspection() {
                     method.nameIdentifier ?: method,
                     "@Inject must be marked as cancellable in order to be cancelled",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                    MakeInjectCancellableFix(injectAnnotation)
+                    MakeInjectCancellableFix(injectAnnotation),
                 )
             } else if (!definitelyUsesCancel && !mayUseCancel && isCancellable) {
                 holder.registerProblem(
                     cancellableAttribute.parent,
                     "@Inject is cancellable but is never cancelled",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                    RemoveInjectCancellableFix(injectAnnotation)
+                    RemoveInjectCancellableFix(injectAnnotation),
                 )
             }
         }
@@ -102,7 +102,7 @@ class MixinCancellableInspection : MixinInspection() {
             file: PsiFile,
             editor: Editor?,
             startElement: PsiElement,
-            endElement: PsiElement
+            endElement: PsiElement,
         ) {
             val annotation = startElement as PsiAnnotation
             val value = PsiElementFactory.getInstance(project).createExpressionFromText("true", annotation)
@@ -122,7 +122,7 @@ class MixinCancellableInspection : MixinInspection() {
             file: PsiFile,
             editor: Editor?,
             startElement: PsiElement,
-            endElement: PsiElement
+            endElement: PsiElement,
         ) {
             val annotation = startElement as PsiAnnotation
             annotation.setDeclaredAttributeValue("cancellable", null)

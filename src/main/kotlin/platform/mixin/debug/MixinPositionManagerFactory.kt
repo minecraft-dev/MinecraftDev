@@ -16,5 +16,5 @@ import com.intellij.debugger.engine.DebugProcess
 
 class MixinPositionManagerFactory : PositionManagerFactory() {
 
-    override fun createPositionManager(process: DebugProcess): PositionManager? = MixinPositionManager(process)
+    override fun createPositionManager(process: DebugProcess): PositionManager = MixinPositionManager(process)
 }

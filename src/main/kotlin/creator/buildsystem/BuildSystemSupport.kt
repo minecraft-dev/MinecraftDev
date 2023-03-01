@@ -21,7 +21,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 interface BuildSystemSupport {
     companion object {
         private val EP_NAME = ExtensionPointName<KeyedLazyInstance<BuildSystemSupport>>(
-            "com.demonwav.minecraft-dev.buildSystemSupport"
+            "com.demonwav.minecraft-dev.buildSystemSupport",
         )
         private val COLLECTOR = KeyedExtensionCollector<BuildSystemSupport, Pair<String, String>>(EP_NAME)
 

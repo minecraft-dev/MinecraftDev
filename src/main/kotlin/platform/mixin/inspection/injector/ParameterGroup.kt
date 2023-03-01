@@ -22,7 +22,7 @@ data class ParameterGroup(
     val parameters: List<Parameter>,
     val required: RequiredLevel = RequiredLevel.ERROR_IF_ABSENT,
     val default: Boolean = required != RequiredLevel.OPTIONAL,
-    val isVarargs: Boolean = false
+    val isVarargs: Boolean = false,
 ) {
 
     val size

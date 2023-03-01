@@ -31,7 +31,7 @@ class TemplateOutdatedStep(parent: NewProjectWizardStep) : AbstractNewProjectWiz
                     "&operating-system=${SystemInfoRt.OS_NAME.urlEncode()}"
                 text(
                     "Is the Minecraft project wizard outdated? " +
-                        "<a href=\"$issueUrl\">Create an issue</a> on the MinecraftDev issue tracker."
+                        "<a href=\"$issueUrl\">Create an issue</a> on the MinecraftDev issue tracker.",
                 )
             }
         }

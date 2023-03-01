@@ -33,7 +33,7 @@ import java.awt.Component
 class ErrorReporter : ErrorReportSubmitter() {
     private val ignoredErrorMessages = listOf(
         "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
-        "Inspection #EntityConstructor has no description"
+        "Inspection #EntityConstructor has no description",
     )
     override fun getReportActionText() = "Report to Minecraft Dev GitHub Issue Tracker"
 
@@ -41,7 +41,7 @@ class ErrorReporter : ErrorReportSubmitter() {
         events: Array<out IdeaLoggingEvent>,
         additionalInfo: String?,
         parentComponent: Component,
-        consumer: Consumer<in SubmittedReportInfo>
+        consumer: Consumer<in SubmittedReportInfo>,
     ): Boolean {
         val dataContext = DataManager.getInstance().getDataContext(parentComponent)
         val project = CommonDataKeys.PROJECT.getData(dataContext)
@@ -108,7 +108,7 @@ class ErrorReporter : ErrorReportSubmitter() {
                 NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
                     DiagnosticBundle.message("error.report.title"),
                     message,
-                    NotificationType.INFORMATION
+                    NotificationType.INFORMATION,
                 ).addAction(BrowseNotificationAction(actionText, htmlUrl)).setImportant(false).notify(project)
 
                 val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", type)
@@ -125,7 +125,7 @@ class ErrorReporter : ErrorReportSubmitter() {
                 ).addAction(BrowseNotificationAction(actionText, userUrl)).setImportant(false).notify(project)
 
                 consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
-            }
+            },
         )
 
         if (project == null) {

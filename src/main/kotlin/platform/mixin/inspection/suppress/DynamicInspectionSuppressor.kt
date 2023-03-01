@@ -27,7 +27,7 @@ class DynamicInspectionSuppressor : InspectionSuppressor {
         "ShadowModifiers",
         "UnqualifiedMemberReference",
         "UnnecessaryQualifiedMemberReference",
-        "UnresolvedMixinReference"
+        "UnresolvedMixinReference",
     )
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {

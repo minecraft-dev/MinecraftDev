@@ -19,7 +19,7 @@ import com.intellij.ui.classFilter.DebuggerClassFilterProvider
 class MixinDebuggerClassFilterProvider : DebuggerClassFilterProvider {
 
     private val filters = listOf(
-        ClassFilter("org.spongepowered.asm.mixin.injection.callback.*")
+        ClassFilter("org.spongepowered.asm.mixin.injection.callback.*"),
     )
 
     override fun getFilters(): List<ClassFilter> {

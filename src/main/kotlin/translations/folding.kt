@@ -33,7 +33,7 @@ class TranslationCodeFoldingOptionsProvider :
         title = "Minecraft"
         checkBox(
             "Translation Strings",
-            TranslationFoldingSettings.instance::shouldFoldTranslations
+            TranslationFoldingSettings.instance::shouldFoldTranslations,
         ) {
             TranslationFoldingSettings.instance.shouldFoldTranslations = it
         }
@@ -44,7 +44,7 @@ class TranslationCodeFoldingOptionsProvider :
 class TranslationFoldingSettings : PersistentStateComponent<TranslationFoldingSettings.State> {
 
     data class State(
-        var shouldFoldTranslations: Boolean = true
+        var shouldFoldTranslations: Boolean = true,
     )
 
     private var state = State()
@@ -98,8 +98,8 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
                             "\"Insufficient parameters for formatting '${translation.text}'\""
                         } else {
                             "\"${translation.text}\""
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }

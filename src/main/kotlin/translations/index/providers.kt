@@ -38,9 +38,11 @@ interface TranslationProvider {
     fun findElements(project: Project, file: VirtualFile, key: String): List<PsiElement>
 
     companion object {
+        // Use name, using FileType as map keys can leak and cause problems with plugin unloading
+        // name is unique among all file types
         val INSTANCES = mapOf(
-            JsonFileType.INSTANCE to JsonTranslationProvider,
-            LangFileType to LangTranslationProvider
+            JsonFileType.INSTANCE.name to JsonTranslationProvider,
+            LangFileType.name to LangTranslationProvider,
         )
     }
 }
@@ -67,19 +69,19 @@ object JsonTranslationProvider : TranslationProvider {
         val psiFile = PsiManager.getInstance(project).findFile(file) as? JsonFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
-            Key<CachedValue<List<JsonProperty>>>("translation_lookup.$key")
+            Key<CachedValue<List<JsonProperty>>>("translation_lookup.$key"),
         ) {
             val value = psiFile.topLevelValue as? JsonObject
             CachedValueProvider.Result.create(
                 value?.propertyList?.filter { it.name == key } ?: emptyList(),
-                PsiModificationTracker.MODIFICATION_COUNT
+                PsiModificationTracker.MODIFICATION_COUNT,
             )
         }
     }
 }
 
 object LangTranslationProvider : TranslationProvider {
-    override fun map(domain: String, input: FileContent): TranslationIndexEntry? {
+    override fun map(domain: String, input: FileContent): TranslationIndexEntry {
         val translations = input.contentAsText
             .lineSequence()
             .filter { !it.startsWith("#") && it.isNotEmpty() }
@@ -94,11 +96,11 @@ object LangTranslationProvider : TranslationProvider {
         val psiFile = PsiManager.getInstance(project).findFile(file) as? LangFile ?: return emptyList()
         return CachedValuesManager.getCachedValue(
             psiFile,
-            Key("translation_lookup.$key")
+            Key("translation_lookup.$key"),
         ) {
             CachedValueProvider.Result.create(
                 psiFile.childrenOfType<LangEntry>().filter { it.key == key },
-                PsiModificationTracker.MODIFICATION_COUNT
+                PsiModificationTracker.MODIFICATION_COUNT,
             )
         }
     }

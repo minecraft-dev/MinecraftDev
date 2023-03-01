@@ -22,7 +22,7 @@ import com.intellij.ui.dsl.builder.Panel
 
 class SimpleMcVersionStep(
     parent: NewProjectWizardStep,
-    versions: List<SemanticVersion>
+    versions: List<SemanticVersion>,
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Minecraft Version:"
 
@@ -45,7 +45,7 @@ class SimpleMcVersionStep(
         val version = SemanticVersion.tryParse(version) ?: return
         findStep<JdkProjectSetupFinalizer>().setPreferredJdk(
             MinecraftVersions.requiredJavaVersion(version),
-            "Minecraft $version"
+            "Minecraft $version",
         )
     }
 
@@ -56,7 +56,7 @@ class SimpleMcVersionStep(
 
 abstract class AbstractMcVersionChainStep(
     parent: NewProjectWizardStep,
-    vararg otherLabels: String
+    vararg otherLabels: String,
 ) : AbstractVersionChainStep(parent, *(listOf("Minecraft Version:") + otherLabels).toTypedArray()) {
     companion object {
         const val MINECRAFT_VERSION = 0
@@ -81,7 +81,7 @@ abstract class AbstractMcVersionChainStep(
         val version = SemanticVersion.tryParse(getVersion(MINECRAFT_VERSION).toString()) ?: return
         findStep<JdkProjectSetupFinalizer>().setPreferredJdk(
             MinecraftVersions.requiredJavaVersion(version),
-            "Minecraft ${getVersion(MINECRAFT_VERSION)}"
+            "Minecraft ${getVersion(MINECRAFT_VERSION)}",
         )
     }
 }

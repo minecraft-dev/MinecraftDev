@@ -26,7 +26,7 @@ class VanillaGradleDataService : AbstractProjectDataService<VanillaGradleData, M
         toImport: Collection<DataNode<VanillaGradleData>>,
         projectData: ProjectData?,
         project: Project,
-        modelsProvider: IdeModifiableModelsProvider
+        modelsProvider: IdeModifiableModelsProvider,
     ) {
         // Dummy service to enable platform-side DataNodes cache
     }

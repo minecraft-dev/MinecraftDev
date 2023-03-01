@@ -89,7 +89,7 @@ class InvokerHandler : MixinMemberAnnotationHandler {
             invokerTarget.classAndMethod.clazz,
             member.project,
             member.resolveScope,
-            canDecompile = false
+            canDecompile = false,
         ).createSmartPointer()
     }
 

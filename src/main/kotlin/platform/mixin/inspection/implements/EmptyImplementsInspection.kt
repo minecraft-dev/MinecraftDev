@@ -33,11 +33,11 @@ class EmptyImplementsInspection : MixinInspection() {
             }
 
             val interfaces = annotation.findDeclaredAttributeValue(null)?.findAnnotations()
-            if (interfaces == null || interfaces.isEmpty()) {
+            if (interfaces.isNullOrEmpty()) {
                 holder.registerProblem(
                     annotation,
                     "@Implements is redundant",
-                    RemoveAnnotationQuickFix(annotation, null)
+                    RemoveAnnotationQuickFix(annotation, null),
                 )
             }
         }

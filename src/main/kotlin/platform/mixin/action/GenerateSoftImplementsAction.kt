@@ -64,7 +64,7 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
             return
         }
 
-        val chooser = MemberChooser<PsiMethodMember>(methods.keys.toTypedArray(), false, true, project)
+        val chooser = MemberChooser(methods.keys.toTypedArray(), false, true, project)
         chooser.title = "Select Methods to Soft-implement"
         chooser.show()
 
@@ -83,14 +83,14 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
                         method,
                         it.substitutor,
                         chooser.isCopyJavadoc,
-                        false
+                        false,
                     )
                         .map { m ->
                             // Apply prefix
                             m.name = prefix + m.name
                             OverrideImplementUtil.createGenerationInfo(m)
                         }
-                }
+                },
             ).firstOrNull()?.positionCaret(editor, true)
         }
     }

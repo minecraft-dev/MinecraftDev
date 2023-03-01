@@ -67,7 +67,7 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
 
 class VelocityVersionStep(
     parent: NewProjectWizardStep,
-    versions: List<SemanticVersion>
+    versions: List<SemanticVersion>,
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label = "Velocity Version:"
 

@@ -34,7 +34,7 @@ class NbttBlock(
     private val node: ASTNode,
     private val settings: CodeStyleSettings,
     private val indent: Indent,
-    private val wrap: Wrap?
+    private val wrap: Wrap?,
 ) : ASTBlock {
 
     private val psiElement = node.psi

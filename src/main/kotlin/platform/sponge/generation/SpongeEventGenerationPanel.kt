@@ -23,7 +23,7 @@ class SpongeEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(c
     private lateinit var eventOrderComboBox: JComboBox<String>
     private lateinit var ignoreCanceledCheckBox: JCheckBox
 
-    override val panel: JPanel?
+    override val panel: JPanel
         get() {
             ignoreCanceledCheckBox.isSelected = true
 
@@ -43,7 +43,7 @@ class SpongeEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(c
             return parentPanel
         }
 
-    override fun gatherData(): GenerationData? {
+    override fun gatherData(): GenerationData {
         return SpongeGenerationData(ignoreCanceledCheckBox.isSelected, eventOrderComboBox.selectedItem as String)
     }
 }

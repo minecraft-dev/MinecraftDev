@@ -17,7 +17,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 
 class BungeeMainPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatformStep(parent, PlatformType.BUNGEECORD) {
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
-        BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/")
+        BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"),
     )
 
     override fun getDependencies(mcVersion: SemanticVersion) = listOf(
@@ -26,8 +26,8 @@ class BungeeMainPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatfor
             "bungeecord-api",
             mcVersion.toString(),
             mavenScope = "provided",
-            gradleConfiguration = "compileOnly"
-        )
+            gradleConfiguration = "compileOnly",
+        ),
     )
 
     class Factory : BungeePlatformStep.Factory {
@@ -42,7 +42,7 @@ class WaterfallPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatform
         BuildRepository("sonatype", "https://oss.sonatype.org/content/groups/public/"),
         BuildRepository(
             "papermc-repo",
-            "https://repo.papermc.io/repository/maven-public/"
+            "https://repo.papermc.io/repository/maven-public/",
         ),
     )
 
@@ -52,7 +52,7 @@ class WaterfallPlatformStep(parent: BungeePlatformStep) : AbstractBungeePlatform
             "waterfall-api",
             "$mcVersion-SNAPSHOT",
             mavenScope = "provided",
-            gradleConfiguration = "compileOnly"
+            gradleConfiguration = "compileOnly",
         ),
     )
 

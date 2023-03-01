@@ -47,19 +47,19 @@ class NbttParserDefinition : ParserDefinition {
             NbttTypes.INT_ARRAY,
             NbttTypes.LONG_ARRAY,
             NbttTypes.COMPOUND,
-            NbttTypes.LIST
+            NbttTypes.LIST,
         )
 
         val NBTT_OPEN_BRACES = TokenSet.create(
             NbttTypes.LPAREN,
             NbttTypes.LBRACE,
-            NbttTypes.LBRACKET
+            NbttTypes.LBRACKET,
         )
 
         val NBTT_CLOSE_BRACES = TokenSet.create(
             NbttTypes.RPAREN,
             NbttTypes.RBRACE,
-            NbttTypes.RBRACKET
+            NbttTypes.RBRACKET,
         )
 
         val NBTT_BRACES = TokenSet.orSet(NBTT_OPEN_BRACES, NBTT_CLOSE_BRACES)

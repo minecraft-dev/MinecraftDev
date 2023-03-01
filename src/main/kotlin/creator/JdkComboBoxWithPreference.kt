@@ -107,7 +107,7 @@ class JdkComboBoxWithPreference internal constructor(
 fun Row.jdkComboBoxWithPreference(
     context: WizardContext,
     sdkProperty: ObservableMutableProperty<Sdk?>,
-    sdkPropertyId: String
+    sdkPropertyId: String,
 ): Cell<JdkComboBoxWithPreference> {
     val sdkModel = ProjectSdksModel()
 
@@ -152,7 +152,7 @@ fun Row.jdkComboBoxWithPreference(
                     preferenceData.sdkPathByJdk[jdk] = homePath
                     stateComponent.setList(
                         preferenceDataProperty,
-                        preferenceData.sdkPathByJdk.map { (jdk, sdk) -> "${jdk.ordinal}=$sdk" }
+                        preferenceData.sdkPathByJdk.map { (jdk, sdk) -> "${jdk.ordinal}=$sdk" },
                     )
                 }
             }

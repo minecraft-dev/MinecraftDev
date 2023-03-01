@@ -20,7 +20,7 @@ data class FabricLoomData(
     val module: ModuleData,
     val tinyMappings: File?,
     val decompileTasks: Map<String, Set<Decompiler>>,
-    val splitMinecraftJar: Boolean
+    val splitMinecraftJar: Boolean,
 ) : AbstractExternalEntityData(module.owner) {
 
     data class Decompiler(val name: String, val taskName: String, val sourcesPath: String)

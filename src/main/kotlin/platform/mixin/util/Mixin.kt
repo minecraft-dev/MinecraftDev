@@ -11,10 +11,10 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.action.FindMixinsAction
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.ACCESSOR
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.ARGS
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
 import com.demonwav.mcdev.util.cached
@@ -30,6 +30,7 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiDisjunctionType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIntersectionType
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
@@ -81,7 +82,7 @@ val PsiClass.mixinTargets: List<ClassNode>
                     findClassNodeByQualifiedName(
                         project,
                         findModule(),
-                        name.replace('/', '.')
+                        name.replace('/', '.'),
                     )
                 }
             classTargets
@@ -144,9 +145,6 @@ fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType
     return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
 }
 
-fun argsType(project: Project): PsiType =
-    PsiType.getTypeByName(ARGS, project, GlobalSearchScope.allScope(project))
-
 fun isAssignable(left: PsiType, right: PsiType): Boolean {
     return when {
         left is PsiIntersectionType -> left.conjuncts.all { isAssignable(it, right) }
@@ -186,4 +184,19 @@ private fun isClassAssignable(leftClass: PsiClass, rightClass: PsiClass): Boolea
         }
     }
     return result
+}
+
+fun isMixinEntryPoint(element: PsiElement?): Boolean {
+    if (element !is PsiMethod) {
+        return false
+    }
+    val project = element.project
+    for (annotation in element.annotations) {
+        val qName = annotation.qualifiedName ?: continue
+        val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
+        if (handler != null && handler.isEntryPoint) {
+            return true
+        }
+    }
+    return false
 }

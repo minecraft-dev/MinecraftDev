@@ -18,5 +18,5 @@ import kotlinx.coroutines.async
 
 fun <T> CoroutineScope.asyncIO(
     start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend CoroutineScope.() -> T
+    block: suspend CoroutineScope.() -> T,
 ): Deferred<T> = async(Dispatchers.IO, start, block)

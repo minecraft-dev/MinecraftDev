@@ -139,7 +139,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                             lifetime?.let(Disposer::dispose)
                             lifetime = null
                         }
-                    }
+                    },
                 )
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .validation(DialogValidation { ValidationInfo("Haven't finished $description") })

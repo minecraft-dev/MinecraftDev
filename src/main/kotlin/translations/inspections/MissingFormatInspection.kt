@@ -42,7 +42,7 @@ class MissingFormatInspection : TranslationInspection() {
                     expression,
                     "There are missing formatting arguments to satisfy '${result.text}'",
                     ProblemHighlightType.GENERIC_ERROR,
-                    *quickFixes
+                    *quickFixes,
                 )
             }
         }

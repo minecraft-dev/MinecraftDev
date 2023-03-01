@@ -30,7 +30,7 @@ class ModsTomlDocumentationProvider : DocumentationProvider {
         editor: Editor,
         file: PsiFile,
         contextElement: PsiElement?,
-        targetOffset: Int
+        targetOffset: Int,
     ): PsiElement? {
         if (!isModsToml(contextElement)) {
             return null

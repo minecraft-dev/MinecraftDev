@@ -35,7 +35,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
-import kotlin.jvm.Throws
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.jps.model.java.JavaSourceRootType
 
@@ -43,7 +42,7 @@ class MinecraftFacet(
     module: Module,
     name: String,
     configuration: MinecraftFacetConfiguration,
-    underlyingFacet: Facet<*>?
+    underlyingFacet: Facet<*>?,
 ) : Facet<MinecraftFacetConfiguration>(facetType, module, name, configuration, underlyingFacet) {
 
     private val moduleMap = ConcurrentHashMap<AbstractModuleType<*>, AbstractModule>()

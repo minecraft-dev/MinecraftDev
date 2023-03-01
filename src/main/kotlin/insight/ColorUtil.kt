@@ -85,7 +85,7 @@ fun UIdentifier.findColor(
     className: String,
     vectorClasses: Array<String>?,
     maxDepth: Int = 10,
-    depth: Int = 0
+    depth: Int = 0,
 ): Pair<Color, UElement>? {
     if (depth >= maxDepth) {
         return null
@@ -133,7 +133,7 @@ fun UIdentifier.findColor(
 
 private fun findColorFromCallExpression(
     methodExpression: UCallExpression,
-    vectorClasses: Array<String>?
+    vectorClasses: Array<String>?,
 ): Pair<Color, UElement>? {
     val project = methodExpression.sourcePsi?.project ?: return null
 

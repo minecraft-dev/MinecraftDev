@@ -53,7 +53,7 @@ class AtParserDefinition : ParserDefinition {
             (AtTypes.ASTERISK to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
             (AtTypes.COMMENT to AtTypes.KEYWORD) to ParserDefinition.SpaceRequirements.MUST_LINE_BREAK,
             (AtTypes.COMMENT to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST_LINE_BREAK,
-            (AtTypes.FUNCTION to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST
+            (AtTypes.FUNCTION to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
         )
     }
 }

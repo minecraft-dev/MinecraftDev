@@ -37,7 +37,7 @@ class SoftImplementTest : BaseMixinTest() {
 
                     }
                     """,
-                    configure = false
+                    configure = false,
                 )
 
                 java(
@@ -62,7 +62,7 @@ class SoftImplementTest : BaseMixinTest() {
                         }
 
                     }
-                    """
+                    """,
                 )
             }
         }

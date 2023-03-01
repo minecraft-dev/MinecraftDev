@@ -60,7 +60,7 @@ class GenerateAccessorAction : BaseGenerateAction(GenerateAccessorHandler()) {
             },
             commandName,
             DocCommandGroupId.noneGroupId(editor.document),
-            editor.document
+            editor.document,
         )
     }
 

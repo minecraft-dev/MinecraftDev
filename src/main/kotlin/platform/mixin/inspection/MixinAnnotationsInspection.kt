@@ -43,7 +43,7 @@ class MixinAnnotationsInspection : MixinInspection() {
                 holder.registerProblem(
                     annotation,
                     "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
-                    RemoveAnnotationQuickFix(annotation, null)
+                    RemoveAnnotationQuickFix(annotation, null),
                 )
             }
         }

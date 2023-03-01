@@ -71,7 +71,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
             "FORGE_VERSION" to "$mcVersion-$forgeVersion",
             "FABRIC_LOADER_VERSION" to fabricLoaderVersion,
             "ARCHITECTURY_GROUP" to architecturyGroup,
-            "JAVA_VERSION" to javaVersion
+            "JAVA_VERSION" to javaVersion,
         )
 
         if (fabricApiVersion != null) {

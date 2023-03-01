@@ -90,22 +90,22 @@ class NbtParseTest {
                                             listOf(
                                                 TagCompound(
                                                     mapOf(
-                                                        "key" to TagString("value")
-                                                    )
+                                                        "key" to TagString("value"),
+                                                    ),
                                                 ),
                                                 TagCompound(
                                                     mapOf(
-                                                        "key" to TagString("value")
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
+                                                        "key" to TagString("value"),
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         )
 }

@@ -50,13 +50,13 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     }
 
                     override fun checkInput(inputString: String): Boolean {
-                        return !inputString.isEmpty() && !inputString.contains('=')
+                        return inputString.isNotEmpty() && !inputString.contains('=')
                     }
 
                     override fun canClose(inputString: String): Boolean {
-                        return !inputString.isEmpty() && !inputString.contains('=')
+                        return inputString.isNotEmpty() && !inputString.contains('=')
                     }
-                }
+                },
             )
             val key = result.first
             val replaceLiteral = result.second
@@ -67,7 +67,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     psi.runWriteAction {
                         val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText(
                             "net.minecraft.client.resources.I18n.format(\"$key\")",
-                            element.context
+                            element.context,
                         )
                         if (psi.language === JavaLanguage.INSTANCE) {
                             JavaCodeStyleManager.getInstance(project)

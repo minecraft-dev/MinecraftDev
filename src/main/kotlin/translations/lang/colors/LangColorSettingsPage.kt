@@ -35,7 +35,7 @@ class LangColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Key", LangSyntaxHighlighter.KEY),
             AttributesDescriptor("Separator", LangSyntaxHighlighter.EQUALS),
             AttributesDescriptor("Value", LangSyntaxHighlighter.VALUE),
-            AttributesDescriptor("Comments", LangSyntaxHighlighter.COMMENT)
+            AttributesDescriptor("Comments", LangSyntaxHighlighter.COMMENT),
         )
     }
 }

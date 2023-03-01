@@ -26,7 +26,7 @@ class McpModuleSettings : PersistentStateComponent<McpModuleSettings.State> {
         var mcpVersion: String? = null,
         var mappingFile: String? = null,
         var srgType: SrgType? = null,
-        var platformVersion: String? = null
+        var platformVersion: String? = null,
     )
 
     private var state: State = State(srgType = SrgType.SRG)

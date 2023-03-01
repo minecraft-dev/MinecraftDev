@@ -37,7 +37,7 @@ class UnusedShadowMethodPrefixInspection : MixinInspection() {
                 holder.registerProblem(
                     prefixValue,
                     "Unused @Shadow prefix",
-                    RemoveAnnotationAttributeQuickFix("@Shadow", "prefix")
+                    RemoveAnnotationAttributeQuickFix("@Shadow", "prefix"),
                 )
             }
         }

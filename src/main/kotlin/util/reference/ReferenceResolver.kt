@@ -99,6 +99,7 @@ private fun PsiElement.findContextElement(): PsiElement {
     var current: PsiElement
     var parent = this
 
+    @Suppress("KotlinConstantConditions") // kotlin is wrong
     do {
         current = parent
         parent = current.parent
@@ -131,7 +132,7 @@ fun LookupElementBuilder.completeToLiteral(context: PsiElement): LookupElementBu
 private class ReplaceElementWithLiteral(
     private val editor: Editor,
     private val file: PsiFile,
-    private val text: String
+    private val text: String,
 ) : Runnable {
 
     override fun run() {
@@ -145,8 +146,8 @@ private class ReplaceElementWithLiteral(
                 element.replace(
                     JavaPsiFacade.getElementFactory(element.project).createExpressionFromText(
                         "\"$text\"",
-                        element.parent
-                    )
+                        element.parent,
+                    ),
                 )
             }
         }

@@ -112,7 +112,7 @@ class ConfigValueInspection : MixinConfigInspection() {
             JAVA_LANG_FLOAT,
             JAVA_LANG_INTEGER,
             JAVA_LANG_LONG,
-            JAVA_LANG_SHORT
+            JAVA_LANG_SHORT,
         )
     }
 }

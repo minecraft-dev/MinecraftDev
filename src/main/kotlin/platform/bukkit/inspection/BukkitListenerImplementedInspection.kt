@@ -33,7 +33,7 @@ class BukkitListenerImplementedInspection : BaseInspection() {
     override fun getStaticDescription() =
         "All Bukkit @EventHandler methods must reside in a class that implements Listener."
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
         return object : InspectionGadgetsFix() {
             override fun doFix(project: Project, descriptor: ProblemDescriptor) {
                 val psiClass = infos[0] as PsiClass
