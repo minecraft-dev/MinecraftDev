@@ -100,9 +100,7 @@ class NbttFoldingBuilder : FoldingBuilder {
     }
 
     override fun isCollapsedByDefault(node: ASTNode): Boolean {
-        val psi = node.psi
-
-        val size = when (psi) {
+        val size = when (val psi = node.psi) {
             is NbttByteArray -> psi.getByteList().size
             is NbttIntArray -> psi.getIntList().size
             is NbttLongArray -> psi.getLongList().size

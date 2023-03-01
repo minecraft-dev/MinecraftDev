@@ -227,6 +227,7 @@ object LocalVariables {
                 val localsHere = this.locals[offset] ?: emptyArray()
                 var changed = false
                 val nextLocals = this.locals[nextOffset]
+                @Suppress("KotlinConstantConditions") // kotlin is wrong
                 if (nextLocals == null) {
                     this.locals[nextOffset] = localsHere.clone()
                     changed = true
@@ -246,6 +247,7 @@ object LocalVariables {
                         }
                     }
                 }
+                @Suppress("KotlinConstantConditions") // kotlin is wrong
                 if (changed) {
                     instructionQueue.add(nextOffset)
                 }

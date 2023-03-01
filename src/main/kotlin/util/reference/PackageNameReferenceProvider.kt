@@ -137,7 +137,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
         private val qualifiedName: String
             get() {
                 val name = qualifiedRange.substring(element.text)
-                return getBasePackage(element)?.let { it + '.' + name } ?: name
+                return getBasePackage(element)?.let { "$it.$name" } ?: name
             }
 
         override val unresolved: Boolean
@@ -153,7 +153,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
 
         private fun getNewName(newTarget: PsiQualifiedNamedElement): String {
             val newName = newTarget.qualifiedName!!
-            return getBasePackage(element)?.let { newName.removePrefix(it + '.') } ?: newName
+            return getBasePackage(element)?.let { newName.removePrefix("$it.") } ?: newName
         }
 
         override fun bindToElement(newTarget: PsiElement): PsiElement? {

@@ -98,8 +98,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
-        val environment = data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE
-        val envName = when (environment) {
+        val envName = when (data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE) {
             Side.CLIENT -> "client"
             Side.SERVER -> "server"
             else -> "*"

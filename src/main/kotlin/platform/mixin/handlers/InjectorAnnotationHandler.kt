@@ -78,8 +78,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     ): InsnResolutionInfo.Failure? {
         return annotation.findAttributeValue("at")?.findAnnotations()
             .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
-            .mapNotNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
-            .firstOrNull()
+            .firstNotNullOfOrNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
     }
 
     override fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement> {

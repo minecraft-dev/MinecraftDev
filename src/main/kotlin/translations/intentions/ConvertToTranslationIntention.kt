@@ -50,11 +50,11 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     }
 
                     override fun checkInput(inputString: String): Boolean {
-                        return !inputString.isEmpty() && !inputString.contains('=')
+                        return inputString.isNotEmpty() && !inputString.contains('=')
                     }
 
                     override fun canClose(inputString: String): Boolean {
-                        return !inputString.isEmpty() && !inputString.contains('=')
+                        return inputString.isNotEmpty() && !inputString.contains('=')
                     }
                 },
             )

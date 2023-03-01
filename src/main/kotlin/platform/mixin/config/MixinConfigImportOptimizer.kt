@@ -23,6 +23,7 @@ import com.intellij.openapi.util.EmptyRunnable
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import kotlin.math.min
 
 class MixinConfigImportOptimizer : ImportOptimizer {
 
@@ -52,7 +53,7 @@ class MixinConfigImportOptimizer : ImportOptimizer {
             val parts1 = class1.split('.')
             val parts2 = class2.split('.')
 
-            val end = Math.min(parts1.size - 1, parts2.size - 1)
+            val end = min(parts1.size - 1, parts2.size - 1)
             for (i in 0 until end) {
                 val result = parts1[i].compareTo(parts2[i], ignoreCase = true)
                 if (result != 0) {
@@ -62,7 +63,7 @@ class MixinConfigImportOptimizer : ImportOptimizer {
 
             if (parts1.size != parts2.size) {
                 // Default package always comes first
-                return Integer.compare(parts1.size, parts2.size)
+                return parts1.size.compareTo(parts2.size)
             }
 
             // Compare class names

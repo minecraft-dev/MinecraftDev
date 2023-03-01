@@ -25,7 +25,7 @@ import com.intellij.openapi.extensions.ExtensionPointName
  */
 class PlatformTypeStep private constructor(
     parent: NewProjectWizardStep,
-) : AbstractNewProjectWizardMultiStep<PlatformTypeStep, PlatformTypeStep.Factory>(parent, EP_NAME),
+) : AbstractNewProjectWizardMultiStep<PlatformTypeStep, Factory>(parent, EP_NAME),
     NewProjectWizardBaseData by parent as NewProjectWizardBaseData {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.platformTypeWizard")

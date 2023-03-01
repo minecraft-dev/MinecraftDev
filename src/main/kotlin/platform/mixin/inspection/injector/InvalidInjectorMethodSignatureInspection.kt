@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.synchronize
+import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -279,6 +280,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
     }
 
     private class ParametersQuickFix(
+        @SafeFieldForPreview
         private val expected: List<ParameterGroup>,
         isInject: Boolean,
     ) : LocalQuickFix {

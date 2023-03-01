@@ -38,9 +38,11 @@ interface TranslationProvider {
     fun findElements(project: Project, file: VirtualFile, key: String): List<PsiElement>
 
     companion object {
+        // Use name, using FileType as map keys can leak and cause problems with plugin unloading
+        // name is unique among all file types
         val INSTANCES = mapOf(
-            JsonFileType.INSTANCE to JsonTranslationProvider,
-            LangFileType to LangTranslationProvider,
+            JsonFileType.INSTANCE.name to JsonTranslationProvider,
+            LangFileType.name to LangTranslationProvider,
         )
     }
 }
@@ -79,7 +81,7 @@ object JsonTranslationProvider : TranslationProvider {
 }
 
 object LangTranslationProvider : TranslationProvider {
-    override fun map(domain: String, input: FileContent): TranslationIndexEntry? {
+    override fun map(domain: String, input: FileContent): TranslationIndexEntry {
         val translations = input.contentAsText
             .lineSequence()
             .filter { !it.startsWith("#") && it.isNotEmpty() }

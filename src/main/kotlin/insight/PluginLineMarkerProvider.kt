@@ -36,6 +36,7 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
             return null
         }
 
+        @Suppress("MoveLambdaOutsideParentheses")
         return LineMarkerInfo(
             element,
             element.textRange,

@@ -99,6 +99,7 @@ private fun PsiElement.findContextElement(): PsiElement {
     var current: PsiElement
     var parent = this
 
+    @Suppress("KotlinConstantConditions") // kotlin is wrong
     do {
         current = parent
         parent = current.parent

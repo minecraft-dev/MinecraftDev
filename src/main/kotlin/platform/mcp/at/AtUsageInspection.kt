@@ -26,7 +26,7 @@ import com.intellij.psi.search.searches.ReferencesSearch
 
 class AtUsageInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription(): String? {
+    override fun getStaticDescription(): String {
         return "The declared access transformer is never used"
     }
 

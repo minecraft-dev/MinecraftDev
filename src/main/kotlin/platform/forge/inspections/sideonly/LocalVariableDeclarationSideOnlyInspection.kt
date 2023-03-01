@@ -38,7 +38,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
 
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
-                annotation,
+                annotation.qualifiedName ?: return null,
                 "Remove @SideOnly annotation from variable class declaration",
             )
         } else {

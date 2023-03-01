@@ -20,6 +20,7 @@ import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import java.util.TreeSet
 
 object TranslationSorter {
     private val ascendingComparator = compareBy<Translation, Iterable<String>>(
@@ -51,13 +52,13 @@ object TranslationSorter {
                 Ordering.ASCENDING -> TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    it.sortedWith(ascendingComparator),
+                    it.sortedWith(ascendingComparator).asIterable(),
                     keepComments,
                 )
                 Ordering.DESCENDING -> TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    it.sortedWith(descendingComparator),
+                    it.sortedWith(descendingComparator).asIterable(),
                     keepComments,
                 )
                 Ordering.TEMPLATE -> sortByTemplate(
@@ -97,12 +98,12 @@ object TranslationSorter {
                 is Comment -> yield(TranslationFiles.FileEntry.Comment(elem.text))
                 EmptyLine -> yield(TranslationFiles.FileEntry.EmptyLine)
                 is Key -> {
-                    val toWrite = tmp.asSequence().filter { elem.matcher.matches(it.key) }
+                    val toWrite = tmp.filterTo(TreeSet(ascendingComparator)) { elem.matcher.matches(it.key) }
                     yieldAll(
                         TranslationFiles.buildFileEntries(
                             project,
                             locale,
-                            toWrite.sortedWith(ascendingComparator),
+                            toWrite,
                             keepComments,
                         ),
                     )
@@ -116,7 +117,7 @@ object TranslationSorter {
                 TranslationFiles.buildFileEntries(
                     project,
                     locale,
-                    tmp.sortedWith(ascendingComparator).asSequence(),
+                    tmp.sortedWith(ascendingComparator),
                     keepComments,
                 ),
             )

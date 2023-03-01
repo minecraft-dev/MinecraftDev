@@ -32,9 +32,5 @@ fun isValidClassName(className: String): Boolean {
         return false
     }
     // keyword identifier
-    if (fieldNameSplit.any { it.isJavaKeyword() }) {
-        return false
-    }
-
-    return true
+    return !fieldNameSplit.any { it.isJavaKeyword() }
 }

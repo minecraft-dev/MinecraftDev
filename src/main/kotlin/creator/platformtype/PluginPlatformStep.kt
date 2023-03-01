@@ -23,7 +23,7 @@ import com.intellij.openapi.extensions.ExtensionPointName
  */
 class PluginPlatformStep(
     parent: PlatformTypeStep,
-) : AbstractNewProjectWizardMultiStep<PluginPlatformStep, PluginPlatformStep.Factory>(parent, EP_NAME) {
+) : AbstractNewProjectWizardMultiStep<PluginPlatformStep, Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.pluginPlatformWizard")
     }

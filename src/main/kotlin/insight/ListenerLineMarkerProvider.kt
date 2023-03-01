@@ -80,7 +80,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
     override fun getName() = "Event Listener line marker"
     override fun getIcon() = GeneralAssets.LISTENER
 
-    private class EventLineMarkerInfo constructor(
+    private class EventLineMarkerInfo(
         element: PsiElement,
         range: TextRange,
         icon: Icon,

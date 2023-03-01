@@ -57,6 +57,7 @@ class ModsTomlCompletionContributor : CompletionContributor() {
             ModsTomlKnownStringValuesCompletionProvider(values),
         )
 
+    @Suppress("SameParameterValue")
     private fun extendKnownValues(key: String, vararg values: String) =
         extendKnownValues(key, values.toSet())
 
@@ -86,16 +87,16 @@ object ModsTomlKeyCompletionProvider : CompletionProvider<CompletionParameters>(
                     is TomlTable -> false
                     else -> return
                 }
-                schema.topLevelKeys(isArray) - table.entries.map { it.key.text }
+                schema.topLevelKeys(isArray) - table.entries.mapTo(HashSet()) { it.key.text }
             }
             is TomlKeyValue -> when (table) {
                 null -> {
                     schema.topLevelEntries.map { it.key } -
-                        key.containingFile.children.filterIsInstance<TomlKeyValue>().map { it.key.text }
+                        key.containingFile.children.filterIsInstance<TomlKeyValue>().mapTo(HashSet()) { it.key.text }
                 }
                 is TomlHeaderOwner -> {
                     val tableName = table.header.key?.segments?.firstOrNull()?.text ?: return
-                    schema.keysForTable(tableName) - table.entries.map { it.key.text }
+                    schema.keysForTable(tableName) - table.entries.mapTo(HashSet()) { it.key.text }
                 }
                 else -> return
             }

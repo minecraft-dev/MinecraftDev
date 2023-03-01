@@ -75,17 +75,17 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
         }
     }
 
-    private class ColorPickerDialog constructor(parent: JComponent, private val component: JComponent) :
+    private class ColorPickerDialog(parent: JComponent, private val component: JComponent) :
         DialogWrapper(parent, false) {
 
         init {
             title = "Choose Color"
-            setResizable(true)
+            isResizable = true
 
             init()
         }
 
-        override fun createCenterPanel(): JComponent? {
+        override fun createCenterPanel(): JComponent {
             return component
         }
     }

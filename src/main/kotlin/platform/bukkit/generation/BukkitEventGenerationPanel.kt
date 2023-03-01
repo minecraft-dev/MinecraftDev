@@ -23,7 +23,7 @@ class BukkitEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(c
     private lateinit var parentPanel: JPanel
     private lateinit var eventPriorityComboBox: JComboBox<String>
 
-    override val panel: JPanel?
+    override val panel: JPanel
         get() {
             ignoreCanceledCheckBox.isSelected = true
 
@@ -40,7 +40,10 @@ class BukkitEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(c
             return parentPanel
         }
 
-    override fun gatherData(): GenerationData? {
-        return BukkitGenerationData(ignoreCanceledCheckBox.isSelected, eventPriorityComboBox.selectedItem.toString())
+    override fun gatherData(): GenerationData {
+        return BukkitGenerationData(
+            ignoreCanceledCheckBox.isSelected,
+            eventPriorityComboBox.selectedItem?.toString() ?: error("No selected item")
+        )
     }
 }

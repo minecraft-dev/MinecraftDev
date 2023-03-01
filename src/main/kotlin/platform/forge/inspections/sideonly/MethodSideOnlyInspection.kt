@@ -28,7 +28,7 @@ class MethodSideOnlyInspection : BaseInspection() {
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
 
-    override fun getStaticDescription(): String? {
+    override fun getStaticDescription(): String {
         return "A method in a class annotated for one side cannot be declared as being in the other side. " +
             "For example, a class which is annotated as @SideOnly(Side.SERVER) cannot contain a method which " +
             "is annotated as @SideOnly(Side.CLIENT). Since a class that is annotated with @SideOnly brings " +
@@ -40,7 +40,10 @@ class MethodSideOnlyInspection : BaseInspection() {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
-            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method")
+            RemoveAnnotationInspectionGadgetsFix(
+                annotation.qualifiedName ?: return null,
+                "Remove @SideOnly annotation from method"
+            )
         } else {
             null
         }

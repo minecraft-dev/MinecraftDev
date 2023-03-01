@@ -41,7 +41,10 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable) {
-            RemoveAnnotationInspectionGadgetsFix(annotation, "Remove @SideOnly annotation from method declaration")
+            RemoveAnnotationInspectionGadgetsFix(
+                annotation.qualifiedName ?: return null,
+                "Remove @SideOnly annotation from method declaration"
+            )
         } else {
             null
         }

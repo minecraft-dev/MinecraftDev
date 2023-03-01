@@ -163,7 +163,7 @@ private fun PsiClass.findInnerClass(name: String): PsiClass? {
 }
 
 @Throws(ClassNameResolutionFailedException::class)
-fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int? {
+fun PsiElement.getAnonymousIndex(anonymousElement: PsiElement): Int {
     // Attempt to find name for anonymous class
     for ((i, element) in anonymousElements.withIndex()) {
         if (element equivalentTo anonymousElement) {

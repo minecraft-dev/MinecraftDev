@@ -54,7 +54,7 @@ class TranslationInverseIndex : FileBasedIndexExtension<String, Void>() {
                     locale == null || TranslationFiles.getLocale(it) == locale
                 }
                 .flatMap {
-                    TranslationProvider.INSTANCES[it.fileType]?.findElements(project, it, key) ?: emptyList()
+                    TranslationProvider.INSTANCES[it.fileType.name]?.findElements(project, it, key) ?: emptyList()
                 }
         }
     }
@@ -62,7 +62,7 @@ class TranslationInverseIndex : FileBasedIndexExtension<String, Void>() {
     private object Indexer : DataIndexer<String, Void, FileContent> {
         override fun map(inputData: FileContent): MutableMap<String, Void?> {
             val domain = inputData.file.mcDomain ?: return mutableMapOf()
-            val entry = TranslationProvider.INSTANCES[inputData.fileType]?.map(domain, inputData)
+            val entry = TranslationProvider.INSTANCES[inputData.fileType.name]?.map(domain, inputData)
                 ?: return mutableMapOf()
             return entry.translations.associateTo(mutableMapOf()) { it.key to null }
         }

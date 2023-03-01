@@ -136,7 +136,7 @@ private fun Sequence<MixinTargetMember>.filterAccessible(
 
 private fun PsiClass.streamMixinHierarchy(): Sequence<PsiClass> {
     return generateSequence(this) {
-        it.superClass?.takeIf { it.isMixin }
+        it.superClass?.takeIf { superClass -> superClass.isMixin }
     }
 }
 

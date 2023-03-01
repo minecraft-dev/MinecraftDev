@@ -36,6 +36,7 @@ import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 class VelocityGradleSupport : BuildSystemSupport {
+    @Suppress("MoveLambdaOutsideParentheses")
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
             BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent).chain(

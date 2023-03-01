@@ -238,7 +238,7 @@ object TranslationFiles {
         return result.removeSuffix("\n").removeSuffix(",")
     }
 
-    fun buildFileEntries(project: Project, locale: String, entries: Sequence<Translation>, keepComments: Int) =
+    fun buildFileEntries(project: Project, locale: String, entries: Iterable<Translation>, keepComments: Int) =
         sequence {
             for (entry in entries) {
                 val langElement = TranslationInverseIndex.findElements(

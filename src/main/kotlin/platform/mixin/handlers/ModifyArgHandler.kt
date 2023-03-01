@@ -59,7 +59,7 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
                 if (validSingleArgTypes.isEmpty()) {
                     validSingleArgTypes.addAll(validArgTypes)
                 } else {
-                    validSingleArgTypes.retainAll(validArgTypes)
+                    validSingleArgTypes.retainAll(validArgTypes.toSet())
                     if (validSingleArgTypes.isEmpty()) {
                         return listOf()
                     }

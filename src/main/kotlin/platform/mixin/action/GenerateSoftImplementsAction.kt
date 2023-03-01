@@ -64,7 +64,7 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
             return
         }
 
-        val chooser = MemberChooser<PsiMethodMember>(methods.keys.toTypedArray(), false, true, project)
+        val chooser = MemberChooser(methods.keys.toTypedArray(), false, true, project)
         chooser.title = "Select Methods to Soft-implement"
         chooser.show()
 

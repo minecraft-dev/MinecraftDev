@@ -114,7 +114,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         element: PsiElement,
         color: Color,
         workElement: UElement,
-    ) : ColorLineMarkerProvider.ColorInfo(
+    ) : ColorInfo(
         element,
         color,
         GutterIconNavigationHandler handler@{ _, psiElement ->

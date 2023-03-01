@@ -36,7 +36,7 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
 
-class BukkitModule<out T : AbstractModuleType<*>> constructor(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
+class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
     var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
         private set
