@@ -22,9 +22,9 @@ import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 class FabricGradleSupport : BuildSystemSupport {
@@ -32,7 +32,7 @@ class FabricGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> FabricGradleFilesStep(parent).chain(::GradleWrapperStep)
+            BuildSystemSupport.PRE_STEP -> FabricGradleFilesStep(parent).nextStep(::GradleWrapperStep)
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
             else -> EmptyStep(parent)
         }

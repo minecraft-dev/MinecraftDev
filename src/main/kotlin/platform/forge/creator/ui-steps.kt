@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.forge.creator
 
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.step.AbstractLatentStep
@@ -20,6 +19,7 @@ import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
 import com.demonwav.mcdev.creator.step.ModNameStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.UpdateUrlStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
@@ -28,7 +28,6 @@ import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.util.IncorrectOperationException
@@ -44,17 +43,15 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
     }
 
     override fun createStep(data: ForgeVersion) = ForgeVersionChainStep(this, data)
-        .chain(
-            ::ModNameStep,
-            ::MainClassStep,
-            ::UseMixinsStep,
-            ::LicenseStep,
-            ::ForgeOptionalSettingsStep,
-            ::ForgeBuildSystemStep,
-            ::ForgeProjectFilesStep,
-            ::ForgeMixinsJsonStep,
-            ::ForgePostBuildSystemStep,
-        )
+        .nextStep(::ModNameStep)
+        .nextStep(::MainClassStep)
+        .nextStep(::UseMixinsStep)
+        .nextStep(::LicenseStep)
+        .nextStep(::ForgeOptionalSettingsStep)
+        .nextStep(::ForgeBuildSystemStep)
+        .nextStep(::ForgeProjectFilesStep)
+        .nextStep(::ForgeMixinsJsonStep)
+        .nextStep(::ForgePostBuildSystemStep)
 
     class Factory : ModPlatformStep.Factory {
         override val name = "Forge"
@@ -91,9 +88,8 @@ class ForgeVersionChainStep(
 class ForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::UpdateUrlStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::UpdateUrlStep)
 }

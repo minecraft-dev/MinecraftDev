@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.fabric.creator
 
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.step.AbstractLatentStep
@@ -19,6 +18,7 @@ import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.ModNameStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.RepositoryStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.creator.step.WaitForSmartModeStep
@@ -31,7 +31,6 @@ import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.bindEnabled
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.not
@@ -64,18 +63,16 @@ class FabricPlatformStep(
     override fun createStep(data: Pair<FabricVersions, FabricApiVersions>): NewProjectWizardStep {
         val (fabricVersions, apiVersions) = data
         return FabricVersionChainStep(this, fabricVersions, apiVersions)
-            .chain(
-                ::FabricEnvironmentStep,
-                ::UseMixinsStep,
-                ::ModNameStep,
-                ::LicenseStep,
-                ::FabricOptionalSettingsStep,
-                ::FabricBuildSystemStep,
-                ::FabricDumbModeFilesStep,
-                ::FabricPostBuildSystemStep,
-                ::WaitForSmartModeStep,
-                ::FabricSmartModeFilesStep,
-            )
+            .nextStep(::FabricEnvironmentStep)
+            .nextStep(::UseMixinsStep)
+            .nextStep(::ModNameStep)
+            .nextStep(::LicenseStep)
+            .nextStep(::FabricOptionalSettingsStep)
+            .nextStep(::FabricBuildSystemStep)
+            .nextStep(::FabricDumbModeFilesStep)
+            .nextStep(::FabricPostBuildSystemStep)
+            .nextStep(::WaitForSmartModeStep)
+            .nextStep(::FabricSmartModeFilesStep)
     }
 
     class Factory : ModPlatformStep.Factory {
@@ -261,9 +258,8 @@ class FabricEnvironmentStep(parent: NewProjectWizardStep) : AbstractNewProjectWi
 class FabricOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::WebsiteStep,
-        ::RepositoryStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::WebsiteStep)
+        .nextStep(::RepositoryStep)
 }
