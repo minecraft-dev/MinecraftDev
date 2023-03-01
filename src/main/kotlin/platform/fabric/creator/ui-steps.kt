@@ -34,6 +34,7 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
+import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -94,6 +95,7 @@ class FabricVersionChainStep(
         val LOADER_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.loaderVersion")
         val YARN_VERSION_KEY = Key.create<String>("${FabricVersionChainStep::class.java.name}.yarnVersion")
         val API_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.apiVersion")
+        val OFFICIAL_MAPPINGS_KEY = Key.create<Boolean>("${FabricVersionChainStep::class.java.name}.officialMappings")
     }
 
     private val showSnapshotsProperty = propertyGraph.property(false)
@@ -103,6 +105,10 @@ class FabricVersionChainStep(
     private val useApiProperty = propertyGraph.property(true)
         .bindBooleanStorage("${javaClass.name}.useApi")
     private var useApi by useApiProperty
+
+    private val useOfficialMappingsProperty = propertyGraph.property(false)
+        .bindBooleanStorage("${javaClass.name}.useOfficialMappings")
+    private var useOfficialMappings by useOfficialMappingsProperty
 
     init {
         showSnapshotsProperty.afterChange { updateVersionBox() }
@@ -122,7 +128,8 @@ class FabricVersionChainStep(
                 comboBox
             }
             YARN_VERSION -> {
-                val comboBox = super.createComboBox(row, index, items)
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useOfficialMappingsProperty.not())
+                row.checkBox("Use Official Mappings").bindSelected(useOfficialMappingsProperty)
                 row.label(EMPTY_LABEL).bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         mcVersion as FabricMcVersion
@@ -133,7 +140,7 @@ class FabricVersionChainStep(
                             "Unable to match Yarn versions to Minecraft version"
                         }
                     },
-                ).component.foreground = JBColor.YELLOW
+                ).bindEnabled(useOfficialMappingsProperty.not()).component.foreground = JBColor.YELLOW
                 comboBox
             }
             API_VERSION -> {
@@ -200,6 +207,7 @@ class FabricVersionChainStep(
         if (useApi) {
             data.putUserData(API_VERSION_KEY, getVersion(API_VERSION) as SemanticVersion)
         }
+        data.putUserData(OFFICIAL_MAPPINGS_KEY, useOfficialMappings)
     }
 }
 
