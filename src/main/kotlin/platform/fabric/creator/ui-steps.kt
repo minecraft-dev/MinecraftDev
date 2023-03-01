@@ -21,6 +21,7 @@ import com.demonwav.mcdev.creator.step.ModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.RepositoryStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
+import com.demonwav.mcdev.creator.step.VersionChainComboBox
 import com.demonwav.mcdev.creator.step.WaitForSmartModeStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
@@ -33,9 +34,9 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
+import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Key
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Cell
@@ -93,6 +94,7 @@ class FabricVersionChainStep(
         val LOADER_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.loaderVersion")
         val YARN_VERSION_KEY = Key.create<String>("${FabricVersionChainStep::class.java.name}.yarnVersion")
         val API_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.apiVersion")
+        val OFFICIAL_MAPPINGS_KEY = Key.create<Boolean>("${FabricVersionChainStep::class.java.name}.officialMappings")
     }
 
     private val showSnapshotsProperty = propertyGraph.property(false)
@@ -102,6 +104,10 @@ class FabricVersionChainStep(
     private val useApiProperty = propertyGraph.property(true)
         .bindBooleanStorage("${javaClass.name}.useApi")
     private var useApi by useApiProperty
+
+    private val useOfficialMappingsProperty = propertyGraph.property(false)
+        .bindBooleanStorage("${javaClass.name}.useOfficialMappings")
+    private var useOfficialMappings by useOfficialMappingsProperty
 
     init {
         showSnapshotsProperty.afterChange { updateVersionBox() }
@@ -113,7 +119,7 @@ class FabricVersionChainStep(
         }
     }
 
-    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<ComboBox<Comparable<*>>> {
+    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<VersionChainComboBox> {
         return when (index) {
             MINECRAFT_VERSION -> {
                 val comboBox = super.createComboBox(row, index, items)
@@ -121,7 +127,8 @@ class FabricVersionChainStep(
                 comboBox
             }
             YARN_VERSION -> {
-                val comboBox = super.createComboBox(row, index, items)
+                val comboBox = super.createComboBox(row, index, items).bindEnabled(useOfficialMappingsProperty.not())
+                row.checkBox("Use Official Mappings").bindSelected(useOfficialMappingsProperty)
                 row.label("").bindText(
                     getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
                         mcVersion as FabricMcVersion
@@ -132,7 +139,7 @@ class FabricVersionChainStep(
                             "Unable to match Yarn versions to Minecraft version"
                         }
                     },
-                ).component.foreground = JBColor.YELLOW
+                ).bindEnabled(useOfficialMappingsProperty.not()).component.foreground = JBColor.YELLOW
                 comboBox
             }
             API_VERSION -> {
@@ -187,12 +194,7 @@ class FabricVersionChainStep(
     private fun updateVersionBox() {
         val versionBox = getVersionBox(MINECRAFT_VERSION) ?: return
         val selectedItem = versionBox.selectedItem
-        versionBox.removeAllItems()
-        for (gameVer in mcVersions) {
-            if (showSnapshots || gameVer.stable) {
-                versionBox.addItem(gameVer)
-            }
-        }
+        versionBox.setSelectableItems(mcVersions.filter { gameVer -> showSnapshots || gameVer.stable })
         versionBox.selectedItem = selectedItem
     }
 
@@ -204,6 +206,7 @@ class FabricVersionChainStep(
         if (useApi) {
             data.putUserData(API_VERSION_KEY, getVersion(API_VERSION) as SemanticVersion)
         }
+        data.putUserData(OFFICIAL_MAPPINGS_KEY, useOfficialMappings)
     }
 }
 

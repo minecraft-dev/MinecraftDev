@@ -23,7 +23,6 @@ import com.intellij.util.proxy.CommonProxy
 import java.io.IOException
 import java.net.Proxy
 import java.net.URI
-import javax.swing.JComboBox
 import kotlin.reflect.KClass
 
 private const val CLOUDFLARE_BASE_URL = "https://minecraftdev.org/versions/"
@@ -93,12 +92,4 @@ fun selectProxy(urlText: String): Proxy? {
     return null
 }
 
-data class PlatformVersion(var versions: List<String>, var selectedIndex: Int) {
-    fun set(combo: JComboBox<String>) {
-        combo.removeAllItems()
-        for (version in this.versions) {
-            combo.addItem(version)
-        }
-        combo.selectedIndex = this.selectedIndex
-    }
-}
+data class PlatformVersion(var versions: List<String>, var selectedIndex: Int)
