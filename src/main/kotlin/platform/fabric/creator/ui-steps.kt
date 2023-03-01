@@ -98,6 +98,7 @@ class FabricVersionChainStep(
         val LOADER_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.loaderVersion")
         val YARN_VERSION_KEY = Key.create<String>("${FabricVersionChainStep::class.java.name}.yarnVersion")
         val API_VERSION_KEY = Key.create<SemanticVersion>("${FabricVersionChainStep::class.java.name}.apiVersion")
+        val OFFICIAL_MAPPINGS_KEY = Key.create<Boolean>("${FabricVersionChainStep::class.java.name}.officialMappings")
     }
 
     private val showSnapshotsProperty = propertyGraph.property(false)
@@ -214,6 +215,7 @@ class FabricVersionChainStep(
         if (useApi) {
             data.putUserData(API_VERSION_KEY, getVersion(API_VERSION) as SemanticVersion)
         }
+        data.putUserData(OFFICIAL_MAPPINGS_KEY, useOfficialMappings)
     }
 }
 

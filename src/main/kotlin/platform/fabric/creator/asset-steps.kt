@@ -108,6 +108,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
+        val useOfficialMappings = data.getUserData(FabricVersionChainStep.OFFICIAL_MAPPINGS_KEY)
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
@@ -131,6 +132,10 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
         if (apiVersion != null) {
             assets.addTemplateProperties("API_VERSION" to apiVersion)
+        }
+
+        if (useOfficialMappings == true) {
+            assets.addTemplateProperties("OFFICIAL_MAPPINGS" to useOfficialMappings)
         }
 
         if (useMixins) {
