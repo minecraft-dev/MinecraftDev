@@ -33,10 +33,10 @@ import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 import com.intellij.psi.xml.XmlTag
 import java.util.EnumSet
@@ -45,11 +45,10 @@ import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
 class SpongeMavenSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent).chain(::SpongePatchPomStep)
-            BuildSystemSupport.POST_STEP -> SpongeMavenProjectFilesStep(parent).chain(
-                ::MavenImportStep,
-                ::ReformatPomStep,
-            )
+            BuildSystemSupport.PRE_STEP -> SpongeMavenFilesStep(parent).nextStep(::SpongePatchPomStep)
+            BuildSystemSupport.POST_STEP -> SpongeMavenProjectFilesStep(parent)
+                .nextStep(::MavenImportStep)
+                .nextStep(::ReformatPomStep)
             else -> EmptyStep(parent)
         }
     }

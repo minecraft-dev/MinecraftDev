@@ -13,7 +13,6 @@ package com.demonwav.mcdev.platform.bungeecord.creator
 import com.demonwav.mcdev.creator.PlatformVersion
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
-import com.demonwav.mcdev.creator.chain
 import com.demonwav.mcdev.creator.getVersionSelector
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
@@ -22,6 +21,7 @@ import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.SimpleMcVersionStep
 import com.demonwav.mcdev.creator.step.SoftDependStep
@@ -31,7 +31,6 @@ import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -71,14 +70,13 @@ abstract class AbstractBungeePlatformStep(
     }
 
     override fun createStep(data: PlatformVersion) =
-        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse)).chain(
-            ::PluginNameStep,
-            ::MainClassStep,
-            ::BungeeOptionalSettingsStep,
-            ::BungeeBuildSystemStep,
-            ::BungeeProjectFilesStep,
-            ::BungeePostBuildSystemStep,
-        )
+        SimpleMcVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse))
+            .nextStep(::PluginNameStep)
+            .nextStep(::MainClassStep)
+            .nextStep(::BungeeOptionalSettingsStep)
+            .nextStep(::BungeeBuildSystemStep)
+            .nextStep(::BungeeProjectFilesStep)
+            .nextStep(::BungeePostBuildSystemStep)
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, this)
@@ -97,9 +95,8 @@ abstract class AbstractBungeePlatformStep(
 class BungeeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsibleStep(parent) {
     override val title = "Optional Settings"
 
-    override fun createStep() = DescriptionStep(this).chain(
-        ::AuthorsStep,
-        ::DependStep,
-        ::SoftDependStep,
-    )
+    override fun createStep() = DescriptionStep(this)
+        .nextStep(::AuthorsStep)
+        .nextStep(::DependStep)
+        .nextStep(::SoftDependStep)
 }

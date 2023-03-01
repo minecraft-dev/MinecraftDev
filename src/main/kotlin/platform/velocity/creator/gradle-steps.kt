@@ -28,25 +28,22 @@ import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.MainClassStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 class VelocityGradleSupport : BuildSystemSupport {
-    @Suppress("MoveLambdaOutsideParentheses")
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent).chain(
-                ::VelocityPatchGradleFilesStep,
-                ::GradleWrapperStep,
-            )
-            BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(
-                ::ReformatBuildGradleStep,
-                { VelocityModifyMainClassStep(it, true) },
-            )
+            BuildSystemSupport.PRE_STEP -> VelocityGradleFilesStep(parent)
+                .nextStep(::VelocityPatchGradleFilesStep)
+                .nextStep(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
+                .nextStep(::ReformatBuildGradleStep)
+                .nextStep { VelocityModifyMainClassStep(it, true) }
             else -> EmptyStep(parent)
         }
     }

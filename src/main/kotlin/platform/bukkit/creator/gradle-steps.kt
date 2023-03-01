@@ -24,20 +24,19 @@ import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.SimpleMcVersionStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.chain
 import com.intellij.openapi.project.Project
 
 class BukkitGradleSupport : BuildSystemSupport {
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> BukkitGradleFilesStep(parent).chain(
-                ::BukkitPatchBuildGradleStep,
-                ::GradleWrapperStep,
-            )
-            BuildSystemSupport.POST_STEP -> GradleImportStep(parent).chain(::ReformatBuildGradleStep)
+            BuildSystemSupport.PRE_STEP -> BukkitGradleFilesStep(parent)
+                .nextStep(::BukkitPatchBuildGradleStep)
+                .nextStep(::GradleWrapperStep)
+            BuildSystemSupport.POST_STEP -> GradleImportStep(parent).nextStep(::ReformatBuildGradleStep)
             else -> EmptyStep(parent)
         }
     }
