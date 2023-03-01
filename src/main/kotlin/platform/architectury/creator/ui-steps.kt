@@ -22,6 +22,7 @@ import com.demonwav.mcdev.creator.step.ModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.RepositoryStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
+import com.demonwav.mcdev.creator.step.VersionChainComboBox
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.architectury.ArchitecturyVersion
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
@@ -34,7 +35,6 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.util.Key
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Cell
@@ -129,7 +129,7 @@ class ArchitecturyVersionChainStep(
         .bindBooleanStorage("${javaClass.name}.useArchApi")
     private var useArchApi by useArchApiProperty
 
-    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<ComboBox<Comparable<*>>> {
+    override fun createComboBox(row: Row, index: Int, items: List<Comparable<*>>): Cell<VersionChainComboBox> {
         return when (index) {
             FABRIC_API_VERSION -> {
                 val comboBox = super.createComboBox(row, index, items).bindEnabled(useFabricApiProperty)
