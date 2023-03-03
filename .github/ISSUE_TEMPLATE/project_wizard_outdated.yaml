@@ -1,6 +1,6 @@
 name: Project Wizard Outdated
 description: The Minecraft project wizard is outdated
-labels: ["status: unverified", "type: bug"]
+labels: ["status: unverified", "type: bug", "feature: creator"]
 body:
   - type: markdown
     attributes:
