@@ -40,7 +40,10 @@ class MinecraftConfigurable : Configurable {
     fun demoBasics(): DialogPanel {
         return panel {
             row {
-                text("Minecraft developpment Settings")
+                text("Minecraft Developpment Settings")
+                button("Change plugin update channel") {
+                    ConfigurePluginUpdatesDialog().show()
+                }
             }
             row {
                 checkBox("Show Project Platform Icons")
