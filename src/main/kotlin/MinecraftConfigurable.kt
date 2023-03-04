@@ -10,6 +10,8 @@
 
 package com.demonwav.mcdev
 
+import com.demonwav.mcdev.asset.GeneralAssets
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
@@ -41,10 +43,14 @@ class MinecraftConfigurable : Configurable {
     fun demoBasics(): DialogPanel {
         return panel {
             row {
+                icon(PlatformAssets.MINECRAFT_ICON)
                 text("Minecraft Developpment Settings")
                 button("Change plugin update channel") {
                     ConfigurePluginUpdatesDialog().show()
                 }.horizontalAlign(HorizontalAlign.RIGHT)
+            }
+            row {
+                text("View Settings")
             }
             row {
                 checkBox("Show Project Platform Icons")
@@ -60,6 +66,7 @@ class MinecraftConfigurable : Configurable {
             }
             row {
                 text("Chat Color Underline Style")
+                comboBox(listOf("Normal", "Bold", "Dotted", "Boxed", "Rounded Boxed", "Waved"))
             }
         }
     }
