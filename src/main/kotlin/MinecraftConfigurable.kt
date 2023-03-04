@@ -39,8 +39,23 @@ class MinecraftConfigurable : Configurable {
 
     fun demoBasics(): DialogPanel {
         return panel {
-            row("Row1 label:") {
-                textField()
+            row {
+                text("Minecraft developpment Settings")
+            }
+            row {
+                checkBox("Show Project Platform Icons")
+            }
+            row {
+                checkBox("Show Event Listener Gutter Icons")
+            }
+            row {
+                checkBox("Show Chat Color Gutter Icons")
+            }
+            row {
+                checkBox("Show Chat Color Underlines")
+            }
+            row {
+                text("Chat Color Underline Style")
             }
         }
     }
