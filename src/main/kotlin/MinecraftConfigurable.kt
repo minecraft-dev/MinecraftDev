@@ -14,6 +14,7 @@ import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
@@ -43,7 +44,7 @@ class MinecraftConfigurable : Configurable {
                 text("Minecraft Developpment Settings")
                 button("Change plugin update channel") {
                     ConfigurePluginUpdatesDialog().show()
-                }
+                }.horizontalAlign(HorizontalAlign.RIGHT)
             }
             row {
                 checkBox("Show Project Platform Icons")
