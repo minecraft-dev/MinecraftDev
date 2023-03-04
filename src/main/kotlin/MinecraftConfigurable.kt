@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev
 
-import com.demonwav.mcdev.asset.GeneralAssets
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.openapi.options.Configurable
@@ -20,13 +19,8 @@ import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import javax.swing.JComboBox
 import javax.swing.JComponent
-import javax.swing.JPanel
 import org.jetbrains.annotations.Nls
-import org.jetbrains.kotlin.tools.projectWizard.wizard.ui.textField
 
 class MinecraftConfigurable : Configurable {
 
@@ -73,13 +67,12 @@ class MinecraftConfigurable : Configurable {
                 text("Chat Color Underline Style")
                 comboBox(listOf("Normal", "Bold", "Dotted", "Boxed", "Rounded Boxed", "Waved"))
                     .enabledIf(showChatColorUnderlinesCheckBox.selected)
-
             }
         }
     }
 
     override fun createComponent(): JComponent {
-        //showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }
+        // showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }
 
         return demoBasics()
     }
@@ -103,7 +96,7 @@ class MinecraftConfigurable : Configurable {
     }
 
     private fun setUnderlineBox() {
-        //chatColorUnderlinesComboBox.isEnabled = showChatColorUnderlinesCheckBox.isSelected
+        // chatColorUnderlinesComboBox.isEnabled = showChatColorUnderlinesCheckBox.isSelected
     }
 
     override fun isModified(): Boolean {
