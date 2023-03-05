@@ -12,27 +12,17 @@ package com.demonwav.mcdev
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
+import com.demonwav.mcdev.util.bindEnabled
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBCheckBox
-import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.selected
+import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import org.jetbrains.annotations.Nls
 
 class MinecraftConfigurable : Configurable {
-
-    /*private lateinit var panel: JPanel
-    private lateinit var showProjectPlatformIconsCheckBox: JCheckBox
-    private lateinit var showEventListenerGutterCheckBox: JCheckBox
-    private lateinit var showChatColorUnderlinesCheckBox: JCheckBox
-    private lateinit var chatColorUnderlinesComboBox: JComboBox<MinecraftSettings.UnderlineType>
-    private lateinit var showChatGutterIconsCheckBox: JCheckBox
-    private lateinit var changePluginUpdateChannelButton: JButton*/
 
     private lateinit var showProjectPlatformIconsCheckBox: Cell<JBCheckBox>
     private lateinit var showEventListenerGutterCheckBox: Cell<JBCheckBox>
@@ -45,7 +35,7 @@ class MinecraftConfigurable : Configurable {
 
     override fun getHelpTopic(): String? = null
 
-    fun demoBasics(): DialogPanel {
+    fun mcDevConfigurationPannel(): DialogPanel {
         val settings = MinecraftSettings.instance
 
         return panel {
@@ -74,19 +64,23 @@ class MinecraftConfigurable : Configurable {
             row {
                 showChatColorUnderlinesCheckBox = checkBox("Show Chat Color Underlines")
                     .bindSelected(settings::isShowChatColorUnderlines)
+                    .onReset {
+                        enabled(false)
+                    }
             }
             row {
                 text("Chat Color Underline Style")
                 chatColorUnderlinesComboBox = comboBox(MinecraftSettings.UnderlineType.values().asList())
                     .enabledIf(showChatColorUnderlinesCheckBox.selected)
+                    .onReset {
+                        enabled(settings.isShowChatColorGutterIcons)
+                    }
             }
         }
     }
 
     override fun createComponent(): JComponent {
-        // showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }
-
-        return demoBasics()
+        return mcDevConfigurationPannel()
     }
 
     private fun init() {}
@@ -109,9 +103,5 @@ class MinecraftConfigurable : Configurable {
         settings.isShowChatColorGutterIcons = showChatGutterIconsCheckBox.selected.invoke()
         settings.isShowChatColorUnderlines = showChatColorUnderlinesCheckBox.selected.invoke()
         // settings.underlineType = chatColorUnderlinesComboBox.selectedItem as MinecraftSettings.UnderlineType
-    }
-
-    override fun reset() {
-        init()
     }
 }
