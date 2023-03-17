@@ -21,7 +21,7 @@ import org.jetbrains.uast.UClass
 class NonJavaMixinInspection : AbstractBaseUastLocalInspectionTool(UClass::class.java) {
     override fun getDisplayName() = "Mixin is not written in Java"
     override fun getStaticDescription() =
-        "<html>Mixins must be written in Java. See <a href=\"$RELEVANT_ISSUE\">this Mixin issue</a></html>"
+        "<html>Mixins should be written in Java. See <a href=\"$RELEVANT_ISSUE\">this Mixin issue</a></html>"
 
     override fun checkClass(
         aClass: UClass,
