@@ -21,6 +21,7 @@ import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
+import com.intellij.execution.RunManager
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
@@ -35,6 +36,8 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.idea.maven.dom.model.MavenDomProjectModel
+import org.jetbrains.idea.maven.execution.MavenRunConfiguration
+import org.jetbrains.idea.maven.execution.MavenRunConfigurationType
 import org.jetbrains.idea.maven.project.importing.MavenImportingManager
 
 private val pluginVersions by lazy {
@@ -165,5 +168,39 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
         } ?: return
 
         promise.finishPromise.blockingGet(Int.MAX_VALUE, TimeUnit.SECONDS)
+
+        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        addRunTaskConfiguration(project, buildSystemProps, "package")
+    }
+
+    private fun addRunTaskConfiguration(
+        project: Project,
+        buildSystemProps: BuildSystemPropertiesStep<*>,
+        task: String,
+    ) {
+        val mavenConfigFactory = MavenRunConfigurationType.getInstance().configurationFactories.first()
+
+        val runManager = RunManager.getInstance(project)
+        val runConfigName = buildSystemProps.artifactId + ' ' + task
+
+        val templateConfig = mavenConfigFactory.createTemplateConfiguration(project)
+        val runConfiguration = mavenConfigFactory.createConfiguration(runConfigName, templateConfig)
+            as MavenRunConfiguration
+        runConfiguration.runnerParameters.goals.add(task)
+
+        runConfiguration.isAllowRunningInParallel = false
+
+        val settings = runManager.createConfiguration(
+            runConfiguration,
+            mavenConfigFactory,
+        )
+
+        settings.isActivateToolWindowBeforeRun = true
+        settings.storeInLocalWorkspace()
+
+        runManager.addConfiguration(settings)
+        if (runManager.selectedConfiguration == null) {
+            runManager.selectedConfiguration = settings
+        }
     }
 }
