@@ -632,6 +632,14 @@
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
+        <localInspection displayName="Mixin is not written in Java"
+                         shortName="NonJavaMixin"
+                         groupName="Mixin"
+                         language="UAST"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.NonJavaMixinInspection"/>
         <localInspection displayName="Mixin not in a mixin config"
                           shortName="UnusedMixin"
                           groupName="Mixin"

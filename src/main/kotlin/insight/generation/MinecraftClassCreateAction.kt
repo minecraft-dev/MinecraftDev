@@ -87,6 +87,7 @@ class MinecraftClassCreateAction :
             builder.addKind("Block", icon, MinecraftTemplates.FABRIC_BLOCK_TEMPLATE)
             builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_ENCHANTMENT_TEMPLATE)
             builder.addKind("Item", icon, MinecraftTemplates.FABRIC_ITEM_TEMPLATE)
+            builder.addKind("Status Effect", icon, MinecraftTemplates.FABRIC_STATUS_EFFECT_TEMPLATE)
         }
     }
 
