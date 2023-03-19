@@ -26,7 +26,7 @@ import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.psi.PsiSubstitutor
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.filters.position.FilterPattern
 import com.intellij.util.ArrayUtil
@@ -96,6 +96,6 @@ private object GetterAnnotationFilter : ElementFilter {
         PsiLanguageInjectionHost::class.java.isAssignableFrom(hintClass)
 }
 
-private fun isValidCandidate(method: PsiMethod): Boolean = method.returnType != PsiType.VOID &&
+private fun isValidCandidate(method: PsiMethod): Boolean = method.returnType != PsiTypes.voidType() &&
     !method.isConstructor && method.hasModifierProperty(PsiModifier.PUBLIC) && !method.hasParameters() &&
     method.containingClass?.qualifiedName != CommonClassNames.JAVA_LANG_OBJECT

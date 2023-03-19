@@ -13,3 +13,5 @@ rootProject.name = "MinecraftDev"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include("mixin-test-data")
+
+startParameter.warningMode = WarningMode.All

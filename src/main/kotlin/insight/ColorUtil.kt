@@ -18,6 +18,7 @@ import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
 import java.util.Locale
@@ -142,10 +143,10 @@ private fun findColorFromCallExpression(
 
     return when {
         // Single Integer Argument
-        types.size == 1 && types[0] == PsiType.INT ->
+        types.size == 1 && types[0] == PsiTypes.intType() ->
             colorFromSingleArgument(arguments[0])?.let { it to arguments[0] }
         // Triple Integer Argument
-        types.size == 3 && types.all { it == PsiType.INT } ->
+        types.size == 3 && types.all { it == PsiTypes.intType() } ->
             colorFromThreeArguments(arguments)?.let { it to methodExpression }
         vectorClasses != null && types.size == 1 -> {
             val scope = GlobalSearchScope.allScope(project)

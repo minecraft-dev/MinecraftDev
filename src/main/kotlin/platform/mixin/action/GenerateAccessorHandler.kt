@@ -56,7 +56,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.uiDesigner.core.GridConstraints
@@ -397,7 +397,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         val accessors = arrayListOf<PsiMethod>()
 
         if (generateGetter) {
-            val prefix = if (target.type == PsiType.BOOLEAN) "is" else "get"
+            val prefix = if (target.type == PsiTypes.booleanType()) "is" else "get"
             val method = factory.createMethodFromText(
                 """
                 @${MixinConstants.Annotations.ACCESSOR}

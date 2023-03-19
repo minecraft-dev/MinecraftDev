@@ -23,7 +23,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.util.createSmartPointer
 import com.intellij.psi.util.parentOfType
@@ -47,7 +47,7 @@ class AccessorHandler : MixinMemberAnnotationHandler {
             if (!method.hasParameters() && accessorInfo.type.allowGetters) {
                 it.desc == method.returnType?.descriptor
             } else if (
-                PsiType.VOID == method.returnType && method.parameterList.parametersCount == 1 &&
+                PsiTypes.voidType() == method.returnType && method.parameterList.parametersCount == 1 &&
                 accessorInfo.type.allowSetters
             ) {
                 it.desc == method.parameterList.parameters[0].type.descriptor

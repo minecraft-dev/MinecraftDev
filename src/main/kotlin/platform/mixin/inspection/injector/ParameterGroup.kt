@@ -17,6 +17,7 @@ import com.demonwav.mcdev.util.normalize
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 
 data class ParameterGroup(
     val parameters: List<Parameter>,
@@ -55,7 +56,13 @@ data class ParameterGroup(
     }
 
     companion object {
-        private val INT_TYPES = setOf(PsiType.INT, PsiType.SHORT, PsiType.CHAR, PsiType.BYTE, PsiType.BOOLEAN)
+        private val INT_TYPES = setOf(
+            PsiTypes.intType(),
+            PsiTypes.shortType(),
+            PsiTypes.charType(),
+            PsiTypes.byteType(),
+            PsiTypes.booleanType()
+        )
 
         private fun matchParameter(expectedType: PsiType, parameter: PsiParameter, allowCoerce: Boolean): Boolean {
             val normalizedExpected = expectedType.normalize()

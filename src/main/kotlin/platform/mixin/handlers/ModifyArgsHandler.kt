@@ -16,7 +16,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.ARGS
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
@@ -44,7 +44,7 @@ class ModifyArgsHandler : InjectorAnnotationHandler() {
                         isVarargs = true,
                     ),
                 ),
-                PsiType.VOID,
+                PsiTypes.voidType(),
             ),
         )
     }

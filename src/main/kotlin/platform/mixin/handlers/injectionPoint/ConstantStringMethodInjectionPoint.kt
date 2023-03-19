@@ -21,6 +21,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
@@ -54,7 +55,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
     ) : NavigationVisitor() {
         private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
             // Must return void
-            if (expression.type != PsiType.VOID) {
+            if (expression.type != PsiTypes.voidType()) {
                 return false
             }
 

@@ -25,7 +25,7 @@ import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReturnStatement
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.controlFlow.ControlFlowUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -85,13 +85,13 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
                         return
                     }
                     val returnType = LambdaUtil.getFunctionalInterfaceReturnType(executableElement) ?: return
-                    if (returnType != PsiType.VOID) {
+                    if (returnType != PsiTypes.voidType()) {
                         return
                     }
                     body
                 }
                 is PsiMethod -> {
-                    if (executableElement.returnType != PsiType.VOID && !executableElement.isConstructor) {
+                    if (executableElement.returnType != PsiTypes.voidType() && !executableElement.isConstructor) {
                         return
                     }
                     executableElement.body ?: return

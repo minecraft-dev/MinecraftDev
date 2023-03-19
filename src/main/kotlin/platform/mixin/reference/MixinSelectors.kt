@@ -48,7 +48,7 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameValuePair
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedMembersSearch
 import com.intellij.psi.util.InheritanceUtil
@@ -563,7 +563,7 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
             val name = descAnnotation.findAttributeValue("value")?.constantStringValue ?: return null
 
             val argTypes = descAnnotation.findAttributeValue("args")?.resolveTypeArray() ?: emptyList()
-            val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiType.VOID
+            val ret = descAnnotation.findAttributeValue("ret")?.resolveType() ?: PsiTypes.voidType()
             val desc = Type.getMethodDescriptor(
                 Type.getType(ret.descriptor),
                 *argTypes.mapToArray { Type.getType(it.descriptor) },

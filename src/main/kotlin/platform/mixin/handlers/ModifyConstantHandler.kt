@@ -30,6 +30,7 @@ import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -136,10 +137,10 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         return constantInfos.asSequence().map {
             when (it.constantInfo.constant) {
                 null -> PsiType.getJavaLangObject(psiManager, annotation.resolveScope)
-                is Int -> PsiType.INT
-                is Float -> PsiType.FLOAT
-                is Long -> PsiType.LONG
-                is Double -> PsiType.DOUBLE
+                is Int -> PsiTypes.intType()
+                is Float -> PsiTypes.floatType()
+                is Long -> PsiTypes.longType()
+                is Double -> PsiTypes.doubleType()
                 is String -> PsiType.getJavaLangString(psiManager, annotation.resolveScope)
                 is Type -> PsiType.getJavaLangClass(psiManager, annotation.resolveScope)
                 else -> throw IllegalStateException("Unknown constant type: ${it.constantInfo.constant.javaClass.name}")

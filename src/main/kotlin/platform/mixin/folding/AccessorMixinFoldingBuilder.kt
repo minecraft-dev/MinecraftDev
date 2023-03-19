@@ -29,8 +29,8 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiParenthesizedExpression
-import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeCastExpression
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.elementType
 import com.intellij.psi.util.parentOfType
 
@@ -83,7 +83,7 @@ class AccessorMixinFoldingBuilder : CustomFoldingBuilder() {
         if (method.hasAnnotation(ACCESSOR)) {
             val name = AccessorHandler.getInstance()?.findAccessorTargetForReference(method)?.element?.name
                 ?: return null
-            return if (method.returnType == PsiType.VOID) {
+            return if (method.returnType == PsiTypes.voidType()) {
                 "$name = "
             } else {
                 name

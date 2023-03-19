@@ -20,6 +20,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.plugins.groovy.lang.resolve.processors.inference.type
@@ -30,29 +31,29 @@ private const val INTERNAL_CONSTRUCTOR_NAME = "<init>"
 
 val PsiPrimitiveType.internalName: Char
     get() = when (this) {
-        PsiType.BYTE -> 'B'
-        PsiType.CHAR -> 'C'
-        PsiType.DOUBLE -> 'D'
-        PsiType.FLOAT -> 'F'
-        PsiType.INT -> 'I'
-        PsiType.LONG -> 'J'
-        PsiType.SHORT -> 'S'
-        PsiType.BOOLEAN -> 'Z'
-        PsiType.VOID -> 'V'
+        PsiTypes.byteType() -> 'B'
+        PsiTypes.charType() -> 'C'
+        PsiTypes.doubleType() -> 'D'
+        PsiTypes.floatType() -> 'F'
+        PsiTypes.intType() -> 'I'
+        PsiTypes.longType() -> 'J'
+        PsiTypes.shortType() -> 'S'
+        PsiTypes.booleanType() -> 'Z'
+        PsiTypes.voidType() -> 'V'
         else -> throw IllegalArgumentException("Unsupported primitive type: $this")
     }
 
 fun getPrimitiveType(internalName: Char): PsiPrimitiveType? {
     return when (internalName) {
-        'B' -> PsiType.BYTE
-        'C' -> PsiType.CHAR
-        'D' -> PsiType.DOUBLE
-        'F' -> PsiType.FLOAT
-        'I' -> PsiType.INT
-        'J' -> PsiType.LONG
-        'S' -> PsiType.SHORT
-        'Z' -> PsiType.BOOLEAN
-        'V' -> PsiType.VOID
+        'B' -> PsiTypes.byteType()
+        'C' -> PsiTypes.charType()
+        'D' -> PsiTypes.doubleType()
+        'F' -> PsiTypes.floatType()
+        'I' -> PsiTypes.intType()
+        'J' -> PsiTypes.longType()
+        'S' -> PsiTypes.shortType()
+        'Z' -> PsiTypes.booleanType()
+        'V' -> PsiTypes.voidType()
         else -> null
     }
 }
@@ -162,7 +163,7 @@ private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
         parameter.type.appendDescriptor(builder)
     }
     builder.append(')')
-    return (returnType ?: PsiType.VOID).appendDescriptor(builder)
+    return (returnType ?: PsiTypes.voidType()).appendDescriptor(builder)
 }
 
 // Field

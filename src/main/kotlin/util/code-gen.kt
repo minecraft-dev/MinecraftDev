@@ -19,11 +19,11 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 
 fun createVoidMethodWithParameterType(project: Project, name: String, paramType: PsiClass): PsiMethod? {
-    val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(name, PsiType.VOID)
+    val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(name, PsiTypes.voidType())
 
     val list = newMethod.parameterList
     val qName = paramType.qualifiedName ?: return null

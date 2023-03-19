@@ -36,6 +36,7 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.PsiUtil
 
 class ConfigValueInspection : MixinConfigInspection() {
@@ -56,8 +57,9 @@ class ConfigValueInspection : MixinConfigInspection() {
 
         private fun checkValue(type: PsiType, value: JsonValue) {
             val valid = when (type) {
-                PsiType.BOOLEAN -> value is JsonBooleanLiteral
-                PsiType.BYTE, PsiType.DOUBLE, PsiType.FLOAT, PsiType.INT, PsiType.LONG, PsiType.SHORT ->
+                PsiTypes.booleanType() -> value is JsonBooleanLiteral
+                PsiTypes.byteType(), PsiTypes.doubleType(), PsiTypes.floatType(), PsiTypes.intType(),
+                PsiTypes.longType(), PsiTypes.shortType() ->
                     value is JsonNumberLiteral
                 is PsiArrayType -> checkArray(type.componentType, value)
                 else -> checkObject(type, value)
