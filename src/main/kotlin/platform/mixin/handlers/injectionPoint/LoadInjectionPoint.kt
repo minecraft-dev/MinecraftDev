@@ -180,9 +180,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         override fun visitForeachStatement(statement: PsiForeachStatement) {
             checkImplicitLocalsPre(statement)
             if (store) {
-                (statement.iterationDeclaration as? PsiParameter)?.let { param ->
-                    addLocalUsage(param, param.name)
-                }
+                addLocalUsage(statement.iterationParameter, statement.iterationParameter.name)
             }
             super.visitForeachStatement(statement)
             checkImplicitLocalsPost(statement)

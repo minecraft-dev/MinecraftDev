@@ -303,7 +303,7 @@ object LocalVariables {
             is PsiVariable -> if (element.isDoubleSlot) 2 else 1
             // arrays have copy of array, length and index variables, iterables have the iterator variable
             is PsiForeachStatement -> {
-                val param = element.iterationDeclaration as? PsiParameter
+                val param = element.iterationParameter as? PsiParameter
                 if (param?.type is PsiArrayType) 3 else 1
             }
             else -> 0

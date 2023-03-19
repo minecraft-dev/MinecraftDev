@@ -46,7 +46,7 @@ class BungeeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        val projectName = baseData.name
+        val projectName = baseData!!.name
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         assets.addTemplateProperties(
             "PROJECT_NAME" to projectName,

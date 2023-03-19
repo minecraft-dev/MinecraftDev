@@ -107,7 +107,7 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
     return result
 }
 
-inline fun <T> runReadActionAsync(crossinline runnable: () -> T): Promise<T> {
+fun <T> runReadActionAsync(runnable: () -> T): Promise<T> {
     return runAsync {
         runReadAction(runnable)
     }

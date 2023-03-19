@@ -56,22 +56,22 @@ abstract class AbstractOptionalStringBasedOnProjectNameStep(
             value = suggestValue()
         }
         valueProperty.updateWhenChanged(formatProperty, ::suggestValue)
-        valueProperty.updateWhenChanged(baseData.nameProperty, ::suggestValue)
+        valueProperty.updateWhenChanged(baseData!!.nameProperty, ::suggestValue)
         formatProperty.updateWhenChanged(valueProperty, ::suggestFormat)
     }
 
-    private fun suggestValue() = format.replace(PROJECT_NAME_PLACEHOLDER, baseData.name)
+    private fun suggestValue() = format.replace(PROJECT_NAME_PLACEHOLDER, baseData!!.name)
 
     private fun suggestFormat(): String {
-        val index = value.indexOf(baseData.name)
+        val index = value.indexOf(baseData!!.name)
         if (index == -1) {
             return value
         }
-        if (value.indexOf(baseData.name, startIndex = index + baseData.name.length) != -1) {
+        if (value.indexOf(baseData!!.name, startIndex = index + baseData!!.name.length) != -1) {
             // don't change format if there are multiple instances of the project name
             return format
         }
-        return value.replace(baseData.name, PROJECT_NAME_PLACEHOLDER)
+        return value.replace(baseData!!.name, PROJECT_NAME_PLACEHOLDER)
     }
 
     companion object {

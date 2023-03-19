@@ -12,10 +12,8 @@ package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.creator.ProjectSetupFinalizer.Factory
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.ide.wizard.stepSequence
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.project.Project
@@ -45,16 +43,11 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
         }
         result
     }
-    private val step by lazy {
-        if (finalizers.isEmpty()) {
-            null
-        } else {
-            stepSequence(finalizers[0], *finalizers.asSequence().drop(1).toTypedArray())
-        }
-    }
 
     override fun setupUI(builder: Panel) {
-        step?.setupUI(builder)
+        for (step in finalizers) {
+            step.setupUI(builder)
+        }
         if (finalizers.isNotEmpty()) {
             builder.row {
                 cell(JPanel())
@@ -69,7 +62,9 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
     }
 
     override fun setupProject(project: Project) {
-        step?.setupProject(project)
+        for (step in finalizers) {
+            step.setupProject(project)
+        }
     }
 }
 

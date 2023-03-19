@@ -53,7 +53,7 @@ class VelocityGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        val projectName = baseData.name
+        val projectName = baseData!!.name
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
