@@ -1,0 +1,11 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
+
+public class ${NAME} extends StatusEffect {
+    public ${NAME}(StatusEffectCategory statusEffectCategory, int color) {
+        super(statusEffectCategory, color);
+    }
+}

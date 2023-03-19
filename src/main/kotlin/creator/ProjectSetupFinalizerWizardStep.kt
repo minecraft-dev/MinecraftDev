@@ -11,6 +11,7 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.creator.ProjectSetupFinalizer.Factory
+import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -42,6 +43,19 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
             }
         }
         result
+    }
+    private val step by lazy {
+        when (finalizers.size) {
+            0 -> null
+            1 -> finalizers[0]
+            else -> {
+                var step = finalizers[0].nextStep { finalizers[1] }
+                for (i in 2 until finalizers.size) {
+                    step = step.nextStep { finalizers[i] }
+                }
+                step
+            }
+        }
     }
 
     override fun setupUI(builder: Panel) {
