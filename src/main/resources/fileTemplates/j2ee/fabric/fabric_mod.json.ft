@@ -22,10 +22,10 @@
     #end
 
   "depends": {
-    "fabricloader": ">=${LOADER_VERSION}",
+    "fabricloader": ">=${d}{loader_version}",
       #if (${API_VERSION})
         "fabric": "*",
       #end
-    "minecraft": "${MC_VERSION}"
+    "minecraft": "${d}{minecraft_version}"
   }
 }
