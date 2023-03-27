@@ -35,6 +35,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var forgeAutoCheckBox: JCheckBox
     private lateinit var fabricEnabledCheckBox: JCheckBox
     private lateinit var fabricAutoCheckBox: JCheckBox
+    private lateinit var quiltEnabledCheckBox: JCheckBox
+    private lateinit var quiltAutoCheckBox: JCheckBox
     private lateinit var architecturyEnabledCheckBox: JCheckBox
     private lateinit var architecturyAutoCheckBox: JCheckBox
     private lateinit var liteloaderEnabledCheckBox: JCheckBox
@@ -64,6 +66,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             spongeEnabledCheckBox,
             forgeEnabledCheckBox,
             fabricEnabledCheckBox,
+            quiltEnabledCheckBox,
             architecturyEnabledCheckBox,
             liteloaderEnabledCheckBox,
             mcpEnabledCheckBox,
@@ -83,6 +86,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             spongeAutoCheckBox,
             forgeAutoCheckBox,
             fabricAutoCheckBox,
+            quiltAutoCheckBox,
             architecturyAutoCheckBox,
             liteloaderAutoCheckBox,
             mcpAutoCheckBox,
@@ -154,31 +158,47 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             also(fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox)
             unique(fabricEnabledCheckBox, architecturyEnabledCheckBox)
         }
+        quiltEnabledCheckBox.addActionListener {
+            also(quiltEnabledCheckBox, fabricEnabledCheckBox, mixinEnabledCheckBox, mcpEnabledCheckBox)
+            unique(quiltEnabledCheckBox, architecturyEnabledCheckBox)
+        }
         architecturyEnabledCheckBox.addActionListener {
             unique(
                 architecturyEnabledCheckBox,
                 fabricEnabledCheckBox,
+                quiltEnabledCheckBox,
                 forgeEnabledCheckBox,
             )
         }
 
         forgeAutoCheckBox.addActionListener {
-            all(forgeAutoCheckBox, fabricAutoCheckBox, architecturyAutoCheckBox)(
+            all(forgeAutoCheckBox, fabricAutoCheckBox, quiltAutoCheckBox, architecturyAutoCheckBox)(
                 FABRIC,
+                QUILT,
                 ARCHITECTURY,
             )
         }
 
         fabricAutoCheckBox.addActionListener {
-            all(fabricAutoCheckBox, forgeAutoCheckBox, architecturyAutoCheckBox)(
+            all(fabricAutoCheckBox, quiltAutoCheckBox, forgeAutoCheckBox, architecturyAutoCheckBox)(
                 FORGE,
+                QUILT,
+                ARCHITECTURY,
+            )
+        }
+
+        quiltAutoCheckBox.addActionListener {
+            all(quiltAutoCheckBox, fabricAutoCheckBox, forgeAutoCheckBox, architecturyAutoCheckBox)(
+                FORGE,
+                FABRIC,
                 ARCHITECTURY,
             )
         }
 
         architecturyAutoCheckBox.addActionListener {
-            all(architecturyAutoCheckBox, forgeAutoCheckBox, fabricAutoCheckBox)(
+            all(architecturyAutoCheckBox, forgeAutoCheckBox, fabricAutoCheckBox, quiltAutoCheckBox)(
                 FORGE,
+                QUILT,
                 FABRIC,
             )
         }
@@ -305,7 +325,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val SPONGE = PAPER + 1
         private const val FORGE = SPONGE + 1
         private const val FABRIC = FORGE + 1
-        private const val ARCHITECTURY = FABRIC + 1
+        private const val QUILT = FABRIC + 1
+        private const val ARCHITECTURY = QUILT + 1
         private const val MCP = ARCHITECTURY + 1
         private const val MIXIN = MCP + 1
         private const val BUNGEECORD = MIXIN + 1
@@ -337,6 +358,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             SPONGE,
             FORGE,
             FABRIC,
+            QUILT,
             ARCHITECTURY,
             MCP,
             MIXIN,
