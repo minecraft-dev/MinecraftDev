@@ -107,12 +107,13 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val mainClassName = "$packageName.${modName.toJavaClassName()}"
         val clientClassName = "$packageName.client.${modName.toJavaClassName()}Client"
         entryPoints = listOf(
-            EntryPoint("main", EntryPoint.Type.CLASS, mainClassName, QuiltConstants.MOD_INITIALIZER),
-            EntryPoint("client", EntryPoint.Type.CLASS, clientClassName, QuiltConstants.CLIENT_MOD_INITIALIZER),
+            EntryPoint("init", EntryPoint.Type.CLASS, mainClassName, QuiltConstants.MOD_INITIALIZER),
+            EntryPoint("client_init", EntryPoint.Type.CLASS, clientClassName, QuiltConstants.CLIENT_MOD_INITIALIZER),
         ) // TODO: un-hardcode?
 
         assets.addTemplateProperties(
             "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "GROUP_ID" to buildSystemProps.groupId,
             "MOD_NAME" to StringUtil.escapeStringCharacters(modName),
             "MOD_DESCRIPTION" to StringUtil.escapeStringCharacters(description),
             "MOD_ENVIRONMENT" to envName,
