@@ -44,7 +44,7 @@ class QuiltGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val mcVersion = data.getUserData(QuiltVersionChainStep.MC_VERSION_KEY) ?: return
         val quiltMappingsVersion = data.getUserData(QuiltVersionChainStep.QUILT_MAPPINGS_VERSION_KEY) ?: return
         val loaderVersion = data.getUserData(QuiltVersionChainStep.LOADER_VERSION_KEY) ?: return
-        val loomVersion = "1.1-" // TODO
+        val loomVersion = "1.1.+" // TODO
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val apiVersion = data.getUserData(QuiltVersionChainStep.API_VERSION_KEY)
         val officialMappings = data.getUserData(QuiltVersionChainStep.OFFICIAL_MAPPINGS_KEY) ?: false

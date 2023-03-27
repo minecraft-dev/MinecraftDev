@@ -1,7 +1,9 @@
 [versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
 minecraft = "${MC_VERSION}"
-quilt_mappings = "${API_VERSION}"
+#if (!${OFFICIAL_MAPPINGS})
+quilt_mappings = "${QUILT_MAPPINGS}"
+#end
 quilt_loader = "${LOADER_VERSION}"
 
 #if (${API_VERSION})

@@ -1,12 +1,14 @@
 pluginManagement {
-    maven {
-        name = 'Quilt'
-        url = 'https://maven.quiltmc.org/repository/release'
+    repositories {
+        maven {
+            name = 'Quilt'
+            url = 'https://maven.quiltmc.org/repository/release'
+        }
+        // Currently needed for Intermediary and other temporary dependencies
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
     }
-    // Currently needed for Intermediary and other temporary dependencies
-    maven {
-        name = 'Fabric'
-        url = 'https://maven.fabricmc.net/'
-    }
-    gradlePluginPortal()
 }

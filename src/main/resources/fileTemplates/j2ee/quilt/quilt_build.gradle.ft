@@ -40,13 +40,13 @@ dependencies {
 processResources {
     inputs.property 'version', version
     inputs.property "minecraft_version", libs.versions.minecraft.get()
-    inputs.property "loader_version", libs.versions.quilt_loader.get()
+    inputs.property "loader_version", libs.versions.quilt.loader.get()
     filteringCharset "UTF-8"
 
     filesMatching('quilt.mod.json') {
         expand "version": version,
                 "minecraft_version": libs.versions.minecraft.get(),
-                "loader_version": libs.versions.quilt_loader.get()
+                "loader_version": libs.versions.quilt.loader.get()
     }
 }
 
