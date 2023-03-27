@@ -35,7 +35,16 @@ class QuiltReferenceContributor : PsiReferenceContributor() {
                     2,
                     PlatformPatterns.psiElement(JsonObject::class.java).isPropertyValue("entrypoints"),
                 ),
-        ) or stringInModJson.withSuperParent(2, PlatformPatterns.psiElement(JsonObject::class.java).isPropertyValue("entrypoints"))
+        ) or stringInModJson
+            .withSuperParent(2, PlatformPatterns.psiElement(JsonObject::class.java).isPropertyValue("entrypoints"))
+            .with(
+                object : PatternCondition<JsonElement>("isNotPropertyName") {
+                    override fun accepts(t: JsonElement, context: ProcessingContext?): Boolean {
+                        val parent = t.parent as? JsonProperty ?: return false
+                        return parent.nameElement != t
+                    }
+                }
+            )
 
         registrar.registerReferenceProvider(entryPointPattern, EntryPointReference)
 
