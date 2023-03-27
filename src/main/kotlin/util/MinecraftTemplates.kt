@@ -89,6 +89,18 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
         }
 
+        FileTemplateGroupDescriptor("Quilt", PlatformAssets.QUILT_ICON).let { quiltGroup ->
+            group.addTemplate(quiltGroup)
+            quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_LIBS_VERSIONS_TEMPLATE, PlatformAssets.QUILT_ICON))
+            quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_BUILD_GRADLE_TEMPLATE, PlatformAssets.QUILT_ICON))
+            quiltGroup.addTemplate(
+                FileTemplateDescriptor(QUILT_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.QUILT_ICON),
+            )
+            quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_MIXINS_JSON_TEMPLATE, PlatformAssets.QUILT_ICON))
+            quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_MOD_JSON_TEMPLATE, PlatformAssets.QUILT_ICON))
+            quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.QUILT_ICON))
+        }
+
         FileTemplateGroupDescriptor("LiteLoader", PlatformAssets.LITELOADER_ICON).let { liteGroup ->
             group.addTemplate(liteGroup)
             liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE))
