@@ -32,6 +32,8 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.platform.quilt.QuiltModuleType
+import com.demonwav.mcdev.platform.quilt.framework.QUILT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.velocity.VelocityModuleType
@@ -50,6 +52,7 @@ enum class PlatformType(
     ARCHITECTURY(ArchitecturyModuleType),
     FORGE(ForgeModuleType),
     FABRIC(FabricModuleType),
+    QUILT(QuiltModuleType),
     SPONGE(SpongeModuleType),
     BUNGEECORD(BungeeCordModuleType, "bungeecord_v2.json"),
     WATERFALL(WaterfallModuleType, "waterfall.json", BUNGEECORD),
@@ -82,6 +85,7 @@ enum class PlatformType(
             ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
+            QUILT_LIBRARY_KIND -> QUILT
             MCP_LIBRARY_KIND -> MCP
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD

@@ -1,0 +1,39 @@
+#set ( $d = "$" )
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "group": "${GROUP_ID}",
+    "id": "${ARTIFACT_ID}",
+    "version": "${d}{version}",
+    "metadata": {
+      "name": "${MOD_NAME}",
+      "description": "${MOD_DESCRIPTION}",
+      "contributors": {},
+      "contact": {},
+      "icon": "assets/example_mod/icon.png"
+    },
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "entrypoints": {},
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "versions": ">=${d}{loader_version}"
+      },
+#if (${API_VERSION})
+      {
+        "id": "quilted_fabric_api",
+        "versions": "*"
+      },
+#end
+      {
+        "id": "minecraft",
+        "versions": "${d}{minecraft_version}"
+      }
+    ]
+  },
+#if (${MIXINS})
+  "mixin": [
+    "${ARTIFACT_ID}.mixins.json"
+  ],
+#end
+}

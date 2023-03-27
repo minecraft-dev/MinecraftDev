@@ -21,6 +21,7 @@ import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.platform.quilt.framework.QUILT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.velocity.framework.VELOCITY_LIBRARY_KIND
 
@@ -31,6 +32,7 @@ val MINECRAFT_LIBRARY_KINDS = setOf(
     SPONGE_LIBRARY_KIND,
     FORGE_LIBRARY_KIND,
     FABRIC_LIBRARY_KIND,
+    QUILT_LIBRARY_KIND,
     ARCHITECTURY_LIBRARY_KIND,
     MCP_LIBRARY_KIND,
     MIXIN_LIBRARY_KIND,

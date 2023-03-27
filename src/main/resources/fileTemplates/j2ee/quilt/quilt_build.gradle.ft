@@ -1,0 +1,98 @@
+plugins {
+    id 'maven-publish'
+    alias libs.plugins.quilt.loom
+}
+
+archivesBaseName = project.archives_base_name
+version = "${project.version}+${libs.versions.minecraft.get()}"
+group = project.maven_group
+
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+}
+
+// All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
+// See https://docs.gradle.org/current/userguide/platforms.html for information on how version catalogs work.
+dependencies {
+    minecraft libs.minecraft
+
+#if (${OFFICIAL_MAPPINGS})
+    mappings loom.layered {
+        mappings variantOf(libs.quilt.mappings) { classifier 'intermediary-v2' }
+        officialMojangMappings()
+    }
+#else
+    mappings variantOf(libs.quilt.mappings) { classifier 'intermediary-v2' }
+#end
+    modImplementation libs.quilt.loader
+
+#if (${API_VERSION})
+    // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
+    // Quilted Fabric API will automatically pull in the correct QSL version.
+    modImplementation libs.quilted.fabric.api
+#end
+}
+
+processResources {
+    inputs.property 'version', version
+    inputs.property "minecraft_version", libs.versions.minecraft.get()
+    inputs.property "loader_version", libs.versions.quilt_loader.get()
+    filteringCharset "UTF-8"
+
+    filesMatching('quilt.mod.json') {
+        expand "version": version,
+                "minecraft_version": libs.versions.minecraft.get(),
+                "loader_version": libs.versions.quilt_loader.get()
+    }
+}
+
+def targetJavaVersion = ${JAVA_VERSION}
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release = targetJavaVersion
+    }
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    // Still required by IDEs such as Eclipse and Visual Studio Code
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+
+    // If this mod is going to be a library, then it should also generate Javadocs in order to aid with development.
+    // Uncomment this line to generate them.
+    // withJavadocJar()
+}
+
+// If you plan to use a different file for the license, don't forget to change the file name here!
+jar {
+    from('LICENSE') {
+        rename { "${it}_${archivesBaseName}" }
+    }
+}
+
+// Configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}

@@ -205,6 +205,13 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_MOD_JSON_TEMPLATE = "fabric_mod.json"
         const val FABRIC_SETTINGS_GRADLE_TEMPLATE = "fabric_settings.gradle"
 
+        const val QUILT_BUILD_GRADLE_TEMPLATE = "quilt_build.gradle"
+        const val QUILT_GRADLE_PROPERTIES_TEMPLATE = "quilt_gradle.properties"
+        const val QUILT_MIXINS_JSON_TEMPLATE = "quilt_mixins.json"
+        const val QUILT_MOD_JSON_TEMPLATE = "quilt_mod.json"
+        const val QUILT_SETTINGS_GRADLE_TEMPLATE = "quilt_settings.gradle"
+        const val QUILT_LIBS_VERSIONS_TEMPLATE = "quilt_libs_versions.toml"
+
         const val ARCHITECTURY_BUILD_GRADLE_TEMPLATE = "architectury_build.gradle"
         const val ARCHITECTURY_GRADLE_PROPERTIES_TEMPLATE = "architectury_gradle.properties"
         const val ARCHITECTURY_SETTINGS_GRADLE_TEMPLATE = "architectury_settings.gradle"

@@ -1,0 +1,10 @@
+# Gradle Properties
+org.gradle.jvmargs = -Xmx1G
+org.gradle.parallel = true
+
+# Mod Properties
+version = ${VERSION}
+maven_group = ${GROUP_ID}
+archives_base_name = ${ARTIFACT_ID}
+
+# Dependencies are managed at gradle/libs.versions.toml

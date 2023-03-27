@@ -1,5 +1,6 @@
 com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModelBuilderImpl
 com.demonwav.mcdev.platform.mcp.gradle.tooling.fabricloom.FabricLoomModelBuilderImpl
+com.demonwav.mcdev.platform.mcp.gradle.tooling.quiltloom.QuiltLoomModelBuilderImpl
 com.demonwav.mcdev.platform.mcp.gradle.tooling.vanillagradle.VanillaGradleModelBuilderImpl
 com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG2BuilderImpl
 com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelFG3BuilderImpl

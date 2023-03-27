@@ -24,7 +24,7 @@
     <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">minecraft-dev</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, Architectury, MCP, Mixin, Velocity, BungeeCord and Waterfall projects to Intellij IDEA.
+      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, Quilt, Architectury, MCP, Mixin, Velocity, BungeeCord and Waterfall projects to Intellij IDEA.
     ]]></description>
 
     <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
@@ -64,6 +64,7 @@
 
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.forge.creator.ForgePlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.fabric.creator.FabricPlatformStep$Factory" />
+        <modPlatformWizard implementation="com.demonwav.mcdev.platform.quilt.creator.QuiltPlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory" />
 
         <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.sponge.creator.SpongePlatformStep$Factory" />
@@ -84,6 +85,7 @@
 
         <buildSystemSupport platform="Forge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.forge.creator.ForgeGradleSupport" />
         <buildSystemSupport platform="Fabric" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.fabric.creator.FabricGradleSupport" />
+        <buildSystemSupport platform="Quilt" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.quilt.creator.QuiltGradleSupport" />
         <buildSystemSupport platform="Architectury" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeMavenSupport" />
@@ -134,6 +136,7 @@
                * Sponge
                * Forge
                * Fabric
+               * Quilt
                * MCP
                * Mixin
                * Velocity
@@ -316,6 +319,13 @@
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
         <!--endregion-->
 
+        <!--region QUILT-->
+        <dependencySupport coordinate="org.quiltmc:quilt-loader" kind="java"/>
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.quilt.framework.QuiltPresentationProvider" />
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.quilt.QuiltFileIconProvider"/>
+        <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.quilt.reference.QuiltReferenceContributor" />
+        <!--endregion-->
+
         <!--region ARCHITECTURY-->
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyPresentationProvider" />
         <!--endregion-->
@@ -325,6 +335,7 @@
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.quiltloom.QuiltLoomDataService"/>
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDataService"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider" />
@@ -332,6 +343,7 @@
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
         <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDecompileSourceProvider" />
+        <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.quiltloom.QuiltLoomDecompileSourceProvider" />
         <attachSourcesProvider implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDecompileSourceProvider" />
 
         <!-- access transformer file type -->
@@ -359,6 +371,7 @@
 
         <gotoSymbolContributor implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor" />
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.fabricloom.TinyUnscrambler"/>
+        <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.quiltloom.TinyUnscrambler"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.srg.McpUnscrambler"/>
         <!--endregion-->
 
@@ -595,6 +608,17 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
+        <!--endregion-->
+
+        <!--region QUILT INSPECTIONS-->
+        <localInspection displayName="Unresolved Quilt mod JSON reference"
+                         shortName="UnresolvedQuiltModJsonReference"
+                         groupName="Quilt"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.quilt.inspection.UnresolvedReferenceInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
@@ -944,6 +968,7 @@
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.quiltloom.QuiltLoomProjectResolverExtension"/>
         <projectResolve implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyProjectResolverExtension"/>
     </extensions>
 

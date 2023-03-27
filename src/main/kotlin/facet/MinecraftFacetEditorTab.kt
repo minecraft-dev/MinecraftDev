@@ -320,6 +320,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.SPONGE,
             PlatformType.FORGE,
             PlatformType.FABRIC,
+            PlatformType.QUILT,
             PlatformType.ARCHITECTURY,
             PlatformType.MCP,
             PlatformType.MIXIN,
