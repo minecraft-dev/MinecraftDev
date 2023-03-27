@@ -36,4 +36,7 @@
     "${ARTIFACT_ID}.mixins.json"
   ],
 #end
+  "minecraft": {
+    "environment": "${MOD_ENVIRONMENT}"
+  }
 }

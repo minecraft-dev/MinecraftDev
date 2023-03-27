@@ -93,7 +93,7 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val envName = when (data.getUserData(QuiltEnvironmentStep.KEY) ?: Side.NONE) {
             Side.CLIENT -> "client"
-            Side.SERVER -> "server"
+            Side.SERVER -> "dedicated_server"
             else -> "*"
         }
         val loaderVersion = data.getUserData(QuiltVersionChainStep.LOADER_VERSION_KEY) ?: return
