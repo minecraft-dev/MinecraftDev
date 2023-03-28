@@ -14,7 +14,11 @@ import com.demonwav.mcdev.creator.EmptyStep
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addTemplates
-import com.demonwav.mcdev.creator.buildsystem.*
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.GRADLE_VERSION_KEY
+import com.demonwav.mcdev.creator.buildsystem.GradleImportStep
+import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
@@ -28,7 +32,7 @@ class QuiltGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> QuiltGradleFilesStep(parent) // TODO: Read fixed version of Gradle Wrapper Step
+            BuildSystemSupport.PRE_STEP -> QuiltGradleFilesStep(parent) // TODO: fixed version of Gradle Wrapper Step
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
             else -> EmptyStep(parent)
         }
@@ -75,7 +79,7 @@ class QuiltGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
             "gradle/libs.versions.toml" to MinecraftTemplates.QUILT_LIBS_VERSIONS_TEMPLATE
         )
 
-        assets.data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(8,0,2))
+        assets.data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(8, 0, 2))
         assets.addGradleWrapperProperties(project)
 
         if (gitEnabled) {

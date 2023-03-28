@@ -11,8 +11,20 @@
 package com.demonwav.mcdev.platform.quilt.creator
 
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
-import com.demonwav.mcdev.creator.step.*
+import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
+import com.demonwav.mcdev.creator.step.AbstractLatentStep
+import com.demonwav.mcdev.creator.step.AbstractMcVersionChainStep
+import com.demonwav.mcdev.creator.step.AbstractOptionalStringBasedOnProjectNameStep
+import com.demonwav.mcdev.creator.step.DescriptionStep
+import com.demonwav.mcdev.creator.step.IssueTrackerStep
+import com.demonwav.mcdev.creator.step.LicenseStep
+import com.demonwav.mcdev.creator.step.ModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
+import com.demonwav.mcdev.creator.step.RepositoryStep
+import com.demonwav.mcdev.creator.step.UseMixinsStep
+import com.demonwav.mcdev.creator.step.VersionChainComboBox
+import com.demonwav.mcdev.creator.step.WaitForSmartModeStep
+import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.platform.quilt.util.QuiltStandardLibrariesVersions
 import com.demonwav.mcdev.platform.quilt.util.QuiltVersions
@@ -193,7 +205,10 @@ class QuiltVersionChainStep(
         super.setupProject(project)
         data.putUserData(MC_VERSION_KEY, (getVersion(MINECRAFT_VERSION) as QuiltMcVersion).version)
         data.putUserData(LOADER_VERSION_KEY, getVersion(LOADER_VERSION) as SemanticVersion)
-        data.putUserData(QUILT_MAPPINGS_VERSION_KEY, (getVersion(QUILT_MAPPINGS_VERSION) as QuiltVersions.QuiltMappingsVersion).name)
+        data.putUserData(
+            QUILT_MAPPINGS_VERSION_KEY,
+            (getVersion(QUILT_MAPPINGS_VERSION) as QuiltVersions.QuiltMappingsVersion).name
+        )
         if (useApi) {
             data.putUserData(API_VERSION_KEY, getVersion(QFAPI_VERSION) as SemanticVersion)
         }

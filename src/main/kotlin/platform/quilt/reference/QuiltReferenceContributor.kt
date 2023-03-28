@@ -15,7 +15,11 @@ import com.demonwav.mcdev.platform.fabric.reference.LicenseReference
 import com.demonwav.mcdev.platform.fabric.reference.ResourceFileReference
 import com.demonwav.mcdev.platform.quilt.util.QuiltConstants
 import com.demonwav.mcdev.util.isPropertyValue
-import com.intellij.json.psi.*
+import com.intellij.json.psi.JsonArray
+import com.intellij.json.psi.JsonElement
+import com.intellij.json.psi.JsonObject
+import com.intellij.json.psi.JsonProperty
+import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiReferenceContributor
@@ -23,12 +27,10 @@ import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.util.ProcessingContext
 import org.jetbrains.kotlin.idea.completion.or
 
-
 class QuiltReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         val stringInModJson = PlatformPatterns.psiElement(JsonStringLiteral::class.java)
             .inVirtualFile(PlatformPatterns.virtualFile().withName(QuiltConstants.QUILT_MOD_JSON))
-
         val entryPointPattern = stringInModJson.withParent(
             PlatformPatterns.psiElement(JsonArray::class.java)
                 .withSuperParent(
