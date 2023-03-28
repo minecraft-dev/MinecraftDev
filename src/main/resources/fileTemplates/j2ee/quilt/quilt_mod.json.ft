@@ -10,7 +10,7 @@
       "description": "${MOD_DESCRIPTION}",
       "contributors": {},
       "contact": {},
-      "icon": "assets/example_mod/icon.png"
+      "icon": "assets/${ARTIFACT_ID}/icon.png"
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {},
