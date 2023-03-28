@@ -18,7 +18,6 @@ import com.demonwav.mcdev.creator.buildsystem.*
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
-import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -29,7 +28,7 @@ class QuiltGradleSupport : BuildSystemSupport {
 
     override fun createStep(step: String, parent: NewProjectWizardStep): NewProjectWizardStep {
         return when (step) {
-            BuildSystemSupport.PRE_STEP -> QuiltGradleFilesStep(parent).nextStep(::GradleWrapperStep)
+            BuildSystemSupport.PRE_STEP -> QuiltGradleFilesStep(parent) // TODO: Read fixed version of Gradle Wrapper Step
             BuildSystemSupport.POST_STEP -> GradleImportStep(parent)
             else -> EmptyStep(parent)
         }
