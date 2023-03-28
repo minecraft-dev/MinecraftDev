@@ -153,9 +153,9 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val generator = JsonElementGenerator(project)
 
         jsonFile.runWriteAction {
-            ((json.findProperty("quilt_loader")?.value as? JsonObject)
-                ?.findProperty("metadata") as? JsonObject)
-                ?.findProperty("contributors")
+            val quiltLoaderProperty = json.findProperty("quilt_loader")?.value as? JsonObject
+            val metadataProperty = quiltLoaderProperty?.findProperty("metadata")?.value as? JsonObject
+            (metadataProperty?.findProperty("contributors")?.value as? JsonObject)
                 ?.let { authorsObject ->
                     for (i in authors.indices) {
                         if (i != 0) {
@@ -167,9 +167,7 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
                     }
                 }
 
-            ((json.findProperty("quilt_loader")?.value as? JsonObject)
-                ?.findProperty("metadata") as? JsonObject)
-                ?.findProperty("contact")
+            (metadataProperty?.findProperty("contact")?.value as? JsonObject)
                 ?.let { contactObject ->
                     val properties = mutableListOf<Pair<String, String>>()
                     if (!website.isNullOrBlank()) {
@@ -191,8 +189,7 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
                     }
                 }
 
-            ((json.findProperty("quilt_loader")?.value as? JsonObject)
-                ?.findProperty("entrypoints")?.value as? JsonObject)
+            (quiltLoaderProperty?.findProperty("entrypoints")?.value as? JsonObject)
                 ?.let { entryPointsObject ->
                     val entryPointsByCategory = entryPoints
                         .groupBy { it.category }
