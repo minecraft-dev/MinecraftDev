@@ -19,7 +19,14 @@ import com.demonwav.mcdev.creator.buildsystem.AbstractRunBuildSystemStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.findStep
-import com.demonwav.mcdev.creator.step.*
+import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModNameStep
+import com.demonwav.mcdev.creator.step.DescriptionStep
+import com.demonwav.mcdev.creator.step.IssueTrackerStep
+import com.demonwav.mcdev.creator.step.LicenseStep
+import com.demonwav.mcdev.creator.step.RepositoryStep
+import com.demonwav.mcdev.creator.step.UseMixinsStep
+import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.platform.quilt.EntryPoint
 import com.demonwav.mcdev.platform.quilt.util.QuiltConstants
@@ -112,9 +119,14 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             )
             else -> listOf(
                 EntryPoint("init", EntryPoint.Type.CLASS, mainClassName, QuiltConstants.MOD_INITIALIZER),
-                EntryPoint("client_init", EntryPoint.Type.CLASS, clientClassName, QuiltConstants.CLIENT_MOD_INITIALIZER),
+                EntryPoint(
+                    "client_init",
+                    EntryPoint.Type.CLASS,
+                    clientClassName,
+                    QuiltConstants.CLIENT_MOD_INITIALIZER
+                ),
             )
-        }  // TODO: un-hardcode?
+        } // TODO: un-hardcode?
 
         assets.addTemplateProperties(
             "ARTIFACT_ID" to buildSystemProps.artifactId,
