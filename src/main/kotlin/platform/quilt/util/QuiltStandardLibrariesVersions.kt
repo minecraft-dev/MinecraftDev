@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2023 minecraft-dev
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.quilt.util
 
 import com.demonwav.mcdev.creator.selectProxy
@@ -41,7 +51,9 @@ class QuiltStandardLibrariesVersions(val versions: List<Version>) {
                                 continue@versionLoop
                             }
                         }
-                        val versionNumber = version["version_number"]?.asString?.let(SemanticVersion.Companion::tryParse)
+                        val versionNumber = version["version_number"]
+                            ?.asString
+                            ?.let(SemanticVersion.Companion::tryParse)
                             ?: return null
                         val gameVersions = version["game_versions"]?.asJsonArray ?: return null
                         val gameVersionsList = mutableListOf<String>()

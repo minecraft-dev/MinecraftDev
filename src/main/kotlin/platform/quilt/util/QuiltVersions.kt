@@ -1,3 +1,13 @@
+/*
+ * Minecraft Dev for IntelliJ
+ *
+ * https://minecraftdev.org
+ *
+ * Copyright (c) 2023 minecraft-dev
+ *
+ * MIT License
+ */
+
 package com.demonwav.mcdev.platform.quilt.util
 
 import com.demonwav.mcdev.creator.selectProxy
@@ -59,7 +69,10 @@ class QuiltVersions(val game: List<Game>, val mappings: List<Mappings>, val load
                     val loaders = json["loader"]?.asJsonArray ?: return null
                     for (loader in loaders) {
                         val loaderObj = loader?.asJsonObject ?: return null
-                        val version = loaderObj["version"]?.asString?.let(SemanticVersion.Companion::tryParse) ?: return null
+                        val version = loaderObj["version"]
+                            ?.asString
+                            ?.let(SemanticVersion.Companion::tryParse)
+                            ?: return null
                         loaderList += version
                     }
                 }
