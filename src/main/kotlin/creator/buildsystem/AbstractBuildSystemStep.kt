@@ -20,9 +20,7 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
-import com.intellij.ui.dsl.builder.EMPTY_LABEL
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.Row
 
 abstract class AbstractBuildSystemStep(
     parent: NewProjectWizardStep,
@@ -39,14 +37,14 @@ abstract class AbstractBuildSystemStep(
     abstract val platformName: String
 
     override val self get() = this
-    override val label get() = if (steps.size > 1) "Build System:" else EMPTY_LABEL
+    override val label = "Build System:"
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)
         return super.initSteps()
     }
 
-    override fun setupSwitcherUi(builder: Row) {
+    override fun setupSwitcherUi(builder: Panel) {
         if (steps.size > 1) {
             super.setupSwitcherUi(builder)
         }

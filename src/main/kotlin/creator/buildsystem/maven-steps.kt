@@ -167,7 +167,7 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
             MavenImportingManager.getInstance(project).linkAndImportFile(pomFile)
         } ?: return
 
-        promise.blockingGet(Int.MAX_VALUE, TimeUnit.SECONDS)
+        promise.finishPromise.blockingGet(Int.MAX_VALUE, TimeUnit.SECONDS)
 
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         addRunTaskConfiguration(project, buildSystemProps, "package")

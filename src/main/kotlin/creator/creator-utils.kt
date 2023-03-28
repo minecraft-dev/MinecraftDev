@@ -26,11 +26,8 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.RecursionManager
 import java.time.ZonedDateTime
 
-var NewProjectWizardStep.gitEnabled
+val NewProjectWizardStep.gitEnabled
     get() = data.getUserData(GitNewProjectWizardData.KEY)!!.git
-    set(value) {
-        data.getUserData(GitNewProjectWizardData.KEY)!!.git = value
-    }
 
 fun FixedAssetsNewProjectWizardStep.addGradleGitignore(project: Project) {
     addTemplates(project, ".gitignore" to MinecraftTemplates.GRADLE_GITIGNORE_TEMPLATE)
