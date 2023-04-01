@@ -31,6 +31,11 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             bukkitGroup.addTemplate(FileTemplateDescriptor(BUKKIT_POM_TEMPLATE))
         }
 
+        FileTemplateGroupDescriptor("Paper", PlatformAssets.PAPER_ICON).let { paperGroup ->
+            group.addTemplate(paperGroup)
+            paperGroup.addTemplate(FileTemplateDescriptor(PAPER_PLUGIN_YML_TEMPLATE))
+        }
+
         FileTemplateGroupDescriptor("BungeeCord", PlatformAssets.BUNGEECORD_ICON).let { bungeeGroup ->
             group.addTemplate(bungeeGroup)
             bungeeGroup.addTemplate(FileTemplateDescriptor(BUNGEECORD_MAIN_CLASS_TEMPLATE))
@@ -164,6 +169,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val BUKKIT_GRADLE_PROPERTIES_TEMPLATE = "Bukkit gradle.properties"
         const val BUKKIT_SETTINGS_GRADLE_TEMPLATE = "Bukkit settings.gradle"
         const val BUKKIT_POM_TEMPLATE = "Bukkit pom.xml"
+
+        const val PAPER_PLUGIN_YML_TEMPLATE = "Paper paper-plugin.yml"
 
         const val BUNGEECORD_MAIN_CLASS_TEMPLATE = "BungeeCord Main Class.java"
         const val BUNGEECORD_PLUGIN_YML_TEMPLATE = "BungeeCord bungee.yml"
