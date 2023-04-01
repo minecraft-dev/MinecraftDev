@@ -38,7 +38,16 @@ import org.jetbrains.uast.toUElementOfType
 
 class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
-    var pluginYml by nullable { facet.findFile("plugin.yml", SourceType.RESOURCE) }
+    var pluginYml by nullable {
+        if (this.type == PlatformType.PAPER) {
+            val paperPlugin = facet.findFile("paper-plugin.yml", SourceType.RESOURCE)
+            if (paperPlugin != null) {
+                return@nullable paperPlugin
+            }
+        }
+
+        facet.findFile("plugin.yml", SourceType.RESOURCE)
+    }
         private set
 
     override val type: PlatformType = type.platformType
