@@ -20,6 +20,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.buildsystem.MavenImportStep
 import com.demonwav.mcdev.creator.buildsystem.ReformatPomStep
+import com.demonwav.mcdev.creator.buildsystem.addDefaultMavenProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
@@ -47,6 +48,7 @@ class VelocityMavenFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
     override val description = "Creating Maven files"
 
     override fun setupAssets(project: Project) {
+        assets.addDefaultMavenProperties()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         assets.addTemplateProperties(
             "JAVA_VERSION" to javaVersion,
