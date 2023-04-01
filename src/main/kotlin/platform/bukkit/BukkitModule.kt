@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitGenerationData
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
+import com.demonwav.mcdev.platform.bukkit.util.PaperConstants
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.createVoidMethodWithParameterType
@@ -53,6 +54,12 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
     override val type: PlatformType = type.platformType
 
     override val moduleType: T = type
+
+    private val pluginParentClasses = listOf(
+        BukkitConstants.PLUGIN,
+        PaperConstants.PLUGIN_BOOTSTRAP,
+        PaperConstants.PLUGIN_LOADER,
+    )
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) =
         BukkitConstants.EVENT_CLASS == eventClass.qualifiedName
@@ -168,11 +175,22 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         val psiClass = (identifier.uastParent as? UClass)?.javaPsi
             ?: return false
 
-        val pluginInterface = JavaPsiFacade.getInstance(element.project)
-            .findClass(BukkitConstants.PLUGIN, module.getModuleWithDependenciesAndLibrariesScope(false))
-            ?: return false
+        if (psiClass.hasModifier(JvmModifier.ABSTRACT)) {
+            return false
+        }
 
-        return !psiClass.hasModifier(JvmModifier.ABSTRACT) && psiClass.isInheritor(pluginInterface, true)
+        val project = element.project
+        for (className in pluginParentClasses) {
+            val pluginInterface = JavaPsiFacade.getInstance(project)
+                .findClass(className, module.getModuleWithDependenciesAndLibrariesScope(false))
+                ?: continue
+
+            if (psiClass.isInheritor(pluginInterface, true)) {
+                return true
+            }
+        }
+
+        return false
     }
 
     override fun dispose() {
