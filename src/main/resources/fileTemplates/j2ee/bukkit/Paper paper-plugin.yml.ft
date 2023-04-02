@@ -11,13 +11,21 @@ prefix: ${PREFIX}
 load: ${LOAD}
 #end
 #if (${LOAD_BEFORE})
-loadbefore: ${LOAD_BEFORE}
+load-before:
+#foreach (${DEP_NAME} in ${LOAD_BEFORE})
+  - name: ${DEP_NAME}
 #end
-#if (${DEPEND})
-depend: ${DEPEND}
 #end
-#if (${SOFT_DEPEND})
-softdepend: ${SOFT_DEPEND}
+#if (${DEPEND} || ${SOFT_DEPEND})
+dependencies:
+#foreach (${DEP_NAME} in ${DEPEND})
+  - name: ${DEP_NAME}
+    required: true
+#end
+#foreach (${DEP_NAME} in ${SOFT_DEPEND})
+  - name: ${DEP_NAME}
+    required: false
+#end
 #end
 #if (${AUTHOR_LIST})
 authors: ${AUTHOR_LIST}
