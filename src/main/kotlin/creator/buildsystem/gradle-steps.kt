@@ -20,7 +20,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.demonwav.mcdev.util.runGradleTaskAndWait
+import com.demonwav.mcdev.util.runGradleTask
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -43,6 +43,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
+import org.jetbrains.kotlin.idea.util.runWhenSmart
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
@@ -63,8 +64,10 @@ abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : Abstrac
 
     override fun perform(project: Project) {
         val outputDirectory = context.projectFileDirectory
-        runGradleTaskAndWait(project, Path.of(outputDirectory)) { settings ->
-            settings.taskNames = listOf(task)
+        project.runWhenSmart {
+            runGradleTask(project, Path.of(outputDirectory)) { settings ->
+                settings.taskNames = listOf(task)
+            }
         }
     }
 }
