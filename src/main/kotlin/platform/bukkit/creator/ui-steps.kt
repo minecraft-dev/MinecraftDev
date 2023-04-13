@@ -93,6 +93,8 @@ abstract class AbstractBukkitPlatformStep(
 
     abstract fun getDependencies(mcVersion: SemanticVersion): List<BuildDependency>
 
+    abstract fun getManifest(): Pair<String, String>
+
     companion object {
         val KEY = Key.create<AbstractBukkitPlatformStep>("${AbstractBukkitPlatformStep::class.java.name}.platform")
     }

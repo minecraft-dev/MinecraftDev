@@ -67,7 +67,7 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
                     .validation(
                         DialogValidation {
                             finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)?.let(::ValidationInfo)
-                        },
+                        }
                     )
             }
         }

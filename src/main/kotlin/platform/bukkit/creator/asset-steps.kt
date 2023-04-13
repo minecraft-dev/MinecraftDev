@@ -46,6 +46,7 @@ class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
         val mcVersion = data.getUserData(SimpleMcVersionStep.KEY) ?: return
+        val bukkitPlatform = data.getUserData(AbstractBukkitPlatformStep.KEY) ?: return
 
         val (packageName, className) = splitPackage(mainClass)
 
@@ -93,9 +94,10 @@ class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
             assets.addTemplateProperties("API_VERSION" to mcVersion.take(2))
         }
 
+        val (manifestPath, manifestTemplate) = bukkitPlatform.getManifest()
         assets.addTemplates(
             project,
-            "src/main/resources/plugin.yml" to MinecraftTemplates.BUKKIT_PLUGIN_YML_TEMPLATE,
+            manifestPath to manifestTemplate,
             "src/main/java/${mainClass.replace('.', '/')}.java" to MinecraftTemplates.BUKKIT_MAIN_CLASS_TEMPLATE,
         )
     }

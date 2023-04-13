@@ -10,7 +10,6 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
-import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.cached
@@ -28,7 +27,8 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.RegisterToolWindowTask
+import com.intellij.openapi.wm.ToolWindow
+import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -38,6 +38,15 @@ import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.ui.content.ContentFactory
 
 class FindMixinsAction : AnAction() {
+
+    class TWFactory : ToolWindowFactory {
+        override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        }
+
+        override fun shouldBeAvailable(project: Project): Boolean {
+            return false
+        }
+    }
 
     companion object {
         private const val TOOL_WINDOW_ID = "Find Mixins"
@@ -108,14 +117,10 @@ class FindMixinsAction : AnAction() {
                         gotoTargetElement(classes.single(), editor, file)
                     } else {
                         val twManager = ToolWindowManager.getInstance(project)
-                        val window = twManager.getToolWindow(TOOL_WINDOW_ID) ?: run {
-                            val task =
-                                RegisterToolWindowTask.closable(TOOL_WINDOW_ID, icon = MixinAssets.MIXIN_CLASS_ICON)
-                            twManager.registerToolWindow(task)
-                        }
-
+                        val window = twManager.getToolWindow(TOOL_WINDOW_ID)!!
                         val component = FindMixinsComponent(classes)
-                        val content = ContentFactory.SERVICE.getInstance().createContent(component.panel, null, false)
+                        val content = ContentFactory.getInstance().createContent(component.panel, null, false)
+                        content.displayName = classOfElement.qualifiedName ?: classOfElement.name
                         window.contentManager.addContent(content)
 
                         window.activate(null)

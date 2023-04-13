@@ -188,12 +188,6 @@ tasks.runPluginVerifier {
     ideVersions.addAll("IC-$ideaVersionName")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
-}
-
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")

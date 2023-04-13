@@ -13,8 +13,13 @@ package com.demonwav.mcdev.platform.bukkit.creator
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.openapi.observable.util.bindBooleanStorage
+import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindSelected
 
 class SpigotPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep(parent, PlatformType.SPIGOT) {
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
@@ -38,6 +43,10 @@ class SpigotPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformSte
         ),
     )
 
+    override fun getManifest(): Pair<String, String> {
+        return "src/main/resources/plugin.yml" to MinecraftTemplates.BUKKIT_PLUGIN_YML_TEMPLATE
+    }
+
     class Factory : BukkitPlatformStep.Factory {
         override val name = "Spigot"
 
@@ -46,6 +55,23 @@ class SpigotPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformSte
 }
 
 class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep(parent, PlatformType.PAPER) {
+
+    private val usePaperManifestProperty = propertyGraph.property(false)
+        .bindBooleanStorage("${javaClass.name}.usePaperManifest")
+
+    private val usePaperManifest by usePaperManifestProperty
+
+    override fun setupUI(builder: Panel) {
+        super.setupUI(builder)
+        with(builder) {
+            row("Paper manifest:") {
+                checkBox("Use paper-plugin.yml")
+                    .bindSelected(usePaperManifestProperty)
+                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+            }
+        }
+    }
+
     override fun getRepositories(mcVersion: SemanticVersion) = listOf(
         BuildRepository(
             "papermc-repo",
@@ -71,6 +97,14 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
                 gradleConfiguration = "compileOnly",
             ),
         )
+    }
+
+    override fun getManifest(): Pair<String, String> {
+        if (usePaperManifest) {
+            return "src/main/resources/paper-plugin.yml" to MinecraftTemplates.PAPER_PLUGIN_YML_TEMPLATE
+        }
+
+        return "src/main/resources/plugin.yml" to MinecraftTemplates.BUKKIT_PLUGIN_YML_TEMPLATE
     }
 
     class Factory : BukkitPlatformStep.Factory {
