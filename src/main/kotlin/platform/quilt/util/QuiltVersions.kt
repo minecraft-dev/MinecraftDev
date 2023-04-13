@@ -44,7 +44,7 @@ class QuiltVersions(val game: List<Game>, val mappings: List<Mappings>, val load
                     .await()
 
                 val gameList = mutableListOf<Game>()
-                val mappingsList = mutableListOf<Mappings>()
+                // val mappingsList = mutableListOf<Mappings>() TODO: workaround for https://github.com/QuiltMC/update-quilt-meta/issues/9, change back when fixed
                 val loaderList = mutableListOf<SemanticVersion>()
                 response.body().toStream().use { stream ->
                     val json = JsonParser.parseReader(stream.reader())?.asJsonObject ?: return null
@@ -57,14 +57,14 @@ class QuiltVersions(val game: List<Game>, val mappings: List<Mappings>, val load
                         gameList += Game(gameVer, stable)
                     }
 
-                    val mappings = json["mappings"]?.asJsonArray ?: return null
+                    /*val mappings = json["mappings"]?.asJsonArray ?: return null TODO: see above
                     for (mapping in mappings) {
                         val mappingObj = mapping?.asJsonObject ?: return null
                         val gameVersion = mappingObj["gameVersion"]?.asString ?: return null
                         val version = mappingObj["version"]?.asString ?: return null
                         val build = mappingObj["build"]?.asInt ?: return null
                         mappingsList += Mappings(gameVersion, QuiltMappingsVersion(version, build))
-                    }
+                    }*/
 
                     val loaders = json["loader"]?.asJsonArray ?: return null
                     for (loader in loaders) {
@@ -74,6 +74,22 @@ class QuiltVersions(val game: List<Game>, val mappings: List<Mappings>, val load
                             ?.let(SemanticVersion.Companion::tryParse)
                             ?: return null
                         loaderList += version
+                    }
+                }
+                // TODO: see above
+                val mappingsList = mutableListOf<Mappings>()
+                val response2 = manager.get("https://meta.quiltmc.org/v3/versions/quilt-mappings")
+                    .header("User-Agent", PluginUtil.useragent)
+                    .suspendable()
+                    .await()
+                response2.body().toStream().use {
+                    val json = JsonParser.parseReader(it.reader())?.asJsonArray ?: return null
+                    for (mapping in json) {
+                        val mappingObj = mapping?.asJsonObject ?: return null
+                        val gameVersion = mappingObj["gameVersion"]?.asString ?: return null
+                        val version = mappingObj["version"]?.asString ?: return null
+                        val build = mappingObj["build"]?.asInt ?: return null
+                        mappingsList += Mappings(gameVersion, QuiltMappingsVersion(version, build))
                     }
                 }
                 return QuiltVersions(gameList, mappingsList, loaderList)
