@@ -15,11 +15,15 @@ import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import java.io.IOException
+import javax.swing.JButton
 import javax.swing.JComboBox
+import javax.swing.JLabel
 
 class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
 
     private lateinit var channelBox: Cell<JComboBox<String>>
+    private lateinit var installButton: Cell<JButton>
+    private lateinit var updateStatusLabel: Cell<JLabel>
 
     private val form = panel {
         row {
@@ -34,24 +38,34 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
                 PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
                     //form.updateCheckInProgressIcon.suspend()
 
-                    /*form.updateStatusLabel.text = when (pluginUpdateStatus) {
+                    updateStatusLabel.component.text = when (pluginUpdateStatus) {
                         is PluginUpdateStatus.LatestVersionInstalled ->
                             "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
                         is PluginUpdateStatus.Update -> {
                             update = pluginUpdateStatus
-                            form.installButton.isVisible = true
+                            installButton.component.isVisible = true
                             "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
                         }
                         else -> // CheckFailed
                             "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
-                    }*/
+                    }
 
                     false
                 }
             }
-            button("Install Update") {
-
-            }
+            installButton = button("Install Update") {
+                update?.let { update ->
+                    close(OK_EXIT_CODE)
+                    try {
+                        PluginUpdater.installPluginUpdate(update)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+            }.visible(false)
+        }
+        row {
+            updateStatusLabel = label("")
         }
     }
     private var update: PluginUpdateStatus.Update? = null
@@ -62,50 +76,8 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         for (channels in Channels.values()) {
             channelBox.component.addItem(channels.title)
         }
-        /*form.updateCheckInProgressIcon.suspend()
-        form.updateCheckInProgressIcon.setPaintPassiveIcon(false)
 
-        form.channelBox.addItem("Stable")
-        for (channels in Channels.values()) {
-            form.channelBox.addItem(channels.title)
-        }
-
-        form.checkForUpdatesNowButton.addActionListener {
-            saveSettings()
-            form.updateCheckInProgressIcon.resume()
-            resetUpdateStatus()
-            PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
-                form.updateCheckInProgressIcon.suspend()
-
-                form.updateStatusLabel.text = when (pluginUpdateStatus) {
-                    is PluginUpdateStatus.LatestVersionInstalled ->
-                        "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
-                    is PluginUpdateStatus.Update -> {
-                        update = pluginUpdateStatus
-                        form.installButton.isVisible = true
-                        "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
-                    }
-                    else -> // CheckFailed
-                        "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
-                }
-
-                false
-            }
-        }
-
-        form.installButton.isVisible = false
-        form.installButton.addActionListener {
-            update?.let { update ->
-                close(OK_EXIT_CODE)
-                try {
-                    PluginUpdater.installPluginUpdate(update)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        form.channelBox.addActionListener { resetUpdateStatus() }
+        channelBox.component.selectedIndex = initialSelectedChannel
 
         Channels.values().forEachIndexed { i, channel ->
             if (channel.hasChannel()) {
@@ -114,7 +86,9 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
             }
         }
 
-        form.channelBox.selectedIndex = initialSelectedChannel*/
+        channelBox.component.addActionListener { resetUpdateStatus() }
+        /*form.updateCheckInProgressIcon.suspend()
+        form.updateCheckInProgressIcon.setPaintPassiveIcon(false)*/
         init()
     }
 
