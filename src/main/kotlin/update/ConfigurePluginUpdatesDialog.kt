@@ -16,7 +16,6 @@ import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import java.io.IOException
-import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JLabel
