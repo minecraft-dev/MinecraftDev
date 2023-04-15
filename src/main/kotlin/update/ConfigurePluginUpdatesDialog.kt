@@ -107,12 +107,12 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
     }
 
     private fun saveSettings() {
-        //saveSelectedChannel(form.channelBox.selectedIndex)
+        saveSelectedChannel(channelBox.component.selectedIndex)
     }
 
     private fun resetUpdateStatus() {
-        //form.updateStatusLabel.text = " "
-        //form.installButton.isVisible = false
+        updateStatusLabel.component.text = " "
+        installButton.component.isVisible = false
     }
 
     override fun doOKAction() {
