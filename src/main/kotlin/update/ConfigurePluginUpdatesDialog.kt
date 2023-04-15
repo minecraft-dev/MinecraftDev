@@ -12,9 +12,11 @@ package com.demonwav.mcdev.update
 
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
+import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.panel
 import java.io.IOException
+import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JLabel
@@ -24,6 +26,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
     private lateinit var channelBox: Cell<JComboBox<String>>
     private lateinit var installButton: Cell<JButton>
     private lateinit var updateStatusLabel: Cell<JLabel>
+    private lateinit var updateCheckInProgressIcon: Cell<JLabel>
 
     private val form = panel {
         row {
@@ -33,10 +36,10 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         row {
             button("Check for updates now") {
                 saveSettings()
-                //form.updateCheckInProgressIcon.resume()
+                updateCheckInProgressIcon.component.isVisible = true
                 resetUpdateStatus()
                 PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
-                    //form.updateCheckInProgressIcon.suspend()
+                    updateCheckInProgressIcon.component.isVisible = false
 
                     updateStatusLabel.component.text = when (pluginUpdateStatus) {
                         is PluginUpdateStatus.LatestVersionInstalled ->
@@ -53,6 +56,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
                     false
                 }
             }
+            updateCheckInProgressIcon = icon(AnimatedIcon.Default.INSTANCE)
             installButton = button("Install Update") {
                 update?.let { update ->
                     close(OK_EXIT_CODE)
@@ -87,8 +91,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
         }
 
         channelBox.component.addActionListener { resetUpdateStatus() }
-        /*form.updateCheckInProgressIcon.suspend()
-        form.updateCheckInProgressIcon.setPaintPassiveIcon(false)*/
+        updateCheckInProgressIcon.component.isVisible = false
         init()
     }
 
