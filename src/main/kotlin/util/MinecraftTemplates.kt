@@ -106,14 +106,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             quiltGroup.addTemplate(FileTemplateDescriptor(QUILT_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.QUILT_ICON))
         }
 
-        FileTemplateGroupDescriptor("LiteLoader", PlatformAssets.LITELOADER_ICON).let { liteGroup ->
-            group.addTemplate(liteGroup)
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_GRADLE_PROPERTIES_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_SETTINGS_GRADLE_TEMPLATE))
-        }
-
         FileTemplateGroupDescriptor("Multi-Module", PlatformAssets.MINECRAFT_ICON).let { multiGroup ->
             group.addTemplate(multiGroup)
             multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_BUILD_GRADLE_TEMPLATE))
@@ -247,11 +239,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE = "architectury_forge_mixins.json"
         const val ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE = "architectury_forge_mods.toml"
         const val ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE = "architectury_forge_pack.mcmeta"
-
-        const val LITELOADER_MAIN_CLASS_TEMPLATE = "LiteLoader Main Class.java"
-        const val LITELOADER_BUILD_GRADLE_TEMPLATE = "LiteLoader build.gradle"
-        const val LITELOADER_GRADLE_PROPERTIES_TEMPLATE = "LiteLoader gradle.properties"
-        const val LITELOADER_SETTINGS_GRADLE_TEMPLATE = "LiteLoader settings.gradle"
 
         const val MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "Multi-Module Base build.gradle"
         const val MULTI_MODULE_GRADLE_PROPERTIES_TEMPLATE = "Multi-Module Base gradle.properties"
