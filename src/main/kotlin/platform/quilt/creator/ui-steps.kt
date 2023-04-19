@@ -14,7 +14,7 @@ import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.step.AbstractLatentStep
 import com.demonwav.mcdev.creator.step.AbstractMcVersionChainStep
-import com.demonwav.mcdev.creator.step.AbstractOptionalStringBasedOnProjectNameStep
+import com.demonwav.mcdev.creator.step.AbstractOptionalStringStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.IssueTrackerStep
 import com.demonwav.mcdev.creator.step.LicenseStep
@@ -310,12 +310,14 @@ class QuiltOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractCollapsi
         .nextStep(::IssueTrackerStep)
 }
 
-class QuiltAuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
+class QuiltAuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label = "Authors:"
     override val bindToStorage = true
 
     init {
-        value = "${LocalUserSettings.userName}:Owner"
+        if (value == "") {
+            value = "${LocalUserSettings.userName}: Owner"
+        }
     }
 
     override fun setupProject(project: Project) {
