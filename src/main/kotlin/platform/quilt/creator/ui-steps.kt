@@ -251,12 +251,13 @@ class QuiltStandardLibrariesStep(
             row("Standard Library:") {
                 segmentedButton(listOf("QSL", "QFAPI", "QFAPI/deprecated FAPI", "None")) { it }
                     .bind(apiNameProperty)
-            }.label("QSL is not yet supported").let { cell ->
-                cell.visible(apiNameProperty.transform { apiName == "QSL" }.get())
-                apiNameProperty.transform { apiName == "QSL" }.afterChange { cell.visible(it) }
-                cell.component.foreground = JBColor.YELLOW
-            }
 
+                label("QSL is not yet supported").let { cell ->
+                    cell.visible(apiNameProperty.transform { apiName == "QSL" }.get())
+                    apiNameProperty.transform { apiName == "QSL" }.afterChange { cell.visible(it) }
+                    cell.component.foreground = JBColor.YELLOW
+                }
+            }
             row("Library Version: ") {
                 val comboBox = cell(
                     VersionChainComboBox(getVersionsList(QuiltVersionChainStep.MC_VERSION_PROPERTY.get()))
