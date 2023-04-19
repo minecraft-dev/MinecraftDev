@@ -31,9 +31,15 @@ dependencies {
     modImplementation libs.quilt.loader
 
 #if (${API_VERSION})
+#if(${API_NAME}=="QFAPI")
     // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
     // Quilted Fabric API will automatically pull in the correct QSL version.
     modImplementation libs.quilted.fabric.api
+#elseif(${API_NAME}=="QFAPI/deprecated FAPI")
+    // QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
+    // Quilted Fabric API will automatically pull in the correct QSL version. The bundle also includes deprecated FAPI libraries
+    modImplementation libs.bundles.quilted.fabric.api
+#end
 #end
 }
 

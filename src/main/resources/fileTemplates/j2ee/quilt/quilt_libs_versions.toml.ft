@@ -17,13 +17,17 @@ quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loade
 
 #if (${API_VERSION})
 quilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
+#if(${API_NAME}=="QFAPI/deprecated FAPI")
 quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }
+#end
 #end
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]
 #if (${API_VERSION})
+#if(${API_NAME}=="QFAPI/deprecated FAPI")
 quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]
+#end
 #end
 
 [plugins]

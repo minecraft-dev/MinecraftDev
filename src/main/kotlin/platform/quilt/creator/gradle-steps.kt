@@ -51,7 +51,8 @@ class QuiltGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val loaderVersion = data.getUserData(QuiltVersionChainStep.LOADER_VERSION_KEY) ?: return
         val loomVersion = "1.1.+" // TODO
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
-        val apiVersion = data.getUserData(QuiltVersionChainStep.API_VERSION_KEY)
+        val apiVersion = data.getUserData(QuiltStandardLibrariesStep.API_VERSION_KEY)
+        val apiName = data.getUserData(QuiltStandardLibrariesStep.API_NAME_KEY)
         val officialMappings = data.getUserData(QuiltVersionChainStep.OFFICIAL_MAPPINGS_KEY) ?: false
 
         assets.addTemplateProperties(
@@ -67,6 +68,10 @@ class QuiltGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
 
         if (apiVersion != null) {
             assets.addTemplateProperties("API_VERSION" to apiVersion)
+        }
+
+        if (apiName != null) {
+            assets.addTemplateProperties("API_NAME" to apiName)
         }
 
         if (officialMappings) {

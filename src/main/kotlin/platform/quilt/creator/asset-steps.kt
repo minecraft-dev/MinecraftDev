@@ -107,7 +107,8 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val mcVersion = data.getUserData(QuiltVersionChainStep.MC_VERSION_KEY) ?: return
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val license = data.getUserData(LicenseStep.KEY) ?: return
-        val apiVersion = data.getUserData(QuiltVersionChainStep.API_VERSION_KEY)
+        val apiVersion = data.getUserData(QuiltStandardLibrariesStep.API_VERSION_KEY)
+        val apiName = data.getUserData(QuiltStandardLibrariesStep.API_NAME_KEY)
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
@@ -142,6 +143,10 @@ class QuiltSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
 
         if (apiVersion != null) {
             assets.addTemplateProperties("API_VERSION" to apiVersion)
+        }
+
+        if (apiName != null) {
+            assets.addTemplateProperties("API_NAME" to apiName)
         }
 
         if (useMixins) {

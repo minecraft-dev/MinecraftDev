@@ -34,6 +34,10 @@ import com.demonwav.mcdev.util.bindEnabled
 import com.intellij.ide.users.LocalUserSettings
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.observable.properties.ObservableMutableProperty
+import com.intellij.openapi.observable.properties.transform
+import com.intellij.openapi.observable.util.bind
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.not
@@ -64,7 +68,8 @@ class QuiltPlatformStep(
 
     override fun createStep(data: Pair<QuiltVersions, QuiltStandardLibrariesVersions>): NewProjectWizardStep {
         val (quiltVersions, apiVersions) = data
-        return QuiltVersionChainStep(this, quiltVersions, apiVersions)
+        return QuiltVersionChainStep(this, quiltVersions)
+            .nextStep { QuiltStandardLibrariesStep(this, apiVersions) }
             .nextStep(::QuiltEnvironmentStep)
             .nextStep(::UseMixinsStep)
             .nextStep(::ModNameStep)
@@ -85,28 +90,23 @@ class QuiltPlatformStep(
 
 class QuiltVersionChainStep(
     parent: NewProjectWizardStep,
-    private val quiltVersions: QuiltVersions,
-    private val apiVersions: QuiltStandardLibrariesVersions,
-) : AbstractMcVersionChainStep(parent, "Loader Version:", "Quilt Mappings Version:", "QFAPI/QSL Version:") {
+    private val quiltVersions: QuiltVersions
+) : AbstractMcVersionChainStep(parent, "Loader Version:", "Quilt Mappings Version:") {
     companion object {
         private const val LOADER_VERSION = 1
         private const val QUILT_MAPPINGS_VERSION = 2
-        private const val QFAPI_VERSION = 3
 
         val MC_VERSION_KEY = Key.create<String>("${QuiltVersionChainStep::class.java.name}.mcVersion")
         val LOADER_VERSION_KEY = Key.create<SemanticVersion>("${QuiltVersionChainStep::class.java.name}.loaderVersion")
         val QUILT_MAPPINGS_VERSION_KEY = Key.create<String>("${QuiltVersionChainStep::class.java.name}.quiltVersion")
-        val API_VERSION_KEY = Key.create<SemanticVersion>("${QuiltVersionChainStep::class.java.name}.qfapiVersion")
         val OFFICIAL_MAPPINGS_KEY = Key.create<Boolean>("${QuiltVersionChainStep::class.java.name}.officialMappings")
+
+        lateinit var MC_VERSION_PROPERTY: ObservableMutableProperty<Comparable<*>>
     }
 
     private val showSnapshotsProperty = propertyGraph.property(false)
         .bindBooleanStorage("${javaClass.name}.showSnapshots")
     private var showSnapshots by showSnapshotsProperty
-
-    private val useApiProperty = propertyGraph.property(true)
-        .bindBooleanStorage("${javaClass.name}.useApi")
-    private var useApi by useApiProperty
 
     private val useOfficialMappingsProperty = propertyGraph.property(false)
         .bindBooleanStorage("${javaClass.name}.useOfficialMappings")
@@ -145,22 +145,6 @@ class QuiltVersionChainStep(
                 ).bindEnabled(useOfficialMappingsProperty.not()).component.foreground = JBColor.YELLOW
                 comboBox
             }
-            QFAPI_VERSION -> {
-                val comboBox = super.createComboBox(row, index, items).bindEnabled(useApiProperty)
-                row.checkBox("Use Quilted Fabric API").bindSelected(useApiProperty)
-                row.label(EMPTY_LABEL).bindText(
-                    getVersionProperty(MINECRAFT_VERSION).transform { mcVersion ->
-                        mcVersion as QuiltMcVersion
-                        val matched = apiVersions.versions.any { mcVersion.version in it.gameVersions }
-                        if (matched) {
-                            EMPTY_LABEL
-                        } else {
-                            "Unable to match QFAPI/QSL versions to Minecraft version"
-                        }
-                    },
-                ).bindEnabled(useApiProperty).component.foreground = JBColor.YELLOW
-                comboBox
-            }
             else -> super.createComboBox(row, index, items)
         }
     }
@@ -176,13 +160,6 @@ class QuiltVersionChainStep(
                 }
                 filteredVersions.ifEmpty { quiltVersions.mappings.map { it.version } }
             }
-            QFAPI_VERSION -> {
-                val mcVersion = versionsAbove[MINECRAFT_VERSION] as QuiltMcVersion
-                val filteredVersions = apiVersions.versions.mapNotNull { api ->
-                    api.version.takeIf { mcVersion.version in api.gameVersions }
-                }
-                filteredVersions.ifEmpty { apiVersions.versions.map { it.version } }
-            }
             else -> throw IncorrectOperationException()
         }
     }
@@ -192,6 +169,7 @@ class QuiltVersionChainStep(
         if (!showSnapshots) {
             updateVersionBox()
         }
+        MC_VERSION_PROPERTY = getVersionProperty(MINECRAFT_VERSION)
     }
 
     private fun updateVersionBox() {
@@ -209,9 +187,6 @@ class QuiltVersionChainStep(
             QUILT_MAPPINGS_VERSION_KEY,
             (getVersion(QUILT_MAPPINGS_VERSION) as QuiltVersions.QuiltMappingsVersion).name
         )
-        if (useApi) {
-            data.putUserData(API_VERSION_KEY, getVersion(QFAPI_VERSION) as SemanticVersion)
-        }
         data.putUserData(OFFICIAL_MAPPINGS_KEY, useOfficialMappings)
     }
 }
@@ -252,6 +227,76 @@ class QuiltEnvironmentStep(parent: NewProjectWizardStep) : AbstractNewProjectWiz
 
     companion object {
         val KEY = Key.create<Side>("${QuiltEnvironmentStep::class.java.name}.environment")
+    }
+}
+
+class QuiltStandardLibrariesStep(
+    parent: NewProjectWizardStep,
+    private val apiVersions: QuiltStandardLibrariesVersions
+) : AbstractNewProjectWizardStep(parent) {
+    companion object {
+        val API_NAME_KEY = Key.create<String>("${QuiltVersionChainStep::class.java.name}.QuiltApiName")
+        val API_VERSION_KEY = Key.create<SemanticVersion>("${QuiltVersionChainStep::class.java.name}.quiltApiVersion")
+    }
+
+    private val apiNameProperty = propertyGraph.property("QFAPI")
+        .bindStorage("${javaClass.name}.apiName")
+    private var apiName by apiNameProperty
+
+    private val apiVersionProperty: GraphProperty<Comparable<*>> = propertyGraph
+        .property(apiVersions.versions.first().version)
+    private var apiVersion by apiVersionProperty
+    override fun setupUI(builder: Panel) {
+        with(builder) {
+            row("Standard Library:") {
+                segmentedButton(listOf("QSL", "QFAPI", "QFAPI/deprecated FAPI", "None")) { it }
+                    .bind(apiNameProperty)
+            }.label("QSL is not yet supported").let { cell ->
+                cell.visible(apiNameProperty.transform { apiName == "QSL" }.get())
+                apiNameProperty.transform { apiName == "QSL" }.afterChange { cell.visible(it) }
+                cell.component.foreground = JBColor.YELLOW
+            }
+
+            row("Library Version: ") {
+                val comboBox = cell(
+                    VersionChainComboBox(getVersionsList(QuiltVersionChainStep.MC_VERSION_PROPERTY.get()))
+                        .bind(apiVersionProperty)
+                )
+                QuiltVersionChainStep.MC_VERSION_PROPERTY.afterChange {
+                    comboBox.component.setSelectableItems(getVersionsList(it))
+                }
+                comboBox.enabled(apiNameProperty.transform { apiName != "QSL" && apiName != "None" }.get())
+                apiNameProperty.transform { apiName != "QSL" && apiName != "None" }.afterChange { comboBox.enabled(it) }
+            }.let { row ->
+                row.label(EMPTY_LABEL).bindText(
+                    QuiltVersionChainStep.MC_VERSION_PROPERTY.transform { mcVersion ->
+                        mcVersion as QuiltMcVersion
+                        val matched = apiVersions.versions.any { mcVersion.version in it.gameVersions }
+                        if (matched) {
+                            EMPTY_LABEL
+                        } else {
+                            "Unable to match QFAPI/QSL versions to Minecraft version"
+                        }
+                    },
+                ).component.foreground = JBColor.YELLOW
+            }
+        }
+    }
+
+    private fun getVersionsList(mcVersion: Comparable<*>): List<SemanticVersion> {
+        val mcVersion = mcVersion as QuiltMcVersion
+        val filteredVersions = apiVersions.versions.mapNotNull { api ->
+            api.version.takeIf { mcVersion.version in api.gameVersions }
+        }
+        return filteredVersions.ifEmpty { apiVersions.versions.map { it.version } }
+    }
+
+    override fun setupProject(project: Project) {
+        super.setupProject(project)
+        if (apiName != "None") {
+            data.putUserData(API_VERSION_KEY, apiVersion as SemanticVersion)
+        }
+        data.putUserData(API_NAME_KEY, apiName)
     }
 }
 
