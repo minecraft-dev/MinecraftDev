@@ -268,8 +268,8 @@ class QuiltStandardLibrariesStep(
                 }
                 comboBox.enabled(apiNameProperty.transform { apiName != "QSL" && apiName != "None" }.get())
                 apiNameProperty.transform { apiName != "QSL" && apiName != "None" }.afterChange { comboBox.enabled(it) }
-            }.let { row ->
-                row.label(EMPTY_LABEL).bindText(
+
+                label(EMPTY_LABEL).bindText(
                     QuiltVersionChainStep.MC_VERSION_PROPERTY.transform { mcVersion ->
                         mcVersion as QuiltMcVersion
                         val matched = apiVersions.versions.any { mcVersion.version in it.gameVersions }
@@ -285,7 +285,7 @@ class QuiltStandardLibrariesStep(
     }
 
     private fun getVersionsList(mcVersion: Comparable<*>): List<SemanticVersion> {
-        val mcVersion = mcVersion as QuiltMcVersion
+        mcVersion as QuiltMcVersion
         val filteredVersions = apiVersions.versions.mapNotNull { api ->
             api.version.takeIf { mcVersion.version in api.gameVersions }
         }
