@@ -10,6 +10,7 @@
 
 package com.demonwav.mcdev.update
 
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.intellij.ui.AnimatedIcon
@@ -62,7 +63,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
                     try {
                         PluginUpdater.installPluginUpdate(update)
                     } catch (e: IOException) {
-                        e.printStackTrace()
+                        thisLogger().error("Failed to install plugin update", e)
                     }
                 }
             }.visible(false)
