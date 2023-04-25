@@ -32,7 +32,13 @@ class FabricLoomProjectResolverExtension : AbstractProjectResolverExtension() {
                 }
             }
 
-            val data = FabricLoomData(ideModule.data, loomData.tinyMappings, decompilers, loomData.splitMinecraftJar)
+            val data = FabricLoomData(
+                ideModule.data,
+                loomData.tinyMappings,
+                decompilers,
+                loomData.splitMinecraftJar,
+                loomData.modSourceSets
+            )
             ideModule.createChild(FabricLoomData.KEY, data)
         }
 
