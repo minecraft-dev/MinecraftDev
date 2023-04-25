@@ -20,6 +20,7 @@ import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
+import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
@@ -125,6 +126,13 @@ class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
             val mixinsJsonFile = "src/main/resources/${buildSystemProps.artifactId}.mixins.json"
             assets.addTemplates(project, mixinsJsonFile to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
         }
+    }
+}
+
+class ForgeReformatPackDescriptorStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(parent) {
+
+    override fun addFilesToReformat() {
+        addFileToReformat("src/main/resources/pack.mcmeta")
     }
 }
 
