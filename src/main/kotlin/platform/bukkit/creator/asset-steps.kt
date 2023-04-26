@@ -56,6 +56,7 @@ class BukkitProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
             "NAME" to pluginName,
             "PACKAGE" to packageName,
             "CLASS_NAME" to className,
+            "FOLIA" to (bukkitPlatform is FoliaPlatformStep)
         )
 
         if (prefix.isNotBlank()) {

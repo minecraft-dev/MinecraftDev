@@ -24,6 +24,8 @@ object PlatformAssets : Assets() {
     val SPIGOT_ICON_2X = loadIcon("/assets/icons/platform/Spigot@2x.png")
     val PAPER_ICON = loadIcon("/assets/icons/platform/Paper.png")
     val PAPER_ICON_2X = loadIcon("/assets/icons/platform/Paper@2x.png")
+    val FOLIA_ICON = loadIcon("/assets/icons/platform/Folia.png")
+    val FOLIA_ICON_2X = loadIcon("/assets/icons/platform/Folia@2x.png")
 
     val FORGE_ICON = loadIcon("/assets/icons/platform/Forge.png")
     val FORGE_ICON_2X = loadIcon("/assets/icons/platform/Forge@2x.png")

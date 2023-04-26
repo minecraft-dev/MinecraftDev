@@ -18,6 +18,7 @@ import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
 import com.demonwav.mcdev.platform.bukkit.framework.BUKKIT_LIBRARY_KIND
+import com.demonwav.mcdev.platform.bukkit.framework.FOLIA_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.PAPER_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bukkit.framework.SPIGOT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.BungeeCordModuleType
@@ -47,6 +48,7 @@ enum class PlatformType(
     BUKKIT(BukkitModuleType, "bukkit.json"),
     SPIGOT(SpigotModuleType, "spigot.json", BUKKIT),
     PAPER(PaperModuleType, "paper.json", SPIGOT),
+    FOLIA(PaperModuleType, "folia.json", PAPER),
     ARCHITECTURY(ArchitecturyModuleType),
     FORGE(ForgeModuleType),
     FABRIC(FabricModuleType),
@@ -78,6 +80,7 @@ enum class PlatformType(
             BUKKIT_LIBRARY_KIND -> BUKKIT
             SPIGOT_LIBRARY_KIND -> SPIGOT
             PAPER_LIBRARY_KIND -> PAPER
+            FOLIA_LIBRARY_KIND -> FOLIA
             SPONGE_LIBRARY_KIND -> SPONGE
             ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE

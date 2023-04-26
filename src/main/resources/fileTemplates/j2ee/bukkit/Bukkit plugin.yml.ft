@@ -28,3 +28,6 @@ description: ${DESCRIPTION}
 #if (${WEBSITE})
 website: ${WEBSITE}
 #end
+#if (${FOLIA})
+folia-supported: true
+#end

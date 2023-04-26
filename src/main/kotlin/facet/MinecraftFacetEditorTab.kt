@@ -29,6 +29,8 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var spigotAutoCheckBox: JCheckBox
     private lateinit var paperEnabledCheckBox: JCheckBox
     private lateinit var paperAutoCheckBox: JCheckBox
+    private lateinit var foliaEnabledCheckBox: JCheckBox
+    private lateinit var foliaAutoCheckBox: JCheckBox
     private lateinit var spongeEnabledCheckBox: JCheckBox
     private lateinit var spongeAutoCheckBox: JCheckBox
     private lateinit var forgeEnabledCheckBox: JCheckBox
@@ -61,6 +63,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bukkitEnabledCheckBox,
             spigotEnabledCheckBox,
             paperEnabledCheckBox,
+            foliaEnabledCheckBox,
             spongeEnabledCheckBox,
             forgeEnabledCheckBox,
             fabricEnabledCheckBox,
@@ -80,6 +83,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             bukkitAutoCheckBox,
             spigotAutoCheckBox,
             paperAutoCheckBox,
+            foliaAutoCheckBox,
             spongeAutoCheckBox,
             forgeAutoCheckBox,
             fabricAutoCheckBox,
@@ -110,6 +114,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
                 bukkitEnabledCheckBox,
                 spigotEnabledCheckBox,
                 paperEnabledCheckBox,
+                foliaEnabledCheckBox,
             )
         }
         spigotEnabledCheckBox.addActionListener {
@@ -117,10 +122,20 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
                 spigotEnabledCheckBox,
                 bukkitEnabledCheckBox,
                 paperEnabledCheckBox,
+                foliaEnabledCheckBox,
             )
         }
         paperEnabledCheckBox.addActionListener {
             unique(
+                foliaEnabledCheckBox,
+                paperEnabledCheckBox,
+                bukkitEnabledCheckBox,
+                spigotEnabledCheckBox,
+            )
+        }
+        foliaEnabledCheckBox.addActionListener {
+            unique(
+                foliaEnabledCheckBox,
                 paperEnabledCheckBox,
                 bukkitEnabledCheckBox,
                 spigotEnabledCheckBox,
@@ -128,21 +143,30 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         }
 
         bukkitAutoCheckBox.addActionListener {
-            all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox)(
+            all(bukkitAutoCheckBox, spigotAutoCheckBox, paperAutoCheckBox, foliaAutoCheckBox)(
                 SPIGOT,
                 PAPER,
+                FOLIA
             )
         }
         spigotAutoCheckBox.addActionListener {
             all(spigotAutoCheckBox, bukkitAutoCheckBox, paperAutoCheckBox)(
                 BUKKIT,
                 PAPER,
+                FOLIA
             )
         }
         paperAutoCheckBox.addActionListener {
             all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(
                 BUKKIT,
                 SPIGOT,
+            )
+        }
+        foliaAutoCheckBox.addActionListener {
+            all(paperAutoCheckBox, bukkitAutoCheckBox, spigotAutoCheckBox)(
+                BUKKIT,
+                SPIGOT,
+                PAPER
             )
         }
 
@@ -302,6 +326,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
         private const val BUKKIT = 0
         private const val SPIGOT = BUKKIT + 1
         private const val PAPER = SPIGOT + 1
+        private const val FOLIA = PAPER + 1
         private const val SPONGE = PAPER + 1
         private const val FORGE = SPONGE + 1
         private const val FABRIC = FORGE + 1
@@ -317,6 +342,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             PlatformType.BUKKIT,
             PlatformType.SPIGOT,
             PlatformType.PAPER,
+            PlatformType.FOLIA,
             PlatformType.SPONGE,
             PlatformType.FORGE,
             PlatformType.FABRIC,
@@ -333,6 +359,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             BUKKIT,
             SPIGOT,
             PAPER,
+            FOLIA,
             SPONGE,
             FORGE,
             FABRIC,
