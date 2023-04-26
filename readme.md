@@ -129,12 +129,14 @@ This project is licensed under [MIT](license.txt).
 Supported Platforms
 -------------------
 
-- [![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) **Spigot**](https://spigotmc.org/) ([![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) Paper](https://papermc.io/))
+- [![Spigot Icon](src/main/resources/assets/icons/platform/Spigot.png?raw=true) **Spigot**](https://spigotmc.org/)
+- [![Paper Icon](src/main/resources/assets/icons/platform/Paper.png?raw=true) **Paper**](https://papermc.io/software/paper)
+- [![Paper Icon](src/main/resources/assets/icons/platform/Folia.png?raw=true) **Folia**](https://papermc.io/software/folia)
 - [![Sponge Icon](src/main/resources/assets/icons/platform/Sponge_dark.png?raw=true) **Sponge**](https://www.spongepowered.org/)
 - [![Architectury Icon](src/main/resources/assets/icons/platform/Architectury.png?raw=true) **Architectury**](https://github.com/architectury/architectury-api)
 - [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](https://forums.minecraftforge.net/)
 - [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
-- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))
-- [![Velocity Icon](src/main/resources/assets/icons/platform/Velocity.png?raw=true) **Velocity**](https://velocitypowered.com/)
+- [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://papermc.io/software/waterfall))
+- [![Velocity Icon](src/main/resources/assets/icons/platform/Velocity.png?raw=true) **Velocity**](https://papermc.io/software/velocity)
 - [![Adventure Icon](src/main/resources/assets/icons/platform/Adventure.png?raw=true) **Adventure**](https://kyori.net/)
