@@ -14,6 +14,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JVMElementFactories
@@ -51,7 +52,7 @@ private fun <T> findColorFromExpression(
         return null
     }
 
-    val referencedElement = expression.resolveToUElement()
+    val referencedElement = runCatchingKtIdeaExceptions { expression.resolveToUElement() }
     if (referencedElement is UField) {
         val referencedFieldInitializer = referencedElement.uastInitializer
         if (referencedFieldInitializer is UReferenceExpression) {
@@ -103,7 +104,7 @@ fun UIdentifier.findColor(
         return findColorFromCallExpression(methodExpression, vectorClasses)
     }
 
-    var referencedElement = (uastParent as? UResolvable)?.resolveToUElement()
+    var referencedElement = runCatchingKtIdeaExceptions { (uastParent as? UResolvable)?.resolveToUElement() }
     while (referencedElement is UField) {
         val referencedFieldInitializer: UExpression? = referencedElement.uastInitializer
         if (referencedFieldInitializer is UCallExpression) {
@@ -120,7 +121,7 @@ fun UIdentifier.findColor(
                 return referenceNameElement.findColor(moduleType, className, vectorClasses, maxDepth, depth + 1)
             } else if (referenceNameElement is UResolvable) {
                 // The expression is complex, so we resolve it. If it is a field we're on for another round
-                referencedElement = referenceNameElement.resolveToUElement()
+                referencedElement = runCatchingKtIdeaExceptions { referenceNameElement.resolveToUElement() }
                 continue
             }
         }

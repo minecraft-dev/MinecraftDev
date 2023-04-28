@@ -350,3 +350,13 @@ fun String.decapitalize(): String = replaceFirstChar { it.lowercase(Locale.ENGLI
 // put the whole class name in as a string (easier to refactor, etc.)
 @Suppress("NOTHING_TO_INLINE") // In order for this to work this function must be `inline`
 inline fun loggerForTopLevel() = Logger.getInstance(MethodHandles.lookup().lookupClass())
+
+inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
+    action()
+} catch (e: Exception) {
+    if (e.javaClass.name == "org.jetbrains.kotlin.idea.caches.resolve.KotlinIdeaResolutionException") {
+        null
+    } else {
+        throw e
+    }
+}
