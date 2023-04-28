@@ -8,6 +8,7 @@
  * MIT License
  */
 
+@file:Suppress("UseJBColor")
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.facet.MinecraftFacet
@@ -143,7 +144,7 @@ private fun findColorFromCallExpression(
 
     return when {
         // Single Integer Argument
-        types.size == 1 && types[0] == PsiType.INT ->
+        types.size == 1 ->
             colorFromSingleArgument(arguments[0])?.let { it to arguments[0] }
         // Triple Integer Argument
         types.size == 3 && types.all { it == PsiType.INT } ->
@@ -163,7 +164,29 @@ private fun findColorFromCallExpression(
 }
 
 private fun colorFromSingleArgument(expression: UExpression): Color? {
-    return Color(expression.evaluate() as? Int ?: return null)
+    return when (val paramVal = expression.evaluate()) {
+        is Int -> Color(paramVal as? Int ?: return null)
+        is String -> {
+            if (paramVal.startsWith("#")) {
+                val hexString = paramVal.substring(1)
+                when (hexString.length) {
+                    6 -> hexString.toIntOrNull(16)?.let(::Color)
+                    3 -> {
+                        val hexInt = hexString.toIntOrNull(16)
+                            ?: return null
+                        val r = (hexInt and 0xf00) shr 8 or (hexInt and 0xf00) shr 4
+                        val g = (hexInt and 0x0f0) shr 4 or (hexInt and 0x0f0)
+                        val b = (hexInt and 0x00f) shl 4 or (hexInt and 0x00f)
+                        Color(r, g, b)
+                    }
+                    else -> null
+                }
+            } else {
+                null
+            }
+        }
+        else -> null
+    }
 }
 
 private fun colorFromThreeArguments(expressions: List<UExpression>): Color? {
@@ -189,10 +212,17 @@ private fun colorFromVectorArgument(newExpression: UCallExpression): Color? {
     return colorFromThreeArguments(newExpression.valueArguments)
 }
 
-fun UElement.setColor(color: String) {
+fun UElement.setColor(color: String, isStringLiteral: Boolean = false) {
     val sourcePsi = this.sourcePsi ?: return
     sourcePsi.containingFile.runWriteAction {
         val project = sourcePsi.project
+        if (isStringLiteral) {
+            val literal = generationPlugin?.getElementFactory(project)?.createStringLiteralExpression(color, sourcePsi)
+                ?: return@runWriteAction
+            this.replace(literal)
+            return@runWriteAction
+        }
+
         val parent = this.uastParent
         val newColorRef = generationPlugin?.getElementFactory(project)?.createQualifiedReference(color, sourcePsi)
             ?: return@runWriteAction
@@ -239,5 +269,24 @@ fun UCallExpression.setColor(red: Int, green: Int, blue: Int) {
         r.sourcePsi?.replace(literalExpressionOne)
         g.sourcePsi?.replace(literalExpressionTwo)
         b.sourcePsi?.replace(literalExpressionThree)
+    }
+}
+
+fun UCallExpression.setColorHSV(h: Float, s: Float, v: Float) {
+    val sourcePsi = this.sourcePsi ?: return
+    sourcePsi.containingFile.runWriteAction {
+        val hExpr = this.valueArguments[0]
+        val sExpr = this.valueArguments[1]
+        val vExpr = this.valueArguments[2]
+
+        val factory = JVMElementFactories.requireFactory(sourcePsi.language, sourcePsi.project)
+
+        val literalExpressionOne = factory.createExpressionFromText(h.toString() + "f", null)
+        val literalExpressionTwo = factory.createExpressionFromText(s.toString() + "f", null)
+        val literalExpressionThree = factory.createExpressionFromText(v.toString() + "f", null)
+
+        hExpr.sourcePsi?.replace(literalExpressionOne)
+        sExpr.sourcePsi?.replace(literalExpressionTwo)
+        vExpr.sourcePsi?.replace(literalExpressionThree)
     }
 }
