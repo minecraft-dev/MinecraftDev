@@ -48,6 +48,7 @@ import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonElementGenerator
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.text.StringUtil
@@ -152,6 +153,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val json = jsonFile.topLevelValue as? JsonObject ?: return
         val generator = JsonElementGenerator(project)
 
+        NonProjectFileWritingAccessProvider.allowWriting(listOf(fabricModJsonFile))
         jsonFile.runWriteAction {
             (json.findProperty("authors")?.value as? JsonArray)?.let { authorsArray ->
                 for (i in authors.indices) {
