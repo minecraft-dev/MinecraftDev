@@ -73,6 +73,7 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
             .nextStep(::ArchitecturyForgeMainClassStep)
             .nextStep(::ArchitecturyFabricMainClassStep)
             .nextStep(::ArchitecturyPostBuildSystemStep)
+            .nextStep(::ArchitecturyReformatPackDescriptorStep)
     }
 
     class Factory : ModPlatformStep.Factory {

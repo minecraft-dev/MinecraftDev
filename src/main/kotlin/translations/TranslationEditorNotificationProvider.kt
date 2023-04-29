@@ -16,6 +16,8 @@ import com.demonwav.mcdev.translations.sorting.TranslationSorter
 import com.demonwav.mcdev.util.applyWriteAction
 import com.demonwav.mcdev.util.findMcpModule
 import com.demonwav.mcdev.util.mcDomain
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
@@ -73,7 +75,16 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
                     Messages.getQuestionIcon(),
                 )
                 if (sort == Messages.YES) {
-                    TranslationSorter.query(project, psi, Ordering.LIKE_DEFAULT)
+                    try {
+                        TranslationSorter.query(project, psi, Ordering.LIKE_DEFAULT)
+                    } catch (e: Exception) {
+                        Notification(
+                            "Translations sorting error",
+                            "Error sorting translations",
+                            e.message ?: e.stackTraceToString(),
+                            NotificationType.WARNING,
+                        ).notify(project)
+                    }
                 }
             }
             panel.createActionLabel("Hide notification") {

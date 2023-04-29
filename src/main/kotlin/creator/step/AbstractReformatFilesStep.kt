@@ -10,11 +10,11 @@
 
 package com.demonwav.mcdev.creator.step
 
-import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiFile
@@ -44,7 +44,7 @@ abstract class AbstractReformatFilesStep(parent: NewProjectWizardStep) : Abstrac
         }
         files.ifEmpty { return }
 
-        runWriteTask {
+        NonProjectFileWritingAccessProvider.disableChecksDuring {
             WriteCommandAction.writeCommandAction(project, *files).withGlobalUndo().run<Throwable> {
                 ReformatCodeProcessor(project, files, null, false).run()
             }

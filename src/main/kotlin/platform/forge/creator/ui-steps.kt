@@ -52,6 +52,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
         .nextStep(::ForgeProjectFilesStep)
         .nextStep(::ForgeMixinsJsonStep)
         .nextStep(::ForgePostBuildSystemStep)
+        .nextStep(::ForgeReformatPackDescriptorStep)
 
     class Factory : ModPlatformStep.Factory {
         override val name = "Forge"

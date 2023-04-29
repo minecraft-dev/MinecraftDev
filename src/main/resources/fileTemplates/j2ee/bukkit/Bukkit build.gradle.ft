@@ -32,7 +32,7 @@ processResources {
     def props = [version: version]
     inputs.properties props
     filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
+    filesMatching('${MANIFEST_NAME}') {
         expand props
     }
 }

@@ -31,4 +31,7 @@ object TranslationConstants {
     const val EXISTS = "m_118936_"
     const val INPUT_CONSTANTS_KEY_GET_KEY = "m_84851_"
     const val CREATE_COMPONENT_TRANSLATION = "createComponentTranslation"
+    const val COMPONENT_CLASS = "net.minecraft.network.chat.Component"
+    const val COMPONENT_TRANSLATABLE = "translatable"
+    const val COMPONENT_TRANSLATABLE_WITH_FALLBACK = "translatableWithFallback"
 }

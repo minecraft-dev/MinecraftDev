@@ -75,21 +75,23 @@ class MinecraftFacetDetector : StartupActivity {
         private fun checkNoFacet(module: Module) {
             val platforms = autoDetectTypes(module).ifEmpty { return }
 
-            val facetManager = FacetManager.getInstance(module)
-            val configuration = MinecraftFacetConfiguration()
-            configuration.state.autoDetectTypes.addAll(platforms)
-
-            val facetType = MinecraftFacet.facetTypeOrNull ?: return
-            val facet = facetManager.createFacet(facetType, "Minecraft", configuration, null)
             runWriteTaskLater {
                 // Only add the new facet if there isn't a Minecraft facet already - double check here since this
                 // task may run much later
-                if (module.isDisposed || facet.isDisposed) {
+                if (module.isDisposed) {
                     // Module may be disposed before we run
                     return@runWriteTaskLater
                 }
-                if (facetManager.getFacetByType(MinecraftFacet.ID) == null) {
-                    val model = facetManager.createModifiableModel()
+
+                val facetType = MinecraftFacet.facetTypeOrNull
+                    ?: return@runWriteTaskLater
+
+                val facetManager = FacetManager.getInstance(module)
+                val model = facetManager.createModifiableModel()
+                if (model.getFacetByType(MinecraftFacet.ID) == null) {
+                    val configuration = MinecraftFacetConfiguration()
+                    configuration.state.autoDetectTypes.addAll(platforms)
+                    val facet = facetManager.createFacet(facetType, "Minecraft", configuration, null)
                     model.addFacet(facet)
                     model.commit()
                 }

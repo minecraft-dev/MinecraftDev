@@ -21,4 +21,5 @@ object McpConstants {
     const val BLOCK = "net.minecraft.block.Block"
     const val ITEM = "net.minecraft.item.Item"
     const val MINECRAFT_SERVER = "net.minecraft.server.MinecraftServer"
+    const val PNG_MCMETA = "*.png.mcmeta"
 }

@@ -72,6 +72,10 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
         setupAssets(project)
 
         WriteAction.runAndWait<Throwable> {
+            if (project.isDisposed) {
+                return@runAndWait
+            }
+
             val generatedFiles = mutableSetOf<VirtualFile>()
             for (asset in assets) {
                 generateFile(asset)?.let { generatedFiles += it }
@@ -86,7 +90,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
     fun runWhenCreated(project: Project, action: () -> Unit) {
         if (ApplicationManager.getApplication().isUnitTestMode) {
             action()
-        } else {
+        } else if (!project.isDisposed) {
             StartupManager.getInstance(project).runAfterOpened {
                 ApplicationManager.getApplication().invokeLater(action, project.disposed)
             }

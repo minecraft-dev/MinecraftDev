@@ -17,6 +17,7 @@ class FabricLoomModelImpl implements FabricLoomModel, Serializable {
     File tinyMappings
     Map<String, List<DecompilerModel>> decompilers
     boolean splitMinecraftJar
+    Map<String, List<String>> modSourceSets
 
     @Immutable
     static class DecompilerModelImpl implements DecompilerModel, Serializable {

@@ -31,6 +31,11 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             bukkitGroup.addTemplate(FileTemplateDescriptor(BUKKIT_POM_TEMPLATE))
         }
 
+        FileTemplateGroupDescriptor("Paper", PlatformAssets.PAPER_ICON).let { paperGroup ->
+            group.addTemplate(paperGroup)
+            paperGroup.addTemplate(FileTemplateDescriptor(PAPER_PLUGIN_YML_TEMPLATE))
+        }
+
         FileTemplateGroupDescriptor("BungeeCord", PlatformAssets.BUNGEECORD_ICON).let { bungeeGroup ->
             group.addTemplate(bungeeGroup)
             bungeeGroup.addTemplate(FileTemplateDescriptor(BUNGEECORD_MAIN_CLASS_TEMPLATE))
@@ -87,14 +92,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
-        }
-
-        FileTemplateGroupDescriptor("LiteLoader", PlatformAssets.LITELOADER_ICON).let { liteGroup ->
-            group.addTemplate(liteGroup)
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_MAIN_CLASS_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_BUILD_GRADLE_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_GRADLE_PROPERTIES_TEMPLATE))
-            liteGroup.addTemplate(FileTemplateDescriptor(LITELOADER_SETTINGS_GRADLE_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Multi-Module", PlatformAssets.MINECRAFT_ICON).let { multiGroup ->
@@ -165,6 +162,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val BUKKIT_SETTINGS_GRADLE_TEMPLATE = "Bukkit settings.gradle"
         const val BUKKIT_POM_TEMPLATE = "Bukkit pom.xml"
 
+        const val PAPER_PLUGIN_YML_TEMPLATE = "Paper paper-plugin.yml"
+
         const val BUNGEECORD_MAIN_CLASS_TEMPLATE = "BungeeCord Main Class.java"
         const val BUNGEECORD_PLUGIN_YML_TEMPLATE = "BungeeCord bungee.yml"
         const val BUNGEECORD_BUILD_GRADLE_TEMPLATE = "BungeeCord build.gradle"
@@ -221,11 +220,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE = "architectury_forge_mixins.json"
         const val ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE = "architectury_forge_mods.toml"
         const val ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE = "architectury_forge_pack.mcmeta"
-
-        const val LITELOADER_MAIN_CLASS_TEMPLATE = "LiteLoader Main Class.java"
-        const val LITELOADER_BUILD_GRADLE_TEMPLATE = "LiteLoader build.gradle"
-        const val LITELOADER_GRADLE_PROPERTIES_TEMPLATE = "LiteLoader gradle.properties"
-        const val LITELOADER_SETTINGS_GRADLE_TEMPLATE = "LiteLoader settings.gradle"
 
         const val MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "Multi-Module Base build.gradle"
         const val MULTI_MODULE_GRADLE_PROPERTIES_TEMPLATE = "Multi-Module Base gradle.properties"
