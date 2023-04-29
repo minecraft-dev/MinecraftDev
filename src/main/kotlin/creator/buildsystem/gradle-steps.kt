@@ -31,6 +31,7 @@ import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Key
@@ -43,7 +44,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
-import org.jetbrains.kotlin.idea.util.runWhenSmart
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
@@ -64,7 +64,7 @@ abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : Abstrac
 
     override fun perform(project: Project) {
         val outputDirectory = context.projectFileDirectory
-        project.runWhenSmart {
+        DumbService.getInstance(project).runWhenSmart {
             runGradleTask(project, Path.of(outputDirectory)) { settings ->
                 settings.taskNames = listOf(task)
             }
