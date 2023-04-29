@@ -30,6 +30,7 @@ import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTaskInSmartMode
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
@@ -90,50 +91,52 @@ class VelocityModifyMainClassStep(
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
 
-        project.runWriteTaskInSmartMode {
-            val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true)
-                ?: return@runWriteTaskInSmartMode
-            val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile
-                ?: return@runWriteTaskInSmartMode
+        NonProjectFileWritingAccessProvider.disableChecksDuring {
+            project.runWriteTaskInSmartMode {
+                val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true)
+                    ?: return@runWriteTaskInSmartMode
+                val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile
+                    ?: return@runWriteTaskInSmartMode
 
-            val psiClass = mainClassPsi.classes[0]
-            val annotation = buildString {
-                append("@Plugin(")
-                append("\nid = ${literal(buildSystemProps.artifactId)}")
-                append(",\nname = ${literal(pluginName)}")
+                val psiClass = mainClassPsi.classes[0]
+                val annotation = buildString {
+                    append("@Plugin(")
+                    append("\nid = ${literal(buildSystemProps.artifactId)}")
+                    append(",\nname = ${literal(pluginName)}")
 
-                if (isGradle) {
-                    append(",\nversion = BuildConstants.VERSION")
-                } else {
-                    append(",\nversion = \"${buildSystemProps.version}\"")
+                    if (isGradle) {
+                        append(",\nversion = BuildConstants.VERSION")
+                    } else {
+                        append(",\nversion = \"${buildSystemProps.version}\"")
+                    }
+
+                    if (description.isNotBlank()) {
+                        append(",\ndescription = ${literal(description)}")
+                    }
+
+                    if (website.isNotBlank()) {
+                        append(",\nurl = ${literal(website)}")
+                    }
+
+                    if (authors.isNotEmpty()) {
+                        append(",\nauthors = {${authors.joinToString(", ", transform = ::literal)}}")
+                    }
+
+                    if (dependencies.isNotEmpty()) {
+                        val deps = dependencies.joinToString(",\n") { "@Dependency(id = ${literal(it)})" }
+                        append(",\ndependencies = {\n$deps\n}")
+                    }
+
+                    append("\n)")
                 }
 
-                if (description.isNotBlank()) {
-                    append(",\ndescription = ${literal(description)}")
+                val factory = JavaPsiFacade.getElementFactory(project)
+                val pluginAnnotation = factory.createAnnotationFromText(annotation, null)
+
+                mainClassPsi.runWriteAction {
+                    psiClass.modifierList?.let { it.addBefore(pluginAnnotation, it.firstChild) }
+                    CodeStyleManager.getInstance(project).reformat(psiClass)
                 }
-
-                if (website.isNotBlank()) {
-                    append(",\nurl = ${literal(website)}")
-                }
-
-                if (authors.isNotEmpty()) {
-                    append(",\nauthors = {${authors.joinToString(", ", transform = ::literal)}}")
-                }
-
-                if (dependencies.isNotEmpty()) {
-                    val deps = dependencies.joinToString(",\n") { "@Dependency(id = ${literal(it)})" }
-                    append(",\ndependencies = {\n$deps\n}")
-                }
-
-                append("\n)")
-            }
-
-            val factory = JavaPsiFacade.getElementFactory(project)
-            val pluginAnnotation = factory.createAnnotationFromText(annotation, null)
-
-            mainClassPsi.runWriteAction {
-                psiClass.modifierList?.let { it.addBefore(pluginAnnotation, it.firstChild) }
-                CodeStyleManager.getInstance(project).reformat(psiClass)
             }
         }
     }

@@ -17,7 +17,10 @@ import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.util.childrenOfType
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.mapFirstNotNull
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.util.ProgressIndicatorBase
 import com.intellij.openapi.project.rootManager
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
@@ -126,12 +129,18 @@ class ModsTomlModIdReference(element: TomlValue) :
         val modAnnotation = JavaPsiFacade.getInstance(element.project).findClass(ForgeConstants.MOD_ANNOTATION, scope)
             ?: return null
         val refScope = GlobalSearchScope.moduleScope(module)
-        return ReferencesSearch.search(modAnnotation, refScope, true).mapFirstNotNull { ref ->
-            ref.element.toUElement()?.getParentOfType<UAnnotation>()
-                ?.takeIf {
-                    it.qualifiedName == ForgeConstants.MOD_ANNOTATION &&
-                        it.findAttributeValue("value")?.evaluateString() == modId
-                }?.getContainingUClass()?.sourcePsi
-        }
+        return ProgressManager.getInstance().runProcess(
+            Computable {
+                ReferencesSearch.search(modAnnotation, refScope, true).mapFirstNotNull { ref ->
+                    ProgressManager.checkCanceled()
+                    ref.element.toUElement()?.getParentOfType<UAnnotation>()
+                        ?.takeIf {
+                            it.qualifiedName == ForgeConstants.MOD_ANNOTATION &&
+                                it.findAttributeValue("value")?.evaluateString() == modId
+                        }?.getContainingUClass()?.sourcePsi
+                }
+            },
+            ProgressIndicatorBase()
+        )
     }
 }

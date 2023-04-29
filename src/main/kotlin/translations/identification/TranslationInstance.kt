@@ -305,6 +305,36 @@ data class TranslationInstance(
                 foldParameters = TranslationFunction.FoldingScope.PARAMETER,
                 obfuscatedName = true,
             ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.COMPONENT_TRANSLATABLE,
+                    "(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;",
+                    TranslationConstants.COMPONENT_CLASS,
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.CALL,
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.COMPONENT_TRANSLATABLE,
+                    "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;",
+                    TranslationConstants.COMPONENT_CLASS,
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.CALL,
+            ),
+            TranslationFunction(
+                MemberReference(
+                    TranslationConstants.COMPONENT_TRANSLATABLE_WITH_FALLBACK,
+                    null,
+                    TranslationConstants.COMPONENT_CLASS,
+                ),
+                0,
+                formatting = false,
+                foldParameters = TranslationFunction.FoldingScope.PARAMETER,
+            ),
         )
 
         fun find(element: PsiElement): TranslationInstance? =

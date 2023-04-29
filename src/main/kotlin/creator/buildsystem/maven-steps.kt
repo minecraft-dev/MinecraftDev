@@ -140,6 +140,7 @@ abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLong
                         // The maven importer requires that the document is saved to disk
                         val document = PsiDocumentManager.getInstance(project).getDocument(pomPsi)
                             ?: return@runWriteAction
+                        PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
                         FileDocumentManager.getInstance().saveDocument(document)
                     }
                 }

@@ -137,8 +137,31 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             val c = ColorChooser.chooseColor(psiElement.project, editor.component, "Choose Color", color, false)
                 ?: return@handler
             when (workElement) {
-                is ULiteralExpression -> workElement.setColor(c.rgb and 0xFFFFFF)
-                is UCallExpression -> workElement.setColor(c.red, c.green, c.blue)
+                is ULiteralExpression -> {
+                    val currentValue = workElement.evaluate()
+                    if (currentValue is Int) {
+                        workElement.setColor(c.rgb and 0xFFFFFF)
+                    } else if (currentValue is String) {
+                        if (currentValue.length == 4) {
+                            val hexString = "#" +
+                                Integer.toUnsignedString(c.red, 16).first() +
+                                Integer.toUnsignedString(c.green, 16).first() +
+                                Integer.toUnsignedString(c.blue, 16).first()
+                            workElement.setColor(hexString, true)
+                        } else {
+                            val hexString = "#" + Integer.toUnsignedString(c.rgb, 16).substring(2)
+                            workElement.setColor(hexString, true)
+                        }
+                    }
+                }
+                is UCallExpression -> {
+                    if (workElement.methodName == "hsvLike") {
+                        val (h, s, v) = Color.RGBtoHSB(c.red, c.green, c.blue, null)
+                        workElement.setColorHSV(h, s, v)
+                    }
+
+                    workElement.setColor(c.red, c.green, c.blue)
+                }
             }
         },
     )

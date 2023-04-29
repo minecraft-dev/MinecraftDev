@@ -20,7 +20,7 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.demonwav.mcdev.util.runGradleTaskAndWait
+import com.demonwav.mcdev.util.runGradleTask
 import com.demonwav.mcdev.util.runWriteAction
 import com.demonwav.mcdev.util.runWriteTask
 import com.demonwav.mcdev.util.virtualFileOrError
@@ -31,6 +31,7 @@ import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Key
@@ -48,7 +49,7 @@ import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 
-val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 3, 3)
+val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 6, 1)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
 
 fun FixedAssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {
@@ -63,8 +64,10 @@ abstract class AbstractRunGradleTaskStep(parent: NewProjectWizardStep) : Abstrac
 
     override fun perform(project: Project) {
         val outputDirectory = context.projectFileDirectory
-        runGradleTaskAndWait(project, Path.of(outputDirectory)) { settings ->
-            settings.taskNames = listOf(task)
+        DumbService.getInstance(project).runWhenSmart {
+            runGradleTask(project, Path.of(outputDirectory)) { settings ->
+                settings.taskNames = listOf(task)
+            }
         }
     }
 }

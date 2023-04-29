@@ -48,11 +48,13 @@ class BukkitGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
+        val (manifestPath, _) = data.getUserData(AbstractBukkitPlatformStep.KEY)!!.getManifest()
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
             "PLUGIN_VERSION" to buildSystemProps.version,
             "JAVA_VERSION" to javaVersion,
+            "MANIFEST_NAME" to manifestPath.substringAfterLast('/')
         )
         assets.addTemplates(
             project,

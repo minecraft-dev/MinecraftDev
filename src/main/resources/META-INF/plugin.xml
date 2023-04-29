@@ -219,6 +219,7 @@
         <colorSettingsPage implementation="com.demonwav.mcdev.translations.lang.colors.LangColorSettingsPage"/>
         <renameInputValidator implementation="com.demonwav.mcdev.translations.lang.LangRenameInputValidator"/>
         <editorNotificationProvider implementation="com.demonwav.mcdev.translations.TranslationEditorNotificationProvider"/>
+        <notificationGroup id="Translations sorting error" displayType="STICKY_BALLOON"/>
         <elementDescriptionProvider implementation="com.demonwav.mcdev.translations.reference.TranslationDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.translations.reference.TranslationReferenceSearch"/>
         <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
@@ -314,6 +315,8 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
         <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor" />
+        <resolveScopeEnlarger implementation="com.demonwav.mcdev.platform.fabric.reference.FabricModJsonResolveScopeEnlarger" />
+        <useScopeEnlarger implementation="com.demonwav.mcdev.platform.fabric.reference.FabricClientUseScopeEnlarger" />
         <!--endregion-->
 
         <!--region ARCHITECTURY-->

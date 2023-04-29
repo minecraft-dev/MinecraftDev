@@ -20,6 +20,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
+import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.IssueTrackerStep
@@ -224,6 +225,13 @@ class ArchitecturyFabricMainClassStep(parent: NewProjectWizardStep) : Architectu
     override val template = MinecraftTemplates.ARCHITECTURY_FABRIC_MAIN_CLASS_TEMPLATE
 
     override fun getClassName(packageName: String, className: String) = "$packageName.fabric.${className}Fabric"
+}
+
+class ArchitecturyReformatPackDescriptorStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(parent) {
+
+    override fun addFilesToReformat() {
+        addFileToReformat("forge/src/main/resources/pack.mcmeta")
+    }
 }
 
 class ArchitecturyBuildSystemStep(parent: NewProjectWizardStep) : AbstractBuildSystemStep(parent) {
