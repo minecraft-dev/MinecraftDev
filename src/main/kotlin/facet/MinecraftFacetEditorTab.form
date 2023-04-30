@@ -71,6 +71,7 @@
           <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <enabled value="false"/>
           <icon value="assets/icons/platform/LiteLoader@2x.png"/>
           <text value=""/>
         </properties>
@@ -238,15 +239,6 @@
           <text value=""/>
         </properties>
       </component>
-      <component id="1d6ee" class="javax.swing.JCheckBox" binding="liteloaderEnabledCheckBox">
-        <constraints>
-          <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <enabled value="true"/>
-          <text value=""/>
-        </properties>
-      </component>
       <component id="4c112" class="javax.swing.JCheckBox" binding="mcpEnabledCheckBox">
         <constraints>
           <grid row="10" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -316,15 +308,6 @@
       <component id="d4735" class="javax.swing.JCheckBox" binding="forgeAutoCheckBox">
         <constraints>
           <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <selected value="false"/>
-          <text value=""/>
-        </properties>
-      </component>
-      <component id="3a46f" class="javax.swing.JCheckBox" binding="liteloaderAutoCheckBox">
-        <constraints>
-          <grid row="9" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <selected value="false"/>
