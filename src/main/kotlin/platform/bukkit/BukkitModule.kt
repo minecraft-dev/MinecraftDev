@@ -40,7 +40,7 @@ import org.jetbrains.uast.toUElementOfType
 class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
     var pluginYml by nullable {
-        if (moduleType is PaperModuleType) {
+        if (moduleType is PaperModuleType || moduleType is FoliaModuleType) {
             val paperPlugin = facet.findFile("paper-plugin.yml", SourceType.RESOURCE)
             if (paperPlugin != null) {
                 return@nullable paperPlugin

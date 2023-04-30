@@ -113,3 +113,55 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
         override fun createStep(parent: BukkitPlatformStep) = PaperPlatformStep(parent)
     }
 }
+
+class FoliaPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep(parent, PlatformType.FOLIA) {
+
+    private val usePaperManifestProperty = propertyGraph.property(false)
+        .bindBooleanStorage("${javaClass.name}.usePaperManifest")
+
+    private val usePaperManifest by usePaperManifestProperty
+
+    override fun setupUI(builder: Panel) {
+        super.setupUI(builder)
+        with(builder) {
+            row("Paper manifest:") {
+                checkBox("Use paper-plugin.yml")
+                    .bindSelected(usePaperManifestProperty)
+                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+            }
+        }
+    }
+
+    override fun getRepositories(mcVersion: SemanticVersion) = listOf(
+        BuildRepository(
+            "papermc-repo",
+            "https://repo.papermc.io/repository/maven-public/",
+        ),
+    )
+
+    override fun getDependencies(mcVersion: SemanticVersion): List<BuildDependency> {
+        return listOf(
+            BuildDependency(
+                "dev.folia",
+                "folia-api",
+                "$mcVersion-R0.1-SNAPSHOT",
+                mavenScope = "provided",
+                gradleConfiguration = "compileOnly",
+            ),
+        )
+    }
+
+    override fun getManifest(): Pair<String, String> {
+        if (usePaperManifest) {
+            return "src/main/resources/paper-plugin.yml" to MinecraftTemplates.PAPER_PLUGIN_YML_TEMPLATE
+        }
+
+        return "src/main/resources/plugin.yml" to MinecraftTemplates.BUKKIT_PLUGIN_YML_TEMPLATE
+    }
+
+    class Factory : BukkitPlatformStep.Factory {
+        override val name = "Folia"
+
+        override fun createStep(parent: BukkitPlatformStep) = FoliaPlatformStep(parent)
+    }
+}

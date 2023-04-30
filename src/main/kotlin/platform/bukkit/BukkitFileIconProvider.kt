@@ -29,7 +29,7 @@ class BukkitFileIconProvider : FileIconProvider {
 
         val module = ModuleUtilCore.findModuleForFile(file, project) ?: return null
         val bukkitModule =
-            MinecraftFacet.getInstance(module, BukkitModuleType, SpigotModuleType, PaperModuleType) ?: return null
+            MinecraftFacet.getInstance(module, BukkitModuleType, SpigotModuleType, PaperModuleType, FoliaModuleType) ?: return null
 
         if (file == bukkitModule.pluginYml) {
             return bukkitModule.icon

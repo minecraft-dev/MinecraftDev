@@ -16,3 +16,4 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 val BUKKIT_LIBRARY_KIND: LibraryKind = libraryKind("bukkit-api")
 val SPIGOT_LIBRARY_KIND: LibraryKind = libraryKind("spigot-api")
 val PAPER_LIBRARY_KIND: LibraryKind = libraryKind("paper-api")
+val FOLIA_LIBRARY_KIND: LibraryKind = libraryKind("folia-api")
