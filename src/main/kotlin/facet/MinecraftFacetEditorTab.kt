@@ -37,8 +37,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     private lateinit var fabricAutoCheckBox: JCheckBox
     private lateinit var architecturyEnabledCheckBox: JCheckBox
     private lateinit var architecturyAutoCheckBox: JCheckBox
-    private lateinit var liteloaderEnabledCheckBox: JCheckBox
-    private lateinit var liteloaderAutoCheckBox: JCheckBox
     private lateinit var mcpEnabledCheckBox: JCheckBox
     private lateinit var mcpAutoCheckBox: JCheckBox
     private lateinit var mixinEnabledCheckBox: JCheckBox
@@ -65,7 +63,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             forgeEnabledCheckBox,
             fabricEnabledCheckBox,
             architecturyEnabledCheckBox,
-            liteloaderEnabledCheckBox,
             mcpEnabledCheckBox,
             mixinEnabledCheckBox,
             bungeecordEnabledCheckBox,
@@ -84,7 +81,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             forgeAutoCheckBox,
             fabricAutoCheckBox,
             architecturyAutoCheckBox,
-            liteloaderAutoCheckBox,
             mcpAutoCheckBox,
             mixinAutoCheckBox,
             bungeecordAutoCheckBox,
@@ -183,7 +179,6 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
             )
         }
 
-        liteloaderEnabledCheckBox.addActionListener { also(liteloaderEnabledCheckBox, mcpEnabledCheckBox) }
         mixinEnabledCheckBox.addActionListener { also(mixinEnabledCheckBox, mcpEnabledCheckBox) }
 
         bungeecordEnabledCheckBox.addActionListener { unique(bungeecordEnabledCheckBox, waterfallEnabledCheckBox) }

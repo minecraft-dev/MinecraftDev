@@ -33,11 +33,13 @@ class FabricModJsonResolveScopeEnlarger : ResolveScopeEnlarger() {
         val loomData = GradleUtil.findGradleModuleData(module)?.children
             ?.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
             ?: return null
+        val modSourceSets = loomData.modSourceSets
+            ?: return null
 
         val moduleScopes = mutableListOf<GlobalSearchScope>()
         val moduleManager = ModuleManager.getInstance(project)
         val parentPath = module.name.substringBeforeLast('.')
-        for ((_, sourceSets) in loomData.modSourceSets) {
+        for ((_, sourceSets) in modSourceSets) {
             for (sourceSet in sourceSets) {
                 val childModule = moduleManager.findModuleByName("$parentPath.$sourceSet")
                 if (childModule != null) {
