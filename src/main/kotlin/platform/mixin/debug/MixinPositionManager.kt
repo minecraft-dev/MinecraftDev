@@ -36,6 +36,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.sun.jdi.AbsentInformationException
@@ -76,7 +77,17 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
 
             if (psiFile != null) {
                 // File found, return correct source file
-                return SourcePosition.createFromLine(psiFile, location.lineNumber() - 1)
+                var line = location.lineNumber() - 1
+                if (psiFile is PsiCompiledElement) {
+                    val adjustedLine = DebuggerUtilsEx.bytecodeToSourceLine(psiFile, line)
+                    if (adjustedLine > -1) {
+                        line = adjustedLine
+                    }
+                }
+
+                if (line > -1) {
+                    return SourcePosition.createFromLine(psiFile, line)
+                }
             }
         } catch (ignored: AbsentInformationException) {
         }
