@@ -29,6 +29,7 @@ import com.intellij.debugger.NoDataException
 import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.DebugProcess
 import com.intellij.debugger.engine.DebuggerUtils
+import com.intellij.debugger.engine.PositionManagerImpl.ClsSourcePosition
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.requests.ClassPrepareRequestor
 import com.intellij.ide.highlighter.JavaFileType
@@ -82,6 +83,9 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
                     val adjustedLine = DebuggerUtilsEx.bytecodeToSourceLine(psiFile, line)
                     if (adjustedLine > -1) {
                         line = adjustedLine
+                    } else {
+                        // Class is not decompiled yet, return a lazily remapped SourcePosition
+                        return ClsSourcePosition(SourcePosition.createFromLine(psiFile, line), line)
                     }
                 }
 
