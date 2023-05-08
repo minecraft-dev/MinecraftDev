@@ -64,7 +64,7 @@ data class MemberReference(
 
     private fun matchOwner(clazz: String): Boolean {
         assert(!clazz.contains('.'))
-        return this.owner == null || this.owner == clazz.replace('/', '.')
+        return this.owner == null || this.owner == clazz.replace('/', '.').replace('$', '.')
     }
 
     override fun matchField(owner: String, name: String, desc: String): Boolean {
