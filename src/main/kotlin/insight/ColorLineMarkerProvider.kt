@@ -22,7 +22,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiEditorUtil
-import com.intellij.ui.ColorChooser
+import com.intellij.ui.ColorChooserService
 import com.intellij.util.FunctionUtil
 import com.intellij.util.ui.ColorIcon
 import com.intellij.util.ui.ColorsIcon
@@ -134,7 +134,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 return@handler
             }
 
-            val c = ColorChooser.chooseColor(psiElement.project, editor.component, "Choose Color", color, false)
+            val c = ColorChooserService.instance.showDialog(psiElement.project, editor.component, "Choose Color", color)
                 ?: return@handler
             when (workElement) {
                 is ULiteralExpression -> {
