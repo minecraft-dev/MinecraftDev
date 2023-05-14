@@ -76,6 +76,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 // default modifier is not present in bytecode
                 continue
             }
+            if (modifier == PsiModifier.OPEN || modifier == PsiModifier.TRANSITIVE) {
+                // those are only used in module-info
+                continue
+            }
 
             val targetModifier = target.method.hasModifier(modifier)
             val overwriteModifier = modifierList.hasModifierProperty(modifier)
