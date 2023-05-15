@@ -59,7 +59,7 @@ import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 
-val DEFAULT_GRADLE_VERSION = SemanticVersion.release(7, 6, 1)
+val DEFAULT_GRADLE_VERSION = SemanticVersion.release(8, 1, 1)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
 
 fun FixedAssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {

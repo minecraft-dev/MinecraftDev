@@ -26,6 +26,7 @@ import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
+import com.demonwav.mcdev.creator.buildsystem.GRADLE_VERSION_KEY
 import com.demonwav.mcdev.creator.buildsystem.GradleImportStep
 import com.demonwav.mcdev.creator.buildsystem.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
@@ -63,6 +64,8 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
+        data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(7, 6, 1))
+
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mcVersion = data.getUserData(ArchitecturyVersionChainStep.MC_VERSION_KEY) ?: return
