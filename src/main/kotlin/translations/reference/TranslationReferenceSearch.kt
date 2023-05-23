@@ -1,11 +1,21 @@
 /*
- * Minecraft Dev for IntelliJ
+ * Minecraft Development for IntelliJ
  *
- * https://minecraftdev.org
+ * https://mcdev.io/
  *
- * Copyright (c) 2023 minecraft-dev
+ * Copyright (C) 2023 minecraft-dev
  *
- * MIT License
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.demonwav.mcdev.translations.reference
@@ -14,20 +24,22 @@ import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
 import com.intellij.openapi.application.runReadAction
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.util.ProgressIndicatorBase
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
-import java.util.concurrent.CompletableFuture
+import com.intellij.util.application
 
 class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.SearchParameters> {
     override fun execute(parameters: ReferencesSearch.SearchParameters, consumer: Processor<in PsiReference>): Boolean {
+        if (application.isReadAccessAllowed) {
+            // Skip when we're in a read action because FindInProjectUtil.findUsages forbids it
+            // I am unsure why we are in a read action sometimes, thankfully references still seem to resolve correctly
+            return true
+        }
+
         val entry = parameters.elementToSearch
 
         val key = runReadAction { TranslationFiles.toTranslation(entry)?.key } ?: return true
@@ -53,31 +65,22 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
             .filter { it.isNotEmpty() }
             .joinToString("|") { "(${Regex.escape(it)})" }
 
-        val future = CompletableFuture<Boolean>()
-        ProgressManager.getInstance().runProcessWithProgressAsynchronously(
-            object : Task.Backgroundable(parameters.project, "Searching for references", true) {
-                override fun run(indicator: ProgressIndicator) {
-                    FindInProjectUtil.findUsages(
-                        model,
-                        parameters.project,
-                        {
-                            if (it.file != null && it.element != null && it.rangeInElement != null) {
-                                val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
-                                val ref = highlighted?.parent?.references
-                                    ?.find { ref -> ref is TranslationReference } as TranslationReference?
-                                if (ref?.key?.full == key && !consumer.process(ref)) {
-                                    future.complete(false)
-                                }
-                            }
-                            true
-                        },
-                        FindUsagesProcessPresentation(UsageViewPresentation()),
-                    )
-                    future.complete(true)
+        FindInProjectUtil.findUsages(
+            model,
+            parameters.project,
+            {
+                if (it.file != null && it.element != null && it.rangeInElement != null) {
+                    val highlighted = it.file?.findElementAt(it.rangeInElement!!.startOffset)
+                    val ref = highlighted?.parent?.references
+                        ?.find { ref -> ref is TranslationReference } as TranslationReference?
+                    if (ref?.key?.full == key) {
+                        consumer.process(ref)
+                    }
                 }
+                true
             },
-            ProgressIndicatorBase()
+            FindUsagesProcessPresentation(UsageViewPresentation()),
         )
-        return future.get()
+        return true
     }
 }

@@ -1,11 +1,21 @@
 /*
- * Minecraft Dev for IntelliJ
+ * Minecraft Development for IntelliJ
  *
- * https://minecraftdev.org
+ * https://mcdev.io/
  *
- * Copyright (c) 2023 minecraft-dev
+ * Copyright (C) 2023 minecraft-dev
  *
- * MIT License
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.demonwav.mcdev.platform.sponge.creator
@@ -16,7 +26,6 @@ import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
-import com.demonwav.mcdev.creator.buildsystem.GRADLE_VERSION_KEY
 import com.demonwav.mcdev.creator.buildsystem.GradleImportStep
 import com.demonwav.mcdev.creator.buildsystem.GradleWrapperStep
 import com.demonwav.mcdev.creator.buildsystem.ReformatBuildGradleStep
@@ -33,7 +42,6 @@ import com.demonwav.mcdev.creator.step.MainClassStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.util.MinecraftTemplates
-import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.starters.local.GeneratorEmptyDirectory
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -55,8 +63,6 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(7, 4, 2))
-
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val spongeVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
