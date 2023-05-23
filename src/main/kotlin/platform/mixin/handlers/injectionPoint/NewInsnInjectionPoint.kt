@@ -1,25 +1,33 @@
 /*
- * Minecraft Dev for IntelliJ
+ * Minecraft Development for IntelliJ
  *
- * https://minecraftdev.org
+ * https://mcdev.io/
  *
- * Copyright (c) 2023 minecraft-dev
+ * Copyright (C) 2023 minecraft-dev
  *
- * MIT License
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
-import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.shortName
@@ -81,9 +89,11 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
             }
             is PsiMethod -> {
                 val ownerName = result.qualifier?.substringAfterLast('.')?.replace('$', '.') ?: targetClass.shortName
+                val descriptorArgs = target.descriptor?.dropLast(1) ?: return null
+                val qualifierInternalName = result.qualifier?.replace('.', '/')
                 return JavaLookupElementBuilder.forMethod(
                     target,
-                    target.getQualifiedMemberReference(result.qualifier).toMixinString(),
+                    "${descriptorArgs}L$qualifierInternalName;",
                     PsiSubstitutor.EMPTY,
                     null,
                 )
@@ -183,8 +193,29 @@ class NewInsnSelectorParser : MixinSelectorParser {
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        return classToMemberReference(value)
+        return NewInsnSelector(value)
     }
+}
+
+private class NewInsnSelector(
+    override val methodDescriptor: String,
+) : MixinSelector {
+    override fun matchField(owner: String, name: String, desc: String): Boolean = false
+
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        if (name != "<init>" || desc.last() != 'V') {
+            return false
+        }
+
+        val lastParen = methodDescriptor.lastIndexOf(')')
+        val argsDesc = methodDescriptor.substring(0, lastParen + 1)
+        val descRet = methodDescriptor.substringAfterLast(')').removeSurrounding("L", ";")
+        return desc.dropLast(1) == argsDesc && descRet == owner
+    }
+
+    override val owner = null
+    override val fieldDescriptor = null
+    override val displayName = methodDescriptor
 }
 
 private fun classToMemberReference(value: String): MemberReference? {

@@ -1,11 +1,21 @@
 /*
- * Minecraft Dev for IntelliJ
+ * Minecraft Development for IntelliJ
  *
- * https://minecraftdev.org
+ * https://mcdev.io/
  *
- * Copyright (c) 2023 minecraft-dev
+ * Copyright (C) 2023 minecraft-dev
  *
- * MIT License
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.demonwav.mcdev.platform.mixin.debug
@@ -19,6 +29,7 @@ import com.intellij.debugger.NoDataException
 import com.intellij.debugger.SourcePosition
 import com.intellij.debugger.engine.DebugProcess
 import com.intellij.debugger.engine.DebuggerUtils
+import com.intellij.debugger.engine.PositionManagerImpl.ClsSourcePosition
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.requests.ClassPrepareRequestor
 import com.intellij.ide.highlighter.JavaFileType
@@ -26,6 +37,7 @@ import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.sun.jdi.AbsentInformationException
@@ -66,7 +78,20 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
 
             if (psiFile != null) {
                 // File found, return correct source file
-                return SourcePosition.createFromLine(psiFile, location.lineNumber() - 1)
+                var line = location.lineNumber() - 1
+                if (psiFile is PsiCompiledElement) {
+                    val adjustedLine = DebuggerUtilsEx.bytecodeToSourceLine(psiFile, line)
+                    if (adjustedLine > -1) {
+                        line = adjustedLine
+                    } else {
+                        // Class is not decompiled yet, return a lazily remapped SourcePosition
+                        return ClsSourcePosition(SourcePosition.createFromLine(psiFile, line), line)
+                    }
+                }
+
+                if (line > -1) {
+                    return SourcePosition.createFromLine(psiFile, line)
+                }
             }
         } catch (ignored: AbsentInformationException) {
         }
