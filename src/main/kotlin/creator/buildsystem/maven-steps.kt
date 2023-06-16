@@ -53,6 +53,7 @@ import org.jetbrains.idea.maven.project.importing.MavenImportingManager
 private val pluginVersions by lazy {
     runBlocking {
         getVersionJson<Map<String, String>>("maven.json")
+            .mapKeys { (k, _) -> k.replace('-', '_') }
     }
 }
 

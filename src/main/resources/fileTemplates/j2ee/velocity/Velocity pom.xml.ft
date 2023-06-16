@@ -24,7 +24,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>${maven-source-plugin-version}</version>
+                        <version>${maven_source_plugin_version}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -37,7 +37,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${maven-javadoc-plugin-version}</version>
+                        <version>${maven_javadoc_plugin_version}</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -50,7 +50,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin-version}</version>
+                        <version>${maven_gpg_plugin_version}</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -83,7 +83,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin-version}</version>
+                <version>${maven_compiler_plugin_version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -92,7 +92,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>templating-maven-plugin</artifactId>
-                <version>${templating-maven-plugin-version}</version>
+                <version>${templating_maven_plugin_version}</version>
                 <executions>
                     <execution>
                         <id>filter-src</id>
@@ -105,24 +105,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>${maven-site-plugin-version}</version>
+                <version>${maven_site_plugin_version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>net.trajano.wagon</groupId>
                         <artifactId>wagon-git</artifactId>
-                        <version>${wagon-git-version}</version>
+                        <version>${wagon_git_version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.maven.doxia</groupId>
                         <artifactId>doxia-module-markdown</artifactId>
-                        <version>${doxia-module-markdown-version}</version>
+                        <version>${doxia_module_markdown_version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${maven-release-plugin-version}</version>
+                <version>${maven_release_plugin_version}</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagNameFormat>@{project.version}</tagNameFormat>
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin-version}</version>
+                <version>${maven_javadoc_plugin_version}</version>
             </plugin>
         </plugins>
     </reporting>
