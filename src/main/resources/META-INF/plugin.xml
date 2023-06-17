@@ -625,6 +625,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
+        <localInspection displayName="Fabric mod JSON entrypoints validation"
+                         shortName="FabricModJsonEntrypointsValidation"
+                         groupName="Fabric"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
