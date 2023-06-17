@@ -28,6 +28,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
+import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiPolyVariantReference
@@ -46,8 +47,8 @@ object EntryPointReference : PsiReferenceProvider() {
         val manipulator = element.manipulator ?: return PsiReference.EMPTY_ARRAY
         val range = manipulator.getRangeInElement(element)
         val text = element.text.substring(range.startOffset, range.endOffset)
-        val methodParts = text.split("::", limit = 2)
-        val clazzParts = methodParts[0].split("$", limit = 0)
+        val memberParts = text.split("::", limit = 2)
+        val clazzParts = memberParts[0].split("$", limit = 0)
         val references = mutableListOf<Reference>()
         var cursor = -1
         var innerClassDepth = -1
@@ -64,12 +65,12 @@ object EntryPointReference : PsiReferenceProvider() {
             )
             cursor += clazzPart.length
         }
-        if (methodParts.size == 2) {
+        if (memberParts.size == 2) {
             cursor += 2
             references.add(
                 Reference(
                     element,
-                    range.cutOut(TextRange.from(cursor, methodParts[1].length)),
+                    range.cutOut(TextRange.from(cursor, memberParts[1].length)),
                     innerClassDepth,
                     true,
                 ),
@@ -81,16 +82,16 @@ object EntryPointReference : PsiReferenceProvider() {
     private fun resolveReference(
         element: JsonStringLiteral,
         innerClassDepth: Int,
-        isMethodReference: Boolean,
+        isMemberReference: Boolean,
     ): Array<PsiElement> {
         val strReference = element.value
-        val methodParts = strReference.split("::", limit = 2)
+        val memberParts = strReference.split("::", limit = 2)
         // split at dollar sign for inner class evaluation
-        val clazzParts = methodParts[0].split("$", limit = 0)
+        val clazzParts = memberParts[0].split("$", limit = 0)
         // this case should only happen if someone misuses the method, better protect against it anyways
         if (innerClassDepth >= clazzParts.size ||
             innerClassDepth + 1 < clazzParts.size &&
-            isMethodReference
+            isMemberReference
         ) {
             throw IncorrectOperationException("Invalid reference")
         }
@@ -104,15 +105,24 @@ object EntryPointReference : PsiReferenceProvider() {
             if (inner.contains('.')) return PsiElement.EMPTY_ARRAY
             clazz = clazz.findInnerClassByName(inner, false) ?: return PsiElement.EMPTY_ARRAY
         }
-        return if (isMethodReference) {
-            if (methodParts.size == 1) {
+        return if (isMemberReference) {
+            if (memberParts.size == 1) {
                 throw IncorrectOperationException("Invalid reference")
             }
-            clazz.methods.filter { method ->
-                method.name == methodParts[1] &&
-                    method.hasModifierProperty(PsiModifier.PUBLIC) &&
-                    method.hasModifierProperty(PsiModifier.STATIC)
-            }.toTypedArray()
+
+            val members = mutableListOf<PsiElement>()
+            clazz.fields.filterTo(members) { field ->
+                field.name == memberParts[1] &&
+                    field.hasModifierProperty(PsiModifier.PUBLIC) &&
+                    field.hasModifierProperty(PsiModifier.STATIC)
+            }
+
+            clazz.methods.filterTo(members) { method ->
+                method.name == memberParts[1] &&
+                    method.hasModifierProperty(PsiModifier.PUBLIC)
+            }
+
+            members.toTypedArray()
         } else {
             arrayOf(clazz)
         }
@@ -124,7 +134,7 @@ object EntryPointReference : PsiReferenceProvider() {
         element: JsonStringLiteral,
         range: TextRange,
         private val innerClassDepth: Int,
-        private val isMethodReference: Boolean,
+        private val isMemberReference: Boolean,
     ) :
         PsiReferenceBase<JsonStringLiteral>(element, range),
         PsiPolyVariantReference,
@@ -134,7 +144,7 @@ object EntryPointReference : PsiReferenceProvider() {
         override val unresolved = resolve() == null
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-            return resolveReference(element, innerClassDepth, isMethodReference)
+            return resolveReference(element, innerClassDepth, isMemberReference)
                 .map { PsiElementResolveResult(it) }.toTypedArray()
         }
 
@@ -154,14 +164,17 @@ object EntryPointReference : PsiReferenceProvider() {
             val text = element.text.substring(range.startOffset, range.endOffset)
             val parts = text.split("::", limit = 2)
 
-            if (isMethodReference) {
-                val targetMethod = newTarget as? PsiMethod
-                    ?: throw IncorrectOperationException("Cannot target $newTarget")
+            if (isMemberReference) {
+                val newTargetName = when (newTarget) {
+                    is PsiMethod -> newTarget.name
+                    is PsiField -> newTarget.name
+                    else -> throw IncorrectOperationException("Cannot target $newTarget")
+                }
                 if (parts.size == 1) {
                     throw IncorrectOperationException("Invalid reference")
                 }
-                val methodRange = range.cutOut(TextRange.from(parts[0].length + 2, parts[1].length))
-                return manipulator.handleContentChange(element, methodRange, targetMethod.name)
+                val memberRange = range.cutOut(TextRange.from(parts[0].length + 2, parts[1].length))
+                return manipulator.handleContentChange(element, memberRange, newTargetName)
             } else {
                 val targetClass = newTarget as? PsiClass
                     ?: throw IncorrectOperationException("Cannot target $newTarget")
