@@ -30,9 +30,11 @@ object MinecraftVersions {
     val MC1_17 = SemanticVersion.release(1, 17)
     val MC1_17_1 = SemanticVersion.release(1, 17, 1)
     val MC1_18 = SemanticVersion.release(1, 18)
+    val MC1_18_2 = SemanticVersion.release(1, 18, 2)
     val MC1_19 = SemanticVersion.release(1, 19)
     val MC1_19_3 = SemanticVersion.release(1, 19, 3)
     val MC1_19_4 = SemanticVersion.release(1, 19, 4)
+    val MC1_20 = SemanticVersion.release(1, 20)
 
     fun requiredJavaVersion(minecraftVersion: SemanticVersion) = when {
         minecraftVersion <= MC1_16_5 -> JavaSdkVersion.JDK_1_8
