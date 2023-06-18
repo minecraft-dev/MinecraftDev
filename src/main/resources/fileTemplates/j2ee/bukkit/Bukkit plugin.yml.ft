@@ -2,7 +2,7 @@ name: ${NAME}
 version: '${VERSION}'
 main: ${MAIN}
 #if (${API_VERSION})
-api-version: ${API_VERSION}
+api-version: '${API_VERSION}'
 #end
 #if (${PREFIX})
 prefix: ${PREFIX}

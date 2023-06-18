@@ -18,7 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<idea-plugin require-restart="true">
+<idea-plugin>
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
@@ -31,10 +31,24 @@
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
-    <vendor email="demonwav@gmail.com" url="https://minecraftdev.org/">minecraft-dev</vendor>
+    <vendor email="kyle@denwav.dev" url="https://mcdev.io/">minecraft-dev</vendor>
 
     <description><![CDATA[
-      Brings support for Bukkit, Spigot, Paper, Sponge, Forge, Fabric, Architectury, MCP, Mixin, Velocity, BungeeCord and Waterfall projects to Intellij IDEA.
+        Provides first-class support for every major Java Minecraft modding or plugin development platform, including:
+        <ul>
+          <li>Bukkit</li>
+          <li>Spigot</li>
+          <li>Paper</li>
+          <li>Sponge</li>
+          <li>Forge</li>
+          <li>Fabric</li>
+          <li>Architectury</li>
+          <li>Velocity</li>
+          <li>BungeeCord</li>
+        </ul>
+
+        Also includes additional features supporting MCP mappings and Mixins for mod development. This plugin also
+        includes a text-based NBT editor.
     ]]></description>
 
     <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
@@ -611,6 +625,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
+        <localInspection displayName="Fabric mod JSON entrypoints validation"
+                         shortName="FabricModJsonEntrypointsValidation"
+                         groupName="Fabric"
+                         language="JSON"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection"/>
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
