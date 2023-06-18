@@ -35,6 +35,8 @@ import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
+import com.demonwav.mcdev.creator.step.DescriptionStep
+import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.util.MinecraftTemplates
@@ -48,7 +50,7 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.lang.JavaVersion
 import java.util.Locale
 
-private val fg5WrapperVersion = SemanticVersion.release(7, 5, 1)
+private val fg6WrapperVersion = SemanticVersion.release(8, 1, 1)
 
 const val MAGIC_RUN_CONFIGS_FILE = ".hello_from_mcdev"
 
@@ -78,28 +80,38 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
+        val description = data.getUserData(DescriptionStep.KEY) ?: return
+        val license = data.getUserData(LicenseStep.KEY) ?: return
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
+        val mcNextVersionPart = mcVersion.parts[1]
+        val mcNextVersion = if (mcNextVersionPart is SemanticVersion.Companion.VersionPart.ReleasePart) {
+            SemanticVersion.release(1, mcNextVersionPart.version + 1)
+        } else {
+            mcVersion
+        }
 
-        data.putUserData(GRADLE_VERSION_KEY, fg5WrapperVersion)
+        data.putUserData(GRADLE_VERSION_KEY, fg6WrapperVersion)
 
         assets.addTemplateProperties(
             "MOD_NAME" to modName,
+            "MC_VERSION" to mcVersion,
             "MCP_CHANNEL" to "official",
             "MCP_VERSION" to mcVersion,
             "MCP_MC_VERSION" to mcVersion,
-            "FORGE_VERSION" to "$mcVersion-$forgeVersion",
+            "MC_NEXT_VERSION" to mcNextVersion,
+            "FORGE_VERSION" to forgeVersion,
+            "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
             "MOD_VERSION" to buildSystemProps.version,
+            "DESCRIPTION" to description,
+            "AUTHOR_LIST" to authors.joinToString(", "),
+            "LICENSE" to license.id,
             "HAS_DATA" to "true",
         )
 
         if (javaVersion != null) {
             assets.addTemplateProperties("JAVA_VERSION" to javaVersion.feature)
-        }
-
-        if (authors.isNotEmpty()) {
-            assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(", "))
         }
 
         if (useMixins) {
