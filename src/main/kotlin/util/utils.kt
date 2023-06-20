@@ -370,3 +370,6 @@ inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
         throw e
     }
 }
+
+fun <T : Throwable> withSuppressed(original: T?, other: T): T =
+    original?.apply { addSuppressed(other) } ?: other
