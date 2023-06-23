@@ -195,7 +195,7 @@ fun isAccessModifier(@ModifierConstant modifier: String): Boolean {
     return modifier in ACCESS_MODIFIERS
 }
 
-infix fun PsiElement.equivalentTo(other: PsiElement): Boolean {
+infix fun PsiElement.equivalentTo(other: PsiElement?): Boolean {
     return manager.areElementsEquivalent(this, other)
 }
 
