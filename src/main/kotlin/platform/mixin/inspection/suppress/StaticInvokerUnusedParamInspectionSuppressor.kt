@@ -51,7 +51,9 @@ class StaticInvokerUnusedParamInspectionSuppressor : InspectionSuppressor {
             return false
         }
 
-        if (!method.hasAnnotation(MixinConstants.Annotations.INVOKER)) {
+        if (!method.hasAnnotation(MixinConstants.Annotations.ACCESSOR) &&
+            !method.hasAnnotation(MixinConstants.Annotations.INVOKER)
+        ) {
             return false
         }
 
