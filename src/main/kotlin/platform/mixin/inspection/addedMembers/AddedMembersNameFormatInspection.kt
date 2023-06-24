@@ -20,17 +20,23 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
+import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.util.decapitalize
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.onShown
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.icons.AllIcons
 import com.intellij.ide.util.SuperMethodWarningUtil
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ComponentValidator
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.text.StringUtil
@@ -42,10 +48,12 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.refactoring.rename.RenameProcessor
 import com.intellij.ui.DocumentAdapter
-import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.EnumComboBoxModel
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.layout.ValidationInfoBuilder
@@ -72,45 +80,43 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
     var validNameFixReplace = "MOD_ID\\\$\$0"
 
     @JvmField
-    var ignoreFields = false
+    var reportFields = ReportMode.NOT_ON_FABRIC
     @JvmField
-    var ignoreMethods = false
+    var reportMethods = ReportMode.NOT_ON_FABRIC
     @JvmField
-    var ignoreInheritedInterfaceMethods = false
+    var reportInheritedMethods = ReportMode.ALWAYS
 
     override fun getStaticDescription() = "Reports added members not matching the correct name format"
 
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
-        if (!ignoreFields) {
+        if (reportFields.shouldReport(field.findModule())) {
             visitAdded(holder, field)
         }
     }
 
     override fun visitAddedMethod(holder: ProblemsHolder, method: PsiMethod, isInherited: Boolean) {
-        if (!shouldIgnoreMethod(method, isInherited)) {
+        if (shouldReportMethod(method, isInherited)) {
             visitAdded(holder, method)
         }
     }
 
-    private fun shouldIgnoreMethod(method: PsiMethod, isInherited: Boolean): Boolean {
-        if (ignoreMethods) {
-            return true
-        }
+    private fun shouldReportMethod(method: PsiMethod, isInherited: Boolean): Boolean {
+        val module = method.findModule()
 
         if (isInherited) {
-            if (ignoreInheritedInterfaceMethods) {
-                return true
+            if (!reportInheritedMethods.shouldReport(module)) {
+                return false
             }
 
             val superMethods = method.findDeepestSuperMethods()
-            val isInterfaceMethod = superMethods.any {
+            val isWritableInterfaceMethod = superMethods.any {
                 val clazz = it.findContainingClass() ?: return@any false
                 clazz.isInterface && clazz.containingFile?.isWritable == true
             }
-            return !isInterfaceMethod
+            return isWritableInterfaceMethod
+        } else {
+            return reportMethods.shouldReport(module)
         }
-
-        return false
     }
 
     private fun visitAdded(holder: ProblemsHolder, added: PsiNameIdentifierOwner) {
@@ -162,35 +168,51 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
                     .columns(COLUMNS_SHORT)
                     .regexValidator()
             }
-            row("Valid name fix replace:") {
+            row {
+                layout(RowLayout.LABEL_ALIGNED)
+                val toolTip =
+                    "Uses regex replacement syntax after matching from the regex in the option above.<br/>" +
+                        "\"MOD_ID\" is replaced with the project name, converted to a valid Java identifier."
+                label("Valid name fix replace:")
+                    .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
+                    .applyToComponent { icon = AllIcons.General.ContextHelp }
+                    .applyToComponent { toolTipText = toolTip }
                 textField().doBindText(::validNameFixReplace).columns(COLUMNS_SHORT)
             }
 
             separator()
 
-            var ignoreFields: Cell<JBCheckBox>? = null
+            row("Report fields:") {
+                comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportFields)
+            }
+            row("Report methods:") {
+                comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportMethods)
+            }
             row {
-                ignoreFields = checkBox("Ignore fields").doBindSelected(::ignoreFields)
+                layout(RowLayout.LABEL_ALIGNED)
+                label("Report inherited methods:")
+                    .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
+                    .applyToComponent { icon = AllIcons.General.ContextHelp }
+                    .applyToComponent { toolTipText = "Reports methods that are inherited from duck interfaces" }
+                comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportInheritedMethods)
             }
-            var ignoreMethods: Cell<JBCheckBox>? = null
-            row {
-                ignoreMethods = checkBox("Ignore methods").doBindSelected(::ignoreMethods)
-            }
-            // make sure ignore fields and ignore methods can't be selected at the same time
-            ignoreFields!!.component.addActionListener {
-                if (ignoreFields!!.component.isSelected) {
-                    ignoreMethods!!.component.isSelected = false
-                }
-            }
-            ignoreMethods!!.component.addActionListener {
-                if (ignoreMethods!!.component.isSelected) {
-                    ignoreFields!!.component.isSelected = false
-                }
-            }
+        }
+    }
 
-            row {
-                checkBox("Ignore inherited interface methods").doBindSelected(::ignoreInheritedInterfaceMethods)
+    enum class ReportMode(private val displayName: String) {
+        ALWAYS("Always"), ON_FABRIC("On Fabric"), NOT_ON_FABRIC("Not on Fabric"), NEVER("Never");
+
+        override fun toString() = displayName
+
+        fun shouldReport(module: Module?): Boolean {
+            if (this == NEVER) {
+                return false
             }
+            if (this == ALWAYS) {
+                return true
+            }
+            val isFabric = module?.let { MinecraftFacet.getInstance(module, FabricModuleType) != null } ?: false
+            return (this == ON_FABRIC) == isFabric
         }
     }
 }
@@ -217,10 +239,14 @@ private fun Cell<JBTextField>.doBindText(getter: () -> String, setter: (String) 
     return this
 }
 
-private fun Cell<JBCheckBox>.doBindSelected(property: KMutableProperty0<Boolean>): Cell<JBCheckBox> {
-    component.isSelected = property.get()
+private fun <T> Cell<ComboBox<T>>.doBindItem(property: KMutableProperty0<T>): Cell<ComboBox<T>> {
+    component.selectedItem = property.get()
     component.addActionListener {
-        property.set(component.isSelected)
+        @Suppress("UNCHECKED_CAST")
+        val selectedItem = component.selectedItem as T?
+        if (selectedItem != null) {
+            property.set(selectedItem)
+        }
     }
     return this
 }
