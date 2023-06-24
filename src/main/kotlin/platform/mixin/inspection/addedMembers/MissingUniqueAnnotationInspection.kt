@@ -20,84 +20,32 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
-import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
-import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.intellij.codeInsight.intention.AddAnnotationFix
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.JavaElementVisitor
-import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.search.searches.SuperMethodsSearch
 
-class MissingUniqueAnnotationInspection : MixinInspection() {
+class MissingUniqueAnnotationInspection : AbstractAddedMembersInspection() {
     override fun getStaticDescription() = "Reports missing @Unique annotations"
 
-    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
-
-    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitField(field: PsiField) {
-            if (field.containingClass?.isMixin != true) {
-                return
-            }
-
-            if (field.hasAnnotation(MixinConstants.Annotations.SHADOW)) {
-                return
-            }
-
-            if (!field.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
-                holder.registerProblem(
-                    field.nameIdentifier,
-                    "Missing @Unique annotation",
-                    AddAnnotationFix(MixinConstants.Annotations.UNIQUE, field)
-                )
-            }
+    override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
+        if (!field.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
+            holder.registerProblem(
+                field.nameIdentifier,
+                "Missing @Unique annotation",
+                AddAnnotationFix(MixinConstants.Annotations.UNIQUE, field)
+            )
         }
+    }
 
-        override fun visitMethod(method: PsiMethod) {
-            if (method.containingClass?.isMixin != true) {
-                return
-            }
-
-            if (method.isConstructor) {
-                return
-            }
-
-            val superMethod = SuperMethodsSearch.search(method, null, true, false).findFirst()
-            if (superMethod != null) {
-                return
-            }
-
-            val hasMixinAnnotation = method.annotations.any {
-                val fqn = it.qualifiedName ?: return@any false
-                fqn in ignoredMethodAnnotations || MixinAnnotationHandler.forMixinAnnotation(
-                    fqn,
-                    holder.project
-                ) != null
-            }
-            if (hasMixinAnnotation) {
-                return
-            }
-
+    override fun visitAddedMethod(holder: ProblemsHolder, method: PsiMethod, isInherited: Boolean) {
+        if (!isInherited && !method.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
             holder.registerProblem(
                 method.nameIdentifier ?: return,
                 "Missing @Unique annotation",
                 AddAnnotationFix(MixinConstants.Annotations.UNIQUE, method)
             )
         }
-    }
-
-    companion object {
-        private val ignoredMethodAnnotations = setOf(
-            MixinConstants.Annotations.UNIQUE,
-            MixinConstants.Annotations.SHADOW,
-            MixinConstants.Annotations.ACCESSOR,
-            MixinConstants.Annotations.INVOKER,
-            MixinConstants.Annotations.OVERWRITE,
-            MixinConstants.Annotations.INTRINSIC,
-            MixinConstants.Annotations.SOFT_OVERRIDE,
-        )
     }
 }
