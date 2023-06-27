@@ -118,6 +118,18 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.MODS_TOML_TEMPLATE,
         )
 
+        val configTemplate = when {
+            mcVersion >= MinecraftVersions.MC1_20 -> MinecraftTemplates.FG3_1_20_CONFIG_TEMPLATE
+            else -> null
+        }
+
+        if (configTemplate != null) {
+            assets.addTemplates(
+                project,
+                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java" to configTemplate,
+            )
+        }
+
         assets.addLicense(project)
     }
 }
