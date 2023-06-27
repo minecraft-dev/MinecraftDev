@@ -48,9 +48,11 @@ import org.jetbrains.uast.generate.replace
 import org.jetbrains.uast.resolveToUElement
 
 fun <T> UIdentifier.findColor(function: (Map<String, Color>, Map.Entry<String, Color>) -> T): T? {
-    val parent = this.uastParent
-    val expression = parent as? UReferenceExpression ?: return null
-    return findColorFromExpression(expression, function)
+    return runCatchingKtIdeaExceptions {
+        val parent = this.uastParent
+        val expression = parent as? UReferenceExpression ?: return null
+        findColorFromExpression(expression, function)
+    }
 }
 
 private fun <T> findColorFromExpression(

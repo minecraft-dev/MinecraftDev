@@ -35,6 +35,7 @@ import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -117,7 +118,7 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = (identifier.uastParent as? UClass)?.javaPsi
+        val psiClass = runCatchingKtIdeaExceptions { (identifier.uastParent as? UClass)?.javaPsi }
             ?: return false
 
         val pluginInterface = JavaPsiFacade.getInstance(element.project)

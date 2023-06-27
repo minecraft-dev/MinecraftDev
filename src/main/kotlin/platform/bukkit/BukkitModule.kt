@@ -35,6 +35,7 @@ import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.nullable
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -182,7 +183,7 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = (identifier.uastParent as? UClass)?.javaPsi
+        val psiClass = runCatchingKtIdeaExceptions { (identifier.uastParent as? UClass)?.javaPsi }
             ?: return false
 
         if (psiClass.hasModifier(JvmModifier.ABSTRACT)) {
