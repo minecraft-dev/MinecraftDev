@@ -219,7 +219,7 @@ private class NewInsnSelector(
 }
 
 private fun classToMemberReference(value: String): MemberReference? {
-    val fqn = value.replace('/', '.').replace('$', '.')
+    val fqn = value.replace('/', '.')
     if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
         if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
             return MemberReference("<init>", owner = fqn)

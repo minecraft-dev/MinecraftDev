@@ -18,7 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<idea-plugin>
+<idea-plugin require-restart="true">
 
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.idea.maven</depends>
@@ -408,6 +408,7 @@
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.DynamicInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.MixinClassCastInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.ShadowOverwriteInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.suppress.StaticInvokerUnusedParamInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.suppress.ShadowNullableInspectionSuppressor"/>
         <lang.inspectionSuppressor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.suppress.SoftImplementInspectionSuppressor"/>
 
@@ -749,6 +750,24 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection"/>
+
+        <!-- Added Members Inspections -->
+        <localInspection displayName="Missing @Unique annotation"
+                         shortName="MissingUnique"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.MissingUniqueAnnotationInspection"/>
+        <localInspection displayName="Name does not match the pattern for added mixin members"
+                         shortName="AddedMixinMembersNamePattern"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
 
         <!-- Implements Inspections -->
         <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
