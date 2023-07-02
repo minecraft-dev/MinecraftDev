@@ -90,7 +90,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         classIdentifier,
                         "Plugin class must have an empty constructor or an @Inject constructor.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        AddDefaultConstructorFix(aClass),
+                        AddDefaultConstructorFix(aClass).asQuickFix(),
                     )
                 }
             }

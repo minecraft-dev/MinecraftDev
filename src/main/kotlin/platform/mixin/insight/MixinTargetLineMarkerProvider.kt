@@ -28,7 +28,7 @@ import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
 import com.intellij.codeInsight.hint.HintManager
-import com.intellij.codeInsight.navigation.NavigationUtil
+import com.intellij.codeInsight.navigation.getPsiElementPopup
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.psi.PsiAnnotation
@@ -111,10 +111,10 @@ class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
                 }
                 else -> {
                     if (editor != null) {
-                        NavigationUtil.getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                        getPsiElementPopup(targets.toTypedArray(), "Choose Target")
                             .showInBestPositionFor(editor)
                     } else {
-                        NavigationUtil.getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                        getPsiElementPopup(targets.toTypedArray(), "Choose Target")
                             .show(RelativePoint(e))
                     }
                 }

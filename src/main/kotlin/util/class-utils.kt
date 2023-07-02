@@ -22,7 +22,6 @@ package com.demonwav.mcdev.util
 
 import com.intellij.codeInsight.daemon.impl.quickfix.AddMethodFix
 import com.intellij.navigation.AnonymousElementProvider
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
@@ -30,7 +29,6 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiInvalidElementAccessException
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
@@ -228,14 +226,7 @@ fun PsiClass.addImplements(qualifiedClassName: String) {
  * Adds the given method to this class, or its copy. Returns the method actually added
  */
 fun PsiClass.addMethod(template: PsiMethod): PsiMethod? {
-    var theNewMethod: PsiMethod? = null
-    object : AddMethodFix(template, this) {
-        override fun postAddAction(file: PsiFile, editor: Editor?, newMethod: PsiMethod?) {
-            theNewMethod = newMethod
-            super.postAddAction(file, editor, newMethod)
-        }
-    }.applyFix()
-    return theNewMethod
+    return AddMethodFix(template, this).createMethod(this)
 }
 
 fun PsiClass.findMatchingMethod(

@@ -254,6 +254,7 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
+    systemProperty("java.awt.headless", "true")
 
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",
