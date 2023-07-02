@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
@@ -52,7 +53,9 @@ class ColorLineMarkerProvider : LineMarkerProvider {
         }
 
         val identifier = element.toUElementOfType<UIdentifier>() ?: return null
-        val info = identifier.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key, identifier) }
+        val info = runCatchingKtIdeaExceptions {
+            identifier.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key, identifier) }
+        }
         if (info != null) {
             NavigateAction.setNavigateAction(info, "Change Color", null)
         }
@@ -164,6 +167,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                         }
                     }
                 }
+
                 is UCallExpression -> {
                     if (workElement.methodName == "hsvLike") {
                         val (h, s, v) = Color.RGBtoHSB(c.red, c.green, c.blue, null)

@@ -29,6 +29,7 @@ import com.demonwav.mcdev.platform.velocity.generation.VelocityGenerationData
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants.SUBSCRIBE_ANNOTATION
 import com.demonwav.mcdev.util.createVoidMethodWithParameterType
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
@@ -75,7 +76,7 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = identifier.uastParent as? UClass
+        val psiClass = runCatchingKtIdeaExceptions { identifier.uastParent as? UClass }
             ?: return false
 
         return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&

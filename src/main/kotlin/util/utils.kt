@@ -369,8 +369,12 @@ inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
     action()
 } catch (e: Exception) {
     if (e.javaClass.name == "org.jetbrains.kotlin.idea.caches.resolve.KotlinIdeaResolutionException") {
+        loggerForTopLevel().info("Caught Kotlin plugin exception", e)
         null
     } else {
         throw e
     }
 }
+
+fun <T : Throwable> withSuppressed(original: T?, other: T): T =
+    original?.apply { addSuppressed(other) } ?: other

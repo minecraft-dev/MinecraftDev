@@ -34,6 +34,7 @@ import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.nullable
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
@@ -187,7 +188,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = identifier.uastParent as? UClass
+        val psiClass = runCatchingKtIdeaExceptions { identifier.uastParent as? UClass }
             ?: return false
 
         return !psiClass.hasModifier(JvmModifier.ABSTRACT) &&

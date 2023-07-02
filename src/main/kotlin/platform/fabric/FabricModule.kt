@@ -28,6 +28,7 @@ import com.demonwav.mcdev.platform.fabric.reference.EntryPointReference
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
@@ -54,7 +55,7 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val parent = identifier.uastParent
+        val parent = runCatchingKtIdeaExceptions { identifier.uastParent }
         if (parent !is UClass && parent !is UMethod) {
             return false
         }
