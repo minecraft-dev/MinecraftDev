@@ -22,6 +22,7 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
@@ -51,19 +52,11 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
             return null
         }
 
-        try {
+        runCatchingKtIdeaExceptions {
             val identifier = element.toUElementOfType<UIdentifier>() ?: return null
             if (identifier.uastParent !is UMethod || identifier.uastEventListener == null) {
                 return null
             }
-        } catch (e: Exception) {
-            // Kotlin plugin is buggy and can throw exceptions here
-            // We do the check like this because we don't actually have this class on the classpath
-            if (e.javaClass.name == "org.jetbrains.kotlin.idea.caches.resolve.KotlinIdeaResolutionException") {
-                return null
-            }
-            // Don't swallow unexpected errors
-            throw e
         }
 
         // By this point, we can guarantee that the action of "go to declaration" will work

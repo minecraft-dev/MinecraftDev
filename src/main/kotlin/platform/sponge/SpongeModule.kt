@@ -31,6 +31,7 @@ import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotationMemberValue
@@ -93,9 +94,9 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val identifier = element?.toUElementOfType<UIdentifier>()
             ?: return false
 
-        val psiClass = identifier.uastParent as? UClass ?: return false
+        val psiClass = runCatchingKtIdeaExceptions { identifier.uastParent as? UClass ?: return false }
 
-        if (psiClass.javaPsi.hasModifier(JvmModifier.ABSTRACT)) {
+        if (psiClass == null || psiClass.javaPsi.hasModifier(JvmModifier.ABSTRACT)) {
             return false
         }
 

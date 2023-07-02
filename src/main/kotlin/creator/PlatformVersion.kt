@@ -23,6 +23,9 @@ package com.demonwav.mcdev.creator
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.fromJson
+import com.demonwav.mcdev.util.mapFirstNotNull
+import com.demonwav.mcdev.util.withSuppressed
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
@@ -35,8 +38,20 @@ import java.net.Proxy
 import java.net.URI
 import kotlin.reflect.KClass
 
-private const val CLOUDFLARE_BASE_URL = "https://minecraftdev.org/versions/"
+// Cloudflare and GitHub are both global CDNs
+// Cloudflare is used first / preferred simply due to domain preference
+private const val CLOUDFLARE_BASE_URL = "https://mcdev.io/versions/"
+// Directly retrieving the file via GitHub is the second option. In some regions / networks Cloudflare is blocked,
+// but we may still be able to reach GitHub
 private const val GITHUB_BASE_URL = "https://raw.githubusercontent.com/minecraft-dev/minecraftdev.org/master/versions/"
+// Finally, there are apparently also regions / networks where both Cloudflare and GitHub is blocked.
+// Or maybe the domain `mcdev.io` (and prior to that, `minecraftdev.org`) is blocked due to weird domain
+// rules (perhaps blocking on the word "minecraft"). In one last ditch effort to retrieve the version json
+// we can also pull from this host, a separate host using a separate domain. This is an OVH server, not
+// proxied through Cloudflare.
+private const val OVH_BASE_URL = "https://versions.denwav.com/versions/"
+
+private val URLS = listOf(CLOUDFLARE_BASE_URL, GITHUB_BASE_URL, OVH_BASE_URL)
 
 val PLATFORM_VERSION_LOGGER = logger<PlatformVersion>()
 
@@ -62,19 +77,16 @@ suspend fun <T : Any> getVersionJson(path: String, type: KClass<T>): T {
 }
 
 suspend fun getText(path: String): String {
-    return try {
-        // attempt cloudflare
-        doCall(CLOUDFLARE_BASE_URL + path)
-    } catch (e: IOException) {
-        PLATFORM_VERSION_LOGGER.warn("Failed to reach cloudflare URL ${CLOUDFLARE_BASE_URL + path}", e)
-        // if that fails, attempt github
+    var thrown: FuelError? = null
+    return URLS.mapFirstNotNull { url ->
         try {
-            doCall(GITHUB_BASE_URL + path)
-        } catch (e: IOException) {
-            PLATFORM_VERSION_LOGGER.warn("Failed to reach fallback GitHub URL ${GITHUB_BASE_URL + path}", e)
-            throw e
+            doCall(url + path)
+        } catch (e: FuelError) {
+            PLATFORM_VERSION_LOGGER.warn("Failed to reach URL $url$path")
+            thrown = withSuppressed(thrown, e)
+            null
         }
-    }
+    } ?: throw thrown!!
 }
 
 private suspend fun doCall(urlText: String): String {
