@@ -318,7 +318,7 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     return clazz
 }
 
-inline fun <T> ClassNode.cached(project: Project, vararg dependencies: Any, crossinline compute: () -> T): T {
+fun <T> ClassNode.cached(project: Project, vararg dependencies: Any, compute: () -> T): T {
     return findStubClass(project)?.cached(*dependencies, compute = compute) ?: compute()
 }
 
@@ -445,11 +445,11 @@ fun FieldNode.getGenericType(
     return Type.getType(this.desc).toPsiType(elementFactory)
 }
 
-inline fun <T> FieldNode.cached(
+fun <T> FieldNode.cached(
     clazz: ClassNode,
     project: Project,
     vararg dependencies: Any,
-    crossinline compute: () -> T,
+    compute: () -> T,
 ): T {
     return findStubField(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
 }
@@ -661,11 +661,11 @@ private fun findAssociatedLambda(psiClass: PsiClass, clazz: ClassNode, lambdaMet
     }
 }
 
-inline fun <T> MethodNode.cached(
+fun <T> MethodNode.cached(
     clazz: ClassNode,
     project: Project,
     vararg dependencies: Array<Any>,
-    crossinline compute: () -> T,
+    compute: () -> T,
 ): T {
     return findStubMethod(clazz, project)?.cached(*dependencies, compute = compute) ?: compute()
 }
