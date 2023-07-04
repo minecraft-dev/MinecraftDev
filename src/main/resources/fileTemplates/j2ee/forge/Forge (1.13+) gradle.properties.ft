@@ -29,7 +29,7 @@ loader_version_range=[${FORGE_SPEC_VERSION},)
 #
 # Parchment is an unofficial project maintained by ParchmentMC, separate from Minecraft Forge.
 # Additional setup is needed to use their mappings, see https://parchmentmc.org/docs/getting-started
-mapping_channel=${MCP_CHANNEL}
+mapping_channel=official
 # The mapping version to query from the mapping channel.
 # This must match the format required by the mapping channel.
 mapping_version=${MC_VERSION}

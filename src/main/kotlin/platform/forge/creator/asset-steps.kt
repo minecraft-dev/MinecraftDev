@@ -108,7 +108,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             mcVersion >= MinecraftVersions.MC1_19 -> MinecraftTemplates.FG3_1_19_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_18 -> MinecraftTemplates.FG3_1_18_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_17 -> MinecraftTemplates.FG3_1_17_MAIN_CLASS_TEMPLATE
-            else -> MinecraftTemplates.FG3_MAIN_CLASS_TEMPLATE
+            else -> MinecraftTemplates.FG3_1_16_MAIN_CLASS_TEMPLATE
         }
 
         assets.addTemplates(
