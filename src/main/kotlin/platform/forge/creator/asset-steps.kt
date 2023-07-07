@@ -53,7 +53,8 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override fun setupAssets(project: Project) {
         val mcVersion = data.getUserData(ForgeVersionChainStep.MC_VERSION_KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionChainStep.FORGE_VERSION_KEY) ?: return
-        val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
+        val mainClass = data.getUserData(MainClassStep.KEY) ?: return
+        val (mainPackageName, mainClassName) = splitPackage(mainClass)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
@@ -113,7 +114,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 
         assets.addTemplates(
             project,
-            "src/main/java/${mainPackageName.replace('.', '/')}/$mainClassName.java" to mainClassTemplate,
+            "src/main/java/${mainClass.replace('.', '/')}.java" to mainClassTemplate,
             "src/main/resources/pack.mcmeta" to MinecraftTemplates.PACK_MCMETA_TEMPLATE,
             "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.MODS_TOML_TEMPLATE,
         )
@@ -124,10 +125,12 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         }
 
         if (configTemplate != null) {
-            assets.addTemplates(
-                project,
-                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java" to configTemplate,
-            )
+            val configPath = if (mainPackageName != null) {
+                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java"
+            } else {
+                "src/main/java/Config.java"
+            }
+            assets.addTemplates(project, configPath to configTemplate)
         }
 
         assets.addLicense(project)
