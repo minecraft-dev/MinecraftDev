@@ -1,8 +1,0 @@
-#if (${FORGE_VERSION})
-forgeVersion = ${FORGE_VERSION}
-#end
-#if (${MCP_VERSION})
-mcpVersion = ${MCP_VERSION}
-#end
-org.gradle.jvmargs=-Xmx3G
-org.gradle.daemon=false

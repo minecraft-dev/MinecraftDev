@@ -26,6 +26,8 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.JavaElementVisitor
@@ -73,6 +75,13 @@ class NoTranslationInspection : TranslationInspection() {
                     TranslationFiles.add(literal, key, result)
                 }
             } catch (ignored: IncorrectOperationException) {
+            } catch (e: Exception) {
+                Notification(
+                    "Translation support error",
+                    "Error while adding translation",
+                    e.message ?: e.stackTraceToString(),
+                    NotificationType.WARNING,
+                ).notify(project)
             }
         }
 

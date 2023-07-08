@@ -244,6 +244,7 @@
         <renameInputValidator implementation="com.demonwav.mcdev.translations.lang.LangRenameInputValidator"/>
         <editorNotificationProvider implementation="com.demonwav.mcdev.translations.TranslationEditorNotificationProvider"/>
         <notificationGroup id="Translations sorting error" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Translation support error" displayType="STICKY_BALLOON"/>
         <elementDescriptionProvider implementation="com.demonwav.mcdev.translations.reference.TranslationDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.translations.reference.TranslationReferenceSearch"/>
         <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>

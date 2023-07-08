@@ -72,7 +72,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 "modId" -> {
                     val value = keyValue.value ?: return
                     val modId = value.stringValue() ?: return
-                    if (!ForgeConstants.MOD_ID_REGEX.matches(modId)) {
+                    if (modId != "\"" && !ForgeConstants.MOD_ID_REGEX.matches(modId)) {
                         val endOffset = if (value.text.endsWith('"')) modId.length + 1 else modId.length
                         holder.registerProblem(value, TextRange(1, endOffset), "Mod ID is invalid")
                     }
@@ -80,7 +80,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 "displayTest" -> {
                     val value = keyValue.value ?: return
                     val test = value.stringValue() ?: return
-                    if (test !in ForgeConstants.DISPLAY_TESTS) {
+                    if (test != "\"" && test !in ForgeConstants.DISPLAY_TESTS) {
                         val endOffset = if (value.text.endsWith('"')) test.length + 1 else test.length
                         holder.registerProblem(value, TextRange(1, endOffset), "DisplayTest $test does not exist")
                     }
@@ -96,7 +96,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 "side" -> {
                     val value = keyValue.value ?: return
                     val side = value.stringValue() ?: return
-                    if (side !in ForgeConstants.DEPENDENCY_SIDES) {
+                    if (side != "\"" && side !in ForgeConstants.DEPENDENCY_SIDES) {
                         val endOffset = if (value.text.endsWith('"')) side.length + 1 else side.length
                         holder.registerProblem(value, TextRange(1, endOffset), "Side $side does not exist")
                     }
@@ -104,7 +104,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 "ordering" -> {
                     val value = keyValue.value ?: return
                     val order = value.stringValue() ?: return
-                    if (order !in ForgeConstants.DEPENDENCY_ORDER) {
+                    if (order != "\"" && order !in ForgeConstants.DEPENDENCY_ORDER) {
                         val endOffset = if (value.text.endsWith('"')) order.length + 1 else order.length
                         holder.registerProblem(value, TextRange(1, endOffset), "Order $order does not exist")
                     }

@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.ifNotBlank
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -60,7 +61,7 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         val longValue = args["longValue"]?.toLongOrNull()
         val doubleValue = args["doubleValue"]?.toDoubleOrNull()
         val stringValue = args["stringValue"]
-        val classValue = args["classValue"]?.let { Type.getObjectType(it.replace('.', '/')) }
+        val classValue = args["classValue"]?.ifNotBlank { Type.getObjectType(it.replace('.', '/')) }
         val count =
             nullValue.toInt() +
                 (intValue != null).toInt() +
