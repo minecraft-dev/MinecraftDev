@@ -81,7 +81,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         FileTemplateGroupDescriptor("Forge", PlatformAssets.FORGE_ICON).let { forgeGroup ->
             group.addTemplate(forgeGroup)
             forgeGroup.addTemplate(FileTemplateDescriptor(FORGE_MIXINS_JSON_TEMPLATE, PlatformAssets.FORGE_ICON))
-            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_16_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_17_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_18_MAIN_CLASS_TEMPLATE))
             forgeGroup.addTemplate(FileTemplateDescriptor(FG3_1_19_MAIN_CLASS_TEMPLATE))
@@ -104,15 +104,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
-        }
-
-        FileTemplateGroupDescriptor("Multi-Module", PlatformAssets.MINECRAFT_ICON).let { multiGroup ->
-            group.addTemplate(multiGroup)
-            multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_BUILD_GRADLE_TEMPLATE))
-            multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_GRADLE_PROPERTIES_TEMPLATE))
-            multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_SETTINGS_GRADLE_TEMPLATE))
-            multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_POM_TEMPLATE))
-            multiGroup.addTemplate(FileTemplateDescriptor(MULTI_MODULE_COMMON_POM_TEMPLATE))
         }
 
         FileTemplateGroupDescriptor("Mixin", PlatformAssets.MIXIN_ICON).let { mixinGroup ->
@@ -199,7 +190,7 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val SPONGE8_SETTINGS_GRADLE_TEMPLATE = "Sponge 8+ settings.gradle.kts"
 
         const val FORGE_MIXINS_JSON_TEMPLATE = "Forge Mixins Config.json"
-        const val FG3_MAIN_CLASS_TEMPLATE = "Forge (1.13+) Main Class.java"
+        const val FG3_1_16_MAIN_CLASS_TEMPLATE = "Forge (1.16+) Main Class.java"
         const val FG3_1_17_MAIN_CLASS_TEMPLATE = "Forge (1.17+) Main Class.java"
         const val FG3_1_18_MAIN_CLASS_TEMPLATE = "Forge (1.18+) Main Class.java"
         const val FG3_1_19_MAIN_CLASS_TEMPLATE = "Forge (1.19+) Main Class.java"
@@ -234,12 +225,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val ARCHITECTURY_FORGE_MIXINS_JSON_TEMPLATE = "architectury_forge_mixins.json"
         const val ARCHITECTURY_FORGE_MODS_TOML_TEMPLATE = "architectury_forge_mods.toml"
         const val ARCHITECTURY_FORGE_PACK_MCMETA_TEMPLATE = "architectury_forge_pack.mcmeta"
-
-        const val MULTI_MODULE_BUILD_GRADLE_TEMPLATE = "Multi-Module Base build.gradle"
-        const val MULTI_MODULE_GRADLE_PROPERTIES_TEMPLATE = "Multi-Module Base gradle.properties"
-        const val MULTI_MODULE_SETTINGS_GRADLE_TEMPLATE = "Multi-Module Base settings.gradle"
-        const val MULTI_MODULE_POM_TEMPLATE = "Multi-Module Base pom.xml"
-        const val MULTI_MODULE_COMMON_POM_TEMPLATE = "Multi-Module Common pom.xml"
 
         const val MIXIN_OVERWRITE_FALLBACK = "Mixin Overwrite Fallback.java"
 

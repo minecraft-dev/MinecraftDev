@@ -66,8 +66,12 @@ fun FixedAssetsNewProjectWizardStep.addLicense(project: Project) {
     addTemplates(project, "LICENSE" to "${license.id}.txt")
 }
 
-fun splitPackage(text: String): Pair<String, String> {
+fun splitPackage(text: String): Pair<String?, String> {
     val index = text.lastIndexOf('.')
+    if (index == -1) {
+        return null to text
+    }
+
     val className = text.substring(index + 1)
     val packageName = text.substring(0, index)
     return packageName to className

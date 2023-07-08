@@ -39,14 +39,15 @@ class SpongeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val (packageName, className) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
+        val mainClass = data.getUserData(MainClassStep.KEY) ?: return
+        val (packageName, className) = splitPackage(mainClass)
 
         assets.addTemplateProperties(
             "PLUGIN_ID" to buildSystemProps.artifactId,
             "PACKAGE" to packageName,
             "CLASS_NAME" to className,
         )
-        val mainClassFile = "src/main/java/${packageName.replace('.', '/')}/$className.java"
+        val mainClassFile = "src/main/java/${mainClass.replace('.', '/')}.java"
         assets.addTemplates(
             project,
             mainClassFile to MinecraftTemplates.SPONGE8_MAIN_CLASS_TEMPLATE,

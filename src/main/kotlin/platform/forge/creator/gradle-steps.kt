@@ -40,7 +40,6 @@ import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.util.MinecraftTemplates
-import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.application.WriteAction
@@ -95,9 +94,6 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         assets.addTemplateProperties(
             "MOD_NAME" to modName,
             "MC_VERSION" to mcVersion,
-            "MCP_CHANNEL" to "official",
-            "MCP_VERSION" to mcVersion,
-            "MCP_MC_VERSION" to mcVersion,
             "MC_NEXT_VERSION" to mcNextVersion,
             "FORGE_VERSION" to forgeVersion,
             "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
@@ -120,13 +116,6 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
 
         if (forgeVersion >= SemanticVersion.release(39, 0, 88)) {
             assets.addTemplateProperties("GAME_TEST_FRAMEWORK" to "true")
-        }
-
-        if (mcVersion <= MinecraftVersions.MC1_16_5) {
-            assets.addTemplateProperties(
-                "MCP_CHANNEL" to "snapshot",
-                "MCP_VERSION" to "20210309",
-            )
         }
 
         assets.addTemplates(

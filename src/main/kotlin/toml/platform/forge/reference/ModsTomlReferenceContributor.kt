@@ -45,6 +45,7 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferen
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.util.ProcessingContext
+import kotlin.math.max
 import org.jetbrains.jps.model.java.JavaResourceRootType
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.evaluateString
@@ -126,7 +127,7 @@ object ModsTomlModIdReferenceProvider : PsiReferenceProvider() {
 }
 
 class ModsTomlModIdReference(element: TomlValue) :
-    PsiReferenceBase<TomlValue>(element, TextRange(1, element.textLength - 1)) {
+    PsiReferenceBase<TomlValue>(element, TextRange(1, max(element.textLength - 1, 1))) {
 
     val modId: String? = element.stringValue()
 
