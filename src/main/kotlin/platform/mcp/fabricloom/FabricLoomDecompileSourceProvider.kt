@@ -29,6 +29,7 @@ import com.intellij.openapi.application.runWriteActionAndWait
 import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.OrderRootType
+import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
@@ -103,6 +104,10 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
                 val library = libraryEntry.library
                 if (library != null) {
                     runWriteActionAndWait {
+                        if (library is LibraryEx && library.isDisposed) {
+                            return@runWriteActionAndWait
+                        }
+
                         val model = library.modifiableModel
                         model.addRoot("jar://$sourcePath!/", OrderRootType.SOURCES)
                         model.commit()

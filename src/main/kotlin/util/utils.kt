@@ -378,3 +378,11 @@ inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
 
 fun <T : Throwable> withSuppressed(original: T?, other: T): T =
     original?.apply { addSuppressed(other) } ?: other
+
+fun <S : CharSequence, R> S.ifNotBlank(block: (S) -> R): R? {
+    if (this.isNotBlank()) {
+        return block(this)
+    }
+
+    return null
+}

@@ -51,7 +51,7 @@ import java.nio.file.Path
 abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     lateinit var outputDirectory: String
     private val assets = arrayListOf<FixedGeneratorAsset>()
-    val templateProperties = hashMapOf<String, Any>()
+    val templateProperties = hashMapOf<String, Any?>()
     private val filesToOpen = hashSetOf<String>()
 
     fun addAssets(vararg assets: Any) = addAssets(assets.toList())
@@ -66,9 +66,9 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
         }
     }
 
-    fun addTemplateProperties(vararg properties: Pair<String, Any>) = addTemplateProperties(properties.toMap())
+    fun addTemplateProperties(vararg properties: Pair<String, Any?>) = addTemplateProperties(properties.toMap())
 
-    fun addTemplateProperties(properties: Map<String, Any>) = templateProperties.putAll(properties)
+    fun addTemplateProperties(properties: Map<String, Any?>) = templateProperties.putAll(properties)
 
     fun addFilesToOpen(vararg relativeCanonicalPaths: String) = addFilesToOpen(relativeCanonicalPaths.toList())
 

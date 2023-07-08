@@ -35,6 +35,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.util.SuperMethodWarningUtil
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ComponentValidator
@@ -299,21 +300,27 @@ private class RenameWithInheritanceFix(
         if (isMethod) {
             val method = startElement as? PsiMethod ?: return
             if (editor != null) {
-                SuperMethodWarningUtil.checkSuperMethod(method, { md ->
-                    RenameProcessor(project, md, newName, false, false).run()
-                    true
-                }, editor)
+                DumbService.getInstance(project).smartInvokeLater {
+                    SuperMethodWarningUtil.checkSuperMethod(method, { md ->
+                        RenameProcessor(project, md, newName, false, false).run()
+                        true
+                    }, editor)
+                }
             } else {
-                val superMethod = method.findDeepestSuperMethods().firstOrNull()
-                for (md in listOfNotNull(superMethod, method)) {
-                    RenameProcessor(project, md, newName, false, false).run()
+                DumbService.getInstance(project).smartInvokeLater {
+                    val superMethod = method.findDeepestSuperMethods().firstOrNull()
+                    for (md in listOfNotNull(superMethod, method)) {
+                        RenameProcessor(project, md, newName, false, false).run()
+                    }
                 }
             }
         } else {
             if (!FileModificationService.getInstance().prepareFileForWrite(file)) {
                 return
             }
-            RenameProcessor(project, startElement, newName, false, false).run()
+            DumbService.getInstance(project).smartInvokeLater {
+                RenameProcessor(project, startElement, newName, false, false).run()
+            }
         }
     }
 
