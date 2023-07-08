@@ -53,7 +53,8 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override fun setupAssets(project: Project) {
         val mcVersion = data.getUserData(ForgeVersionChainStep.MC_VERSION_KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionChainStep.FORGE_VERSION_KEY) ?: return
-        val (mainPackageName, mainClassName) = splitPackage(data.getUserData(MainClassStep.KEY) ?: return)
+        val mainClass = data.getUserData(MainClassStep.KEY) ?: return
+        val (mainPackageName, mainClassName) = splitPackage(mainClass)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
@@ -108,12 +109,12 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             mcVersion >= MinecraftVersions.MC1_19 -> MinecraftTemplates.FG3_1_19_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_18 -> MinecraftTemplates.FG3_1_18_MAIN_CLASS_TEMPLATE
             mcVersion >= MinecraftVersions.MC1_17 -> MinecraftTemplates.FG3_1_17_MAIN_CLASS_TEMPLATE
-            else -> MinecraftTemplates.FG3_MAIN_CLASS_TEMPLATE
+            else -> MinecraftTemplates.FG3_1_16_MAIN_CLASS_TEMPLATE
         }
 
         assets.addTemplates(
             project,
-            "src/main/java/${mainPackageName.replace('.', '/')}/$mainClassName.java" to mainClassTemplate,
+            "src/main/java/${mainClass.replace('.', '/')}.java" to mainClassTemplate,
             "src/main/resources/pack.mcmeta" to MinecraftTemplates.PACK_MCMETA_TEMPLATE,
             "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.MODS_TOML_TEMPLATE,
         )
@@ -124,10 +125,12 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         }
 
         if (configTemplate != null) {
-            assets.addTemplates(
-                project,
-                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java" to configTemplate,
-            )
+            val configPath = if (mainPackageName != null) {
+                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java"
+            } else {
+                "src/main/java/Config.java"
+            }
+            assets.addTemplates(project, configPath to configTemplate)
         }
 
         assets.addLicense(project)

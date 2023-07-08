@@ -79,7 +79,11 @@ class VelocityGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             "PACKAGE" to mainPackage,
         )
 
-        val buildConstantsJava = "src/main/templates/${mainPackage.replace('.', '/')}/BuildConstants.java"
+        val buildConstantsJava = if (mainPackage != null) {
+            "src/main/templates/${mainPackage.replace('.', '/')}/BuildConstants.java"
+        } else {
+            "src/main/templates/BuildConstants.java"
+        }
         assets.addTemplates(
             project,
             "build.gradle" to MinecraftTemplates.VELOCITY_BUILD_GRADLE_TEMPLATE,

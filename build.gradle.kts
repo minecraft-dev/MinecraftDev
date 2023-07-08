@@ -29,12 +29,12 @@ import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.0"
     java
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.14.1"
+    id("org.jetbrains.intellij") version "1.15.0"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -278,7 +278,7 @@ license {
 
     exclude("com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java")
 
-    tasks {
+    this.tasks {
         register("gradle") {
             files.from(
                 fileTree(project.projectDir) {

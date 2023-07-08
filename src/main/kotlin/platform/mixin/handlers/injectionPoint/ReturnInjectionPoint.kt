@@ -36,6 +36,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReturnStatement
 import com.intellij.psi.PsiType
+import com.intellij.psi.controlFlow.AnalysisCanceledException
 import com.intellij.psi.controlFlow.ControlFlowUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -113,7 +114,12 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
             }
 
             val rBrace = codeBlockToAnalyze.rBrace ?: return
-            val controlFlow = HighlightControlFlowUtil.getControlFlowNoConstantEvaluate(codeBlockToAnalyze)
+            val controlFlow = try {
+                HighlightControlFlowUtil.getControlFlowNoConstantEvaluate(codeBlockToAnalyze)
+            } catch (e: AnalysisCanceledException) {
+                return
+            }
+
             if (ControlFlowUtil.canCompleteNormally(controlFlow, 0, controlFlow.size)) {
                 if (tailOnly) {
                     result.clear()

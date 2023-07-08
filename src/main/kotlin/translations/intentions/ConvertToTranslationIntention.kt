@@ -24,6 +24,8 @@ import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.lang.java.JavaLanguage
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidatorEx
@@ -68,9 +70,9 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                     }
                 },
             )
-            val key = result.first
+            val key = result.first ?: return
             val replaceLiteral = result.second
-            if (key != null) {
+            try {
                 TranslationFiles.add(element, key, value)
                 if (replaceLiteral) {
                     val psi = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
@@ -87,6 +89,13 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                         }
                     }
                 }
+            } catch (e: Exception) {
+                Notification(
+                    "Translation support error",
+                    "Error while adding translation",
+                    e.message ?: e.stackTraceToString(),
+                    NotificationType.WARNING,
+                ).notify(project)
             }
         }
     }
