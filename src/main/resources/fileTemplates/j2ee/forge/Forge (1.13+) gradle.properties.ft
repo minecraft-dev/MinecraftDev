@@ -38,7 +38,7 @@ mapping_version=${MC_VERSION}
 
 # The unique mod identifier for the mod. Must be lowercase in English locale. Must fit the regex [a-z][a-z0-9_]{1,63}
 # Must match the String constant located in the main mod class annotated with @Mod.
-mod_id=${ARTIFACT_ID}
+mod_id=${MOD_ID}
 # The human-readable display name for the mod.
 mod_name=${MOD_NAME}
 # The license of the mod. Review your options at https://choosealicense.com/. All Rights Reserved is the default.

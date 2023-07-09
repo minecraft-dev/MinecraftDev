@@ -32,6 +32,7 @@ import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
+import com.demonwav.mcdev.creator.step.PluginIdStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.sponge.SpongeVersion
@@ -52,6 +53,7 @@ class SpongePlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Sponge
     override suspend fun computeData() = SpongeVersion.downloadData()
 
     override fun createStep(data: SpongeVersion) = SpongeApiVersionStep(this, data)
+        .nextStep(::PluginIdStep)
         .nextStep(::PluginNameStep)
         .nextStep(::MainClassStep)
         .nextStep(::LicenseStep)

@@ -4,8 +4,8 @@ plugins {
 #if (${MIXINS})
 loom {
     forge {
-        mixinConfig "${ARTIFACT_ID}-common.mixins.json"
-        mixinConfig "${ARTIFACT_ID}.mixins.json"
+        mixinConfig "${MOD_ID}-common.mixins.json"
+        mixinConfig "${MOD_ID}.mixins.json"
     }
 }
 #end

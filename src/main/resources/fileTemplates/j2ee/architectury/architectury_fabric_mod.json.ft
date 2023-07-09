@@ -1,7 +1,7 @@
 #set ( $d = "$" )
 {
   "schemaVersion": 1,
-  "id": "${ARTIFACT_ID}",
+  "id": "${MOD_ID}",
   "version": "${d}{version}",
 
   "name": "${MOD_NAME}",
@@ -16,8 +16,8 @@
   "entrypoints": {},
 #if (${MIXINS})
   "mixins": [
-    "${ARTIFACT_ID}.mixins.json",
-    "${ARTIFACT_ID}-common.mixins.json"
+    "${MOD_ID}.mixins.json",
+    "${MOD_ID}-common.mixins.json"
   ],
 #end
   "depends": {

@@ -29,6 +29,7 @@ import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
@@ -93,6 +94,7 @@ class VelocityModifyMainClassStep(
 
     override fun perform(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val pluginId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mainClassName = data.getUserData(MainClassStep.KEY) ?: return
         val mainClassFile = "${context.projectFileDirectory}/src/main/java/${mainClassName.replace('.', '/')}.java"
@@ -111,7 +113,7 @@ class VelocityModifyMainClassStep(
                 val psiClass = mainClassPsi.classes[0]
                 val annotation = buildString {
                     append("@Plugin(")
-                    append("\nid = ${literal(buildSystemProps.artifactId)}")
+                    append("\nid = ${literal(pluginId)}")
                     append(",\nname = ${literal(pluginName)}")
 
                     if (isGradle) {
