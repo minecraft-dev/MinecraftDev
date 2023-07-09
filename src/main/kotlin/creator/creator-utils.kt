@@ -29,6 +29,8 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.project.Project
@@ -149,3 +151,12 @@ fun <T> ObservableMutableProperty<T>.updateWhenChanged(dependency: ObservablePro
 }
 
 class EmptyStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent)
+
+fun notifyCreatedProjectNotOpened() {
+    Notification(
+        "Minecraft project creator",
+        "Created project must be opened",
+        "Generated files might be incomplete and the project might be broken.",
+        NotificationType.ERROR,
+    ).notify(null)
+}
