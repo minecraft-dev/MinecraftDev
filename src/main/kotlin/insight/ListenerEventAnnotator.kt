@@ -22,6 +22,7 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -53,10 +54,11 @@ class ListenerEventAnnotator : Annotator {
             return
         }
 
-        val method: UMethod = element.toUElement()?.uastParent as? UMethod
-            ?: element.getUastParentOfType<UTypeReferenceExpression>()
-                ?.getParentOfType<UParameter>()?.uastParent as? UMethod // Be sure to be on the type of a parameter
-            ?: return
+        val method: UMethod = runCatchingKtIdeaExceptions {
+                element.toUElement()?.uastParent as? UMethod
+                    ?: element.getUastParentOfType<UTypeReferenceExpression>()
+                        ?.getParentOfType<UParameter>()?.uastParent as? UMethod // Be sure to be on the type of a parameter
+        } ?: return
         if (method.javaPsi.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract
             return
