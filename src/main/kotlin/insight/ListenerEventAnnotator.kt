@@ -55,9 +55,9 @@ class ListenerEventAnnotator : Annotator {
         }
 
         val method: UMethod = runCatchingKtIdeaExceptions {
-                element.toUElement()?.uastParent as? UMethod
-                    ?: element.getUastParentOfType<UTypeReferenceExpression>()
-                        ?.getParentOfType<UParameter>()?.uastParent as? UMethod // Be sure to be on the type of a parameter
+            element.toUElement()?.uastParent as? UMethod
+                ?: element.getUastParentOfType<UTypeReferenceExpression>()
+                    ?.getParentOfType<UParameter>()?.uastParent as? UMethod // Be sure to be on the type of a parameter
         } ?: return
         if (method.javaPsi.hasModifierProperty(PsiModifier.ABSTRACT)) {
             // I don't think any implementation allows for abstract
