@@ -26,6 +26,7 @@ import com.demonwav.mcdev.creator.step.AbstractLatentStep
 import com.demonwav.mcdev.creator.step.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
+import com.demonwav.mcdev.creator.step.ForgeStyleModIdStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.MainClassStep
 import com.demonwav.mcdev.creator.step.ModNameStep
@@ -53,6 +54,7 @@ class ForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<ForgeVersi
     }
 
     override fun createStep(data: ForgeVersion) = ForgeVersionChainStep(this, data)
+        .nextStep(::ForgeStyleModIdStep)
         .nextStep(::ModNameStep)
         .nextStep(::MainClassStep)
         .nextStep(::UseMixinsStep)

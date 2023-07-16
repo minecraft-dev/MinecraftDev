@@ -38,10 +38,12 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -142,7 +144,28 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         targetClass: ClassNode,
         targetMethod: MethodNode,
     ): List<MethodSignature>? {
-        val constantInfos = getConstantInfos(annotation) ?: return null
+        val constantInfos = getConstantInfos(annotation)
+        if (constantInfos == null) {
+            val method = annotation.parentOfType<PsiMethod>()
+                ?: return emptyList()
+            val returnType = method.returnType
+                ?: return emptyList()
+            val constantParamName = method.parameterList.getParameter(0)?.name ?: "constant"
+            return listOf(
+                MethodSignature(
+                    listOf(
+                        ParameterGroup(listOf(sanitizedParameter(returnType, constantParamName))),
+                        ParameterGroup(
+                            collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+                            isVarargs = true,
+                            required = ParameterGroup.RequiredLevel.OPTIONAL,
+                        ),
+                    ),
+                    returnType,
+                )
+            )
+        }
+
         val psiManager = PsiManager.getInstance(annotation.project)
         return constantInfos.asSequence().map {
             when (it.constantInfo.constant) {
@@ -175,14 +198,37 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         targetClass: ClassNode,
         targetMethod: MethodNode,
     ): List<PsiElement> {
-        val constantInfos = getConstantInfos(annotation) ?: return emptyList()
-
         val targetElement = targetMethod.findSourceElement(
             targetClass,
             annotation.project,
             GlobalSearchScope.allScope(annotation.project),
             canDecompile = true,
         ) ?: return emptyList()
+
+        val constantInfos = getConstantInfos(annotation)
+        if (constantInfos == null) {
+            val returnType = annotation.parentOfType<PsiMethod>()?.returnType
+                ?: return emptyList()
+
+            val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
+                annotation.project,
+                CollectVisitor.Mode.MATCH_ALL,
+                null,
+                Type.getType(returnType.descriptor)
+            )
+            collectVisitor.visit(targetMethod)
+            val bytecodeResults = collectVisitor.result
+
+            val navigationVisitor = ConstantInjectionPoint.MyNavigationVisitor(
+                null,
+                Type.getType(returnType.descriptor)
+            )
+            targetElement.accept(navigationVisitor)
+
+            return bytecodeResults.asSequence().mapNotNull { bytecodeResult ->
+                navigationVisitor.result.getOrNull(bytecodeResult.index)
+            }.sortedBy { it.textOffset }.toList()
+        }
 
         val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
             ?: return emptyList()
@@ -216,7 +262,21 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         targetMethod: MethodNode,
         mode: CollectVisitor.Mode,
     ): List<CollectVisitor.Result<*>> {
-        val constantInfos = getConstantInfos(annotation) ?: return emptyList()
+        val constantInfos = getConstantInfos(annotation)
+        if (constantInfos == null) {
+            val returnType = annotation.parentOfType<PsiMethod>()?.returnType
+                ?: return emptyList()
+
+            val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
+                annotation.project,
+                mode,
+                null,
+                Type.getType(returnType.descriptor)
+            )
+            collectVisitor.visit(targetMethod)
+            return collectVisitor.result.sortedBy { targetMethod.instructions.indexOf(it.insn) }
+        }
+
         val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
             ?: return emptyList()
         return constantInfos.asSequence().flatMap { modifyConstantInfo ->
@@ -240,10 +300,28 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         targetClass: ClassNode,
         targetMethod: MethodNode,
     ): InsnResolutionInfo.Failure? {
-        val constantInfos = getConstantInfos(annotation) ?: return InsnResolutionInfo.Failure()
+        val constantInfos = getConstantInfos(annotation)
+        if (constantInfos == null) {
+            val returnType = annotation.parentOfType<PsiMethod>()?.returnType
+                ?: return InsnResolutionInfo.Failure()
+
+            val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
+                annotation.project,
+                CollectVisitor.Mode.MATCH_FIRST,
+                null,
+                Type.getType(returnType.descriptor)
+            )
+            collectVisitor.visit(targetMethod)
+            return if (collectVisitor.result.isEmpty()) {
+                InsnResolutionInfo.Failure(collectVisitor.filterToBlame)
+            } else {
+                null
+            }
+        }
+
         val constantInjectionPoint = InjectionPoint.byAtCode("CONSTANT") as? ConstantInjectionPoint
             ?: return null
-        return constantInfos.asSequence().mapNotNull { modifyConstantInfo ->
+        return constantInfos.firstNotNullOfOrNull { modifyConstantInfo ->
             val collectVisitor = ConstantInjectionPoint.MyCollectVisitor(
                 annotation.project,
                 CollectVisitor.Mode.MATCH_FIRST,
@@ -256,11 +334,11 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
             )
             collectVisitor.visit(targetMethod)
             if (collectVisitor.result.isEmpty()) {
-                collectVisitor.filterToBlame
+                InsnResolutionInfo.Failure(collectVisitor.filterToBlame)
             } else {
                 null
             }
-        }.firstOrNull()?.let(InsnResolutionInfo::Failure)
+        }
     }
 
     override fun isInsnAllowed(insn: AbstractInsnNode): Boolean {

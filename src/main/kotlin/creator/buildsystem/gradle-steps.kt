@@ -22,6 +22,7 @@ package com.demonwav.mcdev.creator.buildsystem
 
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.findStep
+import com.demonwav.mcdev.creator.notifyCreatedProjectNotOpened
 import com.demonwav.mcdev.creator.step.AbstractLongRunningStep
 import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
 import com.demonwav.mcdev.creator.step.FixedAssetsNewProjectWizardStep
@@ -123,7 +124,8 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
 
     override fun perform(project: Project) {
         invokeAndWait {
-            if (project.isDisposed) {
+            if (project.isDisposed || !project.isInitialized) {
+                notifyCreatedProjectNotOpened()
                 return@invokeAndWait
             }
 
@@ -195,6 +197,11 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
     open val additionalRunTasks = emptyList<String>()
 
     override fun perform(project: Project) {
+        if (!project.isInitialized) {
+            notifyCreatedProjectNotOpened()
+            return
+        }
+
         val rootDirectory = Path.of(context.projectFileDirectory)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
 

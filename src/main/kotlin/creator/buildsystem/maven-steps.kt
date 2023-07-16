@@ -22,6 +22,7 @@ package com.demonwav.mcdev.creator.buildsystem
 
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.getVersionJson
+import com.demonwav.mcdev.creator.notifyCreatedProjectNotOpened
 import com.demonwav.mcdev.creator.step.AbstractLongRunningStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
@@ -126,7 +127,8 @@ abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLong
 
     override fun perform(project: Project) {
         invokeAndWait {
-            if (project.isDisposed) {
+            if (project.isDisposed || !project.isInitialized) {
+                notifyCreatedProjectNotOpened()
                 return@invokeAndWait
             }
 
@@ -173,7 +175,8 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
         val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory).resolve("pom.xml"), true)
             ?: return
         val promise = invokeAndWait {
-            if (project.isDisposed) {
+            if (project.isDisposed || !project.isInitialized) {
+                notifyCreatedProjectNotOpened()
                 return@invokeAndWait null
             }
             MavenImportingManager.getInstance(project).linkAndImportFile(pomFile)

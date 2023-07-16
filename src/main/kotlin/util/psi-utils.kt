@@ -42,9 +42,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiEllipsisType
+import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiKeyword
-import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
@@ -282,7 +282,7 @@ val PsiMethodReferenceExpression.hasSyntheticMethod: Boolean
 val PsiClass.psiType: PsiType
     get() = PsiTypesUtil.getClassType(this)
 
-fun PsiElementFactory.createLiteralExpression(constant: Any?): PsiLiteralExpression {
+fun PsiElementFactory.createLiteralExpression(constant: Any?): PsiExpression {
     return when (constant) {
         null -> createExpressionFromText("null", null)
         is Boolean, is Double, is Int -> createExpressionFromText(constant.toString(), null)
@@ -292,5 +292,5 @@ fun PsiElementFactory.createLiteralExpression(constant: Any?): PsiLiteralExpress
         is String -> createExpressionFromText("\"${StringUtil.escapeStringCharacters(constant)}\"", null)
 
         else -> throw IncorrectOperationException("Unsupported literal type: ${constant.javaClass.name}")
-    } as PsiLiteralExpression
+    }
 }

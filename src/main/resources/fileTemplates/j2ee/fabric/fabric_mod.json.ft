@@ -1,7 +1,7 @@
 #set ( $d = "$" )
 {
   "schemaVersion": 1,
-  "id": "${ARTIFACT_ID}",
+  "id": "${MOD_ID}",
   "version": "${d}{version}",
 
   "name": "${MOD_NAME}",
@@ -10,14 +10,14 @@
   "contact": {},
 
   "license": "${LICENSE}",
-  "icon": "assets/${ARTIFACT_ID}/icon.png",
+  "icon": "assets/${MOD_ID}/icon.png",
 
   "environment": "${MOD_ENVIRONMENT}",
   "entrypoints": {},
 
     #if (${MIXINS})
       "mixins": [
-        "${ARTIFACT_ID}.mixins.json"
+        "${MOD_ID}.mixins.json"
       ],
     #end
 

@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.sponge.reference
 
 import com.demonwav.mcdev.insight.uastEventListener
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.CommonClassNames
@@ -98,7 +99,7 @@ private class GetterReference(element: PsiLanguageInjectionHost) : PsiReferenceB
 private object GetterAnnotationFilter : ElementFilter {
     override fun isAcceptable(element: Any, context: PsiElement?): Boolean {
         val type = context.toUElement() ?: return false
-        val annotation = type.getParentOfType<UAnnotation>() ?: return false
+        val annotation = runCatchingKtIdeaExceptions { type.getParentOfType<UAnnotation>() } ?: return false
         return annotation.qualifiedName == SpongeConstants.GETTER_ANNOTATION
     }
 
