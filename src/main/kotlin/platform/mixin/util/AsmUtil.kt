@@ -719,7 +719,7 @@ fun MethodNode.findOrConstructSourceMethod(
             val simpleName = clazz?.name?.substringAfterLast('/')
             if (simpleName != null) {
                 name = simpleName.substringAfterLast('$')
-                while (!name[0].isJavaIdentifierStart()) {
+                while (name.isNotEmpty() && !name[0].isJavaIdentifierStart()) {
                     val dollarIndex = simpleName.lastIndexOf('$', simpleName.length - name.length - 2)
                     if (dollarIndex == -1) {
                         name = simpleName
