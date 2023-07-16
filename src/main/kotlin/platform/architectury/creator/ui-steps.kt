@@ -26,6 +26,7 @@ import com.demonwav.mcdev.creator.step.AbstractLatentStep
 import com.demonwav.mcdev.creator.step.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
+import com.demonwav.mcdev.creator.step.ForgeStyleModIdStep
 import com.demonwav.mcdev.creator.step.IssueTrackerStep
 import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.ModNameStep
@@ -75,6 +76,7 @@ class ArchitecturyPlatformStep(parent: ModPlatformStep) : AbstractLatentStep<Arc
     override fun createStep(data: ArchitecturyVersionData): NewProjectWizardStep {
         return ArchitecturyVersionChainStep(this, data)
             .nextStep(::UseMixinsStep)
+            .nextStep(::ForgeStyleModIdStep)
             .nextStep(::ModNameStep)
             .nextStep(::LicenseStep)
             .nextStep(::ArchitecturyOptionalSettingsStep)

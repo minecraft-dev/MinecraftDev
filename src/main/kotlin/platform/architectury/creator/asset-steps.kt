@@ -29,6 +29,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
@@ -74,7 +75,8 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
-        val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
+        val packageName = "${buildSystemProps.groupId.toPackageName()}.${modId.toPackageName()}"
         val mcVersion = data.getUserData(ArchitecturyVersionChainStep.MC_VERSION_KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val forgeVersion = data.getUserData(ArchitecturyVersionChainStep.FORGE_VERSION_KEY) ?: return
@@ -114,6 +116,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
             "PACK_COMMENT" to packDescriptor.comment,
             "PACKAGE_NAME" to packageName,
             "JAVA_VERSION" to javaVersion,
+            "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "DISPLAY_TEST" to hasDisplayTestInManifest,
             "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
@@ -160,9 +163,9 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
             assets.addTemplateProperties(
                 "MIXINS" to "true",
             )
-            val commonMixinsFile = "common/src/main/resources/${buildSystemProps.artifactId}-common.mixins.json"
-            val forgeMixinsFile = "forge/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
-            val fabricMixinsFile = "fabric/src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val commonMixinsFile = "common/src/main/resources/$modId-common.mixins.json"
+            val forgeMixinsFile = "forge/src/main/resources/$modId.mixins.json"
+            val fabricMixinsFile = "fabric/src/main/resources/$modId.mixins.json"
             assets.addTemplates(
                 project,
                 commonMixinsFile to MinecraftTemplates.ARCHITECTURY_COMMON_MIXINS_JSON_TEMPLATE,
@@ -194,6 +197,7 @@ abstract class ArchitecturyMainClassStep(
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val useArchApi = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY) != null
 
@@ -203,6 +207,7 @@ abstract class ArchitecturyMainClassStep(
             "PACKAGE_NAME" to packageName,
             "CLASS_NAME" to className,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "MOD_VERSION" to buildSystemProps.version,
             "ARCHITECTURY_PACKAGE" to architecturyPackage,

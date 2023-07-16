@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.creator.notifyCreatedProjectNotOpened
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.application.ReadAction
@@ -56,6 +57,11 @@ abstract class AbstractReformatFilesStep(parent: NewProjectWizardStep) : Abstrac
 
         NonProjectFileWritingAccessProvider.disableChecksDuring {
             WriteCommandAction.writeCommandAction(project, *files).withGlobalUndo().run<Throwable> {
+                if (project.isDisposed || !project.isInitialized) {
+                    notifyCreatedProjectNotOpened()
+                    return@run
+                }
+
                 ReformatCodeProcessor(project, files, null, false).run()
             }
         }

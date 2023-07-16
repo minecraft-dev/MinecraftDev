@@ -48,6 +48,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.ui.EditorNotifications
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.IncorrectOperationException
 import java.awt.BorderLayout
@@ -92,6 +93,7 @@ private class NbtFileEditor(
     private var editor: FileEditor? = null
     private val editorCheckedDisposable = Disposer.newCheckedDisposable()
     private val component = JPanel(BorderLayout())
+    private val tempUserData = mutableMapOf<Any?, Any?>()
 
     init {
         val loading = JBLoadingPanel(null, this)
@@ -123,10 +125,16 @@ private class NbtFileEditor(
                 Disposer.dispose(this)
                 return@let
             }
+            tempUserData.forEach { (k, v) ->
+                @Suppress("UNCHECKED_CAST")
+                editor.putUserData(k as Key<Any>, v)
+            }
+            tempUserData.clear()
             invokeLater {
                 component.add(toolbar.panel, BorderLayout.NORTH)
                 component.add(editor.component, BorderLayout.CENTER)
             }
+            EditorNotifications.getInstance(project).updateAllNotifications()
         }
 
         // This can be null if the file is too big to be parsed as a psi file
@@ -178,12 +186,22 @@ private class NbtFileEditor(
 
     override fun getComponent() = component
     override fun getPreferredFocusedComponent() = editor.exec { preferredFocusedComponent }
-    override fun <T : Any?> getUserData(key: Key<T>) = editor.exec { getUserData(key) }
+    override fun <T : Any?> getUserData(key: Key<T>): T? {
+        if (editor == null) {
+            @Suppress("UNCHECKED_CAST")
+            return tempUserData[key] as? T
+        }
+        return editor.exec { getUserData(key) }
+    }
     override fun selectNotify() {
         editor.exec { selectNotify() }
     }
 
     override fun <T : Any?> putUserData(key: Key<T>, value: T?) {
+        if (editor == null) {
+            tempUserData[key] = value
+            return
+        }
         editor.exec { putUserData(key, value) }
     }
 

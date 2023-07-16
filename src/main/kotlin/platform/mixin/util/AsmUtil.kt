@@ -128,7 +128,8 @@ private fun hasModifier(access: Int, @PsiModifier.ModifierConstant modifier: Str
 }
 
 fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = null): PsiType {
-    return elementFactory.createTypeFromText(className.replace('$', '.'), context)
+    val javaClassName = className.replace("(\\$)(\\D)".toRegex()) { "." + it.groupValues[2] }
+    return elementFactory.createTypeFromText(javaClassName, context)
 }
 
 private fun hasAccess(access: Int, flag: Int) = (access and flag) != 0
@@ -719,7 +720,7 @@ fun MethodNode.findOrConstructSourceMethod(
             val simpleName = clazz?.name?.substringAfterLast('/')
             if (simpleName != null) {
                 name = simpleName.substringAfterLast('$')
-                while (!name[0].isJavaIdentifierStart()) {
+                while (name.isNotEmpty() && !name[0].isJavaIdentifierStart()) {
                     val dollarIndex = simpleName.lastIndexOf('$', simpleName.length - name.length - 2)
                     if (dollarIndex == -1) {
                         name = simpleName

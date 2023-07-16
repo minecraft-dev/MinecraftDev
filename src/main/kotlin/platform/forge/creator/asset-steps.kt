@@ -29,6 +29,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.splitPackage
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AbstractReformatFilesStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
@@ -56,6 +57,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val (mainPackageName, mainClassName) = splitPackage(mainClass)
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
@@ -78,6 +80,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "PACKAGE_NAME" to mainPackageName,
             "CLASS_NAME" to mainClassName,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "MOD_VERSION" to buildSystemProps.version,
             "DISPLAY_TEST" to (forgeVersion >= ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION),
@@ -144,12 +147,13 @@ class ForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
     override fun setupAssets(project: Project) {
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         if (useMixins) {
+            val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
             val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
             assets.addTemplateProperties(
-                "PACKAGE_NAME" to "${buildSystemProps.groupId}.${buildSystemProps.artifactId}.mixin",
-                "ARTIFACT_ID" to buildSystemProps.artifactId,
+                "PACKAGE_NAME" to "${buildSystemProps.groupId}.$modId.mixin",
+                "MOD_ID" to buildSystemProps.artifactId,
             )
-            val mixinsJsonFile = "src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val mixinsJsonFile = "src/main/resources/$modId.mixins.json"
             assets.addTemplates(project, mixinsJsonFile to MinecraftTemplates.FORGE_MIXINS_JSON_TEMPLATE)
         }
     }
