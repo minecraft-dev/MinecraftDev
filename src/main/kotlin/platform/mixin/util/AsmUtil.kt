@@ -128,7 +128,8 @@ private fun hasModifier(access: Int, @PsiModifier.ModifierConstant modifier: Str
 }
 
 fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = null): PsiType {
-    return elementFactory.createTypeFromText(className.replace('$', '.'), context)
+    val javaClassName = className.replace("(\\$)(\\D)".toRegex()) { "." + it.groupValues[2] }
+    return elementFactory.createTypeFromText(javaClassName, context)
 }
 
 private fun hasAccess(access: Int, flag: Int) = (access and flag) != 0
