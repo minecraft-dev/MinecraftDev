@@ -31,17 +31,20 @@ import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 
 class MixinPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(MIXIN_LIBRARY_KIND) {
 
+    private val hintFilePath = "META-INF/services/org.spongepowered.asm.service.IMixinService"
+
     override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.MIXIN_ICON
 
     override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
         for (classesRoot in classesRoots) {
-            val manifest = classesRoot.manifest ?: continue
-            if (manifest["Agent-Class"] != MixinConstants.Classes.MIXIN_AGENT) {
+            val manifest = classesRoot.manifest
+            if (manifest?.get("Agent-Class") != MixinConstants.Classes.MIXIN_AGENT &&
+                classesRoot.findFileByRelativePath(hintFilePath) == null
+            ) {
                 continue
             }
 
-            val version = manifest[IMPLEMENTATION_VERSION] ?: continue
-            return LibraryVersionProperties(version)
+            return LibraryVersionProperties(manifest?.get(IMPLEMENTATION_VERSION))
         }
         return null
     }

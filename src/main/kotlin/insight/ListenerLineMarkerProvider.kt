@@ -76,7 +76,9 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         return GutterIconNavigationHandler handler@{ _, element ->
             val (eventClass, _) = element.toUElementOfType<UIdentifier>()?.uastEventListener ?: return@handler
             FeatureUsageTracker.getInstance().triggerFeatureUsed("navigation.goto.declaration")
-            eventClass.navigate(true)
+            if (eventClass.canNavigate()) {
+                eventClass.navigate(true)
+            }
         }
     }
 

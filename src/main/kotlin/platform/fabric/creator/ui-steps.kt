@@ -27,6 +27,7 @@ import com.demonwav.mcdev.creator.step.AbstractMcVersionChainStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.LicenseStep
+import com.demonwav.mcdev.creator.step.ModIdStep
 import com.demonwav.mcdev.creator.step.ModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.RepositoryStep
@@ -74,6 +75,7 @@ class FabricPlatformStep(
         return FabricVersionChainStep(this, fabricVersions, apiVersions)
             .nextStep(::FabricEnvironmentStep)
             .nextStep(::UseMixinsStep)
+            .nextStep(::ModIdStep)
             .nextStep(::ModNameStep)
             .nextStep(::LicenseStep)
             .nextStep(::FabricOptionalSettingsStep)

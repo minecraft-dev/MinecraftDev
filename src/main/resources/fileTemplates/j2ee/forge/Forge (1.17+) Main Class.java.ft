@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("${ARTIFACT_ID}")
+@Mod("${MOD_ID}")
 public class ${CLASS_NAME} {
 
     // Directly reference a log4j logger.
@@ -44,7 +44,7 @@ public class ${CLASS_NAME} {
 
     private void enqueueIMC(final InterModEnqueueEvent event) {
         // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("${ARTIFACT_ID}", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
+        InterModComms.sendTo("${MOD_ID}", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
     }
 
     private void processIMC(final InterModProcessEvent event) {

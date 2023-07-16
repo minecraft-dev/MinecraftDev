@@ -33,6 +33,7 @@ import com.demonwav.mcdev.creator.step.DependStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
 import com.demonwav.mcdev.creator.step.MainClassStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
+import com.demonwav.mcdev.creator.step.PluginIdStep
 import com.demonwav.mcdev.creator.step.PluginNameStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.PlatformType
@@ -59,6 +60,7 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
 
     override fun createStep(data: PlatformVersion) =
         VelocityVersionStep(this, data.versions.mapNotNull(SemanticVersion::tryParse))
+            .nextStep(::PluginIdStep)
             .nextStep(::PluginNameStep)
             .nextStep(::MainClassStep)
             .nextStep(::VelocityOptionalSettingsStep)

@@ -25,12 +25,12 @@ import com.demonwav.mcdev.toml.inDependenciesHeaderId
 import com.demonwav.mcdev.toml.inModsTomlValueWithKey
 import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.util.childrenOfType
+import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.util.ProgressIndicatorBase
+import com.intellij.codeInsight.completion.JavaLookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.rootManager
-import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
@@ -42,16 +42,11 @@ import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.FileReferenceSet
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.search.searches.AnnotatedElementsSearch
+import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
 import kotlin.math.max
 import org.jetbrains.jps.model.java.JavaResourceRootType
-import org.jetbrains.uast.UAnnotation
-import org.jetbrains.uast.evaluateString
-import org.jetbrains.uast.getContainingUClass
-import org.jetbrains.uast.getParentOfType
-import org.jetbrains.uast.toUElement
 import org.toml.lang.psi.TomlArrayTable
 import org.toml.lang.psi.TomlKeySegment
 import org.toml.lang.psi.TomlPsiFactory
@@ -132,26 +127,39 @@ class ModsTomlModIdReference(element: TomlValue) :
     val modId: String? = element.stringValue()
 
     override fun resolve(): PsiElement? {
-        if (modId == null) {
+        if (modId.isNullOrBlank()) {
             return null
         }
-        val module = element.findModule() ?: return null
-        val scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false)
+
+        val scope = element.resolveScope
+        if (modId == "minecraft") {
+            return JavaPsiFacade.getInstance(element.project)
+                .findClass("net.minecraftforge.fml.mclanguageprovider.MinecraftModContainer", scope)
+        }
+
         val modAnnotation = JavaPsiFacade.getInstance(element.project).findClass(ForgeConstants.MOD_ANNOTATION, scope)
             ?: return null
-        val refScope = GlobalSearchScope.moduleScope(module)
-        return ProgressManager.getInstance().runProcess(
-            Computable {
-                ReferencesSearch.search(modAnnotation, refScope, true).mapFirstNotNull { ref ->
-                    ProgressManager.checkCanceled()
-                    ref.element.toUElement()?.getParentOfType<UAnnotation>()
-                        ?.takeIf {
-                            it.qualifiedName == ForgeConstants.MOD_ANNOTATION &&
-                                it.findAttributeValue("value")?.evaluateString() == modId
-                        }?.getContainingUClass()?.sourcePsi
+        return AnnotatedElementsSearch.searchPsiClasses(modAnnotation, scope).mapFirstNotNull { modClass ->
+            modClass.getAnnotation(ForgeConstants.MOD_ANNOTATION)
+                ?.takeIf {
+                    val id = it.findAttributeValue("value")?.constantStringValue
+                    id == modId
                 }
-            },
-            ProgressIndicatorBase()
-        )
+        }
+    }
+
+    override fun getVariants(): Array<Any> {
+        val scope = element.resolveScope
+        val modAnnotation = JavaPsiFacade.getInstance(element.project).findClass(ForgeConstants.MOD_ANNOTATION, scope)
+            ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        val modIds = mutableListOf(LookupElementBuilder.create("minecraft"))
+        return AnnotatedElementsSearch.searchPsiClasses(modAnnotation, scope).mapNotNullTo(modIds) { modClass ->
+            val modId = modClass.getAnnotation(ForgeConstants.MOD_ANNOTATION)
+                ?.findAttributeValue("value")
+                ?.constantStringValue
+                ?: return@mapNotNullTo null
+
+            JavaLookupElementBuilder.forClass(modClass, modId, true)
+        }.toTypedArray()
     }
 }

@@ -64,8 +64,6 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
         whenStepAvailable<BuildSystemPropertiesStep<*>> { buildSystemStep ->
             classNameProperty.updateWhenChanged(buildSystemStep.groupIdProperty, ::suggestMainClassName)
             classNameProperty.updateWhenChanged(buildSystemStep.artifactIdProperty, ::suggestMainClassName)
-
-            buildSystemStep.groupIdProperty.updateWhenChanged(classNameProperty, ::suggestGroupId)
         }
         whenStepAvailable<AbstractModNameStep> { modNameStep ->
             classNameProperty.updateWhenChanged(modNameStep.nameProperty, ::suggestMainClassName)

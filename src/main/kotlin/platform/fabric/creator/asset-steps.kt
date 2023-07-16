@@ -30,6 +30,7 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
@@ -77,17 +78,18 @@ class FabricDumbModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
 
         if (useMixins) {
             val packageName =
-                "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}.mixin"
+                "${buildSystemProps.groupId.toPackageName()}.${modId.toPackageName()}.mixin"
             assets.addTemplateProperties(
                 "PACKAGE_NAME" to packageName,
                 "JAVA_VERSION" to javaVersion,
             )
-            val mixinsJsonFile = "src/main/resources/${buildSystemProps.artifactId}.mixins.json"
+            val mixinsJsonFile = "src/main/resources/$modId.mixins.json"
             assets.addTemplates(project, mixinsJsonFile to FABRIC_MIXINS_JSON_TEMPLATE)
         }
 
@@ -107,6 +109,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
     override fun setupAssets(project: Project) {
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val envName = when (data.getUserData(FabricEnvironmentStep.KEY) ?: Side.NONE) {
@@ -121,7 +124,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
-        val packageName = "${buildSystemProps.groupId.toPackageName()}.${buildSystemProps.artifactId.toPackageName()}"
+        val packageName = "${buildSystemProps.groupId.toPackageName()}.${modId.toPackageName()}"
         val mainClassName = "$packageName.${modName.toJavaClassName()}"
         val clientClassName = "$packageName.client.${modName.toJavaClassName()}Client"
         entryPoints = listOf(
@@ -131,6 +134,7 @@ class FabricSmartModeFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
 
         assets.addTemplateProperties(
             "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_ID" to modId,
             "MOD_NAME" to StringUtil.escapeStringCharacters(modName),
             "MOD_DESCRIPTION" to StringUtil.escapeStringCharacters(description),
             "MOD_ENVIRONMENT" to envName,

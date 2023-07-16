@@ -27,6 +27,7 @@ import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.ifNotBlank
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAnnotation
@@ -103,9 +104,8 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: PsiClass,
-    ): NavigationVisitor? {
-        val constantInfo = getConstantInfo(at) ?: return null
-        return MyNavigationVisitor(constantInfo)
+    ): NavigationVisitor {
+        return MyNavigationVisitor(getConstantInfo(at))
     }
 
     override fun doCreateCollectVisitor(
@@ -113,9 +113,8 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         target: MixinSelector?,
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
-    ): CollectVisitor<PsiElement>? {
-        val constantInfo = getConstantInfo(at) ?: return null
-        return MyCollectVisitor(at.project, mode, constantInfo)
+    ): CollectVisitor<PsiElement> {
+        return MyCollectVisitor(at.project, mode, getConstantInfo(at))
     }
 
     override fun createLookup(
@@ -135,7 +134,8 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     }
 
     class MyNavigationVisitor(
-        private val constantInfo: ConstantInfo,
+        private val constantInfo: ConstantInfo?,
+        private val expectedType: Type? = null,
     ) : NavigationVisitor() {
         override fun visitForeachStatement(statement: PsiForeachStatement) {
             if (statement.iteratedValue?.type is PsiArrayType) {
@@ -169,8 +169,33 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
         }
 
         private fun visitConstant(element: PsiElement, value: Any?) {
-            if (value != constantInfo.constant) {
+            if (constantInfo != null && value != constantInfo.constant) {
                 return
+            }
+
+            if (expectedType != null && value != null) {
+                // First check if we expect any String literal
+                if (value is String &&
+                    (expectedType.sort != Type.OBJECT || expectedType.className != CommonClassNames.JAVA_LANG_STRING)
+                ) {
+                    return
+                }
+
+                // then check if we expect any class literal
+                if (value is Type && (
+                    expectedType.sort != Type.ARRAY && expectedType.sort != Type.OBJECT ||
+                        expectedType.className != CommonClassNames.JAVA_LANG_CLASS
+                    )
+                ) {
+                    return
+                }
+
+                // otherwise we expect a primitive literal
+                if (expectedType.sort in Type.BOOLEAN..Type.DOUBLE &&
+                    value::class.javaPrimitiveType?.let(Type::getType) != expectedType
+                ) {
+                    return
+                }
             }
 
             val parent = PsiUtil.skipParenthesizedExprUp(element.parent)
@@ -189,7 +214,11 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
                         JavaTokenType.GE -> Opcodes.IFGE
                         else -> null
                     }
-                    if (opcode != null && !constantInfo.expandConditions.any { opcode in it.opcodes }) {
+                    if (opcode != null && (
+                        constantInfo == null ||
+                            !constantInfo.expandConditions.any { opcode in it.opcodes }
+                        )
+                    ) {
                         return
                     }
                 }
@@ -207,10 +236,10 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     class MyCollectVisitor(
         private val project: Project,
         mode: Mode,
-        private val constantInfo: ConstantInfo,
+        private val constantInfo: ConstantInfo?,
+        private val expectedType: Type? = null,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {
-            val elementFactory = JavaPsiFacade.getElementFactory(project)
             methodNode.instructions?.iterator()?.forEachRemaining { insn ->
                 val constant = when (insn) {
                     is InsnNode -> when (insn.opcode) {
@@ -225,13 +254,15 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
                         Opcodes.ACONST_NULL -> null
                         else -> return@forEachRemaining
                     }
+
                     is IntInsnNode -> when (insn.opcode) {
                         Opcodes.BIPUSH, Opcodes.SIPUSH -> insn.operand
                         else -> return@forEachRemaining
                     }
+
                     is LdcInsnNode -> insn.cst
                     is JumpInsnNode -> {
-                        if (!constantInfo.expandConditions.any { insn.opcode in it.opcodes }) {
+                        if (constantInfo == null || !constantInfo.expandConditions.any { insn.opcode in it.opcodes }) {
                             return@forEachRemaining
                         }
                         var lastInsn = insn.previous
@@ -251,16 +282,48 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
                         }
                         0
                     }
+
                     else -> return@forEachRemaining
                 }
-                if (constant == constantInfo.constant) {
-                    val literal = if (constant is Type) {
-                        elementFactory.createExpressionFromText("${constant.className}.class", null)
-                    } else {
-                        elementFactory.createLiteralExpression(constant)
-                    }
-                    addResult(insn, literal)
+
+                if (constantInfo != null && constant != constantInfo.constant) {
+                    return@forEachRemaining
                 }
+
+                if (expectedType != null && constant != null) {
+                    // First check if we expect any String literal
+                    if (constant is String && (
+                        expectedType.sort != Type.OBJECT ||
+                            expectedType.className != CommonClassNames.JAVA_LANG_STRING
+                        )
+                    ) {
+                        return@forEachRemaining
+                    }
+
+                    // then check if we expect any class literal
+                    if (constant is Type && (
+                        expectedType.sort != Type.ARRAY && expectedType.sort != Type.OBJECT ||
+                            expectedType.className != CommonClassNames.JAVA_LANG_CLASS
+                        )
+                    ) {
+                        return@forEachRemaining
+                    }
+
+                    // otherwise we expect a primitive literal
+                    if (expectedType.sort in Type.BOOLEAN..Type.DOUBLE &&
+                        constant::class.javaPrimitiveType?.let(Type::getType) != expectedType
+                    ) {
+                        return@forEachRemaining
+                    }
+                }
+
+                val elementFactory = JavaPsiFacade.getElementFactory(project)
+                val literal = if (constant is Type) {
+                    elementFactory.createExpressionFromText("${constant.className}.class", null)
+                } else {
+                    elementFactory.createLiteralExpression(constant)
+                }
+                addResult(insn, literal)
             }
         }
     }

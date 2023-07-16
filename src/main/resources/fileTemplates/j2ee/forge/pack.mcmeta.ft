@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "${ARTIFACT_ID} resources",
+        "description": "${MOD_ID} resources",
         #if (${PACK_COMMENT} != "")
         "pack_format": ${PACK_FORMAT},
         "_comment": "${PACK_COMMENT}"

@@ -33,6 +33,7 @@ import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
@@ -67,6 +68,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val spongeVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
+        val pluginId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
@@ -78,7 +80,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
-            "PLUGIN_ID" to buildSystemProps.artifactId,
+            "PLUGIN_ID" to pluginId,
             "PLUGIN_VERSION" to buildSystemProps.version,
             "JAVA_VERSION" to javaVersion,
             "SPONGEAPI_VERSION" to spongeVersion,

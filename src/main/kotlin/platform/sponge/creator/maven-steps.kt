@@ -28,7 +28,6 @@ import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractPatchPomStep
 import com.demonwav.mcdev.creator.buildsystem.BuildDependency
 import com.demonwav.mcdev.creator.buildsystem.BuildRepository
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemType
 import com.demonwav.mcdev.creator.buildsystem.MavenImportStep
@@ -37,6 +36,7 @@ import com.demonwav.mcdev.creator.buildsystem.addDefaultMavenProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DependStep
@@ -82,10 +82,10 @@ class SpongeMavenProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
     override val description = "Creating Maven project files"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val spongeApiVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
+        val pluginId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
@@ -93,7 +93,7 @@ class SpongeMavenProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
         val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
 
         assets.addTemplateProperties(
-            "PLUGIN_ID" to buildSystemProps.artifactId,
+            "PLUGIN_ID" to pluginId,
             "VERSION_PLACEHOLDER" to "\${version}",
             "SPONGEAPI_VERSION" to spongeApiVersion,
             "LICENSE" to license.id,
