@@ -43,10 +43,12 @@ class FabricClientUseScopeEnlarger : UseScopeEnlarger() {
 
         if (loomData.splitMinecraftJar) {
             return GlobalSearchScope.filesScope(element.project) {
-                DumbService.getInstance(module.project).runReadActionInSmartMode(Computable {
-                    val moduleWithDeps = GlobalSearchScope.moduleWithDependenciesScope(module)
-                    FilenameIndex.getVirtualFilesByName(FabricConstants.FABRIC_MOD_JSON, moduleWithDeps)
-                })
+                DumbService.getInstance(module.project).runReadActionInSmartMode(
+                    Computable {
+                        val moduleWithDeps = GlobalSearchScope.moduleWithDependenciesScope(module)
+                        FilenameIndex.getVirtualFilesByName(FabricConstants.FABRIC_MOD_JSON, moduleWithDeps)
+                    }
+                )
             }
         }
 
