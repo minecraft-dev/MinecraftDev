@@ -33,7 +33,7 @@ displayURL="${WEBSITE}" #optional
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 #end
 # A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="${ARTIFACT_ID}.png" #optional
+#logoFile="${MOD_ID}.png" #optional
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI

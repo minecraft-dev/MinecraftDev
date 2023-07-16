@@ -33,6 +33,7 @@ import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.AuthorsStep
 import com.demonwav.mcdev.creator.step.DescriptionStep
@@ -47,7 +48,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.lang.JavaVersion
-import java.util.Locale
 
 private val fg6WrapperVersion = SemanticVersion.release(8, 1, 1)
 
@@ -68,14 +68,11 @@ class ForgeGradleSupport : BuildSystemSupport {
 class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAssetsStep(parent) {
     override val description = "Creating Gradle files"
 
-    private fun transformModName(modName: String): String {
-        return modName.lowercase(Locale.ENGLISH).replace(" ", "")
-    }
-
     override fun setupAssets(project: Project) {
         val mcVersion = data.getUserData(ForgeVersionChainStep.MC_VERSION_KEY) ?: return
         val forgeVersion = data.getUserData(ForgeVersionChainStep.FORGE_VERSION_KEY) ?: return
-        val modName = transformModName(data.getUserData(AbstractModNameStep.KEY) ?: return)
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
+        val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
@@ -92,6 +89,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         data.putUserData(GRADLE_VERSION_KEY, fg6WrapperVersion)
 
         assets.addTemplateProperties(
+            "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "MC_VERSION" to mcVersion,
             "MC_NEXT_VERSION" to mcNextVersion,

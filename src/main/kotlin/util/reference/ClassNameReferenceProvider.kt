@@ -52,6 +52,12 @@ abstract class ClassNameReferenceProvider : PackageNameReferenceProvider() {
             return classes.mapToArray(::PsiElementResolveResult)
         }
 
+        // The dollar sign can also be used in normal class names
+        val classesWithDollarSign = facade.findClasses(qualifiedName, element.resolveScope)
+        if (classesWithDollarSign.isNotEmpty()) {
+            return classesWithDollarSign.mapToArray(::PsiElementResolveResult)
+        }
+
         return super.resolve(actualName, element, facade)
     }
 

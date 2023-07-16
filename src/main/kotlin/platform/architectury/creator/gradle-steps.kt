@@ -33,6 +33,7 @@ import com.demonwav.mcdev.creator.buildsystem.addGradleWrapperProperties
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.gitEnabled
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
+import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.MinecraftTemplates
@@ -67,6 +68,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
         data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(7, 6, 1))
 
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mcVersion = data.getUserData(ArchitecturyVersionChainStep.MC_VERSION_KEY) ?: return
         val forgeVersion = data.getUserData(ArchitecturyVersionChainStep.FORGE_VERSION_KEY) ?: return
@@ -78,6 +80,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
             "ARTIFACT_ID" to buildSystemProps.artifactId,
+            "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "VERSION" to buildSystemProps.version,
             "MC_VERSION" to mcVersion,
