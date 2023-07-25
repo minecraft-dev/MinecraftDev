@@ -58,7 +58,7 @@ import com.intellij.codeInspection.ex.createSimple
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.JavaRecursiveElementVisitor
+import com.intellij.psi.JavaRecursiveElementWalkingVisitor
 import com.intellij.psi.PsiAssignmentExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -250,7 +250,7 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
             // delete all cancellation statements and if non-void, replace them with assignments to the return variable
             val cancelCalls = mutableListOf<PsiMethodCallExpression>()
             val returnStatements = mutableListOf<PsiReturnStatement>()
-            oldBody.accept(object : JavaRecursiveElementVisitor() {
+            oldBody.accept(object : JavaRecursiveElementWalkingVisitor() {
                 override fun visitClass(clazz: PsiClass) {
                     // don't recurse into nested classes
                 }
