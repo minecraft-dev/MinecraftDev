@@ -95,6 +95,12 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
                 return
             }
 
+            // check the inject is not optional
+            val require = injectAnnotation.findAttributeValue("require")?.constantValue as? Int
+            if (require == 0) {
+                return
+            }
+
             // check the inject is at HEAD
             val at = injectAnnotation.findAttributeValue("at")?.findAnnotations()?.singleOrNull() ?: return
             if (at.findAttributeValue("value")?.constantStringValue != "HEAD") {
