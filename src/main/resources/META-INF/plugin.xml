@@ -832,6 +832,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ImplicitConstructorInvokerInspection"/>
+        <localInspection displayName="@Inject could be @Overwrite"
+                         shortName="InjectCouldBeOverwrite"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectCouldBeOverwriteInspection"/>
         <localInspection displayName="@Inject into Constructor"
                          shortName="InjectIntoConstructor"
                          groupName="Mixin"
