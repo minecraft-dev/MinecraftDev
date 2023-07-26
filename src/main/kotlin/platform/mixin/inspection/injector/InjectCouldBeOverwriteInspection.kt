@@ -259,7 +259,7 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
                     // don't recurse into nested methods
                 }
 
-                override fun visitLambdaExpression(expression: PsiLambdaExpression?) {
+                override fun visitLambdaExpression(expression: PsiLambdaExpression) {
                     // don't recurse into lambdas
                 }
 
