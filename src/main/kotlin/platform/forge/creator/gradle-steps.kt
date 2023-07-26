@@ -74,7 +74,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-        val javaVersion = context.projectJdk.versionString?.let(JavaVersion::parse)
+        val javaVersion = context.projectJdk?.versionString?.let(JavaVersion::parse)
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val description = data.getUserData(DescriptionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return

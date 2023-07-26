@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.intellij.codeInsight.daemon.impl.analysis.HighlightControlFlowUtil
+import com.demonwav.mcdev.util.hasImplicitReturnStatement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -37,7 +37,6 @@ import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReturnStatement
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.controlFlow.AnalysisCanceledException
-import com.intellij.psi.controlFlow.ControlFlowUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -114,13 +113,13 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
             }
 
             val rBrace = codeBlockToAnalyze.rBrace ?: return
-            val controlFlow = try {
-                HighlightControlFlowUtil.getControlFlowNoConstantEvaluate(codeBlockToAnalyze)
+            val hasImplicitReturnStatement = try {
+                hasImplicitReturnStatement(codeBlockToAnalyze)
             } catch (e: AnalysisCanceledException) {
                 return
             }
 
-            if (ControlFlowUtil.canCompleteNormally(controlFlow, 0, controlFlow.size)) {
+            if (hasImplicitReturnStatement) {
                 if (tailOnly) {
                     result.clear()
                 }
