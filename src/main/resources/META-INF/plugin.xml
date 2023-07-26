@@ -836,7 +836,7 @@
                          shortName="InjectCouldBeOverwrite"
                          groupName="Mixin"
                          language="JAVA"
-                         enabledByDefault="true"
+                         enabledByDefault="false"
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectCouldBeOverwriteInspection"/>
