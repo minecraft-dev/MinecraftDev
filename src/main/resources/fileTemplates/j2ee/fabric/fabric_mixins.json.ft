@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "${PACKAGE_NAME}",
+  "package": "${MIXIN_PACKAGE_NAME}",
   "compatibilityLevel": "JAVA_${JAVA_VERSION}",
   "mixins": [
   ],

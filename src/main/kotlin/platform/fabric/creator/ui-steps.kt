@@ -33,7 +33,6 @@ import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextS
 import com.demonwav.mcdev.creator.step.RepositoryStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.creator.step.VersionChainComboBox
-import com.demonwav.mcdev.creator.step.WaitForSmartModeStep
 import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
@@ -80,10 +79,8 @@ class FabricPlatformStep(
             .nextStep(::LicenseStep)
             .nextStep(::FabricOptionalSettingsStep)
             .nextStep(::FabricBuildSystemStep)
-            .nextStep(::FabricDumbModeFilesStep)
+            .nextStep(::FabricBaseFilesStep)
             .nextStep(::FabricPostBuildSystemStep)
-            .nextStep(::WaitForSmartModeStep)
-            .nextStep(::FabricSmartModeFilesStep)
     }
 
     class Factory : ModPlatformStep.Factory {
