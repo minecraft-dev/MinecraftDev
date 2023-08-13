@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.buildsystem
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.getVersionJson
 import com.demonwav.mcdev.creator.notifyCreatedProjectNotOpened
@@ -62,7 +63,8 @@ fun FixedAssetsNewProjectWizardStep.addDefaultMavenProperties() {
 }
 
 abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
-    override val description = "Patching pom.xml"
+    override val description
+        get() = MCDevBundle.message("creator.step.maven.patch_pom.description")
 
     open fun patchPom(model: MavenDomProjectModel, root: XmlTag) {
         setupCore(model)
@@ -168,7 +170,8 @@ class ReformatPomStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(
 }
 
 class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
-    override val description = "Importing Maven project"
+    override val description
+        get() = MCDevBundle.message("creator.step.maven.import_maven.description")
 
     override fun perform(project: Project) {
         val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory).resolve("pom.xml"), true)

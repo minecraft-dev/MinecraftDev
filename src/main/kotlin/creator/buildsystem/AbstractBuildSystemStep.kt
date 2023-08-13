@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.buildsystem
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.storeToData
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -47,7 +48,8 @@ abstract class AbstractBuildSystemStep(
     abstract val platformName: String
 
     override val self get() = this
-    override val label = "Build System:"
+    override val label
+        get() = MCDevBundle.message("creator.ui.build_system.label.generic")
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)
@@ -94,11 +96,13 @@ abstract class AbstractBuildSystemStep(
 }
 
 class GradleBuildSystem : AbstractBuildSystemStep.Factory {
-    override val name = "Gradle"
+    override val name
+        get() = MCDevBundle.message("creator.ui.build_system.label.gradle")
 }
 
 class MavenBuildSystem : AbstractBuildSystemStep.Factory {
-    override val name = "Maven"
+    override val name
+        get() = MCDevBundle.message("creator.ui.build_system.label.maven")
 }
 
 abstract class AbstractRunBuildSystemStep(

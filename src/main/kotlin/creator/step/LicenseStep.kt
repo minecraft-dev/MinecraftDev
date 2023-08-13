@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.License
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -37,7 +38,7 @@ class LicenseStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(p
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row("License:") {
+            row(MCDevBundle.message("creator.ui.license.label")) {
                 comboBox(License.values().toList())
                     .bindItem(licenseProperty.transform({ License.byId(it) ?: License.ALL_RIGHTS_RESERVED }) { it.id })
             }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.storeToData
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
@@ -68,9 +69,11 @@ abstract class AbstractModNameStep(parent: NewProjectWizardStep) : AbstractNewPr
 }
 
 class ModNameStep(parent: NewProjectWizardStep) : AbstractModNameStep(parent) {
-    override val label = "Mod Name:"
+    override val label
+        get() = MCDevBundle.message("creator.ui.mod_name.label")
 }
 
 class PluginNameStep(parent: NewProjectWizardStep) : AbstractModNameStep(parent) {
-    override val label = "Plugin Name:"
+    override val label
+        get() = MCDevBundle.message("creator.ui.plugin_name.label")
 }

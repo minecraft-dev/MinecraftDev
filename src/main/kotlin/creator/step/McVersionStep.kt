@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.util.MinecraftVersions
@@ -34,7 +35,8 @@ class SimpleMcVersionStep(
     parent: NewProjectWizardStep,
     versions: List<SemanticVersion>,
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
-    override val label = "Minecraft Version:"
+    override val label
+        get() = MCDevBundle.message("creator.ui.mc_version.label")
 
     override fun setupUI(builder: Panel) {
         super.setupUI(builder)

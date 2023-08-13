@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.platformtype
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
@@ -45,7 +46,8 @@ class PlatformTypeStep private constructor(
     }
 
     override val self = this
-    override val label = "Platform Type:"
+    override val label
+        get() = MCDevBundle.message("creator.ui.platform.type.label")
 
     interface Factory : NewProjectWizardMultiStepFactory<PlatformTypeStep>
 }

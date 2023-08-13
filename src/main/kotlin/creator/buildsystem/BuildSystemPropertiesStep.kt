@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.buildsystem
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.storeToData
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
@@ -37,11 +38,11 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.textValidation
 
-private val nonExampleValidation = validationErrorIf<String>("Group ID must be changed from \"org.example\"") {
+private val nonExampleValidation = validationErrorIf<String>(MCDevBundle.message("creator.validation.group_id_non_example")) {
     it == "org.example"
 }
 
-private val versionValidation = validationErrorIf<String>("Version must be a valid semantic version") {
+private val versionValidation = validationErrorIf<String>(MCDevBundle.message("creator.validation.semantic_version")) {
     SemanticVersion.tryParse(it) == null
 }
 
@@ -66,22 +67,22 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
     private fun suggestArtifactId() = parent.name
 
     override fun setupUI(builder: Panel) {
-        builder.collapsibleGroup("Build System Properties") {
-            row("Group ID:") {
+        builder.collapsibleGroup(MCDevBundle.message("creator.ui.group.title")) {
+            row(MCDevBundle.message("creator.ui.group.group_id")) {
                 textField()
                     .bindText(groupIdProperty)
                     .columns(COLUMNS_MEDIUM)
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
             }
-            row("Artifact ID:") {
+            row(MCDevBundle.message("creator.ui.group.artifact_id")) {
                 textField()
                     .bindText(artifactIdProperty)
                     .columns(COLUMNS_MEDIUM)
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
             }
-            row("Version:") {
+            row(MCDevBundle.message("creator.ui.group.version")) {
                 textField()
                     .bindText(versionProperty)
                     .columns(COLUMNS_MEDIUM)

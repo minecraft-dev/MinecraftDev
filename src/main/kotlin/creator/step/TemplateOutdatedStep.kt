@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.update.PluginUtil
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -39,10 +40,7 @@ class TemplateOutdatedStep(parent: NewProjectWizardStep) : AbstractNewProjectWiz
                     "&plugin-version=${PluginUtil.pluginVersion.urlEncode()}" +
                     "&intellij-version=${ApplicationInfo.getInstance().build.asString().urlEncode()}" +
                     "&operating-system=${SystemInfoRt.OS_NAME.urlEncode()}"
-                text(
-                    "Is the Minecraft project wizard outdated? " +
-                        "<a href=\"$issueUrl\">Create an issue</a> on the MinecraftDev issue tracker.",
-                )
+                text(MCDevBundle.message("creator.ui.outdated.message", issueUrl))
             }
         }
     }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.invokeLater
@@ -104,9 +105,9 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                 if (result == null) {
                     placeholder.component = panel {
                         row {
-                            val label = label("Unable to $description")
+                            val label = label(MCDevBundle.message("creator.ui.generic_validation_failure.message", description))
                                 .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                                .validation(DialogValidation { ValidationInfo("Unable to $description") })
+                                .validation(DialogValidation { ValidationInfo(MCDevBundle.message("creator.ui.generic_validation_failure.message", description)) })
                             label.component.foreground = JBColor.RED
                         }
                     }
@@ -152,7 +153,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                     },
                 )
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                    .validation(DialogValidation { ValidationInfo("Haven't finished $description") })
+                    .validation(DialogValidation { ValidationInfo(MCDevBundle.message("creator.ui.generic_unfinished.message", description)) })
             }
         }
     }

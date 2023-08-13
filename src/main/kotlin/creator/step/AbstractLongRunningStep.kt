@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.progress.ProgressIndicator
@@ -57,13 +58,13 @@ abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractN
     }
 
     private fun startTaskQueue(project: Project, queue: TaskQueue) {
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Your project is being created") {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, MCDevBundle.message("creator.step.generic.project_created.message")) {
             override fun run(indicator: ProgressIndicator) {
                 if (project.isDisposed) {
                     return
                 }
 
-                indicator.text = "Your project is being created"
+                indicator.text = MCDevBundle.message("creator.step.generic.project_created.message")
                 var currentQueue = queue
                 while (true) {
                     while (true) {

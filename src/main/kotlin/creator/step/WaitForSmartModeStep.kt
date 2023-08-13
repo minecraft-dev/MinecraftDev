@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
@@ -30,7 +31,8 @@ import com.intellij.openapi.project.Project
  * Thus, this step is for UX purposes only.
  */
 class WaitForSmartModeStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
-    override val description = "Indexing"
+    override val description
+        get() = MCDevBundle.message("creator.step.wait_for_smart.description")
 
     override fun perform(project: Project) {
         DumbService.getInstance(project).waitForSmartMode()

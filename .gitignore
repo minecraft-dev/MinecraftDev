@@ -5,6 +5,8 @@
 
 .idea/*
 !.idea/icon.png
+!.idea/encodings.xml
+!.idea/inspectionProfiles/Project_Default.xml
 
 **/out/
 **/build/
