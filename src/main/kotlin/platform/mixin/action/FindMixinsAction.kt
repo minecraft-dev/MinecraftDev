@@ -52,10 +52,6 @@ class FindMixinsAction : AnAction() {
     class TWFactory : ToolWindowFactory {
         override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         }
-
-        override fun shouldBeAvailable(project: Project): Boolean {
-            return false
-        }
     }
 
     companion object {
