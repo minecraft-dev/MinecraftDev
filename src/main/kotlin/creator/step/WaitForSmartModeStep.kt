@@ -32,7 +32,7 @@ import com.intellij.openapi.project.Project
  */
 class WaitForSmartModeStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.wait_for_smart.description")
+        get() = MCDevBundle("creator.step.wait_for_smart.description")
 
     override fun perform(project: Project) {
         DumbService.getInstance(project).waitForSmartMode()

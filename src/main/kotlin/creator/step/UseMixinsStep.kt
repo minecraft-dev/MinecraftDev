@@ -36,7 +36,7 @@ class UseMixinsStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row(MCDevBundle.message("creator.ui.mixins.label")) {
+            row(MCDevBundle("creator.ui.mixins.label")) {
                 checkBox("")
                     .bindSelected(useMixinsProperty)
             }

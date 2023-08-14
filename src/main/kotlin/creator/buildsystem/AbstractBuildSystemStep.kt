@@ -49,7 +49,7 @@ abstract class AbstractBuildSystemStep(
 
     override val self get() = this
     override val label
-        get() = MCDevBundle.message("creator.ui.build_system.label.generic")
+        get() = MCDevBundle("creator.ui.build_system.label.generic")
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)
@@ -97,12 +97,12 @@ abstract class AbstractBuildSystemStep(
 
 class GradleBuildSystem : AbstractBuildSystemStep.Factory {
     override val name
-        get() = MCDevBundle.message("creator.ui.build_system.label.gradle")
+        get() = MCDevBundle("creator.ui.build_system.label.gradle")
 }
 
 class MavenBuildSystem : AbstractBuildSystemStep.Factory {
     override val name
-        get() = MCDevBundle.message("creator.ui.build_system.label.maven")
+        get() = MCDevBundle("creator.ui.build_system.label.maven")
 }
 
 abstract class AbstractRunBuildSystemStep(

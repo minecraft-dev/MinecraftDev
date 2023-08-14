@@ -47,7 +47,7 @@ class PlatformTypeStep private constructor(
 
     override val self = this
     override val label
-        get() = MCDevBundle.message("creator.ui.platform.type.label")
+        get() = MCDevBundle("creator.ui.platform.type.label")
 
     interface Factory : NewProjectWizardMultiStepFactory<PlatformTypeStep>
 }

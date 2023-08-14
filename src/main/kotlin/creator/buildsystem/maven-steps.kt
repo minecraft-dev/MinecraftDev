@@ -64,7 +64,7 @@ fun FixedAssetsNewProjectWizardStep.addDefaultMavenProperties() {
 
 abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.maven.patch_pom.description")
+        get() = MCDevBundle("creator.step.maven.patch_pom.description")
 
     open fun patchPom(model: MavenDomProjectModel, root: XmlTag) {
         setupCore(model)
@@ -171,7 +171,7 @@ class ReformatPomStep(parent: NewProjectWizardStep) : AbstractReformatFilesStep(
 
 class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.maven.import_maven.description")
+        get() = MCDevBundle("creator.step.maven.import_maven.description")
 
     override fun perform(project: Project) {
         val pomFile = VfsUtil.findFile(Path.of(context.projectFileDirectory).resolve("pom.xml"), true)

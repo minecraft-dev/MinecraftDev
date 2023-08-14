@@ -58,13 +58,16 @@ abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractN
     }
 
     private fun startTaskQueue(project: Project, queue: TaskQueue) {
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, MCDevBundle.message("creator.step.generic.project_created.message")) {
+        val task = object : Task.Backgroundable(
+            project,
+            MCDevBundle("creator.step.generic.project_created.message")
+        ) {
             override fun run(indicator: ProgressIndicator) {
                 if (project.isDisposed) {
                     return
                 }
 
-                indicator.text = MCDevBundle.message("creator.step.generic.project_created.message")
+                indicator.text = MCDevBundle("creator.step.generic.project_created.message")
                 var currentQueue = queue
                 while (true) {
                     while (true) {
@@ -85,8 +88,9 @@ abstract class AbstractLongRunningStep(parent: NewProjectWizardStep) : AbstractN
                 }
                 indicator.text2 = null
             }
-        },
-        )
+        }
+
+        ProgressManager.getInstance().run(task)
     }
 
     companion object {

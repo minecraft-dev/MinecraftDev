@@ -38,7 +38,7 @@ class LicenseStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(p
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row(MCDevBundle.message("creator.ui.license.label")) {
+            row(MCDevBundle("creator.ui.license.label")) {
                 comboBox(License.values().toList())
                     .bindItem(licenseProperty.transform({ License.byId(it) ?: License.ALL_RIGHTS_RESERVED }) { it.id })
             }

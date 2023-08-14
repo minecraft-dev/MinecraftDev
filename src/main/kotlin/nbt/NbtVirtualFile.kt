@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.nbt
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
@@ -62,7 +63,7 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
             tempCompressed = isCompressed
             tempParseSuccessful = true
         } catch (e: MalformedNbtFileException) {
-            text = "Malformed NBT file:\n${e.message}"
+            text = MCDevBundle("nbt.lang.errors.wrapped_error_message", e.message)
             tempCompressed = false
             tempParseSuccessful = false
         }
@@ -92,9 +93,8 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
             if (nbttFile == null) {
                 Notification(
                     "NBT Save Error",
-                    "Error saving NBT file",
-                    "The file is not recognised as a NBTT file. This might be caused by wrong file type associations," +
-                        " or the file could be too large.",
+                    MCDevBundle("nbt.file.save_notify.file_type_error.title"),
+                    MCDevBundle("nbt.file.save_notify.file_type_error.content"),
                     NotificationType.WARNING,
                 ).notify(project)
                 return@runReadActionAsync
@@ -105,8 +105,8 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
             if (rootTag == null) {
                 Notification(
                     "NBT Save Error",
-                    "Error saving NBT file",
-                    "Due to errors in the text representation, ${backingFile.name} could not be saved.",
+                    MCDevBundle("nbt.file.save_notify.parse_error.title"),
+                    MCDevBundle("nbt.file.save_notify.parse_error.content", backingFile.name),
                     NotificationType.WARNING,
                 ).notify(project)
                 return@runReadActionAsync
@@ -126,8 +126,8 @@ class NbtVirtualFile(private val backingFile: VirtualFile, private val project: 
 
                 Notification(
                     "NBT Save Success",
-                    "Saved NBT file successfully",
-                    "${backingFile.name} was saved successfully.",
+                    MCDevBundle("nbt.file.save_notify.success.title"),
+                    MCDevBundle("nbt.file.save_notify.success.content", backingFile.name),
                     NotificationType.INFORMATION,
                 ).notify(project)
             }

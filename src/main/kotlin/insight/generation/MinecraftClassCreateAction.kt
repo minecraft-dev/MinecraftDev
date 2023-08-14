@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.insight.generation
 
 import com.demonwav.mcdev.asset.GeneralAssets
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
@@ -51,7 +52,7 @@ import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
 class MinecraftClassCreateAction :
     CreateTemplateInPackageAction<PsiClass>(
         CAPTION,
-        "Class generation for modders",
+        MCDevBundle("generate.class.description"),
         GeneralAssets.MC_TEMPLATE,
         JavaModuleSourceRootTypes.SOURCES,
     ),
@@ -152,6 +153,7 @@ class MinecraftClassCreateAction :
     }
 
     private companion object {
-        private const val CAPTION = "Minecraft Class"
+        private val CAPTION
+            get() = MCDevBundle("generate.class.caption")
     }
 }

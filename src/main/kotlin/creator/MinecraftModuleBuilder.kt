@@ -41,7 +41,7 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getGroupName() = MinecraftModuleType.NAME
     override fun getBuilderId() = "MINECRAFT_MODULE"
-    override fun getDescription() = MCDevBundle.message("creator.ui.create_minecraft_project")
+    override fun getDescription() = MCDevBundle("creator.ui.create_minecraft_project")
 
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
         if (moduleJdk != null) {

@@ -92,7 +92,7 @@ abstract class AbstractOptionalStringBasedOnProjectNameStep(
 
 class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.description.label")
+        get() = MCDevBundle("creator.ui.description.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
@@ -105,7 +105,7 @@ class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep
 
 class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.authors.label")
+        get() = MCDevBundle("creator.ui.authors.label")
     override val bindToStorage = true
 
     override fun setupProject(project: Project) {
@@ -130,7 +130,7 @@ class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 
 class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-            get() = MCDevBundle.message("creator.ui.website.label")
+        get() = MCDevBundle("creator.ui.website.label")
     override val bindToStorage = true
 
     override fun setupProject(project: Project) {
@@ -144,7 +144,7 @@ class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 
 class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.repository.label")
+        get() = MCDevBundle("creator.ui.repository.label")
 
     init {
         if (format.isEmpty()) {
@@ -163,7 +163,7 @@ class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringBased
 
 class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
     override val label: String
-        get() = MCDevBundle.message("creator.ui.issue_tracker.label")
+        get() = MCDevBundle("creator.ui.issue_tracker.label")
 
     init {
         if (format.isEmpty()) {
@@ -182,7 +182,7 @@ class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringBas
 
 class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.update_url.label")
+        get() = MCDevBundle("creator.ui.update_url.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
@@ -195,7 +195,7 @@ class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(p
 
 class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.depend.label")
+        get() = MCDevBundle("creator.ui.depend.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, AuthorsStep.parseAuthors(value))
@@ -208,7 +208,7 @@ class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(pare
 
 class SoftDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
     override val label
-        get() = MCDevBundle.message("creator.ui.soft_depend.label")
+        get() = MCDevBundle("creator.ui.soft_depend.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, AuthorsStep.parseAuthors(value))

@@ -74,7 +74,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row(MCDevBundle.message("creator.ui.main_class.label")) {
+            row(MCDevBundle("creator.ui.main_class.label")) {
                 textField()
                     .columns(COLUMNS_LARGE)
                     .bindText(classNameProperty)

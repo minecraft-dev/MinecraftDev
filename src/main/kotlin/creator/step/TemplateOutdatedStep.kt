@@ -40,7 +40,7 @@ class TemplateOutdatedStep(parent: NewProjectWizardStep) : AbstractNewProjectWiz
                     "&plugin-version=${PluginUtil.pluginVersion.urlEncode()}" +
                     "&intellij-version=${ApplicationInfo.getInstance().build.asString().urlEncode()}" +
                     "&operating-system=${SystemInfoRt.OS_NAME.urlEncode()}"
-                text(MCDevBundle.message("creator.ui.outdated.message", issueUrl))
+                text(MCDevBundle("creator.ui.outdated.message", issueUrl))
             }
         }
     }

@@ -35,7 +35,7 @@ import java.nio.file.Path
 
 abstract class AbstractReformatFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.reformat.description")
+        get() = MCDevBundle("creator.step.reformat.description")
 
     private val filesToReformat = mutableListOf<String>()
 

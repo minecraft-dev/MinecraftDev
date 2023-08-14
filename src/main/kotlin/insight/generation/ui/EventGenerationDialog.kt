@@ -39,7 +39,7 @@ class EventGenerationDialog(
         private set
 
     init {
-        title = MCDevBundle.message("generate.event_listener.settings")
+        title = MCDevBundle("generate.event_listener.settings")
         isOKActionEnabled = true
         setValidationDelay(0)
 

@@ -38,11 +38,11 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.textValidation
 
-private val nonExampleValidation = validationErrorIf<String>(MCDevBundle.message("creator.validation.group_id_non_example")) {
+private val nonExampleValidation = validationErrorIf<String>(MCDevBundle("creator.validation.group_id_non_example")) {
     it == "org.example"
 }
 
-private val versionValidation = validationErrorIf<String>(MCDevBundle.message("creator.validation.semantic_version")) {
+private val versionValidation = validationErrorIf<String>(MCDevBundle("creator.validation.semantic_version")) {
     SemanticVersion.tryParse(it) == null
 }
 
@@ -67,22 +67,22 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
     private fun suggestArtifactId() = parent.name
 
     override fun setupUI(builder: Panel) {
-        builder.collapsibleGroup(MCDevBundle.message("creator.ui.group.title")) {
-            row(MCDevBundle.message("creator.ui.group.group_id")) {
+        builder.collapsibleGroup(MCDevBundle("creator.ui.group.title")) {
+            row(MCDevBundle("creator.ui.group.group_id")) {
                 textField()
                     .bindText(groupIdProperty)
                     .columns(COLUMNS_MEDIUM)
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
             }
-            row(MCDevBundle.message("creator.ui.group.artifact_id")) {
+            row(MCDevBundle("creator.ui.group.artifact_id")) {
                 textField()
                     .bindText(artifactIdProperty)
                     .columns(COLUMNS_MEDIUM)
                     .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
             }
-            row(MCDevBundle.message("creator.ui.group.version")) {
+            row(MCDevBundle("creator.ui.group.version")) {
                 textField()
                     .bindText(versionProperty)
                     .columns(COLUMNS_MEDIUM)

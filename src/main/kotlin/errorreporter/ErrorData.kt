@@ -28,7 +28,7 @@ import com.intellij.openapi.util.text.StringUtil
 
 // It's easier to just re-use the code that we already were using, rather than changing to a map like
 // Jetbrains said to do in the deprecation message
-class ErrorData(var throwable: Throwable?, val lastAction: String?) {
+class ErrorData(var throwable: Throwable?, private val lastAction: String?) {
 
     var message: String? = null
         get() = field ?: throwable?.message

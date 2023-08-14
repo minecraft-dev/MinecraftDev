@@ -20,7 +20,20 @@
 
 package com.demonwav.mcdev.nbt.lang.colors
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.BYTE
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.DOUBLE
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.FLOAT
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.INT
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.KEYWORD
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.LONG
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.MATERIAL
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.SHORT
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.STRING
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.STRING_NAME
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.UNQUOTED_STRING
+import com.demonwav.mcdev.nbt.lang.colors.NbttSyntaxHighlighter.Companion.UNQUOTED_STRING_NAME
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
@@ -32,7 +45,7 @@ class NbttColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap() = map
     override fun getAttributeDescriptors() = DESCRIPTORS
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
-    override fun getDisplayName() = "NBT Text"
+    override fun getDisplayName() = MCDevBundle("nbt.lang.display_name")
     override fun getDemoText() =
         """
         <name>"Level"</name>: {
@@ -75,18 +88,21 @@ class NbttColorSettingsPage : ColorSettingsPage {
 
     companion object {
         private val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Keyword", NbttSyntaxHighlighter.KEYWORD),
-            AttributesDescriptor("String", NbttSyntaxHighlighter.STRING),
-            AttributesDescriptor("Unquoted String", NbttSyntaxHighlighter.UNQUOTED_STRING),
-            AttributesDescriptor("Name", NbttSyntaxHighlighter.STRING_NAME),
-            AttributesDescriptor("Unquoted Name", NbttSyntaxHighlighter.UNQUOTED_STRING_NAME),
-            AttributesDescriptor("Byte", NbttSyntaxHighlighter.BYTE),
-            AttributesDescriptor("Short", NbttSyntaxHighlighter.SHORT),
-            AttributesDescriptor("Int", NbttSyntaxHighlighter.INT),
-            AttributesDescriptor("Long", NbttSyntaxHighlighter.LONG),
-            AttributesDescriptor("Float", NbttSyntaxHighlighter.FLOAT),
-            AttributesDescriptor("Double", NbttSyntaxHighlighter.DOUBLE),
-            AttributesDescriptor("Material", NbttSyntaxHighlighter.MATERIAL),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.keyword.display_name"), KEYWORD),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.string.display_name"), STRING),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.unquoted_string.display_name"), UNQUOTED_STRING),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.name.display_name"), STRING_NAME),
+            AttributesDescriptor(
+                MCDevBundle("nbt.lang.highlighting.unquoted_name.display_name"),
+                UNQUOTED_STRING_NAME
+            ),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.byte.display_name"), BYTE),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.short.display_name"), SHORT),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.int.display_name"), INT),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.long.display_name"), LONG),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.float.display_name"), FLOAT),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.double.display_name"), DOUBLE),
+            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.material.display_name"), MATERIAL),
         )
 
         private val map = mapOf(

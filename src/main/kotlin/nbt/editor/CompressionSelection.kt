@@ -20,10 +20,12 @@
 
 package com.demonwav.mcdev.nbt.editor
 
-enum class CompressionSelection(private val selectionName: String) {
-    GZIP("GZipped"),
-    UNCOMPRESSED("Uncompressed"),
+import com.demonwav.mcdev.asset.MCDevBundle
+
+enum class CompressionSelection(private val selectionNameFunc: () -> String) {
+    GZIP({ MCDevBundle("nbt.compression.gzip") }),
+    UNCOMPRESSED({ MCDevBundle("nbt.compression.uncompressed") }),
     ;
 
-    override fun toString() = selectionName
+    override fun toString(): String = selectionNameFunc()
 }

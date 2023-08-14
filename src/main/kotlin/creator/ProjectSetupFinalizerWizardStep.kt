@@ -120,7 +120,7 @@ class JdkProjectSetupFinalizer(
     private var sdk by sdkProperty
     private var sdkComboBox: JdkComboBoxWithPreference? = null
     private var preferredJdkLabel: Placeholder? = null
-    private var preferredJdkReason = MCDevBundle.message("creator.validation.jdk_preferred_default_reason")
+    private var preferredJdkReason = MCDevBundle("creator.validation.jdk_preferred_default_reason")
 
     var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
         private set
@@ -147,7 +147,7 @@ class JdkProjectSetupFinalizer(
             preferredJdkLabel?.component = null
         } else {
             preferredJdkLabel?.component =
-                JLabel(MCDevBundle.message("creator.validation.jdk_preferred", preferredJdk.description, preferredJdkReason))
+                JLabel(MCDevBundle("creator.validation.jdk_preferred", preferredJdk.description, preferredJdkReason))
                     .also { it.foreground = JBColor.YELLOW }
         }
     }

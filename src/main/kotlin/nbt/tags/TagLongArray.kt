@@ -22,7 +22,7 @@ package com.demonwav.mcdev.nbt.tags
 
 import java.io.DataOutputStream
 
-class TagLongArray(override val value: LongArray) : NbtValueTag<LongArray>(LongArray::class.java) {
+class TagLongArray(override val value: LongArray) : NbtValueTag<LongArray>(LongArray::class) {
     override val payloadSize = 4 + value.size * 8
     override val typeId = NbtTypeId.LONG_ARRAY
 

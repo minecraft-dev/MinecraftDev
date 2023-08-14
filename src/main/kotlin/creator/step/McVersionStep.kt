@@ -36,7 +36,7 @@ class SimpleMcVersionStep(
     versions: List<SemanticVersion>,
 ) : AbstractSelectVersionStep<SemanticVersion>(parent, versions) {
     override val label
-        get() = MCDevBundle.message("creator.ui.mc_version.label")
+        get() = MCDevBundle("creator.ui.mc_version.label")
 
     override fun setupUI(builder: Panel) {
         super.setupUI(builder)

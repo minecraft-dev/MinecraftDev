@@ -90,7 +90,7 @@ class GradleWrapperStep(parent: NewProjectWizardStep) : AbstractRunGradleTaskSte
 
 abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.gradle.patch_gradle.description")
+        get() = MCDevBundle("creator.step.gradle.patch_gradle.description")
 
     abstract fun patch(project: Project, gradleFiles: GradleFiles)
 
@@ -195,7 +195,7 @@ abstract class AbstractPatchGradleFilesStep(parent: NewProjectWizardStep) : Abst
 
 open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(parent) {
     override val description
-        get() = MCDevBundle.message("creator.step.gradle.import_gradle.description")
+        get() = MCDevBundle("creator.step.gradle.import_gradle.description")
 
     open val additionalRunTasks = emptyList<String>()
 
