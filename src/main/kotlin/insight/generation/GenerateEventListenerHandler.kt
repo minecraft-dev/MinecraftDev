@@ -48,7 +48,7 @@ import com.intellij.refactoring.RefactoringBundle
  * Note that this is a psuedo generator as it relies on a wizard and the
  * [.cleanup] to complete
  */
-class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle.message("generate.event_listener.title")) {
+class GenerateEventListenerHandler : GenerateMembersHandlerBase(MCDevBundle("generate.event_listener.title")) {
 
     private data class GenerateData(
         var editor: Editor,

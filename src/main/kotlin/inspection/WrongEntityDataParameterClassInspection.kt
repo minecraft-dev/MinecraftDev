@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
@@ -39,9 +40,7 @@ import com.intellij.psi.util.InheritanceUtil
 
 class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionTool() {
 
-    override fun getStaticDescription() = "Reports when the class passed to an entity data parameter definition is " +
-        "not the same as the containing entity class"
-
+    override fun getStaticDescription() = MCDevBundle("inspection.entity_data_param.description")
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = Visitor(holder)
 
     class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
@@ -66,7 +65,7 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
             if (!containingClass.manager.areElementsEquivalent(containingClass, firstParameterGenericsClass)) {
                 holder.registerProblem(
                     expression,
-                    "Entity class does not match this entity class",
+                    MCDevBundle("inspection.entity_data_param.message"),
                     QuickFix(firstParameter),
                 )
             }
@@ -74,7 +73,7 @@ class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionT
     }
 
     private class QuickFix(firstParameter: PsiExpression) : LocalQuickFixOnPsiElement(firstParameter) {
-        override fun getText() = "Replace other entity class with this entity class"
+        override fun getText() = MCDevBundle("inspection.entity_data_param.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val factory = JavaPsiFacade.getElementFactory(project)

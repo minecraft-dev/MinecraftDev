@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.platformtype
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
@@ -39,10 +40,12 @@ class ModPlatformStep(
     }
 
     override val self = this
-    override val label = "Platform:"
+    override val label
+        get() = MCDevBundle("creator.ui.platform.label")
 
     class TypeFactory : PlatformTypeStep.Factory {
-        override val name = "Mod"
+        override val name
+            get() = MCDevBundle("creator.ui.platform.mod.name")
         override fun createStep(parent: PlatformTypeStep) = ModPlatformStep(parent)
     }
 

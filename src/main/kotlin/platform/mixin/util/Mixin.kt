@@ -168,15 +168,30 @@ fun isAssignable(left: PsiType, right: PsiType): Boolean {
             }
             val leftClass = left.resolve() ?: return false
             val rightClass = right.resolve() ?: return false
-            if (rightClass.isMixin) {
-                val isMixinAssignable = rightClass.mixinTargets.any {
-                    val stubClass = it.findStubClass(rightClass.project) ?: return@any false
-                    isClassAssignable(leftClass, stubClass)
+
+            val isLeftMixin = leftClass.isMixin
+            val isRightMixin = rightClass.isMixin
+            if (isLeftMixin || isRightMixin) {
+                fun getClassesToTest(clazz: PsiClass, isMixin: Boolean) = if (isMixin) {
+                    clazz.mixinTargets.mapNotNull { it.findStubClass(clazz.project) }
+                } else {
+                    listOf(clazz)
                 }
+
+                val leftClassesToTest = getClassesToTest(leftClass, isLeftMixin)
+                val rightClassesToTest = getClassesToTest(rightClass, isRightMixin)
+
+                val isMixinAssignable = leftClassesToTest.any { leftToTest ->
+                    rightClassesToTest.any { rightToTest ->
+                        isClassAssignable(leftToTest, rightToTest)
+                    }
+                }
+
                 if (isMixinAssignable) {
                     return true
                 }
             }
+
             val mixins = FindMixinsAction.findMixins(rightClass, rightClass.project) ?: return false
             return mixins.any { isClassAssignable(leftClass, it) }
         }

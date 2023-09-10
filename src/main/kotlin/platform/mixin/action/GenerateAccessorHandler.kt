@@ -288,7 +288,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     JavaDirectoryService.getInstance().createInterface(pkg, name)
                 } catch (e: IncorrectOperationException) {
                     invokeLater {
-                        val message = MCDevBundle.message(
+                        val message = MCDevBundle(
                             "intention.error.cannot.create.class.message",
                             name,
                             e.localizedMessage,
@@ -296,7 +296,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                         Messages.showErrorDialog(
                             project,
                             message,
-                            MCDevBundle.message("intention.error.cannot.create.class.title"),
+                            MCDevBundle("intention.error.cannot.create.class.title"),
                         )
                     }
                     return@compute null

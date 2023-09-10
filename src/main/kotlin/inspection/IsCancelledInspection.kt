@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.openapi.module.ModuleUtilCore
@@ -31,9 +32,9 @@ import org.jetbrains.annotations.Nls
 
 class IsCancelledInspection : BaseInspection() {
     @Nls
-    override fun getDisplayName() = "Useless event isCancelled check"
+    override fun getDisplayName() = MCDevBundle("inspection.is_cancelled.name")
 
-    override fun getStaticDescription(): String = "Reports useless event cancellation checks"
+    override fun getStaticDescription(): String = MCDevBundle("inspection.is_cancelled.description")
 
     override fun buildErrorString(vararg infos: Any): String {
         val useless = infos[0] as IsCancelled

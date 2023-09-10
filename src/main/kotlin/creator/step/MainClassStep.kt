@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.updateWhenChanged
@@ -45,8 +46,8 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
         }
 
         return buildSystemProps.groupId.toPackageName() +
-            ".${buildSystemProps.artifactId.toPackageName()}" +
-            ".${findStep<AbstractModNameStep>().name.toJavaClassName()}"
+            "." + buildSystemProps.artifactId.toPackageName() +
+            "." + findStep<AbstractModNameStep>().name.toJavaClassName()
     }
 
     private fun suggestGroupId(): String {
@@ -60,6 +61,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
 
     val classNameProperty = propertyGraph.lazyProperty(::suggestMainClassName)
     var className by classNameProperty
+
     init {
         whenStepAvailable<BuildSystemPropertiesStep<*>> { buildSystemStep ->
             classNameProperty.updateWhenChanged(buildSystemStep.groupIdProperty, ::suggestMainClassName)
@@ -72,7 +74,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
 
     override fun setupUI(builder: Panel) {
         with(builder) {
-            row("Main Class:") {
+            row(MCDevBundle("creator.ui.main_class.label")) {
                 textField()
                     .columns(COLUMNS_LARGE)
                     .bindText(classNameProperty)

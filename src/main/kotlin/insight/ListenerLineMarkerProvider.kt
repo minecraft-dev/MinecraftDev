@@ -22,6 +22,7 @@ package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.GeneralAssets
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -82,7 +83,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         }
     }
 
-    override fun getName() = "Event Listener line marker"
+    override fun getName() = MCDevBundle("insight.event_listener.marker")
     override fun getIcon() = GeneralAssets.LISTENER
 
     private class EventLineMarkerInfo(
@@ -94,10 +95,10 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         element,
         range,
         icon,
-        Function { "Go to Event declaration" },
+        Function { MCDevBundle("insight.event_listener.marker.goto") },
         handler,
         GutterIconRenderer.Alignment.RIGHT,
-        { "event listener indicator" },
+        { MCDevBundle("insight.event_listener.marker.accessible_name") },
     ) {
 
         override fun canMergeWith(info: MergeableLineMarkerInfo<*>): Boolean {
@@ -113,7 +114,7 @@ class ListenerLineMarkerProvider : LineMarkerProviderDescriptor() {
         override fun getCommonIcon(infos: List<MergeableLineMarkerInfo<*>>) = myIcon!!
 
         override fun getCommonTooltip(infos: List<MergeableLineMarkerInfo<*>>): Function<in PsiElement, String> =
-            Function { "Multiple method overrides" }
+            Function { MCDevBundle("insight.event_listener.marker.multiple") }
 
         override fun getElementPresentation(element: PsiElement): String {
             val parent = element.parent

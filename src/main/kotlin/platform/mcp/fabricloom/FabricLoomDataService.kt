@@ -212,7 +212,7 @@ class FabricLoomDataService : AbstractProjectDataService<FabricLoomData, Module>
                     JavaDirectoryService.getInstance().createClass(psiDir, className)
                 } catch (e: IncorrectOperationException) {
                     invokeLater {
-                        val message = MCDevBundle.message(
+                        val message = MCDevBundle(
                             "intention.error.cannot.create.class.message",
                             className,
                             e.localizedMessage,
@@ -220,7 +220,7 @@ class FabricLoomDataService : AbstractProjectDataService<FabricLoomData, Module>
                         Messages.showErrorDialog(
                             project,
                             message,
-                            MCDevBundle.message("intention.error.cannot.create.class.title"),
+                            MCDevBundle("intention.error.cannot.create.class.title"),
                         )
                     }
                     return

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.asyncIO
 import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.invokeLater
@@ -104,9 +105,17 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                 if (result == null) {
                     placeholder.component = panel {
                         row {
-                            val label = label("Unable to $description")
+                            val label = label(MCDevBundle("creator.ui.generic_validation_failure.message", description))
                                 .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
-                                .validation(DialogValidation { ValidationInfo("Unable to $description") })
+                                .validation(
+                                    DialogValidation {
+                                        val labelValidationText = MCDevBundle(
+                                            "creator.ui.generic_validation_failure.message",
+                                            description
+                                        )
+                                        ValidationInfo(labelValidationText)
+                                    }
+                                )
                             label.component.foreground = JBColor.RED
                         }
                     }
@@ -152,7 +161,11 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                     },
                 )
                     .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
-                    .validation(DialogValidation { ValidationInfo("Haven't finished $description") })
+                    .validation(
+                        DialogValidation {
+                            ValidationInfo(MCDevBundle("creator.ui.generic_unfinished.message", description))
+                        }
+                    )
             }
         }
     }

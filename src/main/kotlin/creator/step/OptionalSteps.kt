@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.step
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.updateWhenChanged
 import com.intellij.ide.users.LocalUserSettings
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
@@ -90,7 +91,8 @@ abstract class AbstractOptionalStringBasedOnProjectNameStep(
 }
 
 class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Description:"
+    override val label
+        get() = MCDevBundle("creator.ui.description.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
@@ -102,7 +104,8 @@ class DescriptionStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep
 }
 
 class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Authors:"
+    override val label
+        get() = MCDevBundle("creator.ui.authors.label")
     override val bindToStorage = true
 
     override fun setupProject(project: Project) {
@@ -126,7 +129,8 @@ class AuthorsStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 }
 
 class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Website:"
+    override val label
+        get() = MCDevBundle("creator.ui.website.label")
     override val bindToStorage = true
 
     override fun setupProject(project: Project) {
@@ -139,7 +143,8 @@ class WebsiteStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(par
 }
 
 class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
-    override val label = "Repository:"
+    override val label
+        get() = MCDevBundle("creator.ui.repository.label")
 
     init {
         if (format.isEmpty()) {
@@ -157,11 +162,12 @@ class RepositoryStep(parent: NewProjectWizardStep) : AbstractOptionalStringBased
 }
 
 class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringBasedOnProjectNameStep(parent) {
-    override val label = "Issue Tracker:"
+    override val label: String
+        get() = MCDevBundle("creator.ui.issue_tracker.label")
 
     init {
         if (format.isEmpty()) {
-            format = "https://${LocalUserSettings.userName}/$PROJECT_NAME_PLACEHOLDER/issues"
+            format = "https://github.com/${LocalUserSettings.userName}/$PROJECT_NAME_PLACEHOLDER/issues"
         }
     }
 
@@ -175,7 +181,8 @@ class IssueTrackerStep(parent: NewProjectWizardStep) : AbstractOptionalStringBas
 }
 
 class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Update URL:"
+    override val label
+        get() = MCDevBundle("creator.ui.update_url.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, value)
@@ -187,7 +194,8 @@ class UpdateUrlStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(p
 }
 
 class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Depend:"
+    override val label
+        get() = MCDevBundle("creator.ui.depend.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, AuthorsStep.parseAuthors(value))
@@ -199,7 +207,8 @@ class DependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(pare
 }
 
 class SoftDependStep(parent: NewProjectWizardStep) : AbstractOptionalStringStep(parent) {
-    override val label = "Soft Depend:"
+    override val label
+        get() = MCDevBundle("creator.ui.soft_depend.label")
 
     override fun setupProject(project: Project) {
         data.putUserData(KEY, AuthorsStep.parseAuthors(value))

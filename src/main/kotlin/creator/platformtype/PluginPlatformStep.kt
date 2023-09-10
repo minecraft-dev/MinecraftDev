@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.platformtype
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.platformtype.PluginPlatformStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
@@ -39,10 +40,12 @@ class PluginPlatformStep(
     }
 
     override val self = this
-    override val label = "Platform:"
+    override val label
+        get() = MCDevBundle("creator.ui.platform.label")
 
     class TypeFactory : PlatformTypeStep.Factory {
-        override val name = "Plugin"
+        override val name
+            get() = MCDevBundle("creator.ui.platform.plugin.name")
         override fun createStep(parent: PlatformTypeStep) = PluginPlatformStep(parent)
     }
 

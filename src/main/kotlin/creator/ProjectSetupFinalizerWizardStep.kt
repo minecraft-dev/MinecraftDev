@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.ProjectSetupFinalizer.Factory
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.util.mapFirstNotNull
@@ -123,7 +124,7 @@ class JdkProjectSetupFinalizer(
     private var sdk by sdkProperty
     private var sdkComboBox: JdkComboBoxWithPreference? = null
     private var preferredJdkLabel: Placeholder? = null
-    private var preferredJdkReason = "these settings"
+    private var preferredJdkReason = MCDevBundle("creator.validation.jdk_preferred_default_reason")
 
     var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
         private set
@@ -150,7 +151,7 @@ class JdkProjectSetupFinalizer(
             preferredJdkLabel?.component = null
         } else {
             preferredJdkLabel?.component =
-                JLabel("Java ${preferredJdk.description} is recommended for $preferredJdkReason")
+                JLabel(MCDevBundle("creator.validation.jdk_preferred", preferredJdk.description, preferredJdkReason))
                     .also { it.foreground = JBColor.YELLOW }
         }
     }
