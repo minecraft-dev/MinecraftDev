@@ -20,9 +20,14 @@
 
 package com.demonwav.mcdev.nbt
 
+import org.jetbrains.annotations.Nls
+import org.jetbrains.annotations.Nls.Capitalization.Sentence
+
 open class MalformedNbtFileException : Exception {
-    constructor(message: String) : super(message)
-    constructor(message: String, cause: Throwable) : super(message, cause)
+    constructor(@Nls(capitalization = Sentence) message: String) : super(message)
+    constructor(@Nls(capitalization = Sentence) message: String, cause: Throwable) : super(message, cause)
 }
 
-class NbtFileParseTimeoutException(message: String) : MalformedNbtFileException(message)
+class NbtFileParseTimeoutException(
+    @Nls(capitalization = Sentence) message: String
+) : MalformedNbtFileException(message)

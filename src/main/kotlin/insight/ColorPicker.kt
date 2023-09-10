@@ -20,12 +20,13 @@
 
 package com.demonwav.mcdev.insight
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.util.ui.ColorIcon
+import com.intellij.util.ui.JBUI
 import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Insets
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
@@ -79,7 +80,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
             val constraints = GridBagConstraints()
             constraints.gridy = row
             constraints.fill = GridBagConstraints.NONE
-            constraints.insets = Insets(10, 10, 10, 10)
+            constraints.insets = JBUI.insets(10)
 
             panel.add(label, constraints)
         }
@@ -89,7 +90,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
         DialogWrapper(parent, false) {
 
         init {
-            title = "Choose Color"
+            title = MCDevBundle("generate.color.choose_action")
             isResizable = true
 
             init()

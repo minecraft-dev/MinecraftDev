@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.siyeh.ig.InspectionGadgetsFix
@@ -34,7 +35,7 @@ class IsCancelled(
         this.buildFix = object : InspectionGadgetsFix() {
             override fun doFix(project: Project, descriptor: ProblemDescriptor) = fix(descriptor)
             override fun getName() = "Simplify"
-            override fun getFamilyName() = "Useless isCancelled check"
+            override fun getFamilyName() = MCDevBundle("inspection.is_cancelled.name")
         }
     }
 }

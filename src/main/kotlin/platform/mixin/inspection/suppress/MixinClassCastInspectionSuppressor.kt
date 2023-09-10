@@ -59,7 +59,7 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
                 operand = PsiUtil.skipParenthesizedExprDown(operand.operand) ?: return false
             }
             val realType = getRealType(operand) ?: return false
-            return isAssignable(castType, realType)
+            return isAssignable(realType, castType)
         }
 
         // check == and !=

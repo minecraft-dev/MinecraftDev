@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
@@ -57,7 +58,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             identifier.findColor { map, chosen -> ColorInfo(element, chosen.value, map, chosen.key, identifier) }
         }
         if (info != null) {
-            NavigateAction.setNavigateAction(info, "Change Color", null)
+            NavigateAction.setNavigateAction(info, MCDevBundle("generate.color.change_action"), null)
         }
 
         return info
@@ -143,11 +144,12 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 // implement it yet. It is better to not display the color chooser at all than deceiving users after
                 // after they chose a color
                 HintManager.getInstance()
-                    .showErrorHint(editor, "Can't change colors in " + psiElement.language.displayName)
+                    .showErrorHint(editor, MCDevBundle("generate.color.change_error", psiElement.language.displayName))
                 return@handler
             }
 
-            val c = ColorChooser.chooseColor(psiElement.project, editor.component, "Choose Color", color, false)
+            val actionText = MCDevBundle("generate.color.choose_action")
+            val c = ColorChooser.chooseColor(psiElement.project, editor.component, actionText, color, false)
                 ?: return@handler
             when (workElement) {
                 is ULiteralExpression -> {
@@ -185,7 +187,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             val pair = findColor(element) ?: return null
 
             val info = CommonColorInfo(element, pair.first, pair.second)
-            NavigateAction.setNavigateAction(info, "Change color", null)
+            NavigateAction.setNavigateAction(info, MCDevBundle("generate.color.change_action"), null)
 
             return info
         }

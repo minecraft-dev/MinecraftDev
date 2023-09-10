@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.nbt.lang.psi.mixins.impl
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.MalformedNbtFileException
 import com.demonwav.mcdev.nbt.lang.psi.getNbtTag
 import com.demonwav.mcdev.nbt.lang.psi.mixins.NbttListMixin
@@ -39,7 +40,7 @@ abstract class NbttListImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Nb
             if (type == null) {
                 type = tagType
             } else if (type != tagType) {
-                throw MalformedNbtFileException("Lists can only contain elements of the same type.")
+                throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.invalid_list"))
             }
         }
 

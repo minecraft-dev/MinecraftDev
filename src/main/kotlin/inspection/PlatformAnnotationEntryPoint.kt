@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.reference.EntryPoint
 import com.intellij.codeInspection.reference.RefElement
 import com.intellij.openapi.util.InvalidDataException
@@ -28,7 +29,7 @@ import com.intellij.psi.PsiElement
 import org.jdom.Element
 
 class PlatformAnnotationEntryPoint : EntryPoint() {
-    override fun getDisplayName() = "Minecraft Entry Point"
+    override fun getDisplayName() = MCDevBundle("inspection.entry_point.name")
     override fun isEntryPoint(refElement: RefElement, psiElement: PsiElement) = false
     override fun isEntryPoint(psiElement: PsiElement) = false
     override fun isSelected() = false

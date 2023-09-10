@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.nbt.lang.format
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttByteArray
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttCompound
 import com.demonwav.mcdev.nbt.lang.gen.psi.NbttIntArray
@@ -39,7 +40,7 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 val size = element.getNamedTagList().size
                 list.add(
                     InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}",
+                        children(size),
                         element.textRange.startOffset + 1,
                     ),
                 )
@@ -49,7 +50,7 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 val size = element.getTagList().size
                 list.add(
                     InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}",
+                        children(size),
                         element.textRange.startOffset + 1,
                     ),
                 )
@@ -65,7 +66,7 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 val size = element.getByteList().size
                 list.add(
                     InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}",
+                        children(size),
                         element.node.getChildren(null)[1].textRange.startOffset + 1,
                     ),
                 )
@@ -81,7 +82,7 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 val size = element.getIntList().size
                 list.add(
                     InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}",
+                        children(size),
                         element.node.getChildren(null)[1].textRange.startOffset + 1,
                     ),
                 )
@@ -97,7 +98,7 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
                 val size = element.getLongList().size
                 list.add(
                     InlayInfo(
-                        "$size ${if (size == 1) "child" else "children"}",
+                        children(size),
                         element.node.getChildren(null)[1].textRange.startOffset + 1,
                     ),
                 )
@@ -126,6 +127,14 @@ class NbttParameterNameHints : InlayParameterHintsProvider {
         }
 
         return list
+    }
+
+    private fun children(size: Int): String {
+        return if (size == 1) {
+            MCDevBundle("nbt.lang.inlay_hints.one_child")
+        } else {
+            MCDevBundle("nbt.lang.inlay_hints.children", size)
+        }
     }
 
     override fun getHintInfo(element: PsiElement): HintInfo? = null

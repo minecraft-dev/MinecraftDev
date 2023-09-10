@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.errorreporter
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.HttpConnectionFactory
 import com.demonwav.mcdev.util.fromJson
@@ -39,8 +40,8 @@ object AnonymousFeedback {
 
     data class FeedbackData(val url: String, val token: Int, val isDuplicate: Boolean)
 
-    private const val authedUrl = "https://www.denwav.dev/errorReport"
-    private const val baseUrl = "https://api.github.com/repos/minecraft-dev/mcdev-error-report/issues"
+    private const val AUTHED_URL = "https://www.denwav.dev/errorReport"
+    private const val BASE_URL = "https://api.github.com/repos/minecraft-dev/mcdev-error-report/issues"
 
     fun sendFeedback(
         factory: HttpConnectionFactory,
@@ -142,7 +143,7 @@ object AnonymousFeedback {
     }
 
     private fun sendFeedback(factory: HttpConnectionFactory, payload: ByteArray): Pair<String, Int> {
-        val connection = getConnection(factory, authedUrl)
+        val connection = getConnection(factory, AUTHED_URL)
         connection.connect()
         val json = executeCall(connection, payload)
         return json["html_url"] as String to (json["number"] as Double).toInt()
@@ -155,8 +156,8 @@ object AnonymousFeedback {
         return connection
     }
 
-    private const val openIssueUrl = "$baseUrl?state=open&creator=minecraft-dev-autoreporter&per_page=100"
-    private const val closedIssueUrl = "$baseUrl?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val openIssueUrl = "$BASE_URL?state=open&creator=minecraft-dev-autoreporter&per_page=100"
+    private const val closedIssueUrl = "$BASE_URL?state=closed&creator=minecraft-dev-autoreporter&per_page=100"
 
     private const val packagePrefix = "\tat com.demonwav.mcdev"
 
@@ -298,11 +299,11 @@ object AnonymousFeedback {
         if (index == -1) {
             return null
         }
-        return authedUrl + url.substring(index)
+        return AUTHED_URL + url.substring(index)
     }
 
     private fun sendCommentOnDuplicateIssue(id: Int, factory: HttpConnectionFactory, payload: ByteArray): String {
-        val commentUrl = "$authedUrl/$id/comments"
+        val commentUrl = "$AUTHED_URL/$id/comments"
         val connection = getConnection(factory, commentUrl)
         val json = executeCall(connection, payload)
         return json["html_url"] as String
@@ -315,7 +316,7 @@ object AnonymousFeedback {
 
         val responseCode = connection.responseCode
         if (responseCode != HttpStatus.SC_CREATED) {
-            throw RuntimeException("Expected HTTP_CREATED (201), obtained $responseCode instead.")
+            throw RuntimeException(MCDevBundle("error_reporter.submit.failure", responseCode))
         }
 
         val contentEncoding = connection.contentEncoding ?: "UTF-8"

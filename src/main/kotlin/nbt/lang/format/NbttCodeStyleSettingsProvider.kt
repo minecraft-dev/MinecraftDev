@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.nbt.lang.format
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.intellij.application.options.CodeStyleAbstractConfigurable
 import com.intellij.application.options.TabbedLanguageCodeStylePanel
@@ -33,7 +34,7 @@ class NbttCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
             override fun getHelpTopic(): String? = null
         }
 
-    override fun getConfigurableDisplayName() = "NBT Text"
+    override fun getConfigurableDisplayName() = MCDevBundle("nbt.lang.display_name")
 
     override fun createCustomSettings(settings: CodeStyleSettings) = NbttCodeStyleSettings(settings)
 

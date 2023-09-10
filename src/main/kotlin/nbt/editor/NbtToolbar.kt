@@ -20,20 +20,26 @@
 
 package com.demonwav.mcdev.nbt.editor
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.util.runWriteTaskLater
 import javax.swing.JButton
 import javax.swing.JComboBox
+import javax.swing.JLabel
 import javax.swing.JPanel
 
 class NbtToolbar(nbtFile: NbtVirtualFile) {
     lateinit var panel: JPanel
+    private lateinit var fileTypeLabel: JLabel
     private lateinit var compressionBox: JComboBox<CompressionSelection>
     lateinit var saveButton: JButton
 
     private var lastSelection: CompressionSelection
 
     init {
+        fileTypeLabel.text = MCDevBundle("nbt.compression.file_type.label")
+        saveButton.text = MCDevBundle("nbt.compression.save.button")
+
         compressionBox.addItem(CompressionSelection.GZIP)
         compressionBox.addItem(CompressionSelection.UNCOMPRESSED)
         compressionBox.selectedItem =

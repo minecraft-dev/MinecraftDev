@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.nbt
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.tags.NbtTag
 import com.demonwav.mcdev.nbt.tags.NbtTypeId
 import com.demonwav.mcdev.nbt.tags.RootCompound
@@ -64,10 +65,10 @@ object Nbt {
             stream.use {
                 val tagIdByte = stream.readByte()
                 val tagId = NbtTypeId.getById(tagIdByte)
-                    ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+                    ?: throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.wrong_tag_id", tagIdByte))
 
                 if (tagId != NbtTypeId.COMPOUND) {
-                    throw MalformedNbtFileException("Root tag in NBT file is not a compound.")
+                    throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.invalid_root"))
                 }
 
                 val start = System.currentTimeMillis()
@@ -78,7 +79,7 @@ object Nbt {
             if (e is MalformedNbtFileException) {
                 throw e
             } else {
-                throw MalformedNbtFileException("Error reading file", e)
+                throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.reading"), e)
             }
         }
     }
@@ -88,7 +89,9 @@ object Nbt {
 
         var tagIdByte = this.readByte()
         var tagId =
-            NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+            NbtTypeId.getById(tagIdByte) ?: run {
+                throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.wrong_tag_id", tagIdByte))
+            }
         while (tagId != NbtTypeId.END) {
             val name = this.readUTF()
 
@@ -96,7 +99,9 @@ object Nbt {
 
             tagIdByte = this.readByte()
             tagId =
-                NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+                NbtTypeId.getById(tagIdByte) ?: run {
+                    throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.wrong_tag_id", tagIdByte))
+                }
         }
 
         return@checkTimeout TagCompound(tagMap)
@@ -126,7 +131,9 @@ object Nbt {
     private fun DataInputStream.readListTag(start: Long, timeout: Long) = checkTimeout(start, timeout) {
         val tagIdByte = this.readByte()
         val tagId =
-            NbtTypeId.getById(tagIdByte) ?: throw MalformedNbtFileException("Unexpected tag id found: $tagIdByte")
+            NbtTypeId.getById(tagIdByte) ?: run {
+                throw MalformedNbtFileException(MCDevBundle("nbt.lang.errors.wrong_tag_id", tagIdByte))
+            }
 
         val length = this.readInt()
         if (length <= 0) {
@@ -190,7 +197,7 @@ object Nbt {
         val took = now - start
 
         if (took > timeout) {
-            throw NbtFileParseTimeoutException("NBT parse timeout exceeded - Parse time: $took, Timeout: $timeout.")
+            throw NbtFileParseTimeoutException(MCDevBundle("nbt.lang.errors.parse_timeout", took, timeout))
         }
 
         return action()
