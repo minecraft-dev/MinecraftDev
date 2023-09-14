@@ -42,12 +42,13 @@ import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.util.PsiUtil
 
 /**
- * Looks for `ConstantConditions` warnings on type casts and checks if they are casts to interfaces introduced by mixins
+ * Looks for `ConstantConditions` and `ConstantValue` warnings on type casts and checks if they are casts to interfaces
+ * introduced by mixins
  */
 class MixinClassCastInspectionSuppressor : InspectionSuppressor {
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
-        if (toolId != INSPECTION) {
+        if (toolId !in INSPECTIONS) {
             return false
         }
 
@@ -126,6 +127,6 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         SuppressQuickFix.EMPTY_ARRAY
 
     companion object {
-        private const val INSPECTION = "ConstantConditions"
+        private val INSPECTIONS = setOf("ConstantConditions", "ConstantValue")
     }
 }
