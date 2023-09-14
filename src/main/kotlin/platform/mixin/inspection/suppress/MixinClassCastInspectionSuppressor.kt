@@ -42,8 +42,8 @@ import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.util.PsiUtil
 
 /**
- * Looks for `ConstantConditions` and `ConstantValue` warnings on type casts and checks if they are casts to interfaces
- * introduced by mixins
+ * Looks for `ConstantConditions`, `ConstantValue` and `DataFlowIssue` warnings on type casts and checks if they are
+ * casts to interfaces introduced by mixins
  */
 class MixinClassCastInspectionSuppressor : InspectionSuppressor {
 
@@ -127,6 +127,6 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
         SuppressQuickFix.EMPTY_ARRAY
 
     companion object {
-        private val INSPECTIONS = setOf("ConstantConditions", "ConstantValue")
+        private val INSPECTIONS = setOf("ConstantConditions", "ConstantValue", "DataFlowIssue")
     }
 }
