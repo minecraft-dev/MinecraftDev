@@ -30,6 +30,7 @@ import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
+import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 
 class BukkitListenerImplementedInspection : BaseInspection() {
 
@@ -44,10 +45,10 @@ class BukkitListenerImplementedInspection : BaseInspection() {
         "All Bukkit @EventHandler methods must reside in a class that implements Listener."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
+        val classPointer = (infos[0] as PsiClass).createSmartPointer()
         return object : InspectionGadgetsFix() {
             override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-                val psiClass = infos[0] as PsiClass
-                psiClass.addImplements(BukkitConstants.LISTENER_CLASS)
+                classPointer.element?.addImplements(BukkitConstants.LISTENER_CLASS)
             }
 
             @Nls
@@ -61,11 +62,7 @@ class BukkitListenerImplementedInspection : BaseInspection() {
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {
             override fun visitClass(aClass: PsiClass) {
-                if (
-                    aClass.methods.none {
-                        it.modifierList.findAnnotation(BukkitConstants.HANDLER_ANNOTATION) != null
-                    }
-                ) {
+                if (aClass.methods.none { it.hasAnnotation(BukkitConstants.HANDLER_ANNOTATION) }) {
                     return
                 }
 
