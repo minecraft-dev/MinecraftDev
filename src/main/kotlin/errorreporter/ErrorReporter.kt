@@ -44,6 +44,8 @@ class ErrorReporter : ErrorReportSubmitter() {
     private val ignoredErrorMessages = listOf(
         "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
         "Inspection #EntityConstructor has no description",
+        "VFS name enumerator corrupted",
+        "PersistentEnumerator storage corrupted",
     )
     override fun getReportActionText() = MCDevBundle("error_reporter.submit.action")
 
