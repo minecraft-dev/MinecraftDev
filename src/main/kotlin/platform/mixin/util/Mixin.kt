@@ -201,7 +201,7 @@ fun isAssignable(left: PsiType, right: PsiType): Boolean {
 private fun isClassAssignable(leftClass: PsiClass, rightClass: PsiClass): Boolean {
     var result = false
     InheritanceUtil.processSupers(rightClass, true) {
-        if (it == leftClass) {
+        if (it.qualifiedName == leftClass.qualifiedName) {
             result = true
             false
         } else {
