@@ -84,12 +84,12 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                 return@launch
             }
 
-            val result = asyncIO {
+            val (result: T?, errorMessage: String?) = asyncIO {
                 try {
-                    computeData()
+                    computeData() to null
                 } catch (e: Throwable) {
-                    LOGGER.error(e)
-                    null
+                    LOGGER.warn("computeData failed", e)
+                    null to e.message
                 }
             }.await()
 
@@ -105,17 +105,11 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                 if (result == null) {
                     placeholder.component = panel {
                         row {
-                            val label = label(MCDevBundle("creator.ui.generic_validation_failure.message", description))
+                            val labelValidationText =
+                                MCDevBundle("creator.ui.generic_validation_failure.message", description, errorMessage)
+                            val label = label(labelValidationText)
                                 .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
-                                .validation(
-                                    DialogValidation {
-                                        val labelValidationText = MCDevBundle(
-                                            "creator.ui.generic_validation_failure.message",
-                                            description
-                                        )
-                                        ValidationInfo(labelValidationText)
-                                    }
-                                )
+                                .validation(DialogValidation { ValidationInfo(labelValidationText) })
                             label.component.foreground = JBColor.RED
                         }
                     }
