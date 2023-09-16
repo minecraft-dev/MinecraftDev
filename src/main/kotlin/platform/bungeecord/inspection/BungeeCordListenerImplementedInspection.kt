@@ -30,6 +30,7 @@ import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
+import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 
 class BungeeCordListenerImplementedInspection : BaseInspection() {
 
@@ -43,10 +44,10 @@ class BungeeCordListenerImplementedInspection : BaseInspection() {
         "All BungeeCord @EventHandler methods must reside in a class that implements Listener."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
+        val classPointer = (infos[0] as PsiClass).createSmartPointer()
         return object : InspectionGadgetsFix() {
             override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-                val psiClass = infos[0] as PsiClass
-                psiClass.addImplements(BungeeCordConstants.LISTENER_CLASS)
+                classPointer.element?.addImplements(BungeeCordConstants.LISTENER_CLASS)
             }
 
             @Nls

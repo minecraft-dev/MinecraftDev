@@ -51,11 +51,7 @@ class VelocityPlatformStep(parent: PluginPlatformStep) : AbstractLatentStep<Plat
     override val description = "download Velocity versions"
 
     override suspend fun computeData() = coroutineScope {
-        try {
-            asyncIO { getVersionSelector(PlatformType.VELOCITY) }.await()
-        } catch (e: Throwable) {
-            null
-        }
+        asyncIO { getVersionSelector(PlatformType.VELOCITY) }.await()
     }
 
     override fun createStep(data: PlatformVersion) =
