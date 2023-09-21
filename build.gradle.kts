@@ -24,6 +24,7 @@ import org.gradle.internal.jvm.Jvm
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
+import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
@@ -70,6 +71,12 @@ val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooli
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
     from(gradleToolingExtensionSourceSet.output)
     archiveClassifier.set("gradle-tooling-extension")
+}
+
+val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
+    from("externalAnnotations")
+    destinationDirectory.set(layout.buildDirectory.dir("externalAnnotations"))
+    archiveFileName.set("externalAnnotations.jar")
 }
 
 repositories {
@@ -298,6 +305,9 @@ license {
         register("grammars") {
             files.from(project.fileTree("src/main/grammars"))
         }
+        register("externalAnnotations") {
+            files.from(project.fileTree("externalAnnotations"))
+        }
     }
 }
 
@@ -354,6 +364,12 @@ tasks.register("cleanSandbox", Delete::class) {
     group = "intellij"
     description = "Deletes the sandbox directory."
     delete(layout.projectDirectory.dir(".sandbox"))
+}
+
+tasks.withType<PrepareSandboxTask> {
+    from(externalAnnotationsJar) {
+        into("Minecraft Development/lib/resources")
+    }
 }
 
 tasks.runIde {

@@ -33,7 +33,7 @@ import com.intellij.openapi.project.Project
 object ProjectReimporter {
     private val log = logger<ProjectReimporter>()
 
-    const val CURRENT_REIMPORT_VERSION = 0
+    const val CURRENT_REIMPORT_VERSION = 1
 
     fun needsReimport(facet: MinecraftFacet) =
         facet.configuration.state.projectReimportVersion < CURRENT_REIMPORT_VERSION
