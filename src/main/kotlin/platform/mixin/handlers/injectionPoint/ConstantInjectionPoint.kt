@@ -55,7 +55,7 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
-    private fun getConstantInfo(at: PsiAnnotation): ConstantInfo? {
+    fun getConstantInfo(at: PsiAnnotation): ConstantInfo? {
         val args = AtResolver.getArgs(at)
         val nullValue = args["nullValue"]?.let(java.lang.Boolean::parseBoolean) ?: false
         val intValue = args["intValue"]?.toIntOrNull()

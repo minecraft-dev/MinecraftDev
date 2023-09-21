@@ -81,12 +81,14 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
     }
 
+    open fun getAtKey(annotation: PsiAnnotation): String = "at"
+
     protected open fun isUnresolved(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
     ): InsnResolutionInfo.Failure? {
-        return annotation.findAttributeValue("at")?.findAnnotations()
+        return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
             .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
             .firstNotNullOfOrNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
     }
@@ -103,7 +105,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetClass: ClassNode,
         targetMethod: MethodNode,
     ): List<PsiElement> {
-        return annotation.findAttributeValue("at")?.findAnnotations()
+        return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
             .ifNullOrEmpty { return emptyList() }!!
             .flatMap { AtResolver(it, targetClass, targetMethod).resolveNavigationTargets() }
     }
@@ -129,7 +131,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetMethod: MethodNode,
         mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL,
     ): List<CollectVisitor.Result<*>> {
-        return annotation.findAttributeValue("at")?.findAnnotations()
+        return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
             .ifNullOrEmpty { return emptyList() }!!
             .flatMap { AtResolver(it, targetClass, targetMethod).resolveInstructions(mode) }
     }

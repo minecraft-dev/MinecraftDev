@@ -23,18 +23,15 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.CONSTANT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiQualifiedReference
-import com.intellij.psi.PsiReference
+import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.tree.ClassNode
@@ -68,8 +65,13 @@ class AtResolver(
     private val targetMethod: MethodNode,
 ) {
     companion object {
+        private val injectionPointAnnotations = mapOf(
+            CONSTANT to "CONSTANT"
+        )
+
         private fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
-            var atCode = at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
+            var atCode = at.qualifiedName?.let { injectionPointAnnotations[it] }
+                ?: at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
 
             // remove slice selector
             val isInSlice = at.parentOfType<PsiAnnotation>()?.hasQualifiedName(SLICE) ?: false
@@ -88,8 +90,8 @@ class AtResolver(
         }
 
         fun getArgs(at: PsiAnnotation): Map<String, String> {
-            val args = at.findAttributeValue("args")?.computeStringArray() ?: return emptyMap()
-            return args.asSequence()
+            val args = at.findAttributeValue("args")?.computeStringArray().orEmpty()
+            val explicitArgs = args.asSequence()
                 .map {
                     val parts = it.split('=', limit = 2)
                     if (parts.size == 1) {
@@ -99,6 +101,32 @@ class AtResolver(
                     }
                 }
                 .toMap()
+            return getInherentArgs(at) + explicitArgs
+        }
+
+        private fun getInherentArgs(at: PsiAnnotation): Map<String, String> {
+            return at.attributes.asSequence()
+                .mapNotNull {
+                    val name = it.attributeName
+                    val value = at.findAttributeValue(name) ?: return@mapNotNull null
+                    val string = valueToString(value) ?: return@mapNotNull null
+                    name to string
+                }
+                .toMap()
+        }
+
+        private fun valueToString(value: PsiAnnotationMemberValue): String? {
+            if (value is PsiArrayInitializerMemberValue) {
+                return value.initializers.map { valueToString(it) ?: return null }.joinToString(",")
+            }
+            return when (val constant = value.constantValue) {
+                is PsiClassType -> constant.fullQualifiedName?.replace('.', '/')
+                null -> when (value) {
+                    is PsiReferenceExpression -> value.referenceName
+                    else -> null
+                }
+                else -> constant.toString()
+            }
         }
     }
 

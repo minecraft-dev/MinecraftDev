@@ -15,6 +15,10 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         ElementType.METHOD_CALL, ElementType.FIELD_GET, ElementType.FIELD_SET, ElementType.INSTANCEOF
     )
 
+    override fun getAtKey(annotation: PsiAnnotation): String {
+        return if (annotation.hasAttribute("constant")) "constant" else "at"
+    }
+
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
