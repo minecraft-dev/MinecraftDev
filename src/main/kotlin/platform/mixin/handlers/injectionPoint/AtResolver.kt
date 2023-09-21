@@ -31,7 +31,16 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.psi.*
+import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiAnnotationMemberValue
+import com.intellij.psi.PsiArrayInitializerMemberValue
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiQualifiedReference
+import com.intellij.psi.PsiReference
+import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.tree.ClassNode

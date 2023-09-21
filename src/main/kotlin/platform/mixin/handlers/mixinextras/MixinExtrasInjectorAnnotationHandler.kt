@@ -1,9 +1,34 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2023 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
-import com.demonwav.mcdev.platform.mixin.util.*
+import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
+import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
+import com.demonwav.mcdev.platform.mixin.util.getGenericType
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.toJavaIdentifier
@@ -12,8 +37,13 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
-import org.objectweb.asm.tree.*
-
+import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldInsnNode
+import org.objectweb.asm.tree.LdcInsnNode
+import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.tree.TypeInsnNode
 
 abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler() {
     open val oldSuperBehaviour = false
@@ -23,10 +53,12 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
             override fun matches(insn: AbstractInsnNode) = insn is MethodInsnNode && insn.name != "<init>"
         },
         FIELD_GET {
-            override fun matches(insn: AbstractInsnNode) = insn.opcode == Opcodes.GETFIELD || insn.opcode == Opcodes.GETSTATIC
+            override fun matches(insn: AbstractInsnNode) =
+                insn.opcode == Opcodes.GETFIELD || insn.opcode == Opcodes.GETSTATIC
         },
         FIELD_SET {
-            override fun matches(insn: AbstractInsnNode) = insn.opcode == Opcodes.PUTFIELD || insn.opcode == Opcodes.PUTSTATIC
+            override fun matches(insn: AbstractInsnNode) =
+                insn.opcode == Opcodes.PUTFIELD || insn.opcode == Opcodes.PUTSTATIC
         },
         INSTANTIATION {
             override fun matches(insn: AbstractInsnNode) = insn.opcode == Opcodes.NEW
@@ -62,7 +94,9 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         targetClass: ClassNode,
         targetMethod: MethodNode
     ): List<MethodSignature>? {
-        val insns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return emptyList() }.map { it.insn }
+        val insns = resolveInstructions(annotation, targetClass, targetMethod)
+            .ifEmpty { return emptyList() }
+            .map { it.insn }
         if (insns.any { insn -> supportedElementTypes.none { it.matches(insn) } }) return emptyList()
         val signatures = insns.map { expectedMethodSignature(annotation, targetClass, targetMethod, it) }
         val firstMatch = signatures[0] ?: return emptyList()
@@ -89,11 +123,13 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                 Opcodes.GETFIELD, Opcodes.GETSTATIC -> Type.getType(insn.desc)
                 else -> Type.VOID_TYPE
             }
+
             insn is TypeInsnNode -> when (insn.opcode) {
                 Opcodes.NEW -> Type.getObjectType(insn.desc)
                 Opcodes.INSTANCEOF -> Type.BOOLEAN_TYPE
                 else -> null
             }
+
             isConstant(insn) -> getConstantType(insn)
             else -> null
         }
@@ -108,20 +144,22 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         return when (insn) {
             is MethodInsnNode -> {
                 val sourceClassAndMethod = (
-                        MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
-                            .resolveAsm(annotation.project) as? MethodTargetMember
-                        )?.classAndMethod
+                    MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
+                        .resolveAsm(annotation.project) as? MethodTargetMember
+                    )?.classAndMethod
                 sourceClassAndMethod?.method?.getGenericReturnType(sourceClassAndMethod.clazz, annotation.project)
                     ?: Type.getType(insn.desc).toPsiType(elementFactory)
             }
+
             is FieldInsnNode -> {
                 val sourceClassAndField = (
-                        MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
-                            .resolveAsm(annotation.project) as? FieldTargetMember
-                        )?.classAndField
+                    MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
+                        .resolveAsm(annotation.project) as? FieldTargetMember
+                    )?.classAndField
                 sourceClassAndField?.field?.getGenericType(sourceClassAndField.clazz, annotation.project)
                     ?: Type.getType(insn.desc).toPsiType(elementFactory)
             }
+
             else -> getInsnReturnType(insn)?.toPsiType(elementFactory)
         }
     }
@@ -138,12 +176,14 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                     Opcodes.INVOKESPECIAL -> {
                         args.add(0, Type.getObjectType(if (oldSuperBehaviour) insn.owner else targetClass.name))
                     }
+
                     else -> {
                         args.add(0, Type.getObjectType(insn.owner))
                     }
                 }
                 args
             }
+
             is FieldInsnNode -> {
                 when (insn.opcode) {
                     Opcodes.GETFIELD -> listOf(Type.getObjectType(insn.owner))
@@ -153,12 +193,14 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                     else -> null
                 }
             }
+
             is TypeInsnNode -> {
                 when (insn.opcode) {
                     Opcodes.INSTANCEOF -> listOf(Type.getType(Any::class.java))
                     else -> null
                 }
             }
+
             else -> null
         }
     }
@@ -173,12 +215,16 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         return when (insn) {
             is MethodInsnNode -> {
                 val sourceClassAndMethod = (
-                        MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
-                            .resolveAsm(annotation.project) as? MethodTargetMember
-                        )?.classAndMethod
+                    MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
+                        .resolveAsm(annotation.project) as? MethodTargetMember
+                    )?.classAndMethod
                 val parameters = mutableListOf<Parameter>()
                 if (insn.opcode != Opcodes.INVOKESTATIC) {
-                    val receiver = if (insn.opcode == Opcodes.INVOKESPECIAL && !oldSuperBehaviour) targetClass.name else insn.owner
+                    val receiver = if (insn.opcode == Opcodes.INVOKESPECIAL && !oldSuperBehaviour) {
+                        targetClass.name
+                    } else {
+                        insn.owner
+                    }
                     parameters += Parameter("instance", Type.getObjectType(receiver).toPsiType(elementFactory))
                 }
                 val genericParams = sourceClassAndMethod?.method?.getGenericParameterTypes(
@@ -198,14 +244,16 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                 }
                 parameters
             }
+
             is FieldInsnNode -> {
                 val ownerType = Type.getObjectType(insn.owner).toPsiType(elementFactory)
                 val sourceClassAndField = (
-                        MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
-                            .resolveAsm(annotation.project) as? FieldTargetMember
-                        )?.classAndField
-                val valueType = sourceClassAndField?.field?.getGenericType(sourceClassAndField.clazz, annotation.project)
-                    ?: Type.getType(insn.desc).toPsiType(elementFactory)
+                    MemberReference(insn.name, insn.desc, insn.owner.replace('/', '.'))
+                        .resolveAsm(annotation.project) as? FieldTargetMember
+                    )?.classAndField
+                val valueType =
+                    sourceClassAndField?.field?.getGenericType(sourceClassAndField.clazz, annotation.project)
+                        ?: Type.getType(insn.desc).toPsiType(elementFactory)
                 val owner = Parameter("instance", ownerType)
                 val value = Parameter("value", valueType)
                 when (insn.opcode) {
@@ -216,12 +264,16 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                     else -> null
                 }
             }
+
             is TypeInsnNode -> {
                 when (insn.opcode) {
-                    Opcodes.INSTANCEOF -> listOf(Parameter("object", Type.getType(Any::class.java).toPsiType(elementFactory)))
+                    Opcodes.INSTANCEOF ->
+                        listOf(Parameter("object", Type.getType(Any::class.java).toPsiType(elementFactory)))
+
                     else -> null
                 }
             }
+
             else -> null
         } ?: getInsnArgTypes(insn, targetClass)?.map { Parameter(null, it.toPsiType(elementFactory)) }
     }
@@ -234,21 +286,21 @@ private val CONSTANTS_ALL = intArrayOf(
     Opcodes.LCONST_0, Opcodes.LCONST_1,
     Opcodes.FCONST_0, Opcodes.FCONST_1, Opcodes.FCONST_2,
     Opcodes.DCONST_0, Opcodes.DCONST_1,
-    Opcodes.BIPUSH,  // 15
-    Opcodes.SIPUSH,  // 16
-    Opcodes.LDC,  // 17
-    Opcodes.CHECKCAST,  // 18
+    Opcodes.BIPUSH, // 15
+    Opcodes.SIPUSH, // 16
+    Opcodes.LDC, // 17
+    Opcodes.CHECKCAST, // 18
     Opcodes.INSTANCEOF // 19
 )
 
 private val CONSTANTS_TYPES = arrayOf(
-    "V",  // null is returned as Type.VOID_TYPE
+    "V", // null is returned as Type.VOID_TYPE
     "I",
     "I", "I", "I", "I", "I", "I",
     "J", "J",
     "F", "F", "F",
     "D", "D",
-    "I",  //"B",
+    "I", // "B",
     "I"
 )
 
@@ -271,11 +323,13 @@ private fun getConstantType(insn: AbstractInsnNode?): Type? {
                 else -> null
             }
         }
+
         is TypeInsnNode -> {
             return if (insn.getOpcode() < Opcodes.CHECKCAST) {
                 null // Don't treat NEW and ANEWARRAY as constants
             } else Type.getType(Class::class.java)
         }
+
         else -> {
             val index = CONSTANTS_ALL.indexOf(insn.opcode)
             return if (index < 0) null else Type.getType(CONSTANTS_TYPES.get(index))
