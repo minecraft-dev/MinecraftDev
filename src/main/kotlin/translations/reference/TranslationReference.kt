@@ -23,6 +23,7 @@ package com.demonwav.mcdev.translations.reference
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
@@ -43,7 +44,7 @@ import com.intellij.util.IncorrectOperationException
 class TranslationReference(
     element: PsiElement,
     textRange: TextRange,
-    val key: String,
+    val key: TranslationInstance.Key,
     private val renameHandler: (element: PsiElement, range: TextRange, newName: String) -> PsiElement =
         { elem, range, newName ->
             ElementManipulators.getManipulator(elem).handleContentChange(elem, range, newName)!!
@@ -52,7 +53,7 @@ class TranslationReference(
     override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
         val project = myElement.project
         val entries = TranslationInverseIndex.findElements(
-            key,
+            key.full,
             GlobalSearchScope.allScope(project),
             TranslationConstants.DEFAULT_LOCALE,
         )
@@ -62,11 +63,13 @@ class TranslationReference(
     override fun getVariants(): Array<Any?> {
         val project = myElement.project
         val defaultTranslations = TranslationIndex.getAllDefaultTranslations(project)
+        val pattern = Regex("${Regex.escape(key.prefix)}(.*?)${Regex.escape(key.suffix)}")
         return defaultTranslations
             .filter { it.key.isNotEmpty() }
-            .map { entry ->
+            .mapNotNull { entry -> pattern.matchEntire(entry.key)?.let { entry to it } }
+            .map { (entry, match) ->
                 LookupElementBuilder
-                    .create(entry.key)
+                    .create(if (match.groups.size <= 1) entry.key else match.groupValues[1])
                     .withIcon(PlatformAssets.MINECRAFT_ICON)
                     .withTypeText(TranslationConstants.DEFAULT_LOCALE)
                     .withPresentableText(entry.key)
@@ -84,7 +87,7 @@ class TranslationReference(
             return false
         }
 
-        return (element is LangEntry && element.key == key) ||
-            (element is JsonProperty && element.name == key)
+        return (element is LangEntry && element.key == key.full) ||
+            (element is JsonProperty && element.name == key.full)
     }
 }

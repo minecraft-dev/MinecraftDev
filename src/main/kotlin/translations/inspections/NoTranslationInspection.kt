@@ -63,7 +63,9 @@ class NoTranslationInspection : TranslationInspection() {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             try {
                 val literal = descriptor.psiElement as PsiLiteralExpression
-                val key = literal.value as String
+                val translation = LiteralTranslationIdentifier().identify(literal)
+                val literalValue = literal.value as String
+                val key = translation?.key?.copy(infix = literalValue)?.full ?: literalValue
                 val result = Messages.showInputDialog(
                     "Enter default value for \"$key\":",
                     "Create Translation",

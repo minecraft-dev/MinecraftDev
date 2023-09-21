@@ -28,11 +28,17 @@ data class TranslationInstance(
     val foldingElement: PsiElement?,
     val foldStart: Int,
     val referenceElement: PsiElement?,
-    val key: String,
+    val key: Key,
     val text: String?,
     val formattingError: FormattingError? = null,
     val superfluousVarargStart: Int = -1,
 ) {
+    data class Key(val prefix: String, val infix: String, val suffix: String) {
+        constructor(infix: String) : this("", infix, "")
+
+        val full = (prefix + infix + suffix).trim()
+    }
+
     companion object {
         enum class FormattingError {
             MISSING, SUPERFLUOUS

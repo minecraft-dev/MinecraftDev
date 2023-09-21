@@ -29,9 +29,11 @@ class LiteralTranslationIdentifier : TranslationIdentifier<PsiLiteralExpression>
         if (element.value is String) {
             val result = identify(element.project, element, statement, element)
             return result?.copy(
-                key = result.key.replace(
-                    CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED,
-                    "",
+                key = result.key.copy(
+                    infix = result.key.infix.replace(
+                        CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED,
+                        "",
+                    ),
                 ),
             )
         }

@@ -71,7 +71,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                     foldingElement,
                                     function.matchedIndex,
                                     referenceElement,
-                                    translationKey,
+                                    TranslationInstance.Key(translationKey),
                                     formatted,
                                     if (superfluousParams >= 0) FormattingError.SUPERFLUOUS else null,
                                     superfluousParams,
@@ -81,7 +81,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                     foldingElement,
                                     function.matchedIndex,
                                     referenceElement,
-                                    translationKey,
+                                    TranslationInstance.Key(translationKey),
                                     translation,
                                     FormattingError.MISSING,
                                 )
@@ -91,7 +91,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                                 null,
                                 function.matchedIndex,
                                 referenceElement,
-                                translationKey,
+                                TranslationInstance.Key(translationKey),
                                 null,
                             )
                         }
