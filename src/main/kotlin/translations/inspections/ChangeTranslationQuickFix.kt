@@ -43,7 +43,7 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
             val key = LiteralTranslationIdentifier().identify(literal)?.key ?: return
             val popup = ChooseByNamePopup.createPopup(
                 project,
-                TranslationGotoModel(project, key.prefix, key.suffix),
+                TranslationGotoModel(project),
                 null,
             )
             popup.invoke(
@@ -51,13 +51,9 @@ class ChangeTranslationQuickFix(private val name: String) : LocalQuickFix {
                     override fun elementChosen(element: Any) {
                         val selectedKey = (element as PsiNamedElement).name ?: return
                         literal.containingFile.runWriteAction {
-                            val insertion = selectedKey.substring(
-                                key.prefix.length,
-                                selectedKey.length - key.suffix.length,
-                            )
                             literal.replace(
                                 JavaPsiFacade.getInstance(project).elementFactory.createExpressionFromText(
-                                    "\"$insertion\"",
+                                    "\"$selectedKey\"",
                                     literal.context,
                                 ),
                             )

@@ -22,7 +22,6 @@ package com.demonwav.mcdev.translations.reference
 
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
-import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.lang.gen.psi.LangEntry
 import com.demonwav.mcdev.translations.lang.gen.psi.LangTypes
 import com.intellij.json.JsonElementTypes
@@ -86,7 +85,7 @@ class JsonReferenceContributor : PsiReferenceContributor() {
                         TranslationReference(
                             element,
                             nameTextRange.shiftRight(1).grown(-2),
-                            TranslationInstance.Key("", entry.name, ""),
+                            entry.name,
                         ) { elem, _, newName ->
                             (elem as JsonProperty).setName(newName)
                         },
@@ -111,7 +110,7 @@ class LangReferenceContributor : PsiReferenceContributor() {
                         TranslationReference(
                             element,
                             TextRange(0, entry.key.length),
-                            TranslationInstance.Key("", entry.key, ""),
+                            entry.key,
                         ),
                     )
                 }

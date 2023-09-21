@@ -57,7 +57,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     if (function.matches(call, index)) {
                         val translationKey = function.getTranslationKey(call, referenceElement) ?: continue
                         val entries = TranslationIndex.getAllDefaultEntries(project).merge("")
-                        val translation = entries[translationKey.full]?.text
+                        val translation = entries[translationKey]?.text
                         if (translation != null) {
                             val foldingElement = when (function.foldParameters) {
                                 TranslationFunction.FoldingScope.CALL -> call

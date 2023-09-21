@@ -32,7 +32,7 @@ import com.intellij.psi.PsiNamedElement
 import com.intellij.util.indexing.FindSymbolParameters
 import java.util.TreeSet
 
-class TranslationGotoModel(project: Project, private val prefix: String, private val suffix: String) :
+class TranslationGotoModel(project: Project) :
     ContributorsBasedGotoByModel(
         project,
         arrayOf(
@@ -54,12 +54,7 @@ class TranslationGotoModel(project: Project, private val prefix: String, private
         val result = TreeSet<PsiNamedElement> { o1, o2 ->
             (o1 as PsiNamedElement).name?.compareTo((o2 as PsiNamedElement).name ?: return@TreeSet -1) ?: -1
         }
-        result.addAll(
-            superResult.map { it as PsiNamedElement }.filter {
-                val key = it.name ?: return@filter false
-                key.startsWith(prefix) && key.endsWith(suffix)
-            },
-        )
+        result.addAll(superResult.map { it as PsiNamedElement },)
         return result.toArray()
     }
 

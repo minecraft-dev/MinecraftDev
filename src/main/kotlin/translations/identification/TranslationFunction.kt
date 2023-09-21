@@ -36,10 +36,7 @@ class TranslationFunction(
     private val memberReference: MemberReference,
     val matchedIndex: Int,
     val formatting: Boolean,
-    val setter: Boolean = false,
     val foldParameters: FoldingScope = FoldingScope.CALL,
-    val prefix: String = "",
-    val suffix: String = "",
     val obfuscatedName: Boolean = false,
 ) {
     private fun getMethod(context: PsiElement): PsiMethod? {
@@ -55,17 +52,19 @@ class TranslationFunction(
     }
 
     fun matches(call: PsiCall, paramIndex: Int): Boolean {
-        val referenceMethod = getMethod(call) ?: return false
-        val method = call.resolveMethod() ?: return false
+        return matches(call.resolveMethod() ?: return false, paramIndex)
+    }
+
+    fun matches(method: PsiMethod, paramIndex: Int): Boolean {
+        val referenceMethod = getMethod(method) ?: return false
         return method.isSameReference(referenceMethod) && paramIndex == matchedIndex
     }
 
-    fun getTranslationKey(call: PsiCall, param: PsiElement): TranslationInstance.Key? {
+    fun getTranslationKey(call: PsiCall, param: PsiElement): String? {
         if (!matches(call, matchedIndex)) {
             return null
         }
-        val value = ((param as? PsiLiteral)?.value as? String) ?: return null
-        return TranslationInstance.Key(prefix, value, suffix)
+        return (param as? PsiLiteral)?.value as? String
     }
 
     fun format(translation: String, call: PsiCall): Pair<String, Int>? {
