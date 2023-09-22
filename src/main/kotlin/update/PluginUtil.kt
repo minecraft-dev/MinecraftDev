@@ -30,7 +30,7 @@ object PluginUtil {
     val plugin: IdeaPluginDescriptor
         get() {
             return PluginManagerCore.getPlugin(PLUGIN_ID)
-                ?: error("Minecraft Development plugin not found: " + PluginManagerCore.getPlugins().contentToString())
+                ?: error("Minecraft Development plugin not found: " + PluginManagerCore.plugins.contentToString())
         }
 
     val pluginVersion: String

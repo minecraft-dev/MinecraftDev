@@ -29,6 +29,7 @@ import com.intellij.codeInsight.daemon.impl.quickfix.ModifierFix
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -90,7 +91,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         classIdentifier,
                         "Plugin class must have an empty constructor or an @Inject constructor.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        AddDefaultConstructorFix(aClass).asQuickFix(),
+                        *LocalQuickFix.notNullElements(LocalQuickFix.from(AddDefaultConstructorFix(aClass))),
                     )
                 }
             }

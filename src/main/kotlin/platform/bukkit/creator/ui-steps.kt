@@ -147,7 +147,7 @@ class BukkitLoadOrderStep(parent: NewProjectWizardStep) : AbstractNewProjectWiza
     override fun setupUI(builder: Panel) {
         with(builder) {
             row("Load at:") {
-                segmentedButton(LoadOrder.values().toList(), LoadOrder::toString)
+                segmentedButton(LoadOrder.values().toList()) { text = it.toString() }
                     .bind(loadOrderProperty)
             }
         }
