@@ -40,6 +40,7 @@ import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
+import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 
 class StackEmptyInspection : BaseInspection() {
     companion object {
@@ -63,13 +64,16 @@ class StackEmptyInspection : BaseInspection() {
             " the stack should still be considered empty. Instead, isEmpty() should be called."
 
     override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
+        val compareExpressionPointer = (infos[0] as PsiExpression).createSmartPointer()
+        val binaryExpressionPointer = (infos[2] as PsiBinaryExpression).createSmartPointer()
         return object : InspectionGadgetsFix() {
             override fun getFamilyName() = "Replace with .isEmpty()"
 
             override fun doFix(project: Project, descriptor: ProblemDescriptor) {
-                val compareExpression = infos[0] as PsiExpression
-                val binaryExpression = infos[2] as PsiBinaryExpression
                 val elementFactory = JavaPsiFacade.getElementFactory(project)
+
+                val compareExpression = compareExpressionPointer.element ?: return
+                val binaryExpression = binaryExpressionPointer.element ?: return
 
                 val mappedIsEmpty = compareExpression.findModule()?.getMappedMethod(IS_EMPTY_SRG)?.name ?: "isEmpty"
 

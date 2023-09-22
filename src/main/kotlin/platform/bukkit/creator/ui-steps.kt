@@ -78,11 +78,7 @@ abstract class AbstractBukkitPlatformStep(
     override val description = "download versions"
 
     override suspend fun computeData() = coroutineScope {
-        try {
-            asyncIO { getVersionSelector(platform) }.await()
-        } catch (e: Throwable) {
-            null
-        }
+        asyncIO { getVersionSelector(platform) }.await()
     }
 
     override fun createStep(data: PlatformVersion) =
