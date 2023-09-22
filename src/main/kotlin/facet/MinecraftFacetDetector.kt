@@ -70,6 +70,9 @@ class MinecraftFacetDetector : StartupActivity {
 
         fun doCheck(project: Project) {
             val moduleManager = ModuleManager.getInstance(project)
+
+            var needsReimport = false
+
             for (module in moduleManager.modules) {
                 val facetManager = FacetManager.getInstance(module)
                 val minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID)
@@ -78,7 +81,14 @@ class MinecraftFacetDetector : StartupActivity {
                     checkNoFacet(module)
                 } else {
                     checkExistingFacet(module, minecraftFacet)
+                    if (ProjectReimporter.needsReimport(minecraftFacet)) {
+                        needsReimport = true
+                    }
                 }
+            }
+
+            if (needsReimport) {
+                ProjectReimporter.reimport(project)
             }
         }
 
