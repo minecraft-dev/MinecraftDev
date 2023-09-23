@@ -680,6 +680,7 @@
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
+        <!--region Generic -->
         <localInspection displayName="Mixin is not written in Java"
                          shortName="NonJavaMixin"
                          groupName="Mixin"
@@ -752,8 +753,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
+        <!--endregion-->
 
-        <!-- Annotation handlers -->
+        <!--region Annotation handlers -->
         <localInspection displayName="Unresolved mixin annotation target"
                          shortName="MixinAnnotationTarget"
                          groupName="Mixin"
@@ -762,8 +764,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection"/>
+        <!--endregion-->
 
-        <!-- Added Members Inspections -->
+        <!--region Added Members Inspections -->
         <localInspection displayName="Missing @Unique annotation"
                          shortName="MissingUnique"
                          groupName="Mixin"
@@ -780,8 +783,9 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
+        <!--endregion-->
 
-        <!-- Implements Inspections -->
+        <!--region Implements Inspections -->
         <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
                          shortName="SoftImplementOverrides"
                          groupName="Mixin"
@@ -830,8 +834,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
+        <!--endregion-->
 
-        <!-- Injector Inspections -->
+        <!--region Injector Inspections -->
         <localInspection displayName="Implicit constructor invoker"
                          shortName="ImplicitConstructorInvoker"
                          groupName="Mixin"
@@ -872,8 +877,9 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
+        <!--endregion-->
 
-        <!-- Overwrite Inspections -->
+        <!--region Overwrite Inspections -->
         <localInspection displayName="Invalid @Overwrite method modifiers"
                          shortName="OverwriteModifiers"
                          groupName="Mixin"
@@ -890,8 +896,9 @@
                          level="WEAK WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteAuthorInspection"/>
+        <!--endregion-->
 
-        <!-- Reference Inspections -->
+        <!--region Reference Inspections -->
         <localInspection displayName="Invalid Mixin member reference"
                          shortName="InvalidMemberReference"
                          groupName="Mixin"
@@ -932,8 +939,9 @@
                          level="WEAK WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnnecessaryQualifiedMemberReferenceInspection"/>
+        <!--endregion-->
 
-        <!-- Shadow Inspections -->
+        <!--region Shadow Inspections -->
         <localInspection displayName="Invalid @Shadow modifiers"
                          shortName="ShadowModifiers"
                          groupName="Mixin"
@@ -966,8 +974,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
+        <!--endregion-->
 
-        <!-- Mixin Extras -->
+        <!--region Mixin Extras -->
         <localInspection displayName="Wrong @WrapOperation Operation parameters"
                          shortName="MixinExtrasOperationParameters"
                          groupName="Mixin"
@@ -976,8 +985,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
+        <!--endregion-->
 
-        <!-- Configuration -->
+        <!--region Configuration -->
         <localInspection displayName="Unresolved config reference"
                          shortName="UnresolvedConfigReference"
                          groupName="Mixin"
@@ -1010,6 +1020,7 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
+        <!--endregion-->
         <!--endregion-->
 
         <!--region BUNGEECORD INSPECTIONS-->
