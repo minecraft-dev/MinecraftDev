@@ -493,14 +493,14 @@
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="ERROR"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
         <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="ERROR"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
         <localInspection displayName="Superfluous format arguments"
