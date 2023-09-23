@@ -89,7 +89,6 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
 
             val editor = ExistingLibraryEditor(library, null)
             val type = AnnotationOrderRootType.getInstance()
-            editor.getUrls(type).forEach { editor.removeRoot(it, type) }
             editor.addRoots(listOf(OrderRoot(annotationsPath, type)))
             editor.commit()
 
