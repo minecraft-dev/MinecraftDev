@@ -22,18 +22,9 @@ package com.demonwav.mcdev.translations
 
 object TranslationConstants {
     const val DEFAULT_LOCALE = "en_us"
-    const val I18N_CLASS = "net.minecraft.client.resources.language.I18n"
-    const val TRANSLATABLE_COMPONENT = "net.minecraft.network.chat.TranslatableComponent"
-    const val KEY_MAPPING = "net.minecraft.client.KeyMapping"
-    const val INPUT_CONSTANTS_KEY = "com.mojang.blaze3d.platform.InputConstants"
-    const val TEXT_COMPONENT_HELPER = "net.minecraftforge.server.command.TextComponentHelper"
-    const val CONSTRUCTOR = "<init>"
-    const val COMMAND_EXCEPTION_CLASS = "net.minecraft.command.CommandException"
-    const val GET = "m_118938_"
-    const val EXISTS = "m_118936_"
-    const val INPUT_CONSTANTS_KEY_GET_KEY = "m_84851_"
-    const val CREATE_COMPONENT_TRANSLATION = "createComponentTranslation"
-    const val COMPONENT_CLASS = "net.minecraft.network.chat.Component"
-    const val COMPONENT_TRANSLATABLE = "translatable"
-    const val COMPONENT_TRANSLATABLE_WITH_FALLBACK = "translatableWithFallback"
+    const val TRANSLATABLE_ANNOTATION = "com.demonwav.mcdev.annotations.Translatable"
+    const val REQUIRED = "required"
+    const val FOLD_METHOD = "foldMethod"
+    const val PREFIX = "prefix"
+    const val SUFFIX = "suffix"
 }
