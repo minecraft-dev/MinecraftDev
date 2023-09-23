@@ -30,12 +30,14 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
-    override val supportedElementTypes = listOf(
-        ElementType.METHOD_CALL, ElementType.FIELD_GET, ElementType.INSTANTIATION, ElementType.CONSTANT
+    override val supportedInstructionTypes = listOf(
+        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.INSTANTIATION, InstructionType.CONSTANT
     )
 
-    override fun extraTargetRestrictions(insn: AbstractInsnNode) =
-        getInsnReturnType(insn)?.equals(Type.VOID_TYPE) == false
+    override fun extraTargetRestrictions(insn: AbstractInsnNode): Boolean {
+        val returnType = getInsnReturnType(insn) ?: return false
+        return returnType != Type.VOID_TYPE
+    }
 
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,

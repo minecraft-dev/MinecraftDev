@@ -46,9 +46,9 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler() {
-    open val oldSuperBehaviour = false
+    open val oldSuperBehavior = false
 
-    enum class ElementType {
+    enum class InstructionType {
         METHOD_CALL {
             override fun matches(insn: AbstractInsnNode) = insn is MethodInsnNode && insn.name != "<init>"
         },
@@ -76,7 +76,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         abstract fun matches(insn: AbstractInsnNode): Boolean
     }
 
-    abstract val supportedElementTypes: Collection<ElementType>
+    abstract val supportedInstructionTypes: Collection<InstructionType>
 
     open fun extraTargetRestrictions(insn: AbstractInsnNode): Boolean = true
 
@@ -97,7 +97,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         val insns = resolveInstructions(annotation, targetClass, targetMethod)
             .ifEmpty { return emptyList() }
             .map { it.insn }
-        if (insns.any { insn -> supportedElementTypes.none { it.matches(insn) } }) return emptyList()
+        if (insns.any { insn -> supportedInstructionTypes.none { it.matches(insn) } }) return emptyList()
         val signatures = insns.map { expectedMethodSignature(annotation, targetClass, targetMethod, it) }
         val firstMatch = signatures[0] ?: return emptyList()
         if (signatures.drop(1).any { it != firstMatch }) return emptyList()
@@ -174,7 +174,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                 when (insn.opcode) {
                     Opcodes.INVOKESTATIC -> {}
                     Opcodes.INVOKESPECIAL -> {
-                        args.add(0, Type.getObjectType(if (oldSuperBehaviour) insn.owner else targetClass.name))
+                        args.add(0, Type.getObjectType(if (oldSuperBehavior) insn.owner else targetClass.name))
                     }
 
                     else -> {
@@ -220,7 +220,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                     )?.classAndMethod
                 val parameters = mutableListOf<Parameter>()
                 if (insn.opcode != Opcodes.INVOKESTATIC) {
-                    val receiver = if (insn.opcode == Opcodes.INVOKESPECIAL && !oldSuperBehaviour) {
+                    val receiver = if (insn.opcode == Opcodes.INVOKESPECIAL && !oldSuperBehavior) {
                         targetClass.name
                     } else {
                         insn.owner

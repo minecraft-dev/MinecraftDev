@@ -29,8 +29,8 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class ModifyReceiverHandler : MixinExtrasInjectorAnnotationHandler() {
-    override val supportedElementTypes = listOf(
-        ElementType.METHOD_CALL, ElementType.FIELD_GET, ElementType.FIELD_SET
+    override val supportedInstructionTypes = listOf(
+        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET
     )
 
     override fun extraTargetRestrictions(insn: AbstractInsnNode) = when (insn.opcode) {

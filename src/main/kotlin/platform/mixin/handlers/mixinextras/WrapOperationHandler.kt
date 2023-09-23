@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
@@ -32,11 +33,9 @@ import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
-private const val OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.Operation"
-
 class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
-    override val supportedElementTypes = listOf(
-        ElementType.METHOD_CALL, ElementType.FIELD_GET, ElementType.FIELD_SET, ElementType.INSTANCEOF
+    override val supportedInstructionTypes = listOf(
+        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET, InstructionType.INSTANCEOF
     )
 
     override fun getAtKey(annotation: PsiAnnotation): String {
@@ -64,9 +63,9 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         } else {
             type
         }
-        val psiClass =
-            JavaPsiFacade.getInstance(project).findClass(OPERATION, GlobalSearchScope.allScope(project))
-                ?: return null
+        val psiClass = JavaPsiFacade.getInstance(project)
+            .findClass(MixinConstants.MixinExtras.OPERATION, GlobalSearchScope.allScope(project))
+            ?: return null
         return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
     }
 }

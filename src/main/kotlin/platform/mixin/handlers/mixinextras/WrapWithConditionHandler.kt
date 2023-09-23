@@ -29,10 +29,10 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class WrapWithConditionHandler : MixinExtrasInjectorAnnotationHandler() {
-    override val oldSuperBehaviour = true
+    override val oldSuperBehavior = true
 
-    override val supportedElementTypes = listOf(
-        ElementType.METHOD_CALL, ElementType.FIELD_SET
+    override val supportedInstructionTypes = listOf(
+        InstructionType.METHOD_CALL, InstructionType.FIELD_SET
     )
 
     override fun extraTargetRestrictions(insn: AbstractInsnNode) = getInsnReturnType(insn) == Type.VOID_TYPE

@@ -30,7 +30,6 @@ import com.intellij.patterns.StandardPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.util.ThreeState
-import org.jetbrains.kotlin.idea.completion.or
 
 class MixinCompletionConfidence : CompletionConfidence() {
 
@@ -38,11 +37,11 @@ class MixinCompletionConfidence : CompletionConfidence() {
         .inside(
             false,
             PsiJavaPatterns.psiAnnotation().qName(
-                StandardPatterns.string().startsWith(MixinConstants.PACKAGE)
-                    .or(
-                        StandardPatterns.string()
-                            .oneOf(MixinAnnotationHandler.getBuiltinHandlers().map { it.first }.toList())
-                    )
+                StandardPatterns.or(
+                    StandardPatterns.string().startsWith(MixinConstants.PACKAGE),
+                    StandardPatterns.string()
+                        .oneOf(MixinAnnotationHandler.getBuiltinHandlers().map { it.first }.toList()),
+                )
             ),
             PlatformPatterns.psiFile(),
         )!!
