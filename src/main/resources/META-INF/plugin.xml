@@ -80,6 +80,7 @@
         <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
         </extensionPoint>
+        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" />
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
@@ -152,6 +153,8 @@
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
+
+        <injectionPointAnnotation annotation="org.spongepowered.asm.mixin.injection.Constant" atCode="CONSTANT" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -23,7 +23,6 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.CONSTANT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.util.computeStringArray
@@ -74,12 +73,8 @@ class AtResolver(
     private val targetMethod: MethodNode,
 ) {
     companion object {
-        private val injectionPointAnnotations = mapOf(
-            CONSTANT to "CONSTANT"
-        )
-
         private fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
-            var atCode = at.qualifiedName?.let { injectionPointAnnotations[it] }
+            var atCode = at.qualifiedName?.let { InjectionPointAnnotation.atCodeFor(it) }
                 ?: at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
 
             // remove slice selector
