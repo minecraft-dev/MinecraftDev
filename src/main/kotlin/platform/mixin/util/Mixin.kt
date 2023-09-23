@@ -165,6 +165,9 @@ fun isAssignable(left: PsiType, right: PsiType, allowPrimitiveConversion: Boolea
         left is PsiArrayType -> right is PsiArrayType && isAssignable(left.componentType, right.componentType)
         else -> {
             if (left !is PsiClassType || right !is PsiClassType) {
+                if (right == PsiType.NULL && left !is PsiPrimitiveType) {
+                    return true
+                }
                 if (!allowPrimitiveConversion && (left is PsiPrimitiveType || right is PsiPrimitiveType)) {
                     return left == right
                 }
