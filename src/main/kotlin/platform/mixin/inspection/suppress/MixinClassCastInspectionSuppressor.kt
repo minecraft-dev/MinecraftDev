@@ -22,12 +22,11 @@ package com.demonwav.mcdev.platform.mixin.inspection.suppress
 
 import com.demonwav.mcdev.platform.mixin.action.FindMixinsAction
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
+import com.demonwav.mcdev.util.McdevDfaUtil
 import com.intellij.codeInspection.InspectionSuppressor
 import com.intellij.codeInspection.SuppressQuickFix
-import com.intellij.codeInspection.dataFlow.CommonDataflow
 import com.intellij.codeInspection.dataFlow.TypeConstraint
 import com.intellij.codeInspection.dataFlow.TypeConstraints
-import com.intellij.codeInspection.dataFlow.types.DfReferenceType
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaTokenType
@@ -35,7 +34,6 @@ import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiBinaryExpression
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiInstanceOfExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypeCastExpression
@@ -62,7 +60,7 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
             while (operand is PsiTypeCastExpression) {
                 operand = PsiUtil.skipParenthesizedExprDown(operand.operand) ?: return false
             }
-            val realType = getRealType(operand) ?: return false
+            val realType = McdevDfaUtil.tryGetDataflowType(operand) ?: return false
             return isAssignable(realType, castType)
         }
 
@@ -72,8 +70,8 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
                 element.operationSign.tokenType == JavaTokenType.NE
             )
         ) {
-            val rightType = element.rOperand?.let(this::getTypeConstraint) ?: return false
-            val leftType = getTypeConstraint(element.lOperand) ?: return false
+            val rightType = element.rOperand?.let(McdevDfaUtil::getTypeConstraint) ?: return false
+            val leftType = McdevDfaUtil.getTypeConstraint(element.lOperand) ?: return false
             val isTypeWarning = leftType.meet(rightType) == TypeConstraints.BOTTOM
             if (isTypeWarning) {
                 val leftWithMixins = addMixinsToTypeConstraint(element.project, leftType)
@@ -87,7 +85,7 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
 
         val castExpression = element.parent as? PsiTypeCastExpression ?: return false
         val castType = castExpression.type ?: return false
-        val realType = getRealType(castExpression) ?: return false
+        val realType = McdevDfaUtil.tryGetDataflowType(castExpression) ?: return false
 
         return isAssignable(castType, realType)
     }
@@ -116,14 +114,6 @@ class MixinClassCastInspectionSuppressor : InspectionSuppressor {
             }
         }
         return typeConstraint.join(mixinTypes.reduce(TypeConstraint::join))
-    }
-
-    private fun getRealType(expression: PsiExpression): PsiType? {
-        return getTypeConstraint(expression)?.getPsiType(expression.project)
-    }
-
-    private fun getTypeConstraint(expression: PsiExpression): TypeConstraint? {
-        return (CommonDataflow.getDfType(expression) as? DfReferenceType)?.constraint
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<out SuppressQuickFix> =

@@ -967,6 +967,16 @@
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
 
+        <!-- Mixin Extras -->
+        <localInspection displayName="Wrong @WrapOperation Operation parameters"
+                         shortName="MixinExtrasOperationParameters"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
+
         <!-- Configuration -->
         <localInspection displayName="Unresolved config reference"
                          shortName="UnresolvedConfigReference"
