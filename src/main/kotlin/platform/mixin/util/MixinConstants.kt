@@ -75,4 +75,8 @@ object MixinConstants {
         const val REDIRECT = "org.spongepowered.asm.mixin.injection.Redirect"
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
     }
+
+    object MixinExtras {
+        const val OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.Operation"
+    }
 }

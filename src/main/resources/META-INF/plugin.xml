@@ -80,6 +80,7 @@
         <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
         </extensionPoint>
+        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" />
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
@@ -135,6 +136,11 @@
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyConstant" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyConstantHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyVariable" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Redirect" implementation="com.demonwav.mcdev.platform.mixin.handlers.RedirectInjectorHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyExpressionValue" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyExpressionValueHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyReceiver" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyReceiverHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyReturnValue" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyReturnValueHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.WrapWithCondition" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler" />
 
         <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
         <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
@@ -147,6 +153,8 @@
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
+
+        <injectionPointAnnotation annotation="org.spongepowered.asm.mixin.injection.Constant" atCode="CONSTANT" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
