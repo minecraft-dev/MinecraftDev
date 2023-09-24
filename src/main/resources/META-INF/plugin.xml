@@ -272,6 +272,8 @@
                                order="before javaSkipAutopopupInStrings"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationIndex"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationInverseIndex"/>
+        <java.externalAnnotation.locationProvider implementation="com.demonwav.mcdev.translations.identification.TranslationAnnotationsLocationProvider"/>
+        <externalAnnotationsArtifactsResolver implementation="com.demonwav.mcdev.translations.identification.TranslationExternalAnnotationsArtifactsResolver" order="first"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
