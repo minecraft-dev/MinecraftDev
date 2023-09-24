@@ -651,13 +651,6 @@
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
-        <localInspection displayName="MCP Entity class missing World constructor"
-                         groupName="MCP"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.inspections.EntityConstructorInspection"/>
         <localInspection displayName="Unused access transformer"
                          groupName="MCP"
                          language="Access Transformers"

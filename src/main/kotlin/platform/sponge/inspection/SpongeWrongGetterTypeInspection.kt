@@ -23,7 +23,6 @@ package com.demonwav.mcdev.platform.sponge.inspection
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
-import com.demonwav.mcdev.util.isJavaOptional
 import com.intellij.codeInspection.AbstractBaseUastLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.IntentionAndQuickFixAction
@@ -36,6 +35,7 @@ import com.intellij.lang.jvm.actions.expectedParameter
 import com.intellij.lang.jvm.actions.updateMethodParametersRequest
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiFile
@@ -126,7 +126,7 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
 
     private fun isOptional(type: PsiType): Boolean {
         val typeClass = type as? PsiClassType ?: return false
-        return typeClass.isJavaOptional() && typeClass.hasParameters()
+        return typeClass.equalsToText(CommonClassNames.JAVA_UTIL_OPTIONAL) && typeClass.hasParameters()
     }
 
     private fun getFirstGenericType(typeElement: PsiType): PsiType? =

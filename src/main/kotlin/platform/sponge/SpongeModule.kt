@@ -61,8 +61,8 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         chosenClass: PsiClass,
         chosenName: String,
         data: GenerationData?,
-    ): PsiMethod? {
-        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
+    ): PsiMethod {
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass)
         val modifierList = method.modifierList
 
         val listenerAnnotation = modifierList.addAnnotation("org.spongepowered.api.event.Listener")

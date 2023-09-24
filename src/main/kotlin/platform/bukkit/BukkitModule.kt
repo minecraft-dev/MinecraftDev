@@ -92,7 +92,7 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         chosenClass: PsiClass,
         chosenName: String,
         data: GenerationData?,
-    ): PsiMethod? {
+    ): PsiMethod {
         val bukkitData = data as BukkitGenerationData
 
         val method = generateBukkitStyleEventListenerMethod(
@@ -101,7 +101,7 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
             project,
             BukkitConstants.HANDLER_ANNOTATION,
             bukkitData.isIgnoreCanceled,
-        ) ?: return null
+        )
 
         if (bukkitData.eventPriority != "NORMAL") {
             val list = method.modifierList
@@ -217,8 +217,8 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
             project: Project,
             annotationName: String,
             setIgnoreCancelled: Boolean,
-        ): PsiMethod? {
-            val newMethod = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
+        ): PsiMethod {
+            val newMethod = createVoidMethodWithParameterType(project, chosenName, chosenClass)
             val modifierList = newMethod.modifierList
             val annotation = modifierList.addAnnotation(annotationName)
 
