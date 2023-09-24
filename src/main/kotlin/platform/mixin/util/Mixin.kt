@@ -47,6 +47,7 @@ import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
+import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
@@ -155,7 +156,7 @@ fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType
     return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
 }
 
-fun isAssignable(left: PsiType, right: PsiType): Boolean {
+fun isAssignable(left: PsiType, right: PsiType, allowPrimitiveConversion: Boolean = true): Boolean {
     return when {
         left is PsiIntersectionType -> left.conjuncts.all { isAssignable(it, right) }
         right is PsiIntersectionType -> right.conjuncts.any { isAssignable(left, it) }
@@ -164,7 +165,13 @@ fun isAssignable(left: PsiType, right: PsiType): Boolean {
         left is PsiArrayType -> right is PsiArrayType && isAssignable(left.componentType, right.componentType)
         else -> {
             if (left !is PsiClassType || right !is PsiClassType) {
-                return false
+                if (right == PsiType.NULL && left !is PsiPrimitiveType) {
+                    return true
+                }
+                if (!allowPrimitiveConversion && (left is PsiPrimitiveType || right is PsiPrimitiveType)) {
+                    return left == right
+                }
+                return TypeConversionUtil.isAssignable(left, right)
             }
             val leftClass = left.resolve() ?: return false
             val rightClass = right.resolve() ?: return false
@@ -193,7 +200,11 @@ fun isAssignable(left: PsiType, right: PsiType): Boolean {
             }
 
             val mixins = FindMixinsAction.findMixins(rightClass, rightClass.project) ?: return false
-            return mixins.any { isClassAssignable(leftClass, it) }
+            if (mixins.any { isClassAssignable(leftClass, it) }) {
+                return true
+            }
+
+            return isClassAssignable(leftClass, rightClass)
         }
     }
 }

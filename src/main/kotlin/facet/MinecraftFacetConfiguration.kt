@@ -31,7 +31,9 @@ import com.intellij.util.xmlb.annotations.XCollection
 class MinecraftFacetConfiguration : FacetConfiguration, PersistentStateComponent<MinecraftFacetConfigurationData> {
 
     var facet: MinecraftFacet? = null
-    private var state = MinecraftFacetConfigurationData()
+    private var state = MinecraftFacetConfigurationData(
+        projectReimportVersion = ProjectReimporter.CURRENT_REIMPORT_VERSION
+    )
 
     override fun createEditorTabs(editorContext: FacetEditorContext?, validatorsManager: FacetValidatorsManager?) =
         arrayOf(MinecraftFacetEditorTabV2(this))
@@ -50,4 +52,6 @@ data class MinecraftFacetConfigurationData(
     var autoDetectTypes: MutableSet<PlatformType> = mutableSetOf(),
     @Tag("forgePatcher")
     var forgePatcher: Boolean = false,
+    @Tag("projectReimportVersion")
+    var projectReimportVersion: Int = 0,
 )
