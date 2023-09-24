@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.codeInsight.completion.CompletionConfidence
 import com.intellij.codeInsight.completion.SkipAutopopupInStrings
@@ -35,7 +36,13 @@ class MixinCompletionConfidence : CompletionConfidence() {
     private val mixinAnnotation = PlatformPatterns.psiElement()
         .inside(
             false,
-            PsiJavaPatterns.psiAnnotation().qName(StandardPatterns.string().startsWith(MixinConstants.PACKAGE)),
+            PsiJavaPatterns.psiAnnotation().qName(
+                StandardPatterns.or(
+                    StandardPatterns.string().startsWith(MixinConstants.PACKAGE),
+                    StandardPatterns.string()
+                        .oneOf(MixinAnnotationHandler.getBuiltinHandlers().map { it.first }.toList()),
+                )
+            ),
             PlatformPatterns.psiFile(),
         )!!
 
