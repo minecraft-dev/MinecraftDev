@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mcp.actions
 
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.srg.McpSrgMap
+import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.getDataFromActionEvent
@@ -53,7 +53,7 @@ abstract class SrgActionBase : AnAction() {
 
         val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return showBalloon("No mappings found", e)
 
-        mcpModule.srgManager?.srgMap?.onSuccess { srgMap ->
+        mcpModule.mappingsManager?.mappings?.onSuccess { srgMap ->
             var parent = data.element.parent ?: return@onSuccess showBalloon("Not a valid element", e)
 
             if (parent is PsiMember) {
@@ -73,7 +73,7 @@ abstract class SrgActionBase : AnAction() {
         } ?: showBalloon("No mappings found", e)
     }
 
-    abstract fun withSrgTarget(parent: PsiElement, srgMap: McpSrgMap, e: AnActionEvent, data: ActionData)
+    abstract fun withSrgTarget(parent: PsiElement, srgMap: Mappings, e: AnActionEvent, data: ActionData)
 
     companion object {
         fun showBalloon(message: String, e: AnActionEvent) {

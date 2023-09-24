@@ -50,19 +50,19 @@ class AtUsageInspection : LocalInspectionTool() {
                 val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
                 val instance = MinecraftFacet.getInstance(module) ?: return
                 val mcpModule = instance.getModuleOfType(McpModuleType) ?: return
-                val srgMap = mcpModule.srgManager?.srgMapNow ?: return
+                val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return
 
                 val member = element.function ?: element.fieldName ?: return
                 val reference = AtMemberReference.get(element, member) ?: return
 
                 val psi = when (member) {
                     is AtFunction ->
-                        reference.resolveMember(element.project) ?: srgMap.getMcpMethod(reference)?.resolveMember(
+                        reference.resolveMember(element.project) ?: srgMap.tryGetMappedMethod(reference)?.resolveMember(
                             element.project,
                         ) ?: return
                     is AtFieldName ->
                         reference.resolveMember(element.project)
-                            ?: srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
+                            ?: srgMap.tryGetMappedField(reference)?.resolveMember(element.project) ?: return
                     else ->
                         return
                 }

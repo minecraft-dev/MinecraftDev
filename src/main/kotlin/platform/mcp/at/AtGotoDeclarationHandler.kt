@@ -55,12 +55,12 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
 
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        val srgMap = mcpModule.srgManager?.srgMapNow ?: return null
+        val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return null
 
         return when {
             sourceElement.node.treeParent.elementType === AtTypes.CLASS_NAME -> {
                 val className = sourceElement.parent as AtClassName
-                val classSrgToMcp = srgMap.mapToMcpClass(className.classNameText)
+                val classSrgToMcp = srgMap.getMappedClass(className.classNameText)
                 val psiClass = findQualifiedClass(sourceElement.project, classSrgToMcp) ?: return null
                 arrayOf(psiClass)
             }
@@ -69,7 +69,7 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
                 val function = funcName.parent as AtFunction
                 val entry = function.parent as AtEntry
 
-                val reference = srgMap.mapToMcpMethod(AtMemberReference.get(entry, function) ?: return null)
+                val reference = srgMap.getMappedMethod(AtMemberReference.get(entry, function) ?: return null)
                 val member = reference.resolveMember(sourceElement.project) ?: return null
                 arrayOf(member)
             }
@@ -77,12 +77,12 @@ class AtGotoDeclarationHandler : GotoDeclarationHandler {
                 val fieldName = sourceElement.parent as AtFieldName
                 val entry = fieldName.parent as AtEntry
 
-                val reference = srgMap.mapToMcpField(AtMemberReference.get(entry, fieldName) ?: return null)
+                val reference = srgMap.getMappedField(AtMemberReference.get(entry, fieldName) ?: return null)
                 val member = reference.resolveMember(sourceElement.project) ?: return null
                 arrayOf(member)
             }
             sourceElement.node.elementType === AtTypes.CLASS_VALUE -> {
-                val className = srgMap.mapToMcpClass(parseClassDescriptor(sourceElement.text))
+                val className = srgMap.getMappedClass(parseClassDescriptor(sourceElement.text))
                 val psiClass = findQualifiedClass(sourceElement.project, className) ?: return null
                 arrayOf(psiClass)
             }

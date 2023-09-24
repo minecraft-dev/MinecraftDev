@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
+import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import com.demonwav.mcdev.util.MemberReference
 import com.google.common.collect.ImmutableBiMap
 import com.intellij.openapi.util.registry.Registry
@@ -32,7 +33,7 @@ import net.fabricmc.mappingio.MappingVisitor
 object TinySrgParser : SrgParser {
     private val commentRegex = Regex("#.+")
 
-    override fun parseSrg(path: Path): McpSrgMap {
+    override fun parseSrg(path: Path): Mappings {
         val classMapBuilder = ImmutableBiMap.builder<String, String>()
         val fieldMapBuilder = ImmutableBiMap.builder<MemberReference, MemberReference>()
         val methodMapBuilder = ImmutableBiMap.builder<MemberReference, MemberReference>()
@@ -44,11 +45,12 @@ object TinySrgParser : SrgParser {
             oldParser(path, classMapBuilder, fieldMapBuilder, methodMapBuilder, srgNames)
         }
 
-        return McpSrgMap(
+        return Mappings(
             classMapBuilder.build(),
             fieldMapBuilder.build(),
             methodMapBuilder.build(),
             srgNames,
+            false,
         )
     }
 

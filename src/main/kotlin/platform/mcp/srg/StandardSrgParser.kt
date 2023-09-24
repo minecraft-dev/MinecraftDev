@@ -20,13 +20,14 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
+import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import com.demonwav.mcdev.util.MemberReference
 import com.google.common.collect.ImmutableBiMap
 import java.nio.file.Files
 import java.nio.file.Path
 
 object StandardSrgParser : SrgParser {
-    override fun parseSrg(path: Path): McpSrgMap {
+    override fun parseSrg(path: Path): Mappings {
         val classMapBuilder = ImmutableBiMap.builder<String, String>()
         val fieldMapBuilder = ImmutableBiMap.builder<MemberReference, MemberReference>()
         val methodMapBuilder = ImmutableBiMap.builder<MemberReference, MemberReference>()
@@ -55,6 +56,6 @@ object StandardSrgParser : SrgParser {
             }
         }
 
-        return McpSrgMap(classMapBuilder.build(), fieldMapBuilder.build(), methodMapBuilder.build(), srgNames)
+        return Mappings(classMapBuilder.build(), fieldMapBuilder.build(), methodMapBuilder.build(), srgNames, false)
     }
 }

@@ -114,6 +114,7 @@ class MinecraftFacet(
             }
 
         newlyEnabled.forEach(AbstractModule::init)
+        modules.forEach(AbstractModule::refresh)
 
         ProjectView.getInstance(module.project).refresh()
     }
