@@ -26,6 +26,7 @@ import com.intellij.codeInsight.ExternalAnnotationsArtifactsResolver
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocation
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -34,9 +35,19 @@ import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.ui.OrderRoot
 import com.intellij.openapi.roots.ui.configuration.libraryEditor.ExistingLibraryEditor
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.platform.backend.workspace.toVirtualFileUrl
+import com.intellij.platform.workspace.jps.entities.LibraryRoot
+import com.intellij.platform.workspace.jps.entities.LibraryRootTypeId
+import com.intellij.platform.workspace.jps.entities.modifyEntity
+import com.intellij.platform.workspace.storage.MutableEntityStorage
+import com.intellij.platform.workspace.storage.url.VirtualFileUrlManager
+import com.intellij.workspaceModel.ide.getInstance
+import com.intellij.workspaceModel.ide.impl.legacyBridge.library.LibraryBridge
+import com.intellij.workspaceModel.ide.impl.legacyBridge.library.ProjectLibraryTableBridgeImpl.Companion.findLibraryEntity
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.resolvedPromise
@@ -61,6 +72,34 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
         }
     }
 
+    override fun resolve(
+        project: Project,
+        library: Library,
+        annotationsLocation: AnnotationsLocation,
+        diff: MutableEntityStorage
+    ): Boolean {
+        if (library !is LibraryBridge || library.isDisposed) {
+            return true
+        }
+
+        val annotationsPath = findAnnotationsPath(false) ?: findAnnotationsPath(true) ?: return false
+
+        val libraryEntity = diff.findLibraryEntity(library) ?: return true
+        val vfUrlManager = VirtualFileUrlManager.getInstance(project)
+        val newUrl = annotationsPath.toVirtualFileUrl(vfUrlManager)
+        val annotationsRootType = LibraryRootTypeId(AnnotationOrderRootType.ANNOTATIONS_ID)
+
+        val alreadyExists = libraryEntity.roots.any { it.type == annotationsRootType && it.url == newUrl }
+        if (alreadyExists) {
+            return true
+        }
+
+        diff.modifyEntity(libraryEntity) {
+            roots += LibraryRoot(newUrl, annotationsRootType)
+        }
+        return true
+    }
+
     override fun resolveAsync(project: Project, library: Library, mavenId: String?): Promise<Library> {
         if (!Util.isOurFakeMavenLocation(mavenId)) {
             return resolvedPromise(library)
@@ -82,18 +121,22 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
             return false
         }
 
-        return runWriteAction {
-            val annotationsPath = findAnnotationsPath(false)
-                ?: findAnnotationsPath(true)
-                ?: return@runWriteAction false
+        val annotationsPath = runReadAction { findAnnotationsPath(false) ?: findAnnotationsPath(true) }
+            ?: return false
 
-            val editor = ExistingLibraryEditor(library, null)
-            val type = AnnotationOrderRootType.getInstance()
+        val editor = ExistingLibraryEditor(library, null)
+        val type = AnnotationOrderRootType.getInstance()
+        val alreadyExists = editor.getUrls(type).contains(annotationsPath.url)
+        if (!alreadyExists) {
             editor.addRoots(listOf(OrderRoot(annotationsPath, type)))
-            editor.commit()
-
-            true
+            runWriteAction {
+                editor.commit()
+            }
+        } else {
+            Disposer.dispose(editor)
         }
+
+        return true
     }
 
     private fun findAnnotationsPath(refresh: Boolean): VirtualFile? {
