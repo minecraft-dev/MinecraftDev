@@ -52,9 +52,10 @@ import org.objectweb.asm.tree.JumpInsnNode
 import org.objectweb.asm.tree.LabelNode
 import org.objectweb.asm.tree.LdcInsnNode
 import org.objectweb.asm.tree.MethodNode
+import org.objectweb.asm.tree.TypeInsnNode
 
 class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
-    private fun getConstantInfo(at: PsiAnnotation): ConstantInfo? {
+    fun getConstantInfo(at: PsiAnnotation): ConstantInfo? {
         val args = AtResolver.getArgs(at)
         val nullValue = args["nullValue"]?.let(java.lang.Boolean::parseBoolean) ?: false
         val intValue = args["intValue"]?.toIntOrNull()
@@ -281,6 +282,15 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
                             }
                         }
                         0
+                    }
+
+                    is TypeInsnNode -> {
+                        if (insn.opcode < Opcodes.CHECKCAST) {
+                            // Don't treat NEW and ANEWARRAY as constants
+                            // Matches Mixin's handling
+                            return@forEachRemaining
+                        }
+                        Type.getObjectType(insn.desc)
                     }
 
                     else -> return@forEachRemaining

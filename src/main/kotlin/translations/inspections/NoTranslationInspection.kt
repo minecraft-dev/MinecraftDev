@@ -24,7 +24,6 @@ import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.identification.LiteralTranslationIdentifier
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
@@ -45,11 +44,10 @@ class NoTranslationInspection : TranslationInspection() {
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = LiteralTranslationIdentifier().identify(expression)
-            if (result != null && result.text == null) {
+            if (result != null && result.required && result.text == null) {
                 holder.registerProblem(
                     expression,
                     "The given translation key does not exist",
-                    ProblemHighlightType.GENERIC_ERROR,
                     CreateTranslationQuickFix,
                     ChangeTranslationQuickFix("Use existing translation"),
                 )

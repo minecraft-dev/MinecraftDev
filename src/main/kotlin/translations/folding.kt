@@ -99,6 +99,9 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
                     } else {
                         foldingElement.textRange
                     }
+                if (!translation.required && translation.formattingError != null) {
+                    continue
+                }
                 descriptors.add(
                     FoldingDescriptor(
                         translation.foldingElement.node,
