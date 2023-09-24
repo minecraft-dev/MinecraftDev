@@ -40,7 +40,6 @@ import com.intellij.psi.CommonClassNames.JAVA_LANG_INTEGER
 import com.intellij.psi.CommonClassNames.JAVA_LANG_LONG
 import com.intellij.psi.CommonClassNames.JAVA_LANG_SHORT
 import com.intellij.psi.CommonClassNames.JAVA_LANG_STRING
-import com.intellij.psi.CommonClassNames.JAVA_LANG_STRING_SHORT
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
@@ -95,18 +94,15 @@ class ConfigValueInspection : MixinConfigInspection() {
                 return true // Idk, it's fine I guess
             }
 
-            if (type.className == JAVA_LANG_STRING_SHORT && type.resolve()?.qualifiedName == JAVA_LANG_STRING) {
+            if (type.equalsToText(JAVA_LANG_STRING)) {
                 return value is JsonStringLiteral
             }
 
-            if (type.className == "Boolean" && type.resolve()?.qualifiedName == CommonClassNames.JAVA_LANG_BOOLEAN) {
+            if (type.equalsToText(CommonClassNames.JAVA_LANG_BOOLEAN)) {
                 return value is JsonBooleanLiteral || value is JsonNullLiteral
             }
 
-            if (
-                shortNumberNames.contains(type.className) &&
-                qualifiedNumberNames.contains(type.resolve()?.qualifiedName)
-            ) {
+            if (qualifiedNumberNames.any(type::equalsToText)) {
                 return value is JsonNumberLiteral || value is JsonNullLiteral
             }
 
@@ -114,8 +110,7 @@ class ConfigValueInspection : MixinConfigInspection() {
             return value is JsonObject
         }
 
-        private val shortNumberNames = setOf("Byte", "Character", "Double", "Float", "Integer", "Long", "Short")
-        private val qualifiedNumberNames = setOf(
+        private val qualifiedNumberNames = listOf(
             JAVA_LANG_BYTE,
             JAVA_LANG_CHARACTER,
             JAVA_LANG_DOUBLE,

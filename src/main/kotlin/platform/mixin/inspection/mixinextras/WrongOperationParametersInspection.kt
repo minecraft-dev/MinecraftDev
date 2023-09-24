@@ -32,7 +32,6 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiField
@@ -68,7 +67,7 @@ class WrongOperationParametersInspection : MixinInspection() {
             val (operationIndex, operationParam) = containingMethod.parameterList.parameters.asSequence()
                 .withIndex()
                 .firstOrNull { (_, param) ->
-                    (param.type as? PsiClassType)?.resolve()?.qualifiedName == MixinConstants.MixinExtras.OPERATION
+                    param.type.equalsToText(MixinConstants.MixinExtras.OPERATION)
                 } ?: return
             val (expectedParamTypes, paramNames) = containingMethod.parameterList.parameters.asSequence()
                 .take(operationIndex)

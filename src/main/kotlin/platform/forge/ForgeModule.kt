@@ -163,10 +163,10 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
         chosenClass: PsiClass,
         chosenName: String,
         data: GenerationData?,
-    ): PsiMethod? {
+    ): PsiMethod {
         val isFmlEvent = chosenClass.extendsOrImplements(ForgeConstants.FML_EVENT)
 
-        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass)
         val modifierList = method.modifierList
 
         if (isFmlEvent) {

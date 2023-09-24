@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiBinaryExpression
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiReferenceExpression
@@ -118,7 +117,7 @@ class StackEmptyInspection : BaseInspection() {
             }
 
             private fun isExpressionStack(expression: PsiExpression?): Boolean {
-                return (expression?.type as? PsiClassType)?.resolve()?.fullQualifiedName == STACK_FQ_NAME
+                return expression?.type?.equalsToText(STACK_FQ_NAME) == true
             }
 
             private fun isExpressionEmptyConstant(expression: PsiExpression?): Boolean {
