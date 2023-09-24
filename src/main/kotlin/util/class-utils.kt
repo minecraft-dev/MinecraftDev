@@ -23,7 +23,6 @@ package com.demonwav.mcdev.util
 import com.intellij.codeInsight.daemon.impl.quickfix.AddMethodFix
 import com.intellij.navigation.AnonymousElementProvider
 import com.intellij.openapi.project.Project
-import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
@@ -304,10 +303,6 @@ private fun areReallyOnlyParametersErasureEqual(
 
     return true
 }
-
-fun PsiClass.isJavaOptional(): Boolean = this.qualifiedName == CommonClassNames.JAVA_UTIL_OPTIONAL
-
-fun PsiClassType.isJavaOptional(): Boolean = this.fullQualifiedName == CommonClassNames.JAVA_UTIL_OPTIONAL
 
 class ClassNameResolutionFailedException : Exception {
     constructor() : super()
