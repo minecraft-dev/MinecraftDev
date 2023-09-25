@@ -28,6 +28,7 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.extractVarArgs
 import com.demonwav.mcdev.util.referencedMethod
+import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInspection.dataFlow.CommonDataflow
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
@@ -68,7 +69,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
 
             val method = call.referencedMethod ?: return null
             val parameter = method.parameterList.getParameter(index) ?: return null
-            val translatableAnnotation = parameter.getAnnotation(TranslationConstants.TRANSLATABLE_ANNOTATION)
+            val translatableAnnotation = AnnotationUtil.findAnnotation(parameter, TranslationConstants.TRANSLATABLE_ANNOTATION)
                 ?: return null
 
             val prefix =
