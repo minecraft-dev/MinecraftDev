@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.util.McdevDfaUtil
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
@@ -32,6 +33,7 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpressionList
 import com.intellij.psi.PsiField
@@ -67,7 +69,7 @@ class WrongOperationParametersInspection : MixinInspection() {
             val (operationIndex, operationParam) = containingMethod.parameterList.parameters.asSequence()
                 .withIndex()
                 .firstOrNull { (_, param) ->
-                    param.type.equalsToText(MixinConstants.MixinExtras.OPERATION)
+                    (param.type as? PsiClassType)?.fullQualifiedName == MixinConstants.MixinExtras.OPERATION
                 } ?: return
             val (expectedParamTypes, paramNames) = containingMethod.parameterList.parameters.asSequence()
                 .take(operationIndex)
