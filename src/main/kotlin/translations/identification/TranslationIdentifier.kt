@@ -69,8 +69,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
 
             val method = call.referencedMethod ?: return null
             val parameter = method.parameterList.getParameter(index) ?: return null
-            val translatableAnnotation = AnnotationUtil.findAnnotation(parameter, TranslationConstants.TRANSLATABLE_ANNOTATION)
-                ?: return null
+            val translatableAnnotation =
+                AnnotationUtil.findAnnotation(parameter, TranslationConstants.TRANSLATABLE_ANNOTATION) ?: return null
 
             val prefix =
                 translatableAnnotation.findAttributeValue(TranslationConstants.PREFIX)?.constantStringValue ?: ""
