@@ -360,8 +360,11 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
     }
 
     companion object {
-        private fun isCallbackInfoParam(param: PsiParameter) =
-            param.type.equalsToText(MixinConstants.Classes.CALLBACK_INFO) ||
-                param.type.equalsToText(MixinConstants.Classes.CALLBACK_INFO_RETURNABLE)
+        private fun isCallbackInfoParam(param: PsiParameter): Boolean {
+            val type = (param.type as? PsiClassType)?.resolve() ?: return false
+            val qName = type.qualifiedName ?: return false
+            return qName == MixinConstants.Classes.CALLBACK_INFO ||
+                qName == MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+        }
     }
 }
