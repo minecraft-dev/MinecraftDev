@@ -26,19 +26,21 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
+import com.intellij.psi.search.GlobalSearchScope
 
-fun createVoidMethodWithParameterType(project: Project, name: String, paramType: PsiClass): PsiMethod {
-    val elementFactory = JavaPsiFacade.getElementFactory(project)
-    val newMethod = elementFactory.createMethod(name, PsiType.VOID)
+fun createVoidMethodWithParameterType(project: Project, name: String, paramType: PsiClass): PsiMethod? {
+    val newMethod = JavaPsiFacade.getElementFactory(project).createMethod(name, PsiType.VOID)
 
     val list = newMethod.parameterList
-    val parameter = elementFactory
+    val qName = paramType.qualifiedName ?: return null
+    val parameter = JavaPsiFacade.getElementFactory(project)
         .createParameter(
             "event",
-            elementFactory.createType(paramType)
+            PsiClassType.getTypeByName(qName, project, GlobalSearchScope.allScope(project)),
         )
     list.add(parameter)
 

@@ -22,12 +22,14 @@ package com.demonwav.mcdev.platform.sponge.inspection
 
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.util.Constants
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFile
@@ -58,8 +60,9 @@ class SpongeLoggingInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun visitField(field: PsiField) {
             val element = field.typeElement ?: return
+            val name = (field.type as? PsiClassType)?.fullQualifiedName ?: return
 
-            if (!field.type.equalsToText(Constants.JAVA_UTIL_LOGGER)) {
+            if (name != Constants.JAVA_UTIL_LOGGER) {
                 return
             }
 
