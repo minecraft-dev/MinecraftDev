@@ -31,6 +31,8 @@
     <item name="net.minecraft.client.KeyMapping KeyMapping(java.lang.String, com.mojang.blaze3d.platform.InputConstants.Type, int, java.lang.String) 3">
         <annotation name="com.demonwav.mcdev.annotations.Translatable"/>
     </item>
+
+    <!--region Forge -->
     <item name="net.minecraft.client.KeyMapping KeyMapping(java.lang.String, net.minecraftforge.client.settings.IKeyConflictContext, com.mojang.blaze3d.platform.InputConstants.Type, int, java.lang.String) 0">
         <annotation name="com.demonwav.mcdev.annotations.Translatable"/>
     </item>
@@ -55,4 +57,5 @@
     <item name="net.minecraft.client.KeyMapping KeyMapping(java.lang.String, net.minecraftforge.client.settings.IKeyConflictContext, net.minecraftforge.client.settings.KeyModifier, com.mojang.blaze3d.platform.InputConstants.Key, java.lang.String) 4">
         <annotation name="com.demonwav.mcdev.annotations.Translatable"/>
     </item>
+    <!--endregion-->
 </root>

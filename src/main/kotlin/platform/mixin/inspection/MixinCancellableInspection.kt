@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -57,7 +58,8 @@ class MixinCancellableInspection : MixinInspection() {
             val isCancellable = cancellableAttribute.value == true
 
             val ciParam = method.parameterList.parameters.firstOrNull {
-                it.type.equalsToText(CALLBACK_INFO) || it.type.equalsToText(CALLBACK_INFO_RETURNABLE)
+                val className = (it.type as? PsiClassType)?.fullQualifiedName ?: return@firstOrNull false
+                className == CALLBACK_INFO || className == CALLBACK_INFO_RETURNABLE
             } ?: return
 
             val ciType = (ciParam.type as? PsiClassType)?.resolve() ?: return
