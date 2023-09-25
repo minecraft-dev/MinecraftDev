@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaRecursiveElementWalkingVisitor
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiTypeCastExpression
@@ -73,7 +74,7 @@ class MixinObjectCastFoldingBuilder : CustomFoldingBuilder() {
             }
 
             val innerCast = expression.operand as? PsiTypeCastExpression ?: return
-            if (innerCast.type?.equalsToText(CommonClassNames.JAVA_LANG_OBJECT) == true) {
+            if ((innerCast.type as? PsiClassType)?.resolve()?.qualifiedName == CommonClassNames.JAVA_LANG_OBJECT) {
                 // Fold the two casts
 
                 val start = (expression as? CompositeElement)?.findChildByRole(ChildRole.LPARENTH) ?: return

@@ -30,7 +30,9 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.decapitalize
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.SmartPsiElementPointer
@@ -53,7 +55,7 @@ class InvokerHandler : MixinMemberAnnotationHandler {
         val name = getInvokerTargetName(annotation, member) ?: return emptyList()
         val constructor = name == "<init>"
         if (constructor &&
-            member.returnType?.equalsToText(targetClass.name.replace('/', '.').replace('$', '.')) != true
+            (member.returnType as? PsiClassType)?.resolve()?.fullQualifiedName?.replace('.', '/') != targetClass.name
         ) {
             return emptyList()
         }

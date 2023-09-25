@@ -51,8 +51,8 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
         chosenClass: PsiClass,
         chosenName: String,
         data: GenerationData?,
-    ): PsiMethod {
-        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass)
+    ): PsiMethod? {
+        val method = createVoidMethodWithParameterType(project, chosenName, chosenClass) ?: return null
         val modifierList = method.modifierList
 
         val subscribeAnnotation = modifierList.addAnnotation(SUBSCRIBE_ANNOTATION)
