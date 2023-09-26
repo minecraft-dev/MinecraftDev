@@ -32,6 +32,7 @@ import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -42,6 +43,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
@@ -305,8 +307,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             val parameters = descriptor.psiElement as PsiParameterList
             // We want to preserve captured locals
             val locals = parameters.parameters.dropWhile {
-                !it.type.equalsToText(MixinConstants.Classes.CALLBACK_INFO) &&
-                    !it.type.equalsToText(MixinConstants.Classes.CALLBACK_INFO_RETURNABLE)
+                val fqname = (it.type as? PsiClassType)?.fullQualifiedName ?: return@dropWhile true
+                return@dropWhile fqname != MixinConstants.Classes.CALLBACK_INFO &&
+                    fqname != MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
             }.drop(1) // the first element in the list is the CallbackInfo but we don't want it
                 .takeWhile { !it.isMixinExtrasSugar }
 
