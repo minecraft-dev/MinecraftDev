@@ -93,4 +93,5 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
 
     open fun init() {}
     open fun dispose() {}
+    open fun refresh() {}
 }

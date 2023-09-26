@@ -47,11 +47,18 @@ data class MemberReference(
         assert(owner?.contains('/') != true)
     }
 
+    val withoutDescriptor
+        get() = if (this.descriptor == null) {
+            this
+        } else {
+            copy(descriptor = null)
+        }
+
     val withoutOwner
         get() = if (this.owner == null) {
             this
         } else {
-            MemberReference(this.name, this.descriptor, null, this.matchAllNames, this.matchAllDescs)
+            copy(owner = null)
         }
 
     override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
