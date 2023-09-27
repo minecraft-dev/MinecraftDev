@@ -28,7 +28,8 @@ import com.google.common.collect.ImmutableBiMap
 object HardcodedYarnToMojmap {
     fun createMappings() = Mappings(
         ImmutableBiMap.ofEntries(
-            "net.minecraft.item.ItemStack" mapTo "net.minecraft.world.item.ItemStack"
+            "net.minecraft.item.ItemStack" mapTo "net.minecraft.world.item.ItemStack",
+            "net.minecraft.util.Formatting" mapTo "net.minecraft.ChatFormatting",
         ),
         ImmutableBiMap.ofEntries(),
         ImmutableBiMap.ofEntries(),
