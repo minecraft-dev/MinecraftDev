@@ -23,8 +23,8 @@ package com.demonwav.mcdev.insight.generation.ui
 import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.wm.ex.IdeFocusTraversalPolicy
+import com.intellij.ui.JBColor
 import com.intellij.uiDesigner.core.GridConstraints
-import com.intellij.util.ui.StartupUiUtil
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
@@ -42,7 +42,7 @@ class EventListenerWizard(panel: JPanel?, className: String, defaultListenerName
         classNameTextField.font = EditorUtil.getEditorFont()
         listenerNameTextField.font = EditorUtil.getEditorFont()
         publicVoidLabel.font = EditorUtil.getEditorFont()
-        if (StartupUiUtil.isDarkTheme) {
+        if (!JBColor.isBright()) {
             publicVoidLabel.foreground = JavaHighlightingColors.KEYWORD.defaultAttributes.foregroundColor
         } else {
             publicVoidLabel.foreground =

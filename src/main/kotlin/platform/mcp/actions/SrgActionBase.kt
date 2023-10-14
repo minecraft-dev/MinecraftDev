@@ -41,7 +41,7 @@ import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 import java.awt.Point
 import javax.swing.JComponent
-import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.text.StringEscapeUtils
 
 abstract class SrgActionBase : AnAction() {
 
@@ -119,7 +119,7 @@ abstract class SrgActionBase : AnAction() {
         }
 
         fun showSuccessBalloon(editor: Editor, element: PsiElement, text: String) {
-            val escapedText = StringEscapeUtils.escapeHtml(text)
+            val escapedText = StringEscapeUtils.escapeHtml4(text)
             val balloon = JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(escapedText, null, LightColors.SLIGHTLY_GREEN, null)
                 .setHideOnAction(true)

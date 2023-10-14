@@ -27,12 +27,12 @@ import com.intellij.facet.ui.FacetEditorTab
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.not
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.util.ui.StartupUiUtil
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -84,7 +84,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                 { afterChange { _ -> all(this, bukkit.auto, spigot.auto)(bukkit, spigot, paper) } },
             )
 
-            val isDarkMode = StartupUiUtil.isDarkTheme
+            val isDarkMode = !JBColor.isBright()
             val spongeIcon = if (isDarkMode) PlatformAssets.SPONGE_ICON_2X_DARK else PlatformAssets.SPONGE_ICON_2X
             createRow(sponge, "Sponge", spongeIcon)
 

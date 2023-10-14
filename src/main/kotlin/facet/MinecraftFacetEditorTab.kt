@@ -24,7 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.facet.ui.FacetEditorTab
-import com.intellij.util.ui.StartupUiUtil
+import com.intellij.ui.JBColor
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -102,7 +102,7 @@ class MinecraftFacetEditorTab(private val configuration: MinecraftFacetConfigura
     }
 
     override fun createComponent(): JComponent {
-        if (StartupUiUtil.isDarkTheme) {
+        if (!JBColor.isBright()) {
             spongeIcon.icon = PlatformAssets.SPONGE_ICON_2X_DARK
             mcpIcon.icon = PlatformAssets.MCP_ICON_2X_DARK
             mixinIcon.icon = PlatformAssets.MIXIN_ICON_2X_DARK

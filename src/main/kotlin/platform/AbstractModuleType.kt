@@ -32,7 +32,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import java.awt.Color
 import javax.swing.Icon
-import org.apache.commons.lang.builder.ToStringBuilder
+import org.apache.commons.lang3.builder.ToStringBuilder
 
 abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, val artifactId: String) {
 
@@ -61,7 +61,7 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
             return
         }
         val manager = EntryPointsManager.getInstance(project)
-        val annotations = (manager as? EntryPointsManagerBase)?.ADDITIONAL_ANNOTATIONS as? MutableList<String> ?: return
+        val annotations = (manager as? EntryPointsManagerBase)?.customAdditionalAnnotations ?: return
         ignoredAnnotations.asSequence()
             .filter { annotation -> !annotations.contains(annotation) }
             .forEach { annotations.add(it) }
