@@ -61,7 +61,7 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
             return
         }
         val manager = EntryPointsManager.getInstance(project)
-        val annotations = (manager as? EntryPointsManagerBase)?.customAdditionalAnnotations ?: return
+        val annotations = (manager as? EntryPointsManagerBase)?.customAdditionalAnnotations?.toMutableList() ?: return
         ignoredAnnotations.asSequence()
             .filter { annotation -> !annotations.contains(annotation) }
             .forEach { annotations.add(it) }
