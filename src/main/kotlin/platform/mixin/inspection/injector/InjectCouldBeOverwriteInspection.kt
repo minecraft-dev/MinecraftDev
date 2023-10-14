@@ -72,7 +72,7 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReturnStatement
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.psi.impl.light.LightParameter
 import com.intellij.psi.search.LocalSearchScope
@@ -149,7 +149,7 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
         memState.applyCondition(ciVar.eq(stableCiVar))
         val isCancelledVar = PlainDescriptor.createVariableValue(
             factory,
-            LightParameter("isCancelled", PsiType.BOOLEAN, methodBody)
+            LightParameter("isCancelled", PsiTypes.booleanType(), methodBody)
         )
         memState.setVarValue(isCancelledVar, falseValue)
 
