@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
@@ -219,7 +220,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                         .resolveAsm(annotation.project) as? MethodTargetMember
                     )?.classAndMethod
                 val parameters = mutableListOf<Parameter>()
-                if (insn.opcode != Opcodes.INVOKESTATIC) {
+                if (insn.opcode != Opcodes.INVOKESTATIC && insn.name != "<init>") {
                     val receiver = if (insn.opcode == Opcodes.INVOKESPECIAL && !oldSuperBehavior) {
                         targetClass.name
                     } else {
@@ -269,6 +270,10 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                 when (insn.opcode) {
                     Opcodes.INSTANCEOF ->
                         listOf(Parameter("object", Type.getType(Any::class.java).toPsiType(elementFactory)))
+
+                    Opcodes.NEW -> NewInsnInjectionPoint.findInitCall(insn)?.let {
+                        getPsiParameters(it, targetClass, annotation)
+                    }
 
                     else -> null
                 }
