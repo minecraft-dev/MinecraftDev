@@ -102,7 +102,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
             action()
         } else if (!project.isDisposed) {
             StartupManager.getInstance(project).runAfterOpened {
-                ApplicationManager.getApplication().invokeLater(action, project.disposed)
+                WriteAction.runAndWait<Throwable>(action)
             }
         }
     }
