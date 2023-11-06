@@ -1,8 +1,8 @@
 [versions]
-coroutines = "1.6.4"
-junit = "5.9.0"
-junit-platform = "1.9.0"
-asm = "9.3"
+coroutines = "1.7.3"
+junit = "5.10.0"
+junit-platform = "1.10.0"
+asm = "9.5"
 fuel = "2.3.1"
 
 [libraries]
