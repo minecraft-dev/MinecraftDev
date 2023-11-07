@@ -31,6 +31,10 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.framework.library.LibraryVersionProperties
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.runWriteActionAndWait
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -41,11 +45,17 @@ import com.intellij.openapi.roots.libraries.LibraryDetectionManager
 import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.Key
+import com.intellij.platform.ide.progress.withBackgroundProgress
+import com.intellij.platform.util.progress.forEachWithProgress
+import com.intellij.util.application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
-class MinecraftFacetDetector : StartupActivity {
+class MinecraftFacetDetector : ProjectActivity {
     companion object {
         private val libraryVersionsKey = Key<MutableMap<LibraryKind, String>>("mcdev.libraryVersions")
 
@@ -54,9 +64,14 @@ class MinecraftFacetDetector : StartupActivity {
         }
     }
 
-    override fun runActivity(project: Project) {
-        MinecraftModuleRootListener.doCheck(project)
+    override suspend fun execute(project: Project) {
+        withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+            MinecraftModuleRootListener.doCheck(project)
+        }
     }
+
+    @Service(Service.Level.PROJECT)
+    private class FacetDetectorScopeProvider(val scope: CoroutineScope)
 
     private object MinecraftModuleRootListener : ModuleRootListener {
         override fun rootsChanged(event: ModuleRootEvent) {
@@ -65,25 +80,37 @@ class MinecraftFacetDetector : StartupActivity {
             }
 
             val project = event.source as? Project ?: return
-            doCheck(project)
+            project.service<FacetDetectorScopeProvider>().scope.launch(Dispatchers.EDT) {
+                withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+                    doCheck(project)
+                }
+            }
         }
 
-        fun doCheck(project: Project) {
+        suspend fun doCheck(project: Project) {
             val moduleManager = ModuleManager.getInstance(project)
 
             var needsReimport = false
 
-            for (module in moduleManager.modules) {
+            moduleManager.modules.asList().forEachWithProgress(false) { module ->
                 val facetManager = FacetManager.getInstance(module)
                 val minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID)
 
-                if (minecraftFacet == null) {
-                    checkNoFacet(module)
-                } else {
-                    checkExistingFacet(module, minecraftFacet)
-                    if (ProjectReimporter.needsReimport(minecraftFacet)) {
-                        needsReimport = true
+                val action = {
+                    if (minecraftFacet == null) {
+                        checkNoFacet(module)
+                    } else {
+                        checkExistingFacet(module, minecraftFacet)
+                        if (ProjectReimporter.needsReimport(minecraftFacet)) {
+                            needsReimport = true
+                        }
                     }
+                }
+
+                if (application.isUnitTestMode) {
+                    action()
+                } else {
+                    runWriteActionAndWait(action)
                 }
             }
 

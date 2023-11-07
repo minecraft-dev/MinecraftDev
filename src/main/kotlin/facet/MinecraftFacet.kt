@@ -35,6 +35,7 @@ import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runWriteActionAndWait
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleGrouper
 import com.intellij.openapi.module.ModuleManager
@@ -122,17 +123,19 @@ class MinecraftFacet(
         roots.clear()
         val rootManager = ModuleRootManager.getInstance(module)
 
-        rootManager.contentEntries.asSequence()
-            .flatMap { entry -> entry.sourceFolders.asSequence() }
-            .filterNotNull { it.file }
-            .forEach {
-                when (it.rootType) {
-                    JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, it.file)
-                    JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, it.file)
-                    JavaResourceRootType.RESOURCE -> roots.put(SourceType.RESOURCE, it.file)
-                    JavaResourceRootType.TEST_RESOURCE -> roots.put(SourceType.TEST_RESOURCE, it.file)
+        runWriteActionAndWait {
+            rootManager.contentEntries.asSequence()
+                .flatMap { entry -> entry.sourceFolders.asSequence() }
+                .filterNotNull { it.file }
+                .forEach {
+                    when (it.rootType) {
+                        JavaSourceRootType.SOURCE -> roots.put(SourceType.SOURCE, it.file)
+                        JavaSourceRootType.TEST_SOURCE -> roots.put(SourceType.TEST_SOURCE, it.file)
+                        JavaResourceRootType.RESOURCE -> roots.put(SourceType.RESOURCE, it.file)
+                        JavaResourceRootType.TEST_RESOURCE -> roots.put(SourceType.TEST_RESOURCE, it.file)
+                    }
                 }
-            }
+        }
     }
 
     private fun register(type: AbstractModuleType<*>): AbstractModule {

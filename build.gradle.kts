@@ -95,7 +95,9 @@ dependencies {
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation(libs.bundles.coroutines)
+    implementation(libs.bundles.coroutines) {
+        exclude(module = "kotlinx-coroutines-core-jvm")
+    }
 
     implementation(files(gradleToolingExtensionJar))
 

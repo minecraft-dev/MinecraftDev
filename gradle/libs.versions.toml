@@ -40,6 +40,6 @@ junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref 
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
 
 [bundles]
-coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]
+coroutines = ["coroutines-swing"]
 asm = ["asm", "asm-tree", "asm-analysis"]
 fuel = ["fuel", "fuel-coroutines"]
