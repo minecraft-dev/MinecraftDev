@@ -49,9 +49,9 @@ abstract class ReflectedMemberReferenceBasePoly(element: PsiLiteral) : PsiRefere
 
         val name = memberName
         val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }
-            ?.getModuleOfType(McpModuleType)?.srgManager
-        val srgMap = srgManager?.srgMapNow
-        val mcpName = srgMap?.mapMcpToSrgName(name) ?: name
+            ?.getModuleOfType(McpModuleType)?.mappingsManager
+        val srgMap = srgManager?.mappingsNow
+        val mcpName = srgMap?.mapIntermediaryToMapped(name) ?: name
 
         return typeClass.allFields.asSequence()
             .filter { it.name == mcpName }

@@ -67,9 +67,9 @@ object ReflectedFieldReference : PsiReferenceProvider() {
                             ?: return@withInsertHandler
 
                         val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
-                            ?.getModuleOfType(McpModuleType)?.srgManager
-                        val srgMap = srgManager?.srgMapNow
-                        val srgField = srgMap?.getSrgField(field.simpleQualifiedMemberReference)
+                            ?.getModuleOfType(McpModuleType)?.mappingsManager
+                        val srgMap = srgManager?.mappingsNow
+                        val srgField = srgMap?.getIntermediaryField(field.simpleQualifiedMemberReference)
                             ?: return@withInsertHandler
 
                         context.setLaterRunnable {

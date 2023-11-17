@@ -18,11 +18,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.srg
+package com.demonwav.mcdev.platform.mcp.mappings
 
-import com.demonwav.mcdev.platform.mcp.mappings.Mappings
-import java.nio.file.Path
+import com.google.common.collect.ImmutableBiMap
 
-interface SrgParser {
-    fun parseSrg(path: Path): Mappings
+/**
+ * A temporary solution until we get something more dynamic sorted
+ */
+object HardcodedYarnToMojmap {
+    fun createMappings() = Mappings(
+        ImmutableBiMap.ofEntries(
+            "net.minecraft.item.ItemStack" mapTo "net.minecraft.world.item.ItemStack",
+            "net.minecraft.util.Formatting" mapTo "net.minecraft.ChatFormatting",
+        ),
+        ImmutableBiMap.ofEntries(),
+        ImmutableBiMap.ofEntries(),
+        hashMapOf(),
+        false,
+    )
+
+    private infix fun <T> T.mapTo(value: T) = java.util.AbstractMap.SimpleEntry(this, value)
 }
