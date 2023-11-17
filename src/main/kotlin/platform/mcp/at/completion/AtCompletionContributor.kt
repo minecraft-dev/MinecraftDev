@@ -221,7 +221,7 @@ class AtCompletionContributor : CompletionContributor() {
 
         val mcpModule = MinecraftFacet.getInstance(module)?.getModuleOfType(McpModuleType) ?: return
 
-        val srgMap = mcpModule.srgManager?.srgMapNow ?: return
+        val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return
 
         val srgResult = result.withPrefixMatcher(SrgPrefixMatcher(text))
 
@@ -230,7 +230,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            val memberReference = srgMap.getSrgField(field) ?: field.simpleQualifiedMemberReference
+            val memberReference = srgMap.getIntermediaryField(field) ?: field.simpleQualifiedMemberReference
             srgResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder
@@ -263,7 +263,7 @@ class AtCompletionContributor : CompletionContributor() {
                 continue
             }
 
-            val memberReference = srgMap.getSrgMethod(method) ?: method.qualifiedMemberReference
+            val memberReference = srgMap.getIntermediaryMethod(method) ?: method.qualifiedMemberReference
             srgResult.addElement(
                 PrioritizedLookupElement.withPriority(
                     LookupElementBuilder.create(method.nameAndParameterTypes)

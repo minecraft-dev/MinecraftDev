@@ -47,7 +47,7 @@ class AtAnnotator : Annotator {
         val module = ModuleUtilCore.findModuleForPsiElement(element) ?: return
         val facet = MinecraftFacet.getInstance(module) ?: return
         val mcpModule = facet.getModuleOfType(McpModuleType) ?: return
-        val srgMap = mcpModule.srgManager?.srgMapNow ?: return
+        val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return
 
         val reference = AtMemberReference.get(element, member) ?: return
 
@@ -64,11 +64,11 @@ class AtAnnotator : Annotator {
         // We need to check the srg map, or it can't be resolved (and no underline)
         when (member) {
             is AtFieldName -> {
-                srgMap.getMcpField(reference)?.resolveMember(element.project) ?: return
+                srgMap.tryGetMappedField(reference)?.resolveMember(element.project) ?: return
                 underline(member, holder)
             }
             is AtFunction -> {
-                srgMap.getMcpMethod(reference)?.resolveMember(element.project) ?: return
+                srgMap.tryGetMappedMethod(reference)?.resolveMember(element.project) ?: return
                 underline(member.funcName, holder)
             }
         }

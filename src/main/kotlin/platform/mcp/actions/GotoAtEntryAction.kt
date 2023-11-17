@@ -22,7 +22,7 @@ package com.demonwav.mcdev.platform.mcp.actions
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager
+import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
 import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.getDataFromActionEvent
@@ -50,12 +50,12 @@ class GotoAtEntryAction : AnAction() {
             return
         }
 
-        val srgManager = data.instance.getModuleOfType(McpModuleType)?.srgManager
+        val mappingsManager = data.instance.getModuleOfType(McpModuleType)?.mappingsManager
             // Not all ATs are in MCP modules, fallback to this if possible
             // TODO try to find SRG references for all modules if current module isn't found?
-            ?: SrgManager.findAnyInstance(data.project) ?: return showBalloon(e)
+            ?: MappingsManager.findAnyInstance(data.project) ?: return showBalloon(e)
 
-        srgManager.srgMap.onSuccess { srgMap ->
+        mappingsManager.mappings.onSuccess { srgMap ->
             var parent = data.element.parent
 
             if (parent is PsiMember) {
@@ -67,11 +67,11 @@ class GotoAtEntryAction : AnAction() {
 
             when (parent) {
                 is PsiField -> {
-                    val reference = srgMap.getSrgField(parent) ?: parent.simpleQualifiedMemberReference
+                    val reference = srgMap.getIntermediaryField(parent) ?: parent.simpleQualifiedMemberReference
                     searchForText(e, data, reference.name)
                 }
                 is PsiMethod -> {
-                    val reference = srgMap.getSrgMethod(parent) ?: parent.qualifiedMemberReference
+                    val reference = srgMap.getIntermediaryMethod(parent) ?: parent.qualifiedMemberReference
                     searchForText(e, data, reference.name + reference.descriptor)
                 }
                 else ->
