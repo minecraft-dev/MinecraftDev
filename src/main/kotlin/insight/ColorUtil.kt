@@ -79,7 +79,7 @@ private fun <T> findColorFromExpression(
     val facet = MinecraftFacet.getInstance(module) ?: return null
     val resolvedName = expression.resolvedName ?: return null
     for (abstractModuleType in facet.types) {
-        val map = abstractModuleType.classToColorMappings
+        val map = abstractModuleType.classToColorMappings(module)
         for (entry in map.entries) {
             // This is such a hack
             // Okay, type will be the fully-qualified class, but it will exclude the actual enum

@@ -18,11 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.srg
+package com.demonwav.mcdev.platform.mcp.mappings
 
-import com.demonwav.mcdev.platform.mcp.mappings.Mappings
-import java.nio.file.Path
-
-interface SrgParser {
-    fun parseSrg(path: Path): Mappings
+interface HasCustomNamedMappings {
+    val namedToMojangManager: MappingsManager?
 }

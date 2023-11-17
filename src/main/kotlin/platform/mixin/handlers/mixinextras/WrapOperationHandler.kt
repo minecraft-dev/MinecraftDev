@@ -35,7 +35,8 @@ import org.objectweb.asm.tree.MethodNode
 
 class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
     override val supportedInstructionTypes = listOf(
-        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET, InstructionType.INSTANCEOF
+        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET, InstructionType.INSTANCEOF,
+        InstructionType.INSTANTIATION
     )
 
     override fun getAtKey(annotation: PsiAnnotation): String {

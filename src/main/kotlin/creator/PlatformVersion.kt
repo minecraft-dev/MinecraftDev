@@ -25,7 +25,6 @@ import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.withSuppressed
-import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
@@ -77,11 +76,11 @@ suspend fun <T : Any> getVersionJson(path: String, type: KClass<T>): T {
 }
 
 suspend fun getText(path: String): String {
-    var thrown: FuelError? = null
+    var thrown: Exception? = null
     return URLS.mapFirstNotNull { url ->
         try {
             doCall(url + path)
-        } catch (e: FuelError) {
+        } catch (e: Exception) {
             PLATFORM_VERSION_LOGGER.warn("Failed to reach URL $url$path")
             thrown = withSuppressed(thrown, e)
             null

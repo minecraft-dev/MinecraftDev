@@ -23,7 +23,7 @@ package com.demonwav.mcdev.platform.mcp
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.mcp.srg.SrgManager
+import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.translations.TranslationFileListener
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -43,7 +43,7 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
     private val settings: McpModuleSettings = McpModuleSettings.getInstance(module)
     val accessTransformers = mutableSetOf<VirtualFile>()
 
-    var srgManager: SrgManager? = null
+    var mappingsManager: MappingsManager? = null
         private set
 
     override fun init() {
@@ -61,8 +61,8 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val file = settings.mappingFile ?: return
         val srgType = settings.srgType ?: return
 
-        srgManager = SrgManager.getInstance(file, srgType)
-        srgManager?.parse()
+        mappingsManager = MappingsManager.getInstance(file, srgType)
+        mappingsManager?.parse()
     }
 
     override val moduleType = McpModuleType
@@ -78,8 +78,8 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
         val mappingFile = data.mappingFile ?: return
         val srgType = data.srgType ?: return
 
-        srgManager = SrgManager.getInstance(mappingFile, srgType)
-        srgManager?.parse()
+        mappingsManager = MappingsManager.getInstance(mappingFile, srgType)
+        mappingsManager?.parse()
     }
 
     fun addAccessTransformerFile(file: VirtualFile) {
@@ -91,6 +91,6 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
 
         connection.disconnect()
         accessTransformers.clear()
-        srgManager = null
+        mappingsManager = null
     }
 }

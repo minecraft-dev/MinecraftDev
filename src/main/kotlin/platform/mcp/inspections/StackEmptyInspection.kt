@@ -20,10 +20,9 @@
 
 package com.demonwav.mcdev.platform.mcp.inspections
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.srg.SrgMemberReference
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedClass
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedField
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethod
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.ProblemDescriptor
@@ -36,18 +35,15 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.util.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
 import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
-import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 
 class StackEmptyInspection : BaseInspection() {
     companion object {
-        const val STACK_FQ_NAME = "net.minecraft.item.ItemStack"
-        val STACK_JVM_NAME = STACK_FQ_NAME.replace('.', '/')
-        val EMPTY_SRG = SrgMemberReference.parse("$STACK_JVM_NAME/field_190927_a")
-        val IS_EMPTY_SRG = SrgMemberReference.parse("$STACK_JVM_NAME/func_190926_b")
+        const val STACK_FQ_NAME = "net.minecraft.world.item.ItemStack"
     }
 
     @Nls
@@ -75,7 +71,7 @@ class StackEmptyInspection : BaseInspection() {
                 val compareExpression = compareExpressionPointer.element ?: return
                 val binaryExpression = binaryExpressionPointer.element ?: return
 
-                val mappedIsEmpty = compareExpression.findModule()?.getMappedMethod(IS_EMPTY_SRG)?.name ?: "isEmpty"
+                val mappedIsEmpty = compareExpression.findModule()?.getMappedMethod(STACK_FQ_NAME, "isEmpty", "()Z")
 
                 var expressionText = "${compareExpression.text}.$mappedIsEmpty()"
 
@@ -101,9 +97,10 @@ class StackEmptyInspection : BaseInspection() {
                     val rightExpression = expression.rOperand
 
                     // Check if both operands evaluate to an ItemStack
-                    if (isExpressionStack(leftExpression) && isExpressionStack(rightExpression)) {
-                        val leftEmpty = isExpressionEmptyConstant(leftExpression)
-                        val rightEmpty = isExpressionEmptyConstant(rightExpression)
+                    val module = expression.findModule() ?: return
+                    if (isExpressionStack(module, leftExpression) && isExpressionStack(module, rightExpression)) {
+                        val leftEmpty = isExpressionEmptyConstant(module, leftExpression)
+                        val rightEmpty = isExpressionEmptyConstant(module, rightExpression)
 
                         // Check that only one of the references are ItemStack.EMPTY
                         if (leftEmpty xor rightEmpty) {
@@ -117,26 +114,18 @@ class StackEmptyInspection : BaseInspection() {
                 }
             }
 
-            private fun isExpressionStack(expression: PsiExpression?): Boolean {
-                return (expression?.type as? PsiClassType)?.resolve()?.fullQualifiedName == STACK_FQ_NAME
+            private fun isExpressionStack(module: Module, expression: PsiExpression?): Boolean {
+                val fqn = (expression?.type as? PsiClassType)?.resolve()?.fullQualifiedName
+                return fqn == module.getMappedClass(STACK_FQ_NAME)
             }
 
-            private fun isExpressionEmptyConstant(expression: PsiExpression?): Boolean {
+            private fun isExpressionEmptyConstant(module: Module, expression: PsiExpression?): Boolean {
                 val reference = expression as? PsiReferenceExpression ?: return false
                 val field = reference.resolve() as? PsiField ?: return false
-                val mappedEmpty = field.findModule()?.getMappedField(EMPTY_SRG)?.name ?: "EMPTY"
-                return field.name == mappedEmpty && field.containingClass?.fullQualifiedName == STACK_FQ_NAME
+                val mappedEmpty = module.getMappedField(STACK_FQ_NAME, "EMPTY")
+                return field.name == mappedEmpty &&
+                    field.containingClass?.fullQualifiedName == module.getMappedClass(STACK_FQ_NAME)
             }
         }
-    }
-
-    private fun Module.getMappedMethod(reference: MemberReference): MemberReference? {
-        val srgManager = MinecraftFacet.getInstance(this, McpModuleType)?.srgManager
-        return srgManager?.srgMapNow?.mapToMcpMethod(reference)
-    }
-
-    private fun Module.getMappedField(reference: MemberReference): MemberReference? {
-        val srgManager = MinecraftFacet.getInstance(this, McpModuleType)?.srgManager
-        return srgManager?.srgMapNow?.mapToMcpField(reference)
     }
 }
