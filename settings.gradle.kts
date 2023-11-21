@@ -18,6 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+}
+
 rootProject.name = "MinecraftDev"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
