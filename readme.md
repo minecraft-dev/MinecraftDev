@@ -9,23 +9,23 @@ Minecraft Development for IntelliJ
     </tr>
     <tr>
         <td align="right"><b>Main Build</b></td>
-        <td colspan="2"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
+        <td colspan="2"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2022.3</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20223"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20223)/statusIcon.svg" alt="2022.3 Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20223"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20223)/statusIcon.svg" alt="2022.3 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2023.1</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20231"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20231)/statusIcon.svg" alt="2023.1 Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20231"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20231)/statusIcon.svg" alt="2023.1 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2023.2</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20232"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20232)/statusIcon.svg" alt="2023.2 Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20232"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20232)/statusIcon.svg" alt="2023.2 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="left">2023.3</td>
-        <td align="left"><a href="https://ci.denwav.dev/viewType.html?buildTypeId=MinecraftDev_Nightly_20233"><img src="https://ci.denwav.dev/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20233)/statusIcon.svg" alt="2023.3 Nightly Status" /></a></td>
+        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20233"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20233)/statusIcon.svg" alt="2023.3 Nightly Status" /></a></td>
     </tr>
     <tr>
         <td align="right"><b>OS Tests</b></td>
