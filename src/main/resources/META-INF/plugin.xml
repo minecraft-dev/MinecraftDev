@@ -142,8 +142,8 @@
         <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler" />
         <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.WrapWithCondition" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler" />
 
-        <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
-        <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
+        <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeInjectionPoint" />
+        <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeAssignInjectionPoint" />
         <injectionPoint atCode="INVOKE_STRING" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantStringMethodInjectionPoint" />
         <injectionPoint atCode="FIELD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.FieldInjectionPoint" />
         <injectionPoint atCode="NEW" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint" />
