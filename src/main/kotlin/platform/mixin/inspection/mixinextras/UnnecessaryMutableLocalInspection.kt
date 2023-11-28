@@ -59,7 +59,7 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
                     // Mutable Local references do have different semantics inside a WrapOperation.
                     ?.let { it is InjectorAnnotationHandler && it !is WrapOperationHandler } == true
             }
-            if (hasValidMixinAnnotation) {
+            if (!hasValidMixinAnnotation) {
                 return
             }
 
