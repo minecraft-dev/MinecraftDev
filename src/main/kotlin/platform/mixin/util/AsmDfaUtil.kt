@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.util.internalName
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
@@ -53,6 +54,10 @@ object AsmDfaUtil {
                     ),
                 ).analyze(clazz.name, method)
             } catch (e: AnalyzerException) {
+                val cause = e.cause
+                if (cause is ProcessCanceledException) {
+                    throw cause
+                }
                 LOGGER.warn("AsmDfaUtil.analyzeMethod failed", e)
                 null
             }
