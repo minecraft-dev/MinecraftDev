@@ -980,6 +980,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
+        <localInspection displayName="Unnecessary mutable reference to captured local"
+                         shortName="MixinExtrasUnnecessaryMutableLocal"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
         <!--endregion-->
 
         <!--region Configuration -->
