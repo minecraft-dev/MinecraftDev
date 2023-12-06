@@ -41,6 +41,7 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiUtil
@@ -183,13 +184,13 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
         private val PsiClassType.innerRefType: PsiType?
             get() =
                 when (resolve()?.qualifiedName?.substringAfterLast('.')) {
-                    "LocalBooleanRef" -> PsiType.BOOLEAN
-                    "LocalCharRef" -> PsiType.CHAR
-                    "LocalDoubleRef" -> PsiType.DOUBLE
-                    "LocalFloatRef" -> PsiType.FLOAT
-                    "LocalIntRef" -> PsiType.INT
-                    "LocalLongRef" -> PsiType.LONG
-                    "LocalShortRef" -> PsiType.SHORT
+                    "LocalBooleanRef" -> PsiTypes.booleanType()
+                    "LocalCharRef" -> PsiTypes.charType()
+                    "LocalDoubleRef" -> PsiTypes.doubleType()
+                    "LocalFloatRef" -> PsiTypes.floatType()
+                    "LocalIntRef" -> PsiTypes.intType()
+                    "LocalLongRef" -> PsiTypes.longType()
+                    "LocalShortRef" -> PsiTypes.shortType()
                     "LocalRef" -> parameters.getOrNull(0)
                     else -> null
                 }
