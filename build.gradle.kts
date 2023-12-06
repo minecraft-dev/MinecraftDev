@@ -21,7 +21,6 @@
 import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.cadixdev.gradle.licenser.tasks.LicenseUpdate
 import org.gradle.internal.jvm.Jvm
-import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
@@ -262,7 +261,11 @@ tasks.test {
         }
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
-    jvmArgs("--illegal-access=deny")
+
+    jvmArgs(
+        "-Dsun.io.useCanonCaches=false",
+        "-Dsun.io.useCanonPrefixCache=false",
+    )
 }
 
 idea {
@@ -387,22 +390,4 @@ tasks.runIde {
 tasks.buildSearchableOptions {
     // not working atm
     enabled = false
-    // https://youtrack.jetbrains.com/issue/IDEA-210683
-    jvmArgs(
-        "--illegal-access=deny",
-        "--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED",
-        "--add-opens=java.base/java.lang=ALL-UNNAMED",
-        "--add-opens=java.base/java.util=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
-        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED",
-        "--add-opens=java.desktop/javax.swing=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
-        "--add-opens=java.desktop/sun.swing=ALL-UNNAMED",
-    )
-
-    if (OperatingSystem.current().isMacOsX) {
-        jvmArgs("--add-opens=java.desktop/com.apple.eawt.event=ALL-UNNAMED")
-    }
 }

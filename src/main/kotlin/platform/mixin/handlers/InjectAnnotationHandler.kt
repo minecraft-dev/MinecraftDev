@@ -35,7 +35,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiQualifiedReference
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -65,7 +65,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         result.add(
             ParameterGroup(
                 listOf(
-                    if (returnType == PsiType.VOID) {
+                    if (returnType == PsiTypes.voidType()) {
                         Parameter("ci", callbackInfoType(annotation.project))
                     } else {
                         Parameter(
@@ -127,7 +127,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
             }
         }
 
-        return listOf(MethodSignature(result, PsiType.VOID))
+        return listOf(MethodSignature(result, PsiTypes.voidType()))
     }
 
     override val allowCoerce = true

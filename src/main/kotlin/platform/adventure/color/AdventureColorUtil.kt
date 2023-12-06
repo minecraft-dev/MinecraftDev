@@ -24,7 +24,7 @@ import com.demonwav.mcdev.insight.findColor
 import com.demonwav.mcdev.platform.adventure.AdventureConstants
 import com.demonwav.mcdev.platform.adventure.AdventureModuleType
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import java.awt.Color
 import kotlin.math.roundToInt
 import org.jetbrains.uast.UCallExpression
@@ -85,7 +85,7 @@ fun PsiElement.findAdventureColor(): Pair<Color, UElement>? {
         }
 
         val params = call.valueArguments
-        if (params.size == 1 && params[0].getExpressionType() != PsiType.INT) {
+        if (params.size == 1 && params[0].getExpressionType() != PsiTypes.intType()) {
             return params[0].findAdventureColor()
         }
     }

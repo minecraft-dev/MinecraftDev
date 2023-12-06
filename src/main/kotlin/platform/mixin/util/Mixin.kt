@@ -44,6 +44,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
@@ -165,7 +166,7 @@ fun isAssignable(left: PsiType, right: PsiType, allowPrimitiveConversion: Boolea
         left is PsiArrayType -> right is PsiArrayType && isAssignable(left.componentType, right.componentType)
         else -> {
             if (left !is PsiClassType || right !is PsiClassType) {
-                if (right == PsiType.NULL && left !is PsiPrimitiveType) {
+                if (right == PsiTypes.nullType() && left !is PsiPrimitiveType) {
                     return true
                 }
                 if (!allowPrimitiveConversion && (left is PsiPrimitiveType || right is PsiPrimitiveType)) {

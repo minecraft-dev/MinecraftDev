@@ -39,6 +39,8 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiReference
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
+import java.awt.Point
+import javax.swing.JComponent
 import org.apache.commons.lang.StringEscapeUtils
 
 abstract class SrgActionBase : AnAction() {
@@ -85,21 +87,34 @@ abstract class SrgActionBase : AnAction() {
                 .createBalloon()
 
             val project = e.project ?: return
-            val statusBar = WindowManager.getInstance().getStatusBar(project)
 
             invokeLater {
                 val element = getDataFromActionEvent(e)?.element
                 val editor = getDataFromActionEvent(e)?.editor
-                val at = if (element != null && editor != null) {
+                if (element != null && editor != null) {
                     val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
-                    RelativePoint(
+                    val at = RelativePoint(
                         editor.contentComponent,
                         editor.visualPositionToXY(VisualPosition(pos.line + 1, pos.column)),
                     )
-                } else {
-                    RelativePoint.getCenterOf(statusBar.component)
+                    balloon.show(at, Balloon.Position.below)
+                    return@invokeLater
                 }
-                balloon.show(at, Balloon.Position.below)
+
+                val statusBar = WindowManager.getInstance().getStatusBar(project)
+                val statusBarComponent = statusBar.component
+                if (statusBarComponent != null) {
+                    balloon.show(RelativePoint.getCenterOf(statusBarComponent), Balloon.Position.below)
+                    return@invokeLater
+                }
+
+                val focused = WindowManager.getInstance().getFocusedComponent(project)
+                if (focused is JComponent) {
+                    balloon.show(RelativePoint.getCenterOf(focused), Balloon.Position.below)
+                    return@invokeLater
+                }
+
+                balloon.show(RelativePoint.fromScreen(Point()), Balloon.Position.below)
             }
         }
 

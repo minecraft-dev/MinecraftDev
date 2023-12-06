@@ -125,7 +125,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
             throw IOException("Unable to process template", e)
         }
 
-        val pathStr = "$outputDirectory/${asset.targetFileName}"
+        val pathStr = "$outputDirectory/${asset.relativePath}"
         val path = Path.of(pathStr)
         path.parent?.let(NioFiles::createDirectories)
         Files.writeString(path, code)
@@ -136,7 +136,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
     private fun generateFile(asset: GeneratorResourceFile): VirtualFile? {
         val content = asset.resource.openStream().use { it.readAllBytes() }
 
-        val pathStr = "$outputDirectory/${asset.targetFileName}"
+        val pathStr = "$outputDirectory/${asset.relativePath}"
         val path = Path.of(pathStr)
         path.parent?.let(NioFiles::createDirectories)
         Files.write(path, content)
@@ -145,7 +145,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
     }
 
     private fun generateFile(asset: GeneratorEmptyDirectory): VirtualFile? {
-        val pathStr = "$outputDirectory/${asset.targetFileName}"
+        val pathStr = "$outputDirectory/${asset.relativePath}"
         val path = Path.of(pathStr)
         NioFiles.createDirectories(path)
         return VfsUtil.findFile(path, true)
@@ -183,7 +183,7 @@ sealed class FixedGeneratorAsset {
 }
 
 data class GeneratorAssetDelegate(val delegate: GeneratorAsset) : FixedGeneratorAsset() {
-    override val targetFileName get() = delegate.targetFileName
+    override val targetFileName get() = delegate.relativePath
 }
 
 class GeneratorFile(

@@ -31,7 +31,6 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.enableIf
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.UIUtil
 import javax.swing.Icon
@@ -290,7 +289,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
         platform.enabled.apply(enabledCheckbox)
         platform.auto.afterChange { _ -> checkAuto(platform.auto, platform.enabled, platform.platform) }
         platform.auto.apply(autoCheckbox)
-        checkBox("").bindSelected(platform.enabled).enableIf(platform.auto.not())
+        checkBox("").bindSelected(platform.enabled).enabledIf(platform.auto.not())
         checkBox("").bindSelected(platform.auto)
     }.layout(RowLayout.PARENT_GRID)
 }

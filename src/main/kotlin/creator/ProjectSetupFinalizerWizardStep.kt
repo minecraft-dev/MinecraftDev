@@ -33,8 +33,8 @@ import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.DialogValidation
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
@@ -70,11 +70,13 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
     }
 
     override fun setupUI(builder: Panel) {
-        step?.setupUI(builder)
+        for (step in finalizers) {
+            step.setupUI(builder)
+        }
         if (finalizers.isNotEmpty()) {
             builder.row {
                 cell(JPanel())
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .validation(
                         DialogValidation {
                             finalizers.mapFirstNotNull(ProjectSetupFinalizer::validate)?.let(::ValidationInfo)
@@ -85,7 +87,9 @@ class ProjectSetupFinalizerWizardStep(parent: NewProjectWizardStep) : AbstractNe
     }
 
     override fun setupProject(project: Project) {
-        step?.setupProject(project)
+        for (step in finalizers) {
+            step.setupProject(project)
+        }
     }
 }
 

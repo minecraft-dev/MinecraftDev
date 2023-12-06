@@ -32,8 +32,8 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.DialogValidation
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
@@ -108,7 +108,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                             val labelValidationText =
                                 MCDevBundle("creator.ui.generic_validation_failure.message", description, errorMessage)
                             val label = label(labelValidationText)
-                                .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                                .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                                 .validation(DialogValidation { ValidationInfo(labelValidationText) })
                             label.component.foreground = JBColor.RED
                         }
@@ -154,7 +154,7 @@ abstract class AbstractLatentStep<T>(parent: NewProjectWizardStep) : AbstractNew
                         }
                     },
                 )
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .validation(
                         DialogValidation {
                             ValidationInfo(MCDevBundle("creator.ui.generic_unfinished.message", description))

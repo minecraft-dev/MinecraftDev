@@ -27,10 +27,10 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindStorage
-import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.CHECK_ARTIFACT_ID
 import com.intellij.openapi.ui.validation.CHECK_GROUP_ID
 import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
 import com.intellij.ui.dsl.builder.Panel
@@ -72,21 +72,21 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
                 textField()
                     .bindText(groupIdProperty)
                     .columns(COLUMNS_MEDIUM)
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
             }
             row(MCDevBundle("creator.ui.group.artifact_id")) {
                 textField()
                     .bindText(artifactIdProperty)
                     .columns(COLUMNS_MEDIUM)
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
             }
             row(MCDevBundle("creator.ui.group.version")) {
                 textField()
                     .bindText(versionProperty)
                     .columns(COLUMNS_MEDIUM)
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .textValidation(versionValidation)
             }
         }.expanded = true
