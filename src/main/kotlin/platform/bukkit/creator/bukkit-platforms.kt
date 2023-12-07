@@ -26,8 +26,10 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
+import com.intellij.ui.content.AlertIcon
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindSelected
 
@@ -74,7 +76,11 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
     override fun setupUI(builder: Panel) {
         super.setupUI(builder)
         with(builder) {
-            row("Paper manifest:") {
+            row("Paper Manifest:") {
+                icon(AlertIcon(AllIcons.General.Warning)).comment(
+                    "Paper plugins are <a href=\"https://docs.papermc.io/paper/dev/getting-started/paper-plugins\">" +
+                        "still experimental</a>, their usage is discouraged for general purpose development. "
+                )
                 checkBox("Use paper-plugin.yml")
                     .bindSelected(usePaperManifestProperty)
                     .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
