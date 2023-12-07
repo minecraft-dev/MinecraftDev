@@ -20,9 +20,13 @@
 
 package com.demonwav.mcdev.facet
 
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.externalSystem.ExternalSystemManager
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.model.ProjectSystemId
+import com.intellij.openapi.externalSystem.service.project.trusted.ExternalSystemTrustedProjectDialog
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 
@@ -38,26 +42,33 @@ object ProjectReimporter {
     fun needsReimport(facet: MinecraftFacet) =
         facet.configuration.state.projectReimportVersion < CURRENT_REIMPORT_VERSION
 
-    fun reimport(project: Project) {
+    suspend fun reimport(project: Project) {
         for (module in ModuleManager.getInstance(project).modules) {
             val minecraftFacet = MinecraftFacet.getInstance(module) ?: continue
             minecraftFacet.configuration.state.projectReimportVersion = CURRENT_REIMPORT_VERSION
         }
 
-        val refreshAllProjectsAction = ActionManager.getInstance().getAction("ExternalSystem.RefreshAllProjects")
-        if (refreshAllProjectsAction == null) {
-            log.error("Could not find refresh all projects action")
+        val systemIds = getSystemIds()
+        if (systemIds.isEmpty()) {
+            log.error("No external system found")
             return
         }
-        val callback = ActionManager.getInstance().tryToExecute(
-            refreshAllProjectsAction,
-            null,
-            null,
-            ActionPlaces.UNKNOWN,
-            true
-        )
-        callback.doWhenRejected { error ->
-            log.error("Rejected refresh all projects: $error")
+
+        // We save all documents because there is a possible case that there is an external system config file changed inside the ide.
+        FileDocumentManager.getInstance().saveAllDocuments()
+
+        for (externalSystemId in systemIds) {
+            if (ExternalSystemTrustedProjectDialog.confirmLoadingUntrustedProjectAsync(project, externalSystemId)) {
+                ExternalSystemUtil.refreshProjects(ImportSpecBuilder(project, externalSystemId))
+            }
         }
+    }
+
+    private fun getSystemIds(): List<ProjectSystemId> {
+        val systemIds: MutableList<ProjectSystemId> = ArrayList()
+        ExternalSystemManager.EP_NAME.forEachExtensionSafe { manager: ExternalSystemManager<*, *, *, *, *> ->
+            systemIds.add(manager.systemId)
+        }
+        return systemIds
     }
 }

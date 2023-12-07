@@ -115,7 +115,9 @@ class MinecraftFacetDetector : ProjectActivity {
             }
 
             if (needsReimport) {
-                ProjectReimporter.reimport(project)
+                project.service<FacetDetectorScopeProvider>().scope.launch(Dispatchers.EDT) {
+                    ProjectReimporter.reimport(project)
+                }
             }
         }
 
