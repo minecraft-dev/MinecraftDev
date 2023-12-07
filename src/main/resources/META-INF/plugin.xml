@@ -80,6 +80,7 @@
         <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
         </extensionPoint>
+        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" />
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
@@ -135,9 +136,14 @@
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyConstant" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyConstantHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.ModifyVariable" implementation="com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableHandler" />
         <mixinAnnotationHandler annotation="org.spongepowered.asm.mixin.injection.Redirect" implementation="com.demonwav.mcdev.platform.mixin.handlers.RedirectInjectorHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyExpressionValue" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyExpressionValueHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyReceiver" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyReceiverHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyReturnValue" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyReturnValueHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.WrapWithCondition" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler" />
 
-        <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
-        <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.MethodInjectionPoint" />
+        <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeInjectionPoint" />
+        <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeAssignInjectionPoint" />
         <injectionPoint atCode="INVOKE_STRING" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantStringMethodInjectionPoint" />
         <injectionPoint atCode="FIELD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.FieldInjectionPoint" />
         <injectionPoint atCode="NEW" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint" />
@@ -147,6 +153,8 @@
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
+
+        <injectionPointAnnotation annotation="org.spongepowered.asm.mixin.injection.Constant" atCode="CONSTANT" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -264,6 +272,8 @@
                                order="before javaSkipAutopopupInStrings"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationIndex"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.translations.index.TranslationInverseIndex"/>
+        <java.externalAnnotation.locationProvider implementation="com.demonwav.mcdev.translations.identification.TranslationAnnotationsLocationProvider"/>
+        <externalAnnotationsArtifactsResolver implementation="com.demonwav.mcdev.translations.identification.TranslationExternalAnnotationsArtifactsResolver" order="first"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
 
@@ -426,10 +436,8 @@
                                order="before javaSkipAutopopupInStrings"/>
         <weigher key="completion" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionWeigher" id="mcdev.mixin" order="first"/>
 
-        <facet.toolWindow anchor="bottom" icon="/assets/icons/mixin/mixin_class_gutter.png" canCloseContents="true"
-                          doNotActivateOnStart="true" facetIdList="minecraft" showOnStripeByDefault="false"
-                          factoryClass="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction$TWFactory"
-                          id="Find Mixins"/>
+        <toolWindow anchor="bottom" icon="/assets/icons/mixin/mixin_class_gutter.png" canCloseContents="true" doNotActivateOnStart="true"
+                    factoryClass="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction$TWFactory" id="Find Mixins" />
 
         <!-- Mixin configuration -->
         <fileType name="Mixin Configuration" language="JSON" implementationClass="com.demonwav.mcdev.platform.mixin.config.MixinConfigFileType" fieldName="INSTANCE" />
@@ -485,14 +493,14 @@
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="ERROR"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
         <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
-                         level="ERROR"
+                         level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
         <localInspection displayName="Superfluous format arguments"
@@ -641,13 +649,6 @@
         <!--endregion-->
 
         <!--region MCP INSPECTIONS-->
-        <localInspection displayName="MCP Entity class missing World constructor"
-                         groupName="MCP"
-                         language="JAVA"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.inspections.EntityConstructorInspection"/>
         <localInspection displayName="Unused access transformer"
                          groupName="MCP"
                          language="Access Transformers"
@@ -672,6 +673,7 @@
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
+        <!--region Generic -->
         <localInspection displayName="Mixin is not written in Java"
                          shortName="NonJavaMixin"
                          groupName="Mixin"
@@ -744,8 +746,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
+        <!--endregion-->
 
-        <!-- Annotation handlers -->
+        <!--region Annotation handlers -->
         <localInspection displayName="Unresolved mixin annotation target"
                          shortName="MixinAnnotationTarget"
                          groupName="Mixin"
@@ -754,8 +757,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection"/>
+        <!--endregion-->
 
-        <!-- Added Members Inspections -->
+        <!--region Added Members Inspections -->
         <localInspection displayName="Missing @Unique annotation"
                          shortName="MissingUnique"
                          groupName="Mixin"
@@ -772,8 +776,9 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
+        <!--endregion-->
 
-        <!-- Implements Inspections -->
+        <!--region Implements Inspections -->
         <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
                          shortName="SoftImplementOverrides"
                          groupName="Mixin"
@@ -822,8 +827,9 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
+        <!--endregion-->
 
-        <!-- Injector Inspections -->
+        <!--region Injector Inspections -->
         <localInspection displayName="Implicit constructor invoker"
                          shortName="ImplicitConstructorInvoker"
                          groupName="Mixin"
@@ -864,8 +870,9 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
+        <!--endregion-->
 
-        <!-- Overwrite Inspections -->
+        <!--region Overwrite Inspections -->
         <localInspection displayName="Invalid @Overwrite method modifiers"
                          shortName="OverwriteModifiers"
                          groupName="Mixin"
@@ -882,8 +889,9 @@
                          level="WEAK WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteAuthorInspection"/>
+        <!--endregion-->
 
-        <!-- Reference Inspections -->
+        <!--region Reference Inspections -->
         <localInspection displayName="Invalid Mixin member reference"
                          shortName="InvalidMemberReference"
                          groupName="Mixin"
@@ -924,8 +932,9 @@
                          level="WEAK WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnnecessaryQualifiedMemberReferenceInspection"/>
+        <!--endregion-->
 
-        <!-- Shadow Inspections -->
+        <!--region Shadow Inspections -->
         <localInspection displayName="Invalid @Shadow modifiers"
                          shortName="ShadowModifiers"
                          groupName="Mixin"
@@ -958,8 +967,28 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
+        <!--endregion-->
 
-        <!-- Configuration -->
+        <!--region Mixin Extras -->
+        <localInspection displayName="Wrong @WrapOperation Operation parameters"
+                         shortName="MixinExtrasOperationParameters"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
+        <localInspection displayName="Unnecessary mutable reference to captured local"
+                         shortName="MixinExtrasUnnecessaryMutableLocal"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
+        <!--endregion-->
+
+        <!--region Configuration -->
         <localInspection displayName="Unresolved config reference"
                          shortName="UnresolvedConfigReference"
                          groupName="Mixin"
@@ -992,6 +1021,7 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
+        <!--endregion-->
         <!--endregion-->
 
         <!--region BUNGEECORD INSPECTIONS-->

@@ -75,4 +75,11 @@ object MixinConstants {
         const val REDIRECT = "org.spongepowered.asm.mixin.injection.Redirect"
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
     }
+
+    object MixinExtras {
+        const val OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.Operation"
+        const val WRAP_OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation"
+        const val LOCAL = "com.llamalad7.mixinextras.sugar.Local"
+        const val LOCAL_REF_PACKAGE = "com.llamalad7.mixinextras.sugar.ref."
+    }
 }

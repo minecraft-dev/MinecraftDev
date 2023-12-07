@@ -20,8 +20,9 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
+import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import java.nio.file.Path
 
 interface SrgParser {
-    fun parseSrg(path: Path): McpSrgMap
+    fun parseSrg(path: Path): Mappings
 }

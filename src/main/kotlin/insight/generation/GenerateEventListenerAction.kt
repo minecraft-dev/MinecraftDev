@@ -20,6 +20,14 @@
 
 package com.demonwav.mcdev.insight.generation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInsight.generation.actions.BaseGenerateAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 
-class GenerateEventListenerAction : BaseGenerateAction(GenerateEventListenerHandler())
+class GenerateEventListenerAction : BaseGenerateAction(GenerateEventListenerHandler()) {
+
+    override fun update(e: AnActionEvent) {
+        super.update(e)
+        e.presentation.text = MCDevBundle("generate.event_listener.title")
+    }
+}

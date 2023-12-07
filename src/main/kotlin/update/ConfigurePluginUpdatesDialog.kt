@@ -91,14 +91,14 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
             channelBox.component.addItem(channels.title)
         }
 
-        channelBox.component.selectedIndex = initialSelectedChannel
-
         Channels.values().forEachIndexed { i, channel ->
             if (channel.hasChannel()) {
                 initialSelectedChannel = i + 1
                 return@forEachIndexed
             }
         }
+
+        channelBox.component.selectedIndex = initialSelectedChannel
 
         channelBox.component.addActionListener { resetUpdateStatus() }
         updateCheckInProgressIcon.component.isVisible = false

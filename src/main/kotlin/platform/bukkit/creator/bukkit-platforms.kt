@@ -28,7 +28,7 @@ import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.observable.util.bindBooleanStorage
-import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.ui.content.AlertIcon
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindSelected
@@ -83,7 +83,7 @@ class PaperPlatformStep(parent: BukkitPlatformStep) : AbstractBukkitPlatformStep
                 )
                 checkBox("Use paper-plugin.yml")
                     .bindSelected(usePaperManifestProperty)
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
             }
         }
     }

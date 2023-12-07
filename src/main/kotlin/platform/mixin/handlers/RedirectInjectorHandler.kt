@@ -38,6 +38,7 @@ import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -196,7 +197,7 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
             return listOf(
                 MethodSignature(
                     listOf(ParameterGroup(parameters)),
-                    PsiType.VOID,
+                    PsiTypes.voidType(),
                 ),
             )
         }
@@ -290,7 +291,7 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
                             ),
                         ),
                     ),
-                    PsiType.INT,
+                    PsiTypes.intType(),
                 ),
             )
         }
@@ -322,7 +323,7 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
                         ParameterGroup(
                             listOf(
                                 Parameter("array", psiArrayType),
-                                Parameter("index", PsiType.INT),
+                                Parameter("index", PsiTypes.intType()),
                             ),
                         ),
                     ),
@@ -358,12 +359,12 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
                         ParameterGroup(
                             listOf(
                                 Parameter("array", psiArrayType),
-                                Parameter("index", PsiType.INT),
+                                Parameter("index", PsiTypes.intType()),
                                 Parameter("value", psiArrayType.componentType),
                             ),
                         ),
                     ),
-                    PsiType.VOID,
+                    PsiTypes.voidType(),
                 ),
             )
         }
@@ -428,7 +429,7 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
                 ),
             )
             return listOf(
-                MethodSignature(listOf(parameters), PsiType.BOOLEAN),
+                MethodSignature(listOf(parameters), PsiTypes.booleanType()),
                 MethodSignature(listOf(parameters), classType),
             )
         }

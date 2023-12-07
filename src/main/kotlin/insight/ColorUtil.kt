@@ -30,6 +30,7 @@ import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.JVMElementFactories
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.GlobalSearchScope
 import java.awt.Color
 import java.util.Locale
@@ -78,7 +79,7 @@ private fun <T> findColorFromExpression(
     val facet = MinecraftFacet.getInstance(module) ?: return null
     val resolvedName = expression.resolvedName ?: return null
     for (abstractModuleType in facet.types) {
-        val map = abstractModuleType.classToColorMappings
+        val map = abstractModuleType.classToColorMappings(module)
         for (entry in map.entries) {
             // This is such a hack
             // Okay, type will be the fully-qualified class, but it will exclude the actual enum
@@ -159,7 +160,7 @@ private fun findColorFromCallExpression(
         types.size == 1 ->
             colorFromSingleArgument(arguments[0])?.let { it to arguments[0] }
         // Triple Integer Argument
-        types.size == 3 && types.all { it == PsiType.INT } ->
+        types.size == 3 && types.all { it == PsiTypes.intType() } ->
             colorFromThreeArguments(arguments)?.let { it to methodExpression }
         vectorClasses != null && types.size == 1 -> {
             val scope = GlobalSearchScope.allScope(project)

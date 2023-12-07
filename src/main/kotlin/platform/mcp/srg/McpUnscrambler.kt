@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mcp.srg
 
+import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
 import com.intellij.openapi.project.Project
 import com.intellij.unscramble.UnscrambleSupport
 import javax.swing.JComponent
@@ -31,7 +32,7 @@ class McpUnscrambler : UnscrambleSupport<JComponent> {
     override fun getPresentableName() = "Remap SRG names"
 
     override fun unscramble(project: Project, text: String, logName: String, settings: JComponent?): String? {
-        val srgMap = SrgManager.findAnyInstance(project)?.srgMapNow ?: return null
-        return srgPattern.replace(text) { srgMap.mapMcpToSrgName(it.value) ?: it.value }
+        val srgMap = MappingsManager.findAnyInstance(project)?.mappingsNow ?: return null
+        return srgPattern.replace(text) { srgMap.mapIntermediaryToMapped(it.value) ?: it.value }
     }
 }

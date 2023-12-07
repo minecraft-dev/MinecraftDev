@@ -25,6 +25,7 @@ import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.ex.EntryPointsManager
 import com.intellij.codeInspection.ex.EntryPointsManagerBase
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
@@ -51,8 +52,7 @@ abstract class AbstractModuleType<out T : AbstractModule>(val groupId: String, v
 
     abstract val listenerAnnotations: List<String>
 
-    val classToColorMappings: Map<String, Color>
-        get() = this.colorMap
+    open fun classToColorMappings(module: Module): Map<String, Color> = this.colorMap
 
     abstract fun generateModule(facet: MinecraftFacet): T
 

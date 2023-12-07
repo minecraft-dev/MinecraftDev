@@ -25,8 +25,8 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.validation.AFTER_GRAPH_PROPAGATION
 import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.openapi.ui.validation.and
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.Key
@@ -75,7 +75,7 @@ abstract class AbstractModIdStep(
                 textField()
                     .bindText(idProperty)
                     .columns(COLUMNS_MEDIUM)
-                    .validationRequestor(AFTER_GRAPH_PROPAGATION(propertyGraph))
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(propertyGraph))
                     .textValidation(CHECK_NON_EMPTY and idValidation)
             }
         }

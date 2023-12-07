@@ -25,7 +25,6 @@ import com.demonwav.mcdev.translations.identification.TranslationInstance.Compan
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
@@ -57,7 +56,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
         override fun visitLiteralExpression(expression: PsiLiteralExpression) {
             val result = TranslationInstance.find(expression)
             if (
-                result != null && result.foldingElement is PsiCall &&
+                result != null && result.required && result.foldingElement is PsiCall &&
                 result.formattingError == FormattingError.SUPERFLUOUS
             ) {
                 registerProblem(
@@ -81,7 +80,6 @@ class SuperfluousFormatInspection : TranslationInspection() {
             holder.registerProblem(
                 expression,
                 "There are missing formatting arguments to satisfy '${result.text}'",
-                ProblemHighlightType.GENERIC_ERROR,
                 *quickFixes,
             )
         }

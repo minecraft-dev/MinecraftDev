@@ -23,9 +23,12 @@ package com.demonwav.mcdev.platform.mcp
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedClass
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedField
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.util.CommonColors
-import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.openapi.module.Module
+import java.awt.Color
 import javax.swing.Icon
 
 object McpModuleType : AbstractModuleType<McpModule>("", "") {
@@ -33,8 +36,16 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
     private const val ID = "MCP_MODULE_TYPE"
 
     init {
-        CommonColors.applyStandardColors(colorMap, McpConstants.TEXT_FORMATTING)
         CommonColors.applyStandardColors(colorMap, McpConstants.CHAT_FORMATTING)
+    }
+
+    override fun classToColorMappings(module: Module): Map<String, Color> {
+        return colorMap.mapKeys { key ->
+            val parts = key.key.split('.')
+            val className = parts.dropLast(1).joinToString(".")
+            val fieldName = parts.last()
+            "${module.getMappedClass(className)}.${module.getMappedField(className, fieldName)}"
+        }
     }
 
     override val platformType = PlatformType.MCP
@@ -45,6 +56,4 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
     override val hasIcon = false
 
     override fun generateModule(facet: MinecraftFacet) = McpModule(facet)
-
-    val MC_1_12_2 = SemanticVersion.release(1, 12, 2)
 }

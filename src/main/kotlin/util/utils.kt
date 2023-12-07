@@ -117,7 +117,7 @@ inline fun <T : Any?> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T
     return result
 }
 
-inline fun <T> runReadActionAsync(crossinline runnable: () -> T): Promise<T> {
+fun <T> runReadActionAsync(runnable: () -> T): Promise<T> {
     return runAsync {
         runReadAction(runnable)
     }
@@ -234,7 +234,11 @@ fun Module.findChildren(): Set<Module> {
                 continue
             }
 
-            val path = manager.getModuleGroupPath(m) ?: continue
+            val path = manager.getModuleGrouper(null).getGroupPath(m)
+            if (path.isEmpty()) {
+                continue
+            }
+
             val namedModule = manager.findModuleByName(path.last()) ?: continue
 
             if (namedModule != this) {
@@ -364,11 +368,13 @@ inline fun loggerForTopLevel() = Logger.getInstance(MethodHandles.lookup().looku
 inline fun <T> runCatchingKtIdeaExceptions(action: () -> T): T? = try {
     action()
 } catch (e: Exception) {
-    if (e.javaClass.name == "org.jetbrains.kotlin.idea.caches.resolve.KotlinIdeaResolutionException") {
-        loggerForTopLevel().info("Caught Kotlin plugin exception", e)
-        null
-    } else {
-        throw e
+    when (e.javaClass.name) {
+        "org.jetbrains.kotlin.idea.caches.resolve.KotlinIdeaResolutionException",
+        "org.jetbrains.kotlin.utils.KotlinExceptionWithAttachments" -> {
+            loggerForTopLevel().info("Caught Kotlin plugin exception", e)
+            null
+        }
+        else -> throw e
     }
 }
 

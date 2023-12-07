@@ -70,6 +70,9 @@ class MinecraftFacetDetector : StartupActivity {
 
         fun doCheck(project: Project) {
             val moduleManager = ModuleManager.getInstance(project)
+
+            var needsReimport = false
+
             for (module in moduleManager.modules) {
                 val facetManager = FacetManager.getInstance(module)
                 val minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID)
@@ -78,7 +81,14 @@ class MinecraftFacetDetector : StartupActivity {
                     checkNoFacet(module)
                 } else {
                     checkExistingFacet(module, minecraftFacet)
+                    if (ProjectReimporter.needsReimport(minecraftFacet)) {
+                        needsReimport = true
+                    }
                 }
+            }
+
+            if (needsReimport) {
+                ProjectReimporter.reimport(project)
             }
         }
 
@@ -175,8 +185,8 @@ class MinecraftFacetDetector : StartupActivity {
                     if (m.name.startsWith("SpongeAPI", ignoreCase = true)) {
                         // We don't want want to add parent modules in module groups
                         val moduleManager = ModuleManager.getInstance(m.project)
-                        val groupPath = moduleManager.getModuleGroupPath(m)
-                        if (groupPath == null) {
+                        val groupPath = moduleManager.getModuleGrouper(null).getGroupPath(m)
+                        if (groupPath.isEmpty()) {
                             platformKinds.add(SPONGE_LIBRARY_KIND)
                             return@forEach true
                         }

@@ -74,8 +74,8 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                             ?: return@withInsertHandler
                         val params = literal.parent as? PsiExpressionList ?: return@withInsertHandler
                         val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
-                            ?.getModuleOfType(McpModuleType)?.srgManager
-                        val srgMap = srgManager?.srgMapNow
+                            ?.getModuleOfType(McpModuleType)?.mappingsManager
+                        val srgMap = srgManager?.mappingsNow
 
                         val signature = method.getSignature(PsiSubstitutor.EMPTY)
                         val returnType = method.returnType?.let { TypeConversionUtil.erasure(it).canonicalText }
@@ -84,7 +84,7 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                             .map { it.canonicalText }
 
                         val memberRef = method.qualifiedMemberReference
-                        val srgMethod = srgMap?.getSrgMethod(memberRef) ?: memberRef
+                        val srgMethod = srgMap?.getIntermediaryMethod(memberRef) ?: memberRef
 
                         context.setLaterRunnable {
                             // Commit changes made by code completion
