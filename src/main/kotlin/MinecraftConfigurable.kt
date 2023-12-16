@@ -89,7 +89,8 @@ class MinecraftConfigurable : Configurable {
         settings.isShowEventListenerGutterIcons = showEventListenerGutterCheckBox.isSelected
         settings.isShowChatColorGutterIcons = showChatGutterIconsCheckBox.isSelected
         settings.isShowChatColorUnderlines = showChatColorUnderlinesCheckBox.isSelected
-        settings.underlineType = chatColorUnderlinesComboBox.selectedItem as MinecraftSettings.UnderlineType
+        settings.underlineType = chatColorUnderlinesComboBox.selectedItem as? MinecraftSettings.UnderlineType
+            ?: MinecraftSettings.UnderlineType.DOTTED
     }
 
     override fun reset() {

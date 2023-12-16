@@ -37,7 +37,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-class MethodInjectionPoint : AbstractMethodInjectionPoint() {
+abstract class AbstractInvokeInjectionPoint(private val assign: Boolean) : AbstractMethodInjectionPoint() {
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
@@ -53,9 +53,9 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMethod>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberReference(""), assign)
         }
-        return target?.let { MyCollectVisitor(mode, at.project, it) }
+        return target?.let { MyCollectVisitor(mode, at.project, it, assign) }
     }
 
     private class MyNavigationVisitor(
@@ -141,6 +141,7 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
         mode: Mode,
         private val project: Project,
         private val selector: MixinSelector,
+        private val assign: Boolean,
     ) : CollectVisitor<PsiMethod>(mode) {
         override fun accept(methodNode: MethodNode) {
             val insns = methodNode.instructions ?: return
@@ -150,12 +151,19 @@ class MethodInjectionPoint : AbstractMethodInjectionPoint() {
                 }
 
                 val sourceMethod = nodeMatchesSelector(insn, mode, selector, project) ?: return@forEachRemaining
-                addResult(
-                    insn,
-                    sourceMethod,
-                    qualifier = insn.owner.replace('/', '.'),
-                )
+                val actualInsn = if (assign) insn.next else insn
+                if (actualInsn != null) {
+                    addResult(
+                        actualInsn,
+                        sourceMethod,
+                        qualifier = insn.owner.replace('/', '.'),
+                    )
+                }
             }
         }
     }
 }
+
+class InvokeInjectionPoint : AbstractInvokeInjectionPoint(false)
+
+class InvokeAssignInjectionPoint : AbstractInvokeInjectionPoint(true)

@@ -21,8 +21,8 @@ plugins {
 apply plugin: 'org.spongepowered.mixin'
 #end
 
-group = mod_version
-version = mod_group_id
+group = mod_group_id
+version = mod_version
 
 base {
     archivesName = mod_id

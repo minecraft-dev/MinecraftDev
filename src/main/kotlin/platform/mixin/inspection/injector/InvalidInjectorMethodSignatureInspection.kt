@@ -47,11 +47,13 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -318,13 +320,15 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
             val newParams = expected.flatMapTo(mutableListOf()) {
                 if (it.default) {
+                    val nameHelper = PsiNameHelper.getInstance(project)
+                    val languageLevel = PsiUtil.getLanguageLevel(parameters)
                     it.parameters.mapIndexed { i: Int, p: Parameter ->
-                        JavaPsiFacade.getElementFactory(project).createParameter(
-                            p.name ?: JavaCodeStyleManager.getInstance(project)
+                        val paramName = p.name?.takeIf { name -> nameHelper.isIdentifier(name, languageLevel) }
+                            ?: JavaCodeStyleManager.getInstance(project)
                                 .suggestVariableName(VariableKind.PARAMETER, null, null, p.type).names
-                                .firstOrNull() ?: "var$i",
-                            p.type,
-                        )
+                                .firstOrNull()
+                            ?: "var$i"
+                        JavaPsiFacade.getElementFactory(project).createParameter(paramName, p.type)
                     }
                 } else {
                     emptyList()

@@ -72,7 +72,9 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 "modId" -> {
                     val value = keyValue.value ?: return
                     val modId = value.stringValue() ?: return
-                    if (modId != "\"" && !ForgeConstants.MOD_ID_REGEX.matches(modId)) {
+                    if (modId != "\"" && !(modId.startsWith("\${") && modId.endsWith("}")) &&
+                        !ForgeConstants.MOD_ID_REGEX.matches(modId)
+                    ) {
                         val endOffset = if (value.text.endsWith('"')) modId.length + 1 else modId.length
                         holder.registerProblem(value, TextRange(1, endOffset), "Mod ID is invalid")
                     }

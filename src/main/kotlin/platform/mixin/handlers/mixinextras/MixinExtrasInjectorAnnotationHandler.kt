@@ -149,7 +149,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
                         .resolveAsm(annotation.project) as? MethodTargetMember
                     )?.classAndMethod
                 sourceClassAndMethod?.method?.getGenericReturnType(sourceClassAndMethod.clazz, annotation.project)
-                    ?: Type.getType(insn.desc).toPsiType(elementFactory)
+                    ?: Type.getReturnType(insn.desc).toPsiType(elementFactory)
             }
 
             is FieldInsnNode -> {
