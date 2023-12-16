@@ -117,6 +117,11 @@ class ModsTomlDependencyIdReference(keySegment: TomlKeySegment) : PsiReferenceBa
 object ModsTomlModIdReferenceProvider : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val value = element as? TomlValue ?: return PsiReference.EMPTY_ARRAY
+        val stringValue = value.stringValue()
+        if (stringValue != null && stringValue.startsWith("\${") && stringValue.endsWith("}")) {
+            return PsiReference.EMPTY_ARRAY
+        }
+
         return arrayOf(ModsTomlModIdReference(value))
     }
 }
