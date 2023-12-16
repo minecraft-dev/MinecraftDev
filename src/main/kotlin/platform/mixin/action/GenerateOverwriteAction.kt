@@ -127,7 +127,6 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
             return
         }
 
-
         disableAnnotationWrapping(project) {
             runWriteAction {
                 // Generate needed shadows
