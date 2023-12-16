@@ -60,16 +60,14 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
             return null
         }
 
-        val hasDefaultTranslations = TranslationIndex.hasDefaultTranslations(project, file.mcDomain)
         val hasMcpModule = file.findPsiFile(project)?.findMcpModule() != null
         return Function {
-            createNotificationPanel(missingTranslations, hasDefaultTranslations, hasMcpModule, file, project)
+            createNotificationPanel(missingTranslations, hasMcpModule, file, project)
         }
     }
 
     private fun createNotificationPanel(
         missingTranslations: Sequence<Translation>,
-        hasDefaultTranslations: Boolean,
         hasMcpModule: Boolean,
         file: VirtualFile,
         project: Project
@@ -97,12 +95,7 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
                 .ask(project)
             if (sort) {
                 try {
-                    TranslationSorter.query(
-                        project,
-                        psi,
-                        hasDefaultTranslations,
-                        Ordering.LIKE_DEFAULT
-                    )
+                    TranslationSorter.query(project, psi, true, Ordering.LIKE_DEFAULT)
                 } catch (e: Exception) {
                     Notification(
                         "Translations sorting error",

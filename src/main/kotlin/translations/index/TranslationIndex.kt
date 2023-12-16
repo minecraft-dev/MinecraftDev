@@ -64,9 +64,14 @@ class TranslationIndex : FileBasedIndexExtension<String, TranslationIndexEntry>(
             getProjectDefaultEntries(project, domain).flatten()
 
         fun hasDefaultTranslations(project: Project, domain: String? = null): Boolean {
-            return !FileBasedIndex.getInstance().processValues(NAME, TranslationConstants.DEFAULT_LOCALE, null, { _, entry ->
-                return@processValues entry.sourceDomain == domain
-            }, GlobalSearchScope.projectScope(project))
+            return !FileBasedIndex.getInstance()
+                .processValues(
+                    NAME,
+                    TranslationConstants.DEFAULT_LOCALE,
+                    null,
+                    { _, entry -> entry.sourceDomain != domain },
+                    GlobalSearchScope.projectScope(project)
+                )
         }
 
         fun getTranslations(project: Project, file: VirtualFile): Sequence<Translation> {
