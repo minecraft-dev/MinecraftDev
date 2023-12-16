@@ -21,15 +21,17 @@
 package com.demonwav.mcdev.translations.sorting
 
 import com.demonwav.mcdev.translations.Translation
-import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.actions.TranslationSortOrderDialog
 import com.demonwav.mcdev.translations.index.TranslationIndex
+import com.demonwav.mcdev.util.applyWriteAction
 import com.demonwav.mcdev.util.lexicographical
 import com.demonwav.mcdev.util.mcDomain
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import com.intellij.psi.codeStyle.CodeStyleManager
 import java.util.TreeSet
 
 object TranslationSorter {
@@ -39,18 +41,22 @@ object TranslationSorter {
 
     private val descendingComparator = ascendingComparator.reversed()
 
-    fun query(project: Project, file: PsiFile, defaultSelection: Ordering = Ordering.ASCENDING) {
-        val domain = file.virtualFile.mcDomain
-        val defaultEntries = TranslationIndex.getProjectDefaultTranslations(project, domain)
-        val noDefaults = defaultEntries.none()
-        val isDefaultFile = TranslationFiles.getLocale(file.virtualFile) == TranslationConstants.DEFAULT_LOCALE
-        val (order, comments) = TranslationSortOrderDialog.show(noDefaults || isDefaultFile, defaultSelection)
+    fun query(
+        project: Project,
+        file: PsiFile,
+        hasDefaultTranslations: Boolean,
+        defaultSelection: Ordering = Ordering.ASCENDING
+    ) {
+        val (order, comments) = TranslationSortOrderDialog.show(
+            hasDefaultTranslations || TranslationFiles.isDefaultLocale(file.virtualFile),
+            defaultSelection
+        )
 
         if (order == null) {
             return
         }
 
-        sort(project, file, order, comments)
+        file.applyWriteAction { sort(project, file, order, comments) }
     }
 
     private fun sort(project: Project, file: PsiFile, ordering: Ordering, keepComments: Int) {
@@ -91,6 +97,12 @@ object TranslationSorter {
 
         file.runWriteAction {
             TranslationFiles.replaceAll(file, sorted.asIterable())
+            val documentManager = PsiDocumentManager.getInstance(project)
+            val document = documentManager.getDocument(file)
+            if (document != null) {
+                documentManager.commitDocument(document)
+                CodeStyleManager.getInstance(project).reformat(file, true)
+            }
         }
     }
 

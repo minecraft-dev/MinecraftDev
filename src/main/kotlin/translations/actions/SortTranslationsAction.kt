@@ -21,7 +21,9 @@
 package com.demonwav.mcdev.translations.actions
 
 import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.sorting.TranslationSorter
+import com.demonwav.mcdev.util.mcDomain
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
@@ -34,7 +36,11 @@ class SortTranslationsAction : AnAction() {
         val file = e.getData(LangDataKeys.PSI_FILE) ?: return
 
         try {
-            TranslationSorter.query(file.project, file)
+            TranslationSorter.query(
+                file.project,
+                file,
+                TranslationIndex.hasDefaultTranslations(file.project, file.virtualFile.mcDomain)
+            )
         } catch (e: Exception) {
             Notification(
                 "Translations sorting error",
