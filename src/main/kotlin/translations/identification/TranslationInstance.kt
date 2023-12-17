@@ -29,6 +29,7 @@ data class TranslationInstance(
     val key: Key,
     val text: String?,
     val required: Boolean,
+    val allowArbitraryArgs: Boolean,
     val formattingError: FormattingError? = null,
     val superfluousVarargStart: Int = -1,
 ) {

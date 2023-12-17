@@ -39,6 +39,12 @@
             <val name="foldMethod" val="true"/>
         </annotation>
     </item>
+    <item name="net.minecraft.network.chat.Component net.minecraft.network.chat.MutableComponent translatableEscape(java.lang.String, java.lang.Object...) 0">
+        <annotation name="com.demonwav.mcdev.annotations.Translatable">
+            <val name="foldMethod" val="true"/>
+            <val name="allowArbitraryArgs" val="true"/>
+        </annotation>
+    </item>
     <item name="net.minecraft.network.chat.Component net.minecraft.network.chat.MutableComponent translatableWithFallback(java.lang.String, java.lang.String) 0">
         <annotation name="com.demonwav.mcdev.annotations.Translatable"/>
     </item>
