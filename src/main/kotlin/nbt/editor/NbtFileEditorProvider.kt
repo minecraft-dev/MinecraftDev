@@ -70,7 +70,8 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
         runAsync {
             val nbtFile = NbtVirtualFile(file, project)
 
-            if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
+            val allowWrite = runReadAction { NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project) }
+            if (allowWrite) {
                 NonProjectFileWritingAccessProvider.allowWriting(listOf(nbtFile))
             }
 
