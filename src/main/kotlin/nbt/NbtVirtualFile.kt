@@ -24,10 +24,10 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
-import com.demonwav.mcdev.nbt.lang.NbttFileType
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
 import com.demonwav.mcdev.util.runReadActionAsync
 import com.demonwav.mcdev.util.runWriteTaskLater
+import com.intellij.lang.Language
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl
@@ -41,42 +41,41 @@ import java.io.DataOutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.GZIPOutputStream
 
-class NbtVirtualFile(private val backingFile: VirtualFile, private val project: Project) :
-    LightVirtualFile(backingFile.name + ".nbtt", NbttFileType, ""),
-    IdeDocumentHistoryImpl.SkipFromDocumentHistory {
+fun NbtVirtualFile(backingFile: VirtualFile, project: Project): NbtVirtualFile {
+    var language: Language = NbttLanguage
 
-    val isCompressed: Boolean
-    lateinit var toolbar: NbtToolbar
-    val parseSuccessful: Boolean
+    var text: String
+    var compressed: Boolean
+    var parseSuccessful: Boolean
 
-    init {
-        originalFile = backingFile
-        language = NbttLanguage
-
-        var text: String
-        var tempCompressed: Boolean
-        var tempParseSuccessful: Boolean
-
-        try {
-            val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(10))
-            text = rootCompound.toString()
-            tempCompressed = isCompressed
-            tempParseSuccessful = true
-        } catch (e: MalformedNbtFileException) {
-            text = MCDevBundle("nbt.lang.errors.wrapped_error_message", e.message)
-            tempCompressed = false
-            tempParseSuccessful = false
-        }
-
-        this.isCompressed = tempCompressed
-        this.parseSuccessful = tempParseSuccessful
-
-        if (!this.parseSuccessful) {
-            language = PlainTextLanguage.INSTANCE
-        }
-
-        setContent(this, text, false)
+    try {
+        val (rootCompound, isCompressed) = Nbt.buildTagTree(backingFile.inputStream, TimeUnit.SECONDS.toMillis(10))
+        text = rootCompound.toString()
+        compressed = isCompressed
+        parseSuccessful = true
+    } catch (e: MalformedNbtFileException) {
+        text = MCDevBundle("nbt.lang.errors.wrapped_error_message", e.message)
+        compressed = false
+        parseSuccessful = false
     }
+
+    if (!parseSuccessful) {
+        language = PlainTextLanguage.INSTANCE
+    }
+
+    return NbtVirtualFile(backingFile, project, language, text, compressed, parseSuccessful)
+}
+
+class NbtVirtualFile(
+    private val backingFile: VirtualFile,
+    private val project: Project,
+    language: Language,
+    text: String,
+    val isCompressed: Boolean,
+    val parseSuccessful: Boolean,
+) : LightVirtualFile(backingFile.name + ".nbtt", language, text), IdeDocumentHistoryImpl.SkipFromDocumentHistory {
+
+    lateinit var toolbar: NbtToolbar
 
     override fun refresh(asynchronous: Boolean, recursive: Boolean, postRunnable: Runnable?) {
         backingFile.refresh(asynchronous, recursive, postRunnable)

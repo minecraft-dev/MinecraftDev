@@ -27,12 +27,12 @@ import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
-import com.intellij.codeInsight.daemon.impl.PsiElementListNavigator
-import com.intellij.ide.util.PsiClassListCellRenderer
+import com.intellij.codeInsight.navigation.NavigationUtil
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
+import com.intellij.ui.awt.RelativePoint
 import java.awt.event.MouseEvent
 
 class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
@@ -67,13 +67,8 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         val targets = psiClass.mixinTargets
             .mapNotNull { it.findSourceClass(psiClass.project, psiClass.resolveScope, canDecompile = true) }
         if (targets.isNotEmpty()) {
-            PsiElementListNavigator.openTargets(
-                e,
-                targets.toTypedArray(),
-                "Choose target class of $name",
-                null,
-                PsiClassListCellRenderer(),
-            )
+            NavigationUtil.getPsiElementPopup(targets.toTypedArray<PsiElement>(), "Choose target class of $name")
+                .show(RelativePoint(e))
         }
     }
 }

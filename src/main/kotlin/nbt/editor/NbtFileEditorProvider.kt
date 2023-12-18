@@ -70,7 +70,8 @@ class NbtFileEditorProvider : PsiAwareTextEditorProvider(), DumbAware {
         runAsync {
             val nbtFile = NbtVirtualFile(file, project)
 
-            if (NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project)) {
+            val allowWrite = runReadAction { NonProjectFileWritingAccessProvider.isWriteAccessAllowed(file, project) }
+            if (allowWrite) {
                 NonProjectFileWritingAccessProvider.allowWriting(listOf(nbtFile))
             }
 
@@ -94,6 +95,7 @@ private class NbtFileEditor(
     private val editorCheckedDisposable = Disposer.newCheckedDisposable()
     private val component = JPanel(BorderLayout())
     private val tempUserData = mutableMapOf<Any?, Any?>()
+    private var disposed = false
 
     init {
         val loading = JBLoadingPanel(null, this)
@@ -148,6 +150,10 @@ private class NbtFileEditor(
             .run<Throwable> {
                 CodeStyleManager.getInstance(project).reformat(psiFile, true)
             }
+
+        if (disposed) {
+            return
+        }
 
         project.messageBus.connect(this).subscribe(
             AnActionListener.TOPIC,
@@ -216,7 +222,9 @@ private class NbtFileEditor(
         editor.exec { removePropertyChangeListener(listener) }
     }
 
-    override fun dispose() {}
+    override fun dispose() {
+        disposed = true
+    }
 
     override fun getStructureViewBuilder() = editor.exec { structureViewBuilder }
     override fun equals(other: Any?) = other is NbtFileEditor && other.component == this.component

@@ -68,6 +68,9 @@ object TranslationFiles {
     fun getLocale(file: VirtualFile?) =
         file?.nameWithoutExtension?.lowercase(Locale.ENGLISH)
 
+    fun isDefaultLocale(file: VirtualFile?) =
+        file?.nameWithoutExtension?.lowercase(Locale.ENGLISH) == TranslationConstants.DEFAULT_LOCALE
+
     tailrec fun seekTranslation(element: PsiElement): PsiNamedElement? {
         // don't use elvis here, K2 doesn't think it's a tail recursive call if you do
         val res = toTranslation(element)?.let { element as? PsiNamedElement }

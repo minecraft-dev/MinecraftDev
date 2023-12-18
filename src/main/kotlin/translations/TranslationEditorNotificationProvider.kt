@@ -32,8 +32,9 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.MessageDialogBuilder
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.findPsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotificationProvider
@@ -49,61 +50,67 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
     override fun collectNotificationData(
         project: Project,
         file: VirtualFile,
-    ): Function<in FileEditor, out JComponent?> = Function { createNotificationPanel(file, project) }
-
-    private fun createNotificationPanel(file: VirtualFile, project: Project): InfoPanel? {
-        val locale = TranslationFiles.getLocale(file)
-        if (!show || !TranslationFiles.isTranslationFile(file) || locale == TranslationConstants.DEFAULT_LOCALE) {
+    ): Function<in FileEditor, out JComponent?>? {
+        if (!show || !TranslationFiles.isTranslationFile(file) || TranslationFiles.isDefaultLocale(file)) {
             return null
         }
 
         val missingTranslations = getMissingTranslations(project, file)
-        if (missingTranslations.any()) {
-            val panel = InfoPanel()
-            panel.text = "Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale)."
-            panel.createActionLabel(
-                "Add missing default entries (won't reflect changes in original English localization)",
-            ) {
-                val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
-                psi.applyWriteAction {
-                    val fileEntries = missingTranslations.map {
-                        TranslationFiles.FileEntry.Translation(it.key, it.text)
-                    }
-                    TranslationFiles.addAll(psi, fileEntries.asIterable())
-                    EditorNotifications.updateAll()
-                }
-
-                if (psi.findMcpModule() == null) {
-                    // TranslationSorter.query requires an MCP module to work
-                    return@createActionLabel
-                }
-
-                val sort = Messages.showYesNoDialog(
-                    project,
-                    "Would you like to sort all translations now?",
-                    "Sort Translations",
-                    Messages.getQuestionIcon(),
-                )
-                if (sort == Messages.YES) {
-                    try {
-                        TranslationSorter.query(project, psi, Ordering.LIKE_DEFAULT)
-                    } catch (e: Exception) {
-                        Notification(
-                            "Translations sorting error",
-                            "Error sorting translations",
-                            e.message ?: e.stackTraceToString(),
-                            NotificationType.WARNING,
-                        ).notify(project)
-                    }
-                }
-            }
-            panel.createActionLabel("Hide notification") {
-                panel.isVisible = false
-                show = false
-            }
-            return panel
+        if (missingTranslations.none()) {
+            return null
         }
-        return null
+
+        val hasMcpModule = file.findPsiFile(project)?.findMcpModule() != null
+        return Function {
+            createNotificationPanel(missingTranslations, hasMcpModule, file, project)
+        }
+    }
+
+    private fun createNotificationPanel(
+        missingTranslations: Sequence<Translation>,
+        hasMcpModule: Boolean,
+        file: VirtualFile,
+        project: Project
+    ): InfoPanel {
+        val panel = InfoPanel()
+        panel.text = "Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale)."
+        panel.createActionLabel(
+            "Add missing default entries (won't reflect changes in original English localization)",
+        ) {
+            val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
+            psi.applyWriteAction {
+                val fileEntries = missingTranslations.map {
+                    TranslationFiles.FileEntry.Translation(it.key, it.text)
+                }
+                TranslationFiles.addAll(psi, fileEntries.asIterable())
+                EditorNotifications.updateAll()
+            }
+
+            if (!hasMcpModule) {
+                // TranslationSorter.query requires an MCP module to work
+                return@createActionLabel
+            }
+
+            val sort = MessageDialogBuilder.yesNo("Sort Translations", "Would you like to sort all translations now?")
+                .ask(project)
+            if (sort) {
+                try {
+                    TranslationSorter.query(project, psi, true, Ordering.LIKE_DEFAULT)
+                } catch (e: Exception) {
+                    Notification(
+                        "Translations sorting error",
+                        "Error sorting translations",
+                        e.message ?: e.stackTraceToString(),
+                        NotificationType.WARNING,
+                    ).notify(project)
+                }
+            }
+        }
+        panel.createActionLabel("Hide notification") {
+            panel.isVisible = false
+            show = false
+        }
+        return panel
     }
 
     private fun getMissingTranslations(project: Project, file: VirtualFile): Sequence<Translation> {
