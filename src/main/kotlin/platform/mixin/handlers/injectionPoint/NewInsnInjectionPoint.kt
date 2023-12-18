@@ -23,13 +23,14 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
+import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
+import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.internalName
-import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -40,12 +41,10 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
@@ -109,18 +108,11 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         private val selector: MixinSelector,
     ) : NavigationVisitor() {
         override fun visitNewExpression(expression: PsiNewExpression) {
-            val anonymousName = expression.anonymousClass?.fullQualifiedName?.replace('.', '/')
+            val anonymousClass = expression.anonymousClass
+            val anonymousName = anonymousClass?.fullQualifiedName?.replace('.', '/')
             if (anonymousName != null) {
-                // guess descriptor
-                val hasThis = expression.parentOfType<PsiMethod>()?.hasModifierProperty(PsiModifier.STATIC) == false
-                val thisType = if (hasThis) expression.parentOfType<PsiClass>()?.internalName else null
-                val argTypes = expression.argumentList?.expressionTypes?.map { it.descriptor } ?: emptyList()
-                val bytecodeArgTypes = if (thisType != null) listOf(thisType) + argTypes else argTypes
-                val methodDesc = Type.getMethodDescriptor(
-                    Type.VOID_TYPE,
-                    *bytecodeArgTypes.mapToArray { Type.getType(it) },
-                )
-                if (selector.matchMethod(anonymousName, "<init>", methodDesc)) {
+                val method = findClassNodeByPsiClass(anonymousClass)?.findMethod(selector)
+                if (method != null && selector.matchMethod(anonymousName, method.name, method.desc)) {
                     addResult(expression)
                 }
             } else {

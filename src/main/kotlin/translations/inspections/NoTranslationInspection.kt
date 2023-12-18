@@ -65,6 +65,7 @@ class NoTranslationInspection : TranslationInspection() {
                 val literalValue = literal.value as String
                 val key = translation?.key?.copy(infix = literalValue)?.full ?: literalValue
                 val result = Messages.showInputDialog(
+                    project,
                     "Enter default value for \"$key\":",
                     "Create Translation",
                     Messages.getQuestionIcon(),
