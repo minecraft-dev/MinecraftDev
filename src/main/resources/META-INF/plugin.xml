@@ -511,6 +511,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
+        <localInspection displayName="Wrong translation argument types"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.translations.inspections.WrongTypeInTranslationArgsInspection"/>
         <localInspection displayName="Entity class does not match this entity class"
                          groupName="Minecraft"
                          language="JAVA"

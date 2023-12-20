@@ -25,6 +25,7 @@ object TranslationConstants {
     const val TRANSLATABLE_ANNOTATION = "com.demonwav.mcdev.annotations.Translatable"
     const val REQUIRED = "required"
     const val FOLD_METHOD = "foldMethod"
+    const val ALLOW_ARBITRARY_ARGS = "allowArbitraryArgs"
     const val PREFIX = "prefix"
     const val SUFFIX = "suffix"
 }
