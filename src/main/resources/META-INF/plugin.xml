@@ -233,6 +233,7 @@
         <additionalTextAttributes scheme="Default" file="colorSchemes/NbttDefault.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/NbttDarcula.xml"/>
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
+        <lang.fileViewProviderFactory language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileViewProviderFactory"/>
 
         <!-- Minecraft localization files -->
         <fileType name="MCLang" language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangFileType" fieldName="INSTANCE" extensions="lang"/>
