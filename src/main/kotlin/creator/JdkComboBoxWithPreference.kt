@@ -144,7 +144,12 @@ fun Row.jdkComboBoxWithPreference(
     stateComponent.getList(preferenceDataProperty)?.let { preferenceDataStrs ->
         for (preferenceDataStr in preferenceDataStrs) {
             val parts = preferenceDataStr.split('=', limit = 2)
-            val jdk = parts.firstOrNull()?.toIntOrNull()?.let { JavaSdkVersion.values()[it] } ?: continue
+            val featureVersion = parts.firstOrNull()?.toIntOrNull() ?: continue
+            val knownJdkVersions = JavaSdkVersion.values()
+            if (featureVersion !in knownJdkVersions.indices) {
+                continue
+            }
+            val jdk = knownJdkVersions[featureVersion]
             val sdk = parts.last()
             preferenceData.sdkPathByJdk[jdk] = sdk
         }
