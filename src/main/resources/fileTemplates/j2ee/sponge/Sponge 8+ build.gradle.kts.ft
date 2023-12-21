@@ -3,7 +3,7 @@ import org.spongepowered.plugin.metadata.model.PluginDependency
 
 plugins {
     `java-library`
-    id("org.spongepowered.gradle.plugin") version "2.1.1"
+    id("org.spongepowered.gradle.plugin") version "2.2.0"
 }
 
 group = "${GROUP_ID}"
@@ -30,12 +30,12 @@ sponge {
         #end
         links {
             #if (${WEBSITE})
-            homepage("${WEBSITE}")
+            homepageLink("${WEBSITE}")
             #else
-            // homepage("https://spongepowered.org")
+            // homepageLink("https://spongepowered.org")
             #end
-            // source("https://spongepowered.org/source")
-            // issues("https://spongepowered.org/issues")
+            // sourceLink("https://spongepowered.org/source")
+            // issuesLink("https://spongepowered.org/issues")
         }
         #foreach (${AUTHOR} in ${AUTHORS})
         contributor("${AUTHOR}") {

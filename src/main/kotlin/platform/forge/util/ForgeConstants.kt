@@ -52,4 +52,5 @@ object ForgeConstants {
     val MOD_ID_REGEX = "^[a-z][a-z0-9_-]{1,63}$".toRegex()
 
     val DISPLAY_TEST_MANIFEST_VERSION = SemanticVersion.release(41, 0, 15)
+    val CLIENT_ONLY_MANIFEST_VERSION = SemanticVersion.release(49, 0, 6)
 }

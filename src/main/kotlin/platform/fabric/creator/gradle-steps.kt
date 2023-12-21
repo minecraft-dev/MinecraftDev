@@ -57,7 +57,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val mcVersion = data.getUserData(FabricVersionChainStep.MC_VERSION_KEY) ?: return
         val yarnVersion = data.getUserData(FabricVersionChainStep.YARN_VERSION_KEY) ?: return
         val loaderVersion = data.getUserData(FabricVersionChainStep.LOADER_VERSION_KEY) ?: return
-        val loomVersion = "1.2-SNAPSHOT"
+        val loomVersion = "1.4-SNAPSHOT"
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
         val officialMappings = data.getUserData(FabricVersionChainStep.OFFICIAL_MAPPINGS_KEY) ?: false
