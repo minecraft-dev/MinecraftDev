@@ -66,7 +66,13 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
         val name = psiClass.name ?: return
         val targets = psiClass.mixinTargets
             .mapNotNull { it.findSourceClass(psiClass.project, psiClass.resolveScope, canDecompile = true) }
-        if (targets.isNotEmpty()) {
+
+        val singleTarget = targets.singleOrNull()
+        if (singleTarget != null) {
+            if (singleTarget.canNavigate()) {
+                singleTarget.navigate(true)
+            }
+        } else if (targets.isNotEmpty()) {
             getPsiElementPopup(targets.toTypedArray<PsiElement>(), "Choose target class of $name")
                 .show(RelativePoint(e))
         }
