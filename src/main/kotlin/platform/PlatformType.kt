@@ -42,6 +42,8 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
+import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
+import com.demonwav.mcdev.platform.neoforge.framework.NEOFORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.velocity.VelocityModuleType
@@ -65,6 +67,7 @@ enum class PlatformType(
     WATERFALL(WaterfallModuleType, "waterfall.json", BUNGEECORD),
     VELOCITY(VelocityModuleType, "velocity.json"),
     MIXIN(MixinModuleType),
+    NEOFORGE(NeoForgeModuleType),
     MCP(McpModuleType),
     ADVENTURE(AdventureModuleType),
     ;
@@ -81,8 +84,11 @@ enum class PlatformType(
     }
 
     companion object {
-        fun removeParents(types: MutableSet<PlatformType>) =
-            types.filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }.toHashSet()
+        fun removeParents(types: Set<PlatformType?>) =
+            types.asSequence()
+                .filterNotNull()
+                .filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }
+                .toHashSet()
 
         fun fromLibraryKind(kind: LibraryKind) = when (kind) {
             BUKKIT_LIBRARY_KIND -> BUKKIT
@@ -98,6 +104,7 @@ enum class PlatformType(
             WATERFALL_LIBRARY_KIND -> WATERFALL
             VELOCITY_LIBRARY_KIND -> VELOCITY
             ADVENTURE_LIBRARY_KIND -> ADVENTURE
+            NEOFORGE_LIBRARY_KIND -> NEOFORGE
             else -> null
         }
     }

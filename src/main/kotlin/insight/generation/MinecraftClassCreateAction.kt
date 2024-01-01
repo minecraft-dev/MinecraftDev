@@ -27,6 +27,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
@@ -66,6 +67,7 @@ class MinecraftClassCreateAction :
 
         val module = directory.findModule() ?: return
         val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
+        val isNeoForge = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
         val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
             ?.minecraftVersion?.let(SemanticVersion::parse)
@@ -92,6 +94,16 @@ class MinecraftClassCreateAction :
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
             }
         }
+
+        if (isNeoForge) {
+            val icon = PlatformAssets.NEOFORGE_ICON
+            builder.addKind("Block", icon, MinecraftTemplates.NEOFORGE_BLOCK_TEMPLATE)
+            builder.addKind("Enchantment", icon, MinecraftTemplates.NEOFORGE_ENCHANTMENT_TEMPLATE)
+            builder.addKind("Item", icon, MinecraftTemplates.NEOFORGE_ITEM_TEMPLATE)
+            builder.addKind("Mob Effect", icon, MinecraftTemplates.NEOFORGE_MOB_EFFECT_TEMPLATE)
+            builder.addKind("Packet", icon, MinecraftTemplates.NEOFORGE_PACKET_TEMPLATE)
+        }
+
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
 
@@ -107,9 +119,10 @@ class MinecraftClassCreateAction :
         val module = psi?.findModule() ?: return false
         val isFabricMod = MinecraftFacet.getInstance(module, FabricModuleType) != null
         val isForgeMod = MinecraftFacet.getInstance(module, ForgeModuleType) != null
+        val isNeoForgeMod = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val hasMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()?.minecraftVersion != null
 
-        return (isFabricMod || isForgeMod && hasMcVersion) && super.isAvailable(dataContext)
+        return (isFabricMod || isNeoForgeMod || isForgeMod && hasMcVersion) && super.isAvailable(dataContext)
     }
 
     override fun checkPackageExists(directory: PsiDirectory): Boolean {
