@@ -24,8 +24,11 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.manipulator
+import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.reference.InspectionReference
 import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -47,10 +50,17 @@ class ResourceFileReference(private val description: String) : PsiReferenceProvi
         override val unresolved = resolve() == null
 
         override fun resolve(): PsiElement? {
+            fun findFileIn(module: Module): PsiFile? {
+                val facet = MinecraftFacet.getInstance(module) ?: return null
+                val virtualFile = facet.findFile(element.value, SourceType.RESOURCE) ?: return null
+                return PsiManager.getInstance(element.project).findFile(virtualFile)
+            }
+
             val module = element.findModule() ?: return null
-            val facet = MinecraftFacet.getInstance(module) ?: return null
-            val virtualFile = facet.findFile(element.value, SourceType.RESOURCE) ?: return null
-            return PsiManager.getInstance(element.project).findFile(virtualFile)
+            return findFileIn(module)
+                ?: ModuleRootManager.getInstance(module)
+                    .getDependencies(false)
+                    .mapFirstNotNull(::findFileIn)
         }
 
         override fun bindToElement(newTarget: PsiElement): PsiElement? {
