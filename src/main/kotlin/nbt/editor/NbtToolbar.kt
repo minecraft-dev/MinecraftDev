@@ -23,46 +23,35 @@ package com.demonwav.mcdev.nbt.editor
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.util.runWriteTaskLater
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JLabel
-import javax.swing.JPanel
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.EnumComboBoxModel
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
 
 class NbtToolbar(nbtFile: NbtVirtualFile) {
-    lateinit var panel: JPanel
-    private lateinit var fileTypeLabel: JLabel
-    private lateinit var compressionBox: JComboBox<CompressionSelection>
-    lateinit var saveButton: JButton
 
-    private var lastSelection: CompressionSelection
+    private var compressionSelection: CompressionSelection? =
+        if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
+
+    val selection: CompressionSelection
+        get() = compressionSelection!!
+
+    lateinit var panel: DialogPanel
 
     init {
-        fileTypeLabel.text = MCDevBundle("nbt.compression.file_type.label")
-        saveButton.text = MCDevBundle("nbt.compression.save.button")
-
-        compressionBox.addItem(CompressionSelection.GZIP)
-        compressionBox.addItem(CompressionSelection.UNCOMPRESSED)
-        compressionBox.selectedItem =
-            if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
-        lastSelection = selection
-
-        if (!nbtFile.isWritable || !nbtFile.parseSuccessful) {
-            compressionBox.isEnabled = false
-        }
-
-        if (!nbtFile.parseSuccessful) {
-            panel.isVisible = false
-        }
-
-        saveButton.addActionListener {
-            lastSelection = selection
-
-            runWriteTaskLater {
-                nbtFile.writeFile(this)
+        panel = panel {
+            row(MCDevBundle("nbt.compression.file_type.label")) {
+                comboBox(EnumComboBoxModel(CompressionSelection::class.java))
+                    .bindItem(::compressionSelection)
+                    .enabled(nbtFile.isWritable && nbtFile.parseSuccessful)
+                button(MCDevBundle("nbt.compression.save.button")) {
+                    panel.apply()
+                    runWriteTaskLater {
+                        nbtFile.writeFile(this)
+                    }
+                }
             }
+            visible(nbtFile.parseSuccessful)
         }
     }
-
-    val selection
-        get() = compressionBox.selectedItem as CompressionSelection
 }

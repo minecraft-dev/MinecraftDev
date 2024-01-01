@@ -78,12 +78,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
             state.underlineType = underlineType
         }
 
-    val underlineTypeIndex: Int
-        get() {
-            val type = underlineType
-            return UnderlineType.values().indices.firstOrNull { type == UnderlineType.values()[it] } ?: 0
-        }
-
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {
 
         NORMAL("Normal", EffectType.LINE_UNDERSCORE),

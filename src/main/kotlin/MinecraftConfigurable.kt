@@ -20,80 +20,80 @@
 
 package com.demonwav.mcdev
 
+import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
+import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.options.Configurable
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import javax.swing.JComboBox
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.EnumComboBoxModel
+import com.intellij.ui.components.Label
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.IconUtil
 import javax.swing.JComponent
-import javax.swing.JPanel
 import org.jetbrains.annotations.Nls
 
 class MinecraftConfigurable : Configurable {
 
-    private lateinit var panel: JPanel
-    private lateinit var showProjectPlatformIconsCheckBox: JCheckBox
-    private lateinit var showEventListenerGutterCheckBox: JCheckBox
-    private lateinit var showChatColorUnderlinesCheckBox: JCheckBox
-    private lateinit var chatColorUnderlinesComboBox: JComboBox<MinecraftSettings.UnderlineType>
-    private lateinit var showChatGutterIconsCheckBox: JCheckBox
-    private lateinit var changePluginUpdateChannelButton: JButton
+    private lateinit var panel: DialogPanel
 
     @Nls
-    override fun getDisplayName() = "Minecraft Development"
+    override fun getDisplayName() = MCDevBundle("minecraft.settings.display_name")
 
-    override fun getHelpTopic(): String? = null
+    override fun createComponent(): JComponent = panel {
+        row(
+            Label(MCDevBundle("minecraft.settings.title"), bold = true).apply {
+                font = font.deriveFont(font.size * 1.5f)
+                icon = IconUtil.scale(PlatformAssets.MINECRAFT_ICON_2X, null, 1.5f)
+            }
+        ) {
+            button(MCDevBundle("minecraft.settings.change_update_channel")) {
+                ConfigurePluginUpdatesDialog().show()
+            }.align(AlignX.RIGHT)
+        }.bottomGap(BottomGap.MEDIUM)
 
-    override fun createComponent(): JComponent {
-        showChatColorUnderlinesCheckBox.addActionListener { setUnderlineBox() }
+        val settings = MinecraftSettings.instance
 
-        return panel
-    }
+        row {
+            checkBox(MCDevBundle("minecraft.settings.show_project_platform_icons"))
+                .bindSelected(settings::isShowProjectPlatformIcons)
+        }
+        row {
+            checkBox(MCDevBundle("minecraft.settings.show_event_listener_gutter_icons"))
+                .bindSelected(settings::isShowEventListenerGutterIcons)
+        }
+        row {
+            checkBox(MCDevBundle("minecraft.settings.show_chat_color_gutter_icons"))
+                .bindSelected(settings::isShowChatColorGutterIcons)
+        }
+        row {
+            checkBox(MCDevBundle("minecraft.settings.show_chat_color_underlines"))
+                .bindSelected(settings::isShowChatColorUnderlines)
+        }.bottomGap(BottomGap.SMALL)
 
-    private fun init() {
-        for (type in MinecraftSettings.UnderlineType.values()) {
-            chatColorUnderlinesComboBox.addItem(type)
+        group(indent = false) {
+            row(MCDevBundle("minecraft.settings.chat_color_underline_style")) {
+                comboBox(EnumComboBoxModel(MinecraftSettings.UnderlineType::class.java))
+                    .bindItem(settings::underlineType) { settings.underlineType = it!! }
+                    .align(AlignX.LEFT)
+            }
         }
 
-        val settings = MinecraftSettings.instance
+        onApply {
+            for (project in ProjectManager.getInstance().openProjects) {
+                ProjectView.getInstance(project).refresh()
+            }
+        }
+    }.also { panel = it }
 
-        showProjectPlatformIconsCheckBox.isSelected = settings.isShowProjectPlatformIcons
-        showEventListenerGutterCheckBox.isSelected = settings.isShowEventListenerGutterIcons
-        showChatGutterIconsCheckBox.isSelected = settings.isShowChatColorGutterIcons
-        showChatColorUnderlinesCheckBox.isSelected = settings.isShowChatColorUnderlines
+    override fun isModified(): Boolean = panel.isModified()
 
-        chatColorUnderlinesComboBox.selectedIndex = settings.underlineTypeIndex
-        setUnderlineBox()
+    override fun apply() = panel.apply()
 
-        changePluginUpdateChannelButton.addActionListener { ConfigurePluginUpdatesDialog().show() }
-    }
-
-    private fun setUnderlineBox() {
-        chatColorUnderlinesComboBox.isEnabled = showChatColorUnderlinesCheckBox.isSelected
-    }
-
-    override fun isModified(): Boolean {
-        val settings = MinecraftSettings.instance
-
-        return showProjectPlatformIconsCheckBox.isSelected != settings.isShowProjectPlatformIcons ||
-            showEventListenerGutterCheckBox.isSelected != settings.isShowEventListenerGutterIcons ||
-            showChatGutterIconsCheckBox.isSelected != settings.isShowChatColorGutterIcons ||
-            showChatColorUnderlinesCheckBox.isSelected != settings.isShowChatColorUnderlines ||
-            chatColorUnderlinesComboBox.selectedItem !== settings.underlineType
-    }
-
-    override fun apply() {
-        val settings = MinecraftSettings.instance
-
-        settings.isShowProjectPlatformIcons = showProjectPlatformIconsCheckBox.isSelected
-        settings.isShowEventListenerGutterIcons = showEventListenerGutterCheckBox.isSelected
-        settings.isShowChatColorGutterIcons = showChatGutterIconsCheckBox.isSelected
-        settings.isShowChatColorUnderlines = showChatColorUnderlinesCheckBox.isSelected
-        settings.underlineType = chatColorUnderlinesComboBox.selectedItem as? MinecraftSettings.UnderlineType
-            ?: MinecraftSettings.UnderlineType.DOTTED
-    }
-
-    override fun reset() {
-        init()
-    }
+    override fun reset() = panel.reset()
 }
