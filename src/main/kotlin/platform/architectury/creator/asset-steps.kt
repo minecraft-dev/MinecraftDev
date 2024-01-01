@@ -118,6 +118,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
             "JAVA_VERSION" to javaVersion,
             "MOD_ID" to modId,
             "MOD_NAME" to modName,
+            "FABRIC_CLASS_NAME_FQN" to packageName + ".fabric." + modName.toJavaClassName() + "Fabric",
             "DISPLAY_TEST" to hasDisplayTestInManifest,
             "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
             "MC_VERSION" to mcVersion,

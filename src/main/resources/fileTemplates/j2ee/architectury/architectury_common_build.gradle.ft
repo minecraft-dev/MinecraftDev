@@ -1,3 +1,7 @@
+architectury {
+    common(rootProject.enabled_platforms.split(","))
+}
+
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
@@ -6,10 +10,6 @@ dependencies {
     // Remove the next line if you don't want to depend on the API
     modApi "${ARCHITECTURY_GROUP}:architectury:${rootProject.architectury_version}"
 #end
-}
-
-architectury {
-    common("fabric", "forge")
 }
 
 publishing {
