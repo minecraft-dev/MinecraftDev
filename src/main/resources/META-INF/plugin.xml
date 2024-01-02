@@ -878,6 +878,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
+        <localInspection displayName="@Inject before a superconstructor call is cancellable"
+                         shortName="InjectCancellableBeforeSuperConstructorCall"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->
