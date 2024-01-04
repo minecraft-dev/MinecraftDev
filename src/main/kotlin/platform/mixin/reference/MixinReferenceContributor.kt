@@ -55,5 +55,15 @@ class MixinReferenceContributor : PsiReferenceContributor() {
             TargetReference.ELEMENT_PATTERN,
             TargetReference,
         )
+
+        // Accessor references
+        registrar.registerReferenceProvider(
+            AccessorReference.ELEMENT_PATTERN,
+            AccessorReference,
+        )
+        registrar.registerReferenceProvider(
+            InvokerReference.ELEMENT_PATTERN,
+            InvokerReference,
+        )
     }
 }

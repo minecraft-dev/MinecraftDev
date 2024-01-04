@@ -25,8 +25,11 @@ import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.resolveClass
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
+import com.intellij.psi.search.GlobalSearchScope
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
@@ -117,18 +120,48 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
 
 sealed class MixinTargetMember(val mixin: PsiClass?) {
     abstract val access: Int
+
+    abstract fun findSourceElement(
+        project: Project,
+        scope: GlobalSearchScope,
+        canDecompile: Boolean = false
+    ): PsiElement?
+
+    abstract fun findOrConstructSourceMember(
+        project: Project,
+        scope: GlobalSearchScope,
+        canDecompile: Boolean = false
+    ): PsiMember
 }
 
 class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, field: FieldNode) : this(ClassAndFieldNode(clazz, field))
 
     override val access = classAndField.field.access
+
+    override fun findSourceElement(project: Project, scope: GlobalSearchScope, canDecompile: Boolean) =
+        classAndField.field.findSourceField(classAndField.clazz, project, scope, canDecompile)
+
+    override fun findOrConstructSourceMember(
+        project: Project,
+        scope: GlobalSearchScope,
+        canDecompile: Boolean
+    ) = classAndField.field.findOrConstructSourceField(classAndField.clazz, project, scope, canDecompile)
 }
 
 class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, method: MethodNode) : this(ClassAndMethodNode(clazz, method))
 
     override val access = classAndMethod.method.access
+
+    override fun findSourceElement(project: Project, scope: GlobalSearchScope, canDecompile: Boolean) =
+        classAndMethod.method.findSourceElement(classAndMethod.clazz, project, scope, canDecompile)
+
+    override fun findOrConstructSourceMember(
+        project: Project,
+        scope: GlobalSearchScope,
+        canDecompile: Boolean
+    ) = classAndMethod.method.findOrConstructSourceMethod(classAndMethod.clazz, project, scope, canDecompile)
 }
 
 private fun Sequence<MixinTargetMember>.filterAccessible(

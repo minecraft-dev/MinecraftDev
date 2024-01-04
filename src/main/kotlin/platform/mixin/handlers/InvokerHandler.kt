@@ -53,6 +53,10 @@ class InvokerHandler : MixinMemberAnnotationHandler {
     override fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember> {
         val member = annotation.parentOfType<PsiMethod>() ?: return emptyList()
         val name = getInvokerTargetName(annotation, member) ?: return emptyList()
+        if (name == "<clinit>") {
+            return emptyList()
+        }
+
         val constructor = name == "<init>"
         if (constructor &&
             (member.returnType as? PsiClassType)?.resolve()?.fullQualifiedName?.replace('.', '/') != targetClass.name
