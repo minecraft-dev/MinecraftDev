@@ -32,7 +32,8 @@ class ParchmentVersion private constructor(val versions: List<String>) {
             try {
                 // Using this URL doesn't work currently
                 // val url = "https://maven.parchmentmc.org/org/parchmentmc/parchment-$mcVersion/maven-metadata.xml"
-                val url = "https://ldtteam.jfrog.io/artifactory/parchmentmc-public/org/parchmentmc/data/parchment-$mcVersion/maven-metadata.xml"
+                val url = "https://ldtteam.jfrog.io/artifactory/parchmentmc-public/" +
+                    "org/parchmentmc/data/parchment-$mcVersion/maven-metadata.xml"
                 val versions = collectMavenVersions(url)
                 return ParchmentVersion(versions)
             } catch (e: Exception) {
