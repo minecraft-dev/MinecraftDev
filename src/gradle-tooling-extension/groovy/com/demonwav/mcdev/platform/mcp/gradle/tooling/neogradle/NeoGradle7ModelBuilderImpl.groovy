@@ -55,7 +55,7 @@ final class NeoGradle7ModelBuilderImpl implements ModelBuilderService {
             return null
         }
 
-        def mappingsFile = tasks.neoFormMergeMappings.output.get()
+        def mappingsFile = project.tasks.neoFormMergeMappings.output.get().asFile
 
         def accessTransformers = extension.accessTransformers.files.asList()
 
