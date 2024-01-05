@@ -111,16 +111,12 @@ class NeoForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
             "src/main/resources/META-INF/mods.toml" to MinecraftTemplates.NEOFORGE_MODS_TOML_TEMPLATE,
         )
 
-        val configTemplate = MinecraftTemplates.NEOFORGE_CONFIG_TEMPLATE
-
-        if (configTemplate != null) {
-            val configPath = if (mainPackageName != null) {
-                "src/main/java/${mainPackageName.replace('.', '/')}/Config.java"
-            } else {
-                "src/main/java/Config.java"
-            }
-            assets.addTemplates(project, configPath to configTemplate)
+        val configPath = if (mainPackageName != null) {
+            "src/main/java/${mainPackageName.replace('.', '/')}/Config.java"
+        } else {
+            "src/main/java/Config.java"
         }
+        assets.addTemplates(project, configPath to MinecraftTemplates.NEOFORGE_CONFIG_TEMPLATE)
 
         assets.addLicense(project)
     }

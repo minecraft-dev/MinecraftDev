@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.neoforge.creator
 
 import com.demonwav.mcdev.creator.EmptyStep
+import com.demonwav.mcdev.creator.ParchmentStep
 import com.demonwav.mcdev.creator.addGradleGitignore
 import com.demonwav.mcdev.creator.addTemplates
 import com.demonwav.mcdev.creator.buildsystem.AbstractRunGradleTaskStep
@@ -77,6 +78,7 @@ class NeoForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val description = data.getUserData(DescriptionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
+        val parchment = findStep<ParchmentStep>()
         val mcNextVersionPart = mcVersion.parts[1]
         val mcNextVersion = if (mcNextVersionPart is SemanticVersion.Companion.VersionPart.ReleasePart) {
             SemanticVersion.release(1, mcNextVersionPart.version + 1)
@@ -100,6 +102,7 @@ class NeoForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             "AUTHOR_LIST" to authors.joinToString(", "),
             "LICENSE" to license.id,
             "HAS_DATA" to "true",
+            "PARCHMENT_VERSION" to parchment.parchmentVersion.takeIf { parchment.useParchment },
         )
 
         if (javaVersion != null) {

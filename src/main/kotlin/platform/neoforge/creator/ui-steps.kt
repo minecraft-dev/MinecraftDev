@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.neoforge.creator
 
+import com.demonwav.mcdev.creator.ParchmentStep
 import com.demonwav.mcdev.creator.platformtype.ModPlatformStep
 import com.demonwav.mcdev.creator.step.AbstractCollapsibleStep
 import com.demonwav.mcdev.creator.step.AbstractLatentStep
@@ -44,7 +45,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.util.IncorrectOperationException
 import kotlinx.coroutines.coroutineScope
 
-private val minSupportedMcVersion = MinecraftVersions.MC1_20_4
+private val minSupportedMcVersion = MinecraftVersions.MC1_20_2
 
 class NeoForgePlatformStep(parent: ModPlatformStep) : AbstractLatentStep<NeoForgeVersion>(parent) {
     override val description = "fetch NeoForge versions"
@@ -107,4 +108,5 @@ class NeoForgeOptionalSettingsStep(parent: NewProjectWizardStep) : AbstractColla
         .nextStep(::AuthorsStep)
         .nextStep(::WebsiteStep)
         .nextStep(::UpdateUrlStep)
+        .nextStep(::ParchmentStep)
 }

@@ -20,15 +20,10 @@
 
 package com.demonwav.mcdev.platform.neoforge.version
 
-import com.demonwav.mcdev.creator.selectProxy
-import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.requests.suspendable
 import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
-import javax.xml.stream.XMLInputFactory
-import javax.xml.stream.events.XMLEvent
 
 class NeoForgeVersion private constructor(val versions: List<String>) {
 
@@ -69,40 +64,8 @@ class NeoForgeVersion private constructor(val versions: List<String>) {
         suspend fun downloadData(): NeoForgeVersion? {
             try {
                 val url = "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
-                val manager = FuelManager()
-                manager.proxy = selectProxy(url)
-
-                val response = manager.get(url)
-                    .header("User-Agent", PluginUtil.useragent)
-                    .suspendable()
-                    .await()
-
-                val result = mutableListOf<String>()
-                response.body().toStream().use { stream ->
-                    val inputFactory = XMLInputFactory.newInstance()
-
-                    @Suppress("UNCHECKED_CAST")
-                    val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-                    for (event in reader) {
-                        if (!event.isStartElement) {
-                            continue
-                        }
-                        val start = event.asStartElement()
-                        val name = start.name.localPart
-                        if (name != "version") {
-                            continue
-                        }
-
-                        val versionEvent = reader.next()
-                        if (!versionEvent.isCharacters) {
-                            continue
-                        }
-
-                        result += versionEvent.asCharacters().data
-                    }
-                }
-
-                return NeoForgeVersion(result)
+                val versions = collectMavenVersions(url)
+                return NeoForgeVersion(versions)
             } catch (e: IOException) {
                 LOGGER.error("Failed to retrieve NeoForge version data", e)
             }
