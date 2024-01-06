@@ -19,7 +19,7 @@ neo_version_range=[${NEOFORGE_SPEC_VERSION},)
 loader_version_range=[2,)
 
 #if (${PARCHMENT_VERSION})
-neogradle.subsystems.parchment.minecraftVersion=${MC_VERSION}
+neogradle.subsystems.parchment.minecraftVersion=${PARCHMENT_MC_VERSION}
 neogradle.subsystems.parchment.mappingsVersion=${PARCHMENT_VERSION}
 #else
 # Uncomment this to activate parchment

@@ -69,3 +69,45 @@ suspend fun collectMavenVersions(url: String, filter: Predicate<String> = Predic
 
     return result
 }
+
+@Throws(IOException::class)
+suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> {
+    val manager = FuelManager()
+    manager.proxy = selectProxy(url)
+
+    val response = manager.get(url)
+        .header("User-Agent", PluginUtil.useragent)
+        .allowRedirects(true)
+        .suspendable()
+        .await()
+
+    val result = mutableListOf<String>()
+    response.body().toStream().use { stream ->
+        val inputFactory = XMLInputFactory.newInstance()
+
+        @Suppress("UNCHECKED_CAST")
+        val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
+        for (event in reader) {
+            if (!event.isStartElement) {
+                continue
+            }
+            val start = event.asStartElement()
+            val name = start.name.localPart
+            if (name != "a") {
+                continue
+            }
+
+            val childPathEvent = reader.next()
+            if (!childPathEvent.isCharacters) {
+                continue
+            }
+
+            val childPath = childPathEvent.asCharacters().data
+            if (childPath != "../") {
+                result += childPath
+            }
+        }
+    }
+
+    return result
+}

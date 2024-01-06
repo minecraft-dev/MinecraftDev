@@ -101,9 +101,15 @@ class NeoForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
             "DESCRIPTION" to description,
             "AUTHOR_LIST" to authors.joinToString(", "),
             "LICENSE" to license.id,
-            "HAS_DATA" to "true",
-            "PARCHMENT_VERSION" to parchment.parchmentVersion.takeIf { parchment.useParchment },
+            "HAS_DATA" to "true"
         )
+
+        if (parchment.useParchment) {
+            assets.addTemplateProperties(
+                "PARCHMENT_MC_VERSION" to parchment.parchmentVersion?.mcVersion.toString(),
+                "PARCHMENT_VERSION" to parchment.parchmentVersion?.parchmentVersion,
+            )
+        }
 
         if (javaVersion != null) {
             assets.addTemplateProperties("JAVA_VERSION" to javaVersion.feature)

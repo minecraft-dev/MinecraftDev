@@ -20,28 +20,61 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.util.SemanticVersion
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.HttpException
 import com.intellij.openapi.diagnostic.logger
 
-class ParchmentVersion private constructor(val versions: List<String>) {
+class ParchmentVersion private constructor(val mcVersion: SemanticVersion, val parchmentVersion: String) {
+
+    private val presentableString by lazy { "$mcVersion - $parchmentVersion" }
+
+    override fun toString(): String = presentableString
+
     companion object {
         private val LOGGER = logger<ParchmentVersion>()
 
-        suspend fun downloadData(mcVersion: String): ParchmentVersion? {
+        suspend fun downloadData(limit: Int = 50): List<ParchmentVersion> {
+            val versions = mutableListOf<ParchmentVersion>()
+            val mcVersions = collectSupportedMcVersions() ?: return emptyList()
+            for (mcVersion in mcVersions) {
+                val url = "https://maven.parchmentmc.org/org/parchmentmc/data/parchment-$mcVersion/maven-metadata.xml"
+                try {
+                    collectMavenVersions(url)
+                        .mapTo(versions) { ParchmentVersion(mcVersion, it) }
+                    if (versions.size > limit) {
+                        return versions.subList(0, limit)
+                    }
+                } catch (e: Exception) {
+                    if (e !is FuelError || e.exception !is HttpException) {
+                        LOGGER.error("Failed to retrieve Parchment version data from $url", e)
+                    }
+                }
+            }
+
+            return versions
+        }
+
+        private suspend fun collectSupportedMcVersions(): List<SemanticVersion>? {
             try {
-                // Using this URL doesn't work currently
-                // val url = "https://maven.parchmentmc.org/org/parchmentmc/parchment-$mcVersion/maven-metadata.xml"
-                val url = "https://ldtteam.jfrog.io/artifactory/parchmentmc-public/" +
-                    "org/parchmentmc/data/parchment-$mcVersion/maven-metadata.xml"
-                val versions = collectMavenVersions(url)
-                return ParchmentVersion(versions)
+                val baseUrl = "https://maven.parchmentmc.org/org/parchmentmc/data/"
+                val scrapeArtifactoryDirectoryListing = scrapeArtifactoryDirectoryListing(baseUrl)
+                return scrapeArtifactoryDirectoryListing
+                    .asReversed()
+                    .asSequence()
+                    .filter { it.startsWith("parchment-") }
+                    .mapNotNull {
+                        val mcVersion = it.removePrefix("parchment-").removeSuffix("/")
+                        SemanticVersion.tryParse(mcVersion)
+                    }
+                    .toList()
             } catch (e: Exception) {
                 if (e is FuelError && e.exception is HttpException) {
                     return null
                 }
-                LOGGER.error("Failed to retrieve Parchment $mcVersion version data", e)
+                LOGGER.error("Failed to list supported Parchment Minecraft versions", e)
             }
+
             return null
         }
     }
