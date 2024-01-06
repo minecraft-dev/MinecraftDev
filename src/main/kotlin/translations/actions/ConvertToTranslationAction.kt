@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.translations.actions
 
 import com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.LangDataKeys
@@ -34,6 +35,8 @@ class ConvertToTranslationAction : AnAction() {
         val element = file.findElementAt(editor.caretModel.offset) ?: return
         ConvertToTranslationIntention().invoke(editor.project ?: return, editor, element)
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         val file = e.getData(LangDataKeys.PSI_FILE)
