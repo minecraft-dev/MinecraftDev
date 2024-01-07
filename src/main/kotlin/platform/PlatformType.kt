@@ -81,8 +81,10 @@ enum class PlatformType(
     }
 
     companion object {
-        fun removeParents(types: MutableSet<PlatformType>) =
-            types.filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }.toHashSet()
+        fun removeParents(types: Set<PlatformType?>) =
+            types.filterNotNull()
+                .filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }
+                .toHashSet()
 
         fun fromLibraryKind(kind: LibraryKind) = when (kind) {
             BUKKIT_LIBRARY_KIND -> BUKKIT
