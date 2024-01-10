@@ -31,7 +31,6 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.lang.Language
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
