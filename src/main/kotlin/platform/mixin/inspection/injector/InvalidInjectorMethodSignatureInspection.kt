@@ -128,10 +128,12 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         if (possibleSignatures.isEmpty()) {
                             reportedSignature = true
-                            holder.registerProblem(
-                                parameters,
-                                "There are no possible signatures for this injector",
-                            )
+                            if (handler.isUnresolved(annotation) != null) {
+                                holder.registerProblem(
+                                    parameters,
+                                    "There are no possible signatures for this injector",
+                                )
+                            }
                             continue
                         }
 
