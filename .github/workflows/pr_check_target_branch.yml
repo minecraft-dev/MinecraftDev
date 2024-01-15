@@ -1,0 +1,22 @@
+name: Make sure PRs target the dev branch
+
+on:
+  pull_request_target:
+    types: [opened, edited]
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      # Do not check out the repository here. See https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+      - uses: Vankka/pr-target-branch-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          target: /\b(?!dev\b).*?\b/
+          exclude: dev
+          change-to: dev
+          comment: |
+            New PRs should target the `dev` branch. The base branch of this PR has been automatically changed to `dev`.
+            Please check that there are no merge conflicts.
+
