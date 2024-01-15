@@ -1,5 +1,7 @@
 <p align="center"><a href="https://minecraftdev.org/"><img src="https://minecraftdev.org/assets/icon.svg" height="120" alt="logo"/></a></p>
 
+This is a PR test
+
 Minecraft Development for IntelliJ
 ==================================
 
