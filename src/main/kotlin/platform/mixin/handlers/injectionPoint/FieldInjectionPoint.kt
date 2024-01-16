@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -152,6 +152,14 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
                             } ?: return
 
                             addResult(actualResult)
+
+                            // if an expression is accessed for reading *and* writing, add it twice to properly handle ordinals
+                            if (opcode == -1 &&
+                                PsiUtil.isAccessedForReading(actualResult) &&
+                                PsiUtil.isAccessedForWriting(actualResult)
+                            ) {
+                                addResult(actualResult)
+                            }
                         }
                     }
                 }

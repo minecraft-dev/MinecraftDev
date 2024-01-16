@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,6 +36,7 @@ import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.creator.step.AbstractModIdStep
 import com.demonwav.mcdev.creator.step.AbstractModNameStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
+import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
@@ -65,7 +66,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(7, 6, 1))
+        data.putUserData(GRADLE_VERSION_KEY, SemanticVersion.release(8, 4))
 
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
@@ -76,6 +77,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
         val fabricApiVersion = data.getUserData(ArchitecturyVersionChainStep.FABRIC_API_VERSION_KEY)
         val archApiVersion = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY)
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
+        val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         assets.addTemplateProperties(
             "GROUP_ID" to buildSystemProps.groupId,
@@ -88,6 +90,7 @@ class ArchitecturyGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRu
             "FABRIC_LOADER_VERSION" to fabricLoaderVersion,
             "ARCHITECTURY_GROUP" to architecturyGroup,
             "JAVA_VERSION" to javaVersion,
+            "MIXINS" to useMixins,
         )
 
         if (fabricApiVersion != null) {

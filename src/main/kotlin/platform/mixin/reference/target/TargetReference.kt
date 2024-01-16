@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
+import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
@@ -71,9 +72,13 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     private fun getTargets(at: PsiAnnotation, forUnresolved: Boolean): List<ClassAndMethodNode>? {
         val (handler, annotation) = generateSequence(at.parent) { it.parent }
             .filterIsInstance<PsiAnnotation>()
+            .flatMap { it.owner?.annotations?.asSequence() ?: emptySequence() }
             .mapNotNull { annotation ->
                 val qName = annotation.qualifiedName ?: return@mapNotNull null
-                MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)?.let { it to annotation }
+                (
+                    MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)
+                        as? InjectorAnnotationHandler
+                    )?.let { it to annotation }
             }.firstOrNull() ?: return null
         if (forUnresolved && handler.isSoft) {
             return null

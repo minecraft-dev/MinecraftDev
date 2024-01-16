@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,22 +26,27 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypeRegistry
 import com.intellij.openapi.util.io.ByteSequence
 import com.intellij.openapi.vfs.VirtualFile
+import java.io.ByteArrayInputStream
+import java.io.EOFException
 
 class NbtFileTypeDetector : FileTypeRegistry.FileTypeDetector {
     override fun detect(file: VirtualFile, firstBytes: ByteSequence, firstCharsIfText: CharSequence?): FileType? {
         return try {
             // 20 ms is plenty of time to parse most files
             // Won't parse very large files, but if we fail on timeout then those files probably are NBT anyways
-            Nbt.buildTagTree(file.inputStream, 20)
+            Nbt.buildTagTree(ByteArrayInputStream(firstBytes.toBytes()), 20)
             NbtFileType
         } catch (e: Throwable) {
-            if (e is NbtFileParseTimeoutException) {
+            when (e) {
                 // If a timeout occurred then no file structure errors were detected in the parse time, so we can
                 // probably assume it's a (very big) NBT file
-                NbtFileType
-            } else {
-                null
+                is NbtFileParseTimeoutException -> NbtFileType
+                // If we reach the end of the stream without another error then let's assume it is a valid NBT file
+                is EOFException -> NbtFileType
+                else -> null
             }
         }
     }
+
+    override fun getDesiredContentPrefixLength(): Int = 1024 * 10
 }

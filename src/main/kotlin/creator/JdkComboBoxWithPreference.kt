@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -144,7 +144,12 @@ fun Row.jdkComboBoxWithPreference(
     stateComponent.getList(preferenceDataProperty)?.let { preferenceDataStrs ->
         for (preferenceDataStr in preferenceDataStrs) {
             val parts = preferenceDataStr.split('=', limit = 2)
-            val jdk = parts.firstOrNull()?.toIntOrNull()?.let { JavaSdkVersion.values()[it] } ?: continue
+            val featureVersion = parts.firstOrNull()?.toIntOrNull() ?: continue
+            val knownJdkVersions = JavaSdkVersion.values()
+            if (featureVersion !in knownJdkVersions.indices) {
+                continue
+            }
+            val jdk = knownJdkVersions[featureVersion]
             val sdk = parts.last()
             preferenceData.sdkPathByJdk[jdk] = sdk
         }

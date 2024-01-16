@@ -13,7 +13,11 @@
   "icon": "icon.png",
 
   "environment": "${MOD_ENVIRONMENT}",
-  "entrypoints": {},
+  "entrypoints": {
+    "main": [
+      "${FABRIC_CLASS_NAME_FQN}"
+    ]
+  },
 #if (${MIXINS})
   "mixins": [
     "${MOD_ID}.mixins.json",

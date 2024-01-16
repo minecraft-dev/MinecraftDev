@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
+import com.demonwav.mcdev.util.loggerForTopLevel
 import com.demonwav.mcdev.util.runReadActionAsync
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.lang.Language
@@ -40,6 +41,8 @@ import com.intellij.util.ThreeState
 import java.io.DataOutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.GZIPOutputStream
+
+private val LOG = loggerForTopLevel()
 
 fun NbtVirtualFile(backingFile: VirtualFile, project: Project): NbtVirtualFile {
     var language: Language = NbttLanguage
@@ -99,8 +102,20 @@ class NbtVirtualFile(
                 return@runReadActionAsync
             }
 
-            val rootTag = nbttFile.getRootCompound()?.getRootCompoundTag()
+            val rootTagParseResult = runCatching { nbttFile.getRootCompound()?.getRootCompoundTag() }
 
+            if (rootTagParseResult.isFailure) {
+                val exception = rootTagParseResult.exceptionOrNull()
+                Notification(
+                    "NBT Save Error",
+                    MCDevBundle("nbt.file.save_notify.parse_exception.title"),
+                    MCDevBundle("nbt.file.save_notify.parse_exception.content", backingFile.name, exception),
+                    NotificationType.WARNING,
+                ).notify(project)
+                return@runReadActionAsync
+            }
+
+            val rootTag = rootTagParseResult.getOrNull()
             if (rootTag == null) {
                 Notification(
                     "NBT Save Error",

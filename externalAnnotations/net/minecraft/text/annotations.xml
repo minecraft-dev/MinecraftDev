@@ -3,7 +3,7 @@
 
     https://mcdev.io/
 
-    Copyright (C) 2023 minecraft-dev
+    Copyright (C) 2024 minecraft-dev
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -39,6 +39,12 @@
     <item name="net.minecraft.text.Text net.minecraft.text.MutableText translatable(java.lang.String, java.lang.Object...) 0">
         <annotation name="com.demonwav.mcdev.annotations.Translatable">
             <val name="foldMethod" val="true"/>
+        </annotation>
+    </item>
+    <item name="net.minecraft.text.Text net.minecraft.text.MutableText stringifiedTranslatable(java.lang.String, java.lang.Object...) 0">
+        <annotation name="com.demonwav.mcdev.annotations.Translatable">
+            <val name="foldMethod" val="true"/>
+            <val name="allowArbitraryArgs" val="true"/>
         </annotation>
     </item>
     <item name="net.minecraft.text.Text net.minecraft.text.MutableText translatableWithFallback(java.lang.String, java.lang.String) 0">

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -54,6 +54,16 @@ class MixinReferenceContributor : PsiReferenceContributor() {
         registrar.registerReferenceProvider(
             TargetReference.ELEMENT_PATTERN,
             TargetReference,
+        )
+
+        // Accessor references
+        registrar.registerReferenceProvider(
+            AccessorReference.ELEMENT_PATTERN,
+            AccessorReference,
+        )
+        registrar.registerReferenceProvider(
+            InvokerReference.ELEMENT_PATTERN,
+            InvokerReference,
         )
     }
 }

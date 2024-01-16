@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
@@ -83,11 +85,16 @@ class MixinCancellableInspection : MixinInspection() {
             }
 
             if (definitelyUsesCancel && !isCancellable) {
+                val fixes = mutableListOf<LocalQuickFix>()
+                if (!CancellableBeforeSuperCallInspection.doesInjectBeforeSuperConstructorCall(injectAnnotation)) {
+                    fixes += MakeInjectCancellableFix(injectAnnotation)
+                }
+
                 holder.registerProblem(
                     method.nameIdentifier ?: method,
                     "@Inject must be marked as cancellable in order to be cancelled",
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                    MakeInjectCancellableFix(injectAnnotation),
+                    *fixes.toTypedArray(),
                 )
             } else if (!definitelyUsesCancel && !mayUseCancel && isCancellable) {
                 holder.registerProblem(
@@ -120,10 +127,10 @@ class MixinCancellableInspection : MixinInspection() {
         }
     }
 
-    private class RemoveInjectCancellableFix(element: PsiAnnotation) :
+    class RemoveInjectCancellableFix(element: PsiAnnotation) :
         LocalQuickFixAndIntentionActionOnPsiElement(element) {
 
-        override fun getFamilyName(): String = "Remove unused cancellable attribute"
+        override fun getFamilyName(): String = "Remove cancellable attribute"
 
         override fun getText(): String = familyName
 

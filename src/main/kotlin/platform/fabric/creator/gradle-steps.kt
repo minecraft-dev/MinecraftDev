@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,7 +57,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val mcVersion = data.getUserData(FabricVersionChainStep.MC_VERSION_KEY) ?: return
         val yarnVersion = data.getUserData(FabricVersionChainStep.YARN_VERSION_KEY) ?: return
         val loaderVersion = data.getUserData(FabricVersionChainStep.LOADER_VERSION_KEY) ?: return
-        val loomVersion = "1.2-SNAPSHOT"
+        val loomVersion = "1.4-SNAPSHOT"
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val apiVersion = data.getUserData(FabricVersionChainStep.API_VERSION_KEY)
         val officialMappings = data.getUserData(FabricVersionChainStep.OFFICIAL_MAPPINGS_KEY) ?: false

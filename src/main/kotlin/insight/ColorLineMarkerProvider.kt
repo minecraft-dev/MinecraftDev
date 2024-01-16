@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -85,7 +85,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
 
                 val editor = PsiEditorUtil.findEditor(psiElement) ?: return@handler
 
-                val picker = ColorPicker(map, editor.component)
+                val picker = ColorPicker(map, element.project, editor.component)
                 val newColor = picker.showDialog()
                 if (newColor != null && map[newColor] != color) {
                     workElement.setColor(newColor)

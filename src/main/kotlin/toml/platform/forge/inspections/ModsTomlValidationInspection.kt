@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ import com.demonwav.mcdev.toml.TomlElementVisitor
 import com.demonwav.mcdev.toml.platform.forge.ModsTomlSchema
 import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.toml.tomlType
+import com.demonwav.mcdev.toml.unquoteKey
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.findMcpModule
 import com.intellij.codeInspection.InspectionManager
@@ -120,7 +121,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 key.segments.indexOf(keySegment) == 1 &&
                 key.segments.first().text == "dependencies" // We are visiting a dependency table
             ) {
-                val targetId = keySegment.text
+                val targetId = keySegment.unquoteKey()
                 val isDeclaredId = keySegment.containingFile.children
                     .filterIsInstance<TomlArrayTable>()
                     .filter { it.header.key?.name == "mods" }
