@@ -16,6 +16,7 @@ jobs:
           target: /\b(?!dev\b).*?\b/
           exclude: dev
           change-to: dev
+          already-exists-action: nothing
           comment: |
             New PRs should target the `dev` branch. The base branch of this PR has been automatically changed to `dev`.
             Please check that there are no merge conflicts.
