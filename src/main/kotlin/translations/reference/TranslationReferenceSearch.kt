@@ -24,9 +24,9 @@ import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
 import com.intellij.openapi.application.runReadAction
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.util.createSmartPointer
 import com.intellij.usages.FindUsagesProcessPresentation
 import com.intellij.usages.UsageViewPresentation
 import com.intellij.util.Processor
@@ -41,9 +41,10 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
             return true
         }
 
-        val entryPointer = parameters.elementToSearch.createSmartPointer()
-
-        val key = runReadAction { entryPointer.element?.let(TranslationFiles::toTranslation)?.key } ?: return true
+        val key = runReadAction {
+            val searchElement = parameters.elementToSearch.takeIf(PsiElement::isValid)
+            searchElement?.let(TranslationFiles::toTranslation)?.key
+        } ?: return true
 
         fun <A> power(start: List<A>): Set<List<A>> {
             tailrec fun pwr(s: List<A>, acc: Set<List<A>>): Set<List<A>> =
