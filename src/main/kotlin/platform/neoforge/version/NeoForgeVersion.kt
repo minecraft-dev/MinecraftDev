@@ -45,7 +45,7 @@ class NeoForgeVersion private constructor(val versions: List<String>) {
         return@lazy version
     }
 
-    fun getForgeVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
+    fun getNeoForgeVersions(mcVersion: SemanticVersion): List<SemanticVersion> {
         val versionText = mcVersion.toString()
         // Drop the 1. part of the mc version
         val shortMcVersion = versionText.substringAfter('.')

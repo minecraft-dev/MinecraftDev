@@ -89,7 +89,7 @@ class NeoForgeVersionChainStep(
         return when (versionsAbove.size) {
             MINECRAFT_VERSION -> neoforgeVersionData.sortedMcVersions.filter { it >= minSupportedMcVersion }
             NEOFORGE_VERSION ->
-                neoforgeVersionData.getForgeVersions(versionsAbove[MINECRAFT_VERSION] as SemanticVersion)
+                neoforgeVersionData.getNeoForgeVersions(versionsAbove[MINECRAFT_VERSION] as SemanticVersion)
             else -> throw IncorrectOperationException()
         }
     }

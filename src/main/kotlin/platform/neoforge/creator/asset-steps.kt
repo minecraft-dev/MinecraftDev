@@ -64,8 +64,7 @@ class NeoForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
         val nextMcVersion = when (val part = mcVersion.parts.getOrNull(1)) {
-            // Mimics the code used to get the next Minecraft version in NeoForge's MDK
-            // https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
+            // Extract the major version and increment (1.20.4 -> 1.21), as is done manually in the MDK
             is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
             null -> "?"
             else -> part.versionString
