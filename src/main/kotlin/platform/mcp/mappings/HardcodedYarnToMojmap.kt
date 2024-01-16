@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mcp.mappings
 
+import com.demonwav.mcdev.util.MemberReference
 import com.google.common.collect.ImmutableBiMap
 
 /**
@@ -30,9 +31,20 @@ object HardcodedYarnToMojmap {
         ImmutableBiMap.ofEntries(
             "net.minecraft.item.ItemStack" mapTo "net.minecraft.world.item.ItemStack",
             "net.minecraft.util.Formatting" mapTo "net.minecraft.ChatFormatting",
+            "net.minecraft.text.Text" mapTo "net.minecraft.network.chat.Component",
         ),
         ImmutableBiMap.ofEntries(),
-        ImmutableBiMap.ofEntries(),
+        ImmutableBiMap.ofEntries(
+            MemberReference(
+                owner = "net.minecraft.util.Text",
+                name = "stringifiedTranslatable",
+                descriptor = "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/text/MutableText;"
+            ) mapTo MemberReference(
+                owner = "net.minecraft.network.chat.Component",
+                name = "translatableEscape",
+                descriptor = "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/MutableComponent;"
+            )
+        ),
         hashMapOf(),
         false,
     )

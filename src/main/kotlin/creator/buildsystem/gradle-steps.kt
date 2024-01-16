@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -61,7 +61,7 @@ import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 
-val DEFAULT_GRADLE_VERSION = SemanticVersion.release(8, 1, 1)
+val DEFAULT_GRADLE_VERSION = SemanticVersion.release(8, 5)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
 
 fun FixedAssetsNewProjectWizardStep.addGradleWrapperProperties(project: Project) {

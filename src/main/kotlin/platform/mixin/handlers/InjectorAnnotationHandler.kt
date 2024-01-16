@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,6 +34,7 @@ import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.Parameter
+import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingClass
@@ -44,6 +45,8 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiType
+import com.intellij.psi.util.PsiModificationTracker
+import java.util.concurrent.ConcurrentHashMap
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -110,9 +113,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
             .flatMap { AtResolver(it, targetClass, targetMethod).resolveNavigationTargets() }
     }
 
-    fun resolveInstructions(annotation: PsiAnnotation): List<InsnResult> {
-        val containingClass = annotation.findContainingClass() ?: return emptyList()
-        return containingClass.mixinTargets.flatMap { resolveInstructions(annotation, it) }
+    fun resolveInstructions(annotation: PsiAnnotation) = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
+        val containingClass = annotation.findContainingClass() ?: return@cached emptyList()
+        containingClass.mixinTargets.flatMap { resolveInstructions(annotation, it) }
     }
 
     fun resolveInstructions(annotation: PsiAnnotation, targetClass: ClassNode): List<InsnResult> {
@@ -131,9 +134,14 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetMethod: MethodNode,
         mode: CollectVisitor.Mode = CollectVisitor.Mode.MATCH_ALL,
     ): List<CollectVisitor.Result<*>> {
-        return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
-            .ifNullOrEmpty { return emptyList() }!!
-            .flatMap { AtResolver(it, targetClass, targetMethod).resolveInstructions(mode) }
+        val cache = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
+            ConcurrentHashMap<Pair<ClassAndMethodNode, CollectVisitor.Mode>, List<CollectVisitor.Result<*>>>()
+        }
+        return cache.computeIfAbsent(ClassAndMethodNode(targetClass, targetMethod) to mode) {
+            annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
+                .ifNullOrEmpty { return@computeIfAbsent emptyList() }!!
+                .flatMap { AtResolver(it, targetClass, targetMethod).resolveInstructions(mode) }
+        }
     }
 
     /**

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -49,7 +49,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.util.lang.JavaVersion
 
-private val fg6WrapperVersion = SemanticVersion.release(8, 1, 1)
+private val fg6WrapperVersion = SemanticVersion.release(8, 4)
 
 const val MAGIC_RUN_CONFIGS_FILE = ".hello_from_mcdev"
 

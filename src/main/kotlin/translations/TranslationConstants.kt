@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ object TranslationConstants {
     const val TRANSLATABLE_ANNOTATION = "com.demonwav.mcdev.annotations.Translatable"
     const val REQUIRED = "required"
     const val FOLD_METHOD = "foldMethod"
+    const val ALLOW_ARBITRARY_ARGS = "allowArbitraryArgs"
     const val PREFIX = "prefix"
     const val SUFFIX = "suffix"
 }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
+import com.demonwav.mcdev.platform.mixin.util.findSuperConstructorCall
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
@@ -56,9 +57,6 @@ import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.InsnList
-import org.objectweb.asm.tree.MethodInsnNode
 
 class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
@@ -88,8 +86,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         if (!shouldBeStatic && targetMethod.method.isConstructor) {
                             // before the superclass constructor call, everything must be static
-                            targetMethod.method.instructions?.let { methodInsns ->
-                                val superCtorCall = findSuperConstructorCall(methodInsns)
+                            val methodInsns = targetMethod.method.instructions
+                            val superCtorCall = targetMethod.method.findSuperConstructorCall()
+                            if (methodInsns != null && superCtorCall != null) {
                                 val insns = handler.resolveInstructions(
                                     annotation,
                                     targetMethod.clazz,
@@ -129,10 +128,12 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         if (possibleSignatures.isEmpty()) {
                             reportedSignature = true
-                            holder.registerProblem(
-                                parameters,
-                                "There are no possible signatures for this injector",
-                            )
+                            if (handler.isUnresolved(annotation) != null) {
+                                holder.registerProblem(
+                                    parameters,
+                                    "There are no possible signatures for this injector",
+                                )
+                            }
                             continue
                         }
 
@@ -197,27 +198,6 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                     }
                 }
             }
-        }
-
-        private fun findSuperConstructorCall(methodInsns: InsnList): AbstractInsnNode? {
-            var superCtorCall = methodInsns.first
-            var newCount = 0
-            while (superCtorCall != null) {
-                if (superCtorCall.opcode == Opcodes.NEW) {
-                    newCount++
-                } else if (superCtorCall.opcode == Opcodes.INVOKESPECIAL) {
-                    val methodCall = superCtorCall as MethodInsnNode
-                    if (methodCall.name == "<init>") {
-                        if (newCount == 0) {
-                            return superCtorCall
-                        } else {
-                            newCount--
-                        }
-                    }
-                }
-                superCtorCall = superCtorCall.next
-            }
-            return null
         }
 
         private fun checkReturnType(

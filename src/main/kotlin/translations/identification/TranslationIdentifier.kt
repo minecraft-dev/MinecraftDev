@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,18 +20,23 @@
 
 package com.demonwav.mcdev.translations.identification
 
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedClass
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethod
 import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.merge
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.extractVarArgs
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.referencedMethod
 import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInspection.dataFlow.CommonDataflow
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement
@@ -79,6 +84,12 @@ abstract class TranslationIdentifier<T : PsiElement> {
             val required =
                 translatableAnnotation.findAttributeValue(TranslationConstants.REQUIRED)?.constantValue as? Boolean
                     ?: true
+            val isPreEscapeException =
+                method.containingClass?.qualifiedName?.startsWith("net.minecraft.") == true &&
+                    isPreEscapeMcVersion(project, element)
+            val allowArbitraryArgs = isPreEscapeException || translatableAnnotation.findAttributeValue(
+                TranslationConstants.ALLOW_ARBITRARY_ARGS
+            )?.constantValue as? Boolean ?: false
 
             val translationKey = CommonDataflow.computeValue(element) as? String ?: return null
 
@@ -90,7 +101,8 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     referenceElement,
                     TranslationInstance.Key(prefix, translationKey, suffix),
                     null,
-                    required
+                    required,
+                    allowArbitraryArgs,
                 )
 
             val foldMethod =
@@ -126,6 +138,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     TranslationInstance.Key(prefix, translationKey, suffix),
                     formatted,
                     required,
+                    allowArbitraryArgs,
                     if (superfluousParams >= 0) FormattingError.SUPERFLUOUS else null,
                     superfluousParams,
                 )
@@ -137,6 +150,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     TranslationInstance.Key(prefix, translationKey, suffix),
                     translation,
                     required,
+                    allowArbitraryArgs,
                     FormattingError.MISSING,
                 )
             }
@@ -147,6 +161,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
             val paramCount = STRING_FORMATTING_PATTERN.findAll(format).count()
 
             val varargs = call.extractVarArgs(method.parameterList.parametersCount - 1, true, true)
+                ?: return null
             val varargStart = if (varargs.size > paramCount) {
                 method.parameterList.parametersCount - 1 + paramCount
             } else {
@@ -159,6 +174,21 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 throw e
             } catch (e: IllegalFormatException) {
                 null
+            }
+        }
+
+        private fun isPreEscapeMcVersion(project: Project, contextElement: PsiElement): Boolean {
+            val module = contextElement.findModule() ?: return false
+            val componentClassName = module.getMappedClass("net.minecraft.network.chat.Component")
+            val componentClass = JavaPsiFacade.getInstance(project)
+                .findClass(componentClassName, contextElement.resolveScope) ?: return false
+            val translatableEscapeName = module.getMappedMethod(
+                "net.minecraft.network.chat.Component",
+                "translatableEscape",
+                "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/minecraft/network/chat/Component;"
+            )
+            return componentClass.findMethodsByName(translatableEscapeName, false).any { method ->
+                method.descriptor?.startsWith("(Ljava/lang/String;[Ljava/lang/Object;)") == true
             }
         }
 

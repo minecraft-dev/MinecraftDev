@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -76,12 +76,6 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         get() = state.underlineType
         set(underlineType) {
             state.underlineType = underlineType
-        }
-
-    val underlineTypeIndex: Int
-        get() {
-            val type = underlineType
-            return UnderlineType.values().indices.firstOrNull { type == UnderlineType.values()[it] } ?: 0
         }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {

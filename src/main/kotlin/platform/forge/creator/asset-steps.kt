@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -83,6 +83,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "MOD_ID" to modId,
             "MOD_NAME" to modName,
             "MOD_VERSION" to buildSystemProps.version,
+            "SUPPORTS_CLIENT_SIDE_ONLY" to (forgeVersion >= ForgeConstants.CLIENT_ONLY_MANIFEST_VERSION),
             "DISPLAY_TEST" to (forgeVersion >= ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION),
             "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
             "MC_VERSION" to mcVersion,

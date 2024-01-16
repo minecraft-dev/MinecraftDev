@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -52,4 +52,5 @@ object ForgeConstants {
     val MOD_ID_REGEX = "^[a-z][a-z0-9_-]{1,63}$".toRegex()
 
     val DISPLAY_TEST_MANIFEST_VERSION = SemanticVersion.release(41, 0, 15)
+    val CLIENT_ONLY_MANIFEST_VERSION = SemanticVersion.release(49, 0, 6)
 }

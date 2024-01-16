@@ -1,6 +1,7 @@
-org.gradle.jvmargs=-Xmx1G
+org.gradle.jvmargs=-Xmx2048M
 
 minecraft_version=${MC_VERSION}
+enabled_platforms=fabric,forge
 
 archives_base_name=${ARTIFACT_ID}
 mod_version=${VERSION}

@@ -3,7 +3,7 @@
 
     https://mcdev.io/
 
-    Copyright (C) 2023 minecraft-dev
+    Copyright (C) 2024 minecraft-dev
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -233,6 +233,7 @@
         <additionalTextAttributes scheme="Default" file="colorSchemes/NbttDefault.xml"/>
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/NbttDarcula.xml"/>
         <codeInsight.parameterNameHints language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints" />
+        <lang.fileViewProviderFactory language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileViewProviderFactory"/>
 
         <!-- Minecraft localization files -->
         <fileType name="MCLang" language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangFileType" fieldName="INSTANCE" extensions="lang"/>
@@ -512,6 +513,13 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
+        <localInspection displayName="Wrong translation argument types"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.translations.inspections.WrongTypeInTranslationArgsInspection"/>
         <localInspection displayName="Entity class does not match this entity class"
                          groupName="Minecraft"
                          language="JAVA"
@@ -872,6 +880,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
+        <localInspection displayName="@Inject before a superconstructor call is cancellable"
+                         shortName="InjectCancellableBeforeSuperConstructorCall"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -81,8 +81,10 @@ enum class PlatformType(
     }
 
     companion object {
-        fun removeParents(types: MutableSet<PlatformType>) =
-            types.filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }.toHashSet()
+        fun removeParents(types: Set<PlatformType?>) =
+            types.filterNotNull()
+                .filter { type -> type.children.isEmpty() || types.none { type.children.contains(it) } }
+                .toHashSet()
 
         fun fromLibraryKind(kind: LibraryKind) = when (kind) {
             BUKKIT_LIBRARY_KIND -> BUKKIT

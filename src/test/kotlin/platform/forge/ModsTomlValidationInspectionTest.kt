@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -106,6 +106,33 @@ modId="examplemod1"
 [[mods]]
 modId="examplemod2"
 [[dependencies.<error descr="Mod examplemod3 is not declared in this file">examplemod3</error>]]
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Dependency For Mod With Good Placeholder")
+    fun dependencyForModWithGoodPlaceholder() {
+        val placeholder = "\${mod_id}"
+        doTest(
+            """
+[[mods]]
+modId="$placeholder"
+[[dependencies."$placeholder"]]
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Dependency For Mod With Bad Placeholder")
+    fun dependencyForModWithBadPlaceholder() {
+        val goodPlaceholder = "\${mod_id}"
+        val badPlaceholder = "\${bad_mod_id}"
+        doTest(
+            """
+[[mods]]
+modId="$goodPlaceholder"
+[[dependencies.<error descr="Mod $badPlaceholder is not declared in this file">"$badPlaceholder"</error>]]
             """,
         )
     }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionI
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.resolveClass
@@ -45,9 +46,9 @@ import com.intellij.util.xmlb.annotations.Attribute
 import org.objectweb.asm.tree.ClassNode
 
 interface MixinAnnotationHandler {
-    fun resolveTarget(annotation: PsiAnnotation): List<MixinTargetMember> {
-        val containingClass = annotation.findContainingClass() ?: return emptyList()
-        return containingClass.mixinTargets.flatMap { resolveTarget(annotation, it) }
+    fun resolveTarget(annotation: PsiAnnotation) = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
+        val containingClass = annotation.findContainingClass() ?: return@cached emptyList()
+        containingClass.mixinTargets.flatMap { resolveTarget(annotation, it) }
     }
 
     fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember>

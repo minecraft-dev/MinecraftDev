@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -150,11 +150,8 @@ fun callbackInfoReturnableType(project: Project, context: PsiElement, returnType
         returnType
     }
 
-    // TODO: Can we do this without looking up the PsiClass?
-    val psiClass =
-        JavaPsiFacade.getInstance(project).findClass(CALLBACK_INFO_RETURNABLE, GlobalSearchScope.allScope(project))
-            ?: return null
-    return JavaPsiFacade.getElementFactory(project).createType(psiClass, boxedType)
+    return JavaPsiFacade.getElementFactory(project)
+        .createTypeFromText("$CALLBACK_INFO_RETURNABLE<${boxedType.canonicalText}>", context)
 }
 
 fun isAssignable(left: PsiType, right: PsiType, allowPrimitiveConversion: Boolean = true): Boolean {

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2023 minecraft-dev
+ * Copyright (C) 2024 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -79,6 +79,7 @@ import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.signature.SignatureReader
+import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.FieldNode
@@ -200,6 +201,11 @@ fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findM
         if (actualThrowable is ProcessCanceledException) {
             throw actualThrowable
         }
+
+        if (actualThrowable is NoSuchFileException) {
+            return null
+        }
+
         val message = actualThrowable.message
         // TODO: display an error to the user?
         if (message == null || !message.contains("Unsupported class file major version")) {
@@ -576,6 +582,31 @@ val MethodNode.isConstructor
 
 val MethodNode.isClinit
     get() = this.name == "<clinit>"
+
+/**
+ * Finds the super() call in this method node, assuming it is a constructor
+ */
+fun MethodNode.findSuperConstructorCall(): AbstractInsnNode? {
+    val insns = instructions ?: return null
+    var superCtorCall = insns.first
+    var newCount = 0
+    while (superCtorCall != null) {
+        if (superCtorCall.opcode == Opcodes.NEW) {
+            newCount++
+        } else if (superCtorCall.opcode == Opcodes.INVOKESPECIAL) {
+            val methodCall = superCtorCall as MethodInsnNode
+            if (methodCall.name == "<init>") {
+                if (newCount == 0) {
+                    return superCtorCall
+                } else {
+                    newCount--
+                }
+            }
+        }
+        superCtorCall = superCtorCall.next
+    }
+    return null
+}
 
 private fun findContainingMethod(clazz: ClassNode, lambdaMethod: MethodNode): Pair<MethodNode, Int>? {
     if (!lambdaMethod.hasAccess(Opcodes.ACC_SYNTHETIC)) {
