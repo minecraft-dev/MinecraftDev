@@ -1003,6 +1003,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
+        <localInspection displayName="Unresolved @Local capture"
+                         shortName="UnresolvedLocalCapture"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnresolvedLocalCaptureInspection"/>
         <!--endregion-->
 
         <!--region Configuration -->

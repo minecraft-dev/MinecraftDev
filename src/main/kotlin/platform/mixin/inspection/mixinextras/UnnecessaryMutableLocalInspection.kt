@@ -25,13 +25,13 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.unwrapLocalRef
 import com.demonwav.mcdev.util.findContainingMethod
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementFactory
 import com.intellij.psi.PsiExpressionList
@@ -40,8 +40,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiReferenceExpression
-import com.intellij.psi.PsiType
-import com.intellij.psi.PsiTypes
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiUtil
@@ -169,8 +167,7 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
 
         private fun fixMethod(method: PsiMethod, paramIndex: Int) {
             val param = method.parameterList.getParameter(paramIndex) ?: return
-            val paramType = param.type as? PsiClassType ?: return
-            val innerType = paramType.innerRefType ?: return
+            val innerType = param.type.unwrapLocalRef()
             val factory = PsiElementFactory.getInstance(method.project)
             param.typeElement?.replace(factory.createTypeElement(innerType))
             for (ref in ReferencesSearch.search(param)) {
@@ -180,19 +177,5 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
                 call.replace(ref.element)
             }
         }
-
-        private val PsiClassType.innerRefType: PsiType?
-            get() =
-                when (resolve()?.qualifiedName?.substringAfterLast('.')) {
-                    "LocalBooleanRef" -> PsiTypes.booleanType()
-                    "LocalCharRef" -> PsiTypes.charType()
-                    "LocalDoubleRef" -> PsiTypes.doubleType()
-                    "LocalFloatRef" -> PsiTypes.floatType()
-                    "LocalIntRef" -> PsiTypes.intType()
-                    "LocalLongRef" -> PsiTypes.longType()
-                    "LocalShortRef" -> PsiTypes.shortType()
-                    "LocalRef" -> parameters.getOrNull(0)
-                    else -> null
-                }
     }
 }

@@ -20,6 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
+
 @Suppress("MemberVisibilityCanBePrivate")
 object MixinConstants {
     const val PACKAGE = "org.spongepowered.asm.mixin."
@@ -81,5 +85,26 @@ object MixinConstants {
         const val WRAP_OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation"
         const val LOCAL = "com.llamalad7.mixinextras.sugar.Local"
         const val LOCAL_REF_PACKAGE = "com.llamalad7.mixinextras.sugar.ref."
+
+        fun PsiType.unwrapLocalRef(): PsiType {
+            if (this !is PsiClassType) {
+                return this
+            }
+            val qName = resolve()?.qualifiedName ?: return this
+            if (!qName.startsWith(LOCAL_REF_PACKAGE)) {
+                return this
+            }
+            return when (qName.substringAfterLast('.')) {
+                "LocalBooleanRef" -> PsiTypes.booleanType()
+                "LocalCharRef" -> PsiTypes.charType()
+                "LocalDoubleRef" -> PsiTypes.doubleType()
+                "LocalFloatRef" -> PsiTypes.floatType()
+                "LocalIntRef" -> PsiTypes.intType()
+                "LocalLongRef" -> PsiTypes.longType()
+                "LocalShortRef" -> PsiTypes.shortType()
+                "LocalRef" -> parameters.getOrNull(0) ?: this
+                else -> this
+            }
+        }
     }
 }
