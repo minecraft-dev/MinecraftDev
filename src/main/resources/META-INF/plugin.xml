@@ -457,6 +457,19 @@
         <debuggerClassFilterProvider implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
+
+        <!--region MixinExtras Expression Language-->
+        <fileType name="MixinExtras Expression File"
+                  implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionFileType"
+                  fieldName="INSTANCE"
+                  language="MEExpression"
+                  extensions="mixinextrasexpression"/>
+        <lang.parserDefinition language="MEExpression"
+                               implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="MEExpression"
+                                       implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionSyntaxHighlighterFactory"/>
+        <!--endregion-->
+
         <!--endregion-->
 
         <!--region VELOCITY-->

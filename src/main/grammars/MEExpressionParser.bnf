@@ -1,0 +1,253 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2024 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+{
+    parserClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionParser"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="ME"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.platform.mixin.expression.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.mixin.expression.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTokenType"
+
+    tokens = [
+        TOKEN_RESERVED = "TOKEN_RESERVED"
+    ]
+
+    extends(".+Expression") = expression
+    extends(".+Statement") = statement
+}
+
+meExpressionFile ::= statement <<eof>>
+
+statement ::= memberAssignStatement |
+    arrayStoreStatement |
+    identifierAssignmentStatement |
+    returnStatement |
+    throwStatement |
+    expressionStatement {
+
+}
+
+memberAssignStatement ::= expression TOKEN_DOT name TOKEN_ASSIGN expression {
+    pin = 4
+    methods = [
+        receiverExpr = "expression[0]"
+        memberName = "name"
+        valueExpr = "expression[1]"
+    ]
+}
+
+arrayStoreStatement ::= expression TOKEN_LEFT_BRACKET expression TOKEN_RIGHT_BRACKET TOKEN_ASSIGN expression {
+    pin = 5
+    methods = [
+        arrayExpr = "expression[0]"
+        indexExpr = "expression[1]"
+        valueExpr = "expression[2]"
+    ]
+}
+
+identifierAssignmentStatement ::= name TOKEN_ASSIGN expression {
+    pin = 2
+    methods = [
+        identifier = "name"
+        valueExpr = "expression"
+    ]
+}
+
+returnStatement ::= TOKEN_RETURN expression {
+    pin = 1
+    methods = [
+        valueExpr = "expression"
+    ]
+}
+
+throwStatement ::= TOKEN_THROW expression {
+    pin = 1
+    methods = [
+        valueExpr = "expression"
+    ]
+}
+
+expressionStatement ::= expression {
+}
+
+expression ::= capturingExpression |
+    superCallExpression |
+    methodCallExpression |
+    staticMethodCallExpression | 
+    arrayAccessExpression |
+    classConstantExpression |
+    memberAccessExpression | 
+    unaryExpression |
+    castExpression |
+    parenthesizedExpression |
+    instantiationExpression |
+    binaryExpression |
+    litExpression |
+    thisExpression |
+    nameExpression {
+}
+
+capturingExpression ::= TOKEN_AT TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
+    pin = 1
+}
+
+parenthesizedExpression ::= TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
+    pin = 1
+}
+
+superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+    pin = 2
+    methods = [
+        memberName = "name"
+    ]
+}
+
+methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+    pin = 4
+    methods = [
+        receiverExpr = "expression"
+        memberName = "name"
+    ]
+}
+
+staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+    pin = 2
+    methods = [
+        memberName = "name"
+    ]
+}
+
+arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression TOKEN_RIGHT_BRACKET !TOKEN_ASSIGN {
+    pin = 2
+    methods = [
+        arrayExpr = "expression[0]"
+        indexExpr = "expression[1]"
+    ]
+}
+
+classConstantExpression ::= name TOKEN_DOT TOKEN_CLASS {
+    pin = 3
+    methods = [
+        className = "name"
+    ]
+}
+
+memberAccessExpression ::= expression TOKEN_DOT name !TOKEN_ASSIGN {
+    methods = [
+        receiverExpr = "expression"
+        memberName = "name"
+    ]
+}
+
+unaryExpression ::= (TOKEN_MINUS | TOKEN_BITWISE_NOT) !(TOKEN_DEC_LIT | TOKEN_INT_LIT) expression {
+    pin = 2
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEUnaryExpressionMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEUnaryExpressionImplMixin"
+}
+
+castExpression ::= TOKEN_LEFT_PAREN name TOKEN_RIGHT_PAREN expression {
+    rightAssociative = true
+    methods = [
+        type = "name"
+    ]
+}
+
+instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+    rightAssociative = true
+    pin = 1
+    methods = [
+        type = "name"
+    ]
+}
+
+binaryExpression ::= expression binaryOp expression {
+    pin = 2
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEBinaryExpressionMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEBinaryExpressionImplMixin"
+    methods = [
+        leftExpr = "expression[0]"
+        rightExpr = "expression[1]"
+    ]
+}
+
+private binaryOp ::= multiplicativeOp |
+    additiveOp |
+    shiftOp |
+    comparisonOp |
+    TOKEN_INSTANCEOF |
+    equalityOp |
+    TOKEN_BITWISE_AND |
+    TOKEN_BITWISE_XOR |
+    TOKEN_BITWISE_OR
+
+private multiplicativeOp ::= TOKEN_MULT | TOKEN_DIV | TOKEN_MOD
+private additiveOp ::= TOKEN_PLUS | TOKEN_MINUS
+private shiftOp ::= TOKEN_SHL | TOKEN_SHR | TOKEN_USHR
+private comparisonOp ::= TOKEN_LT | TOKEN_LE | TOKEN_GT | TOKEN_GE
+private equalityOp ::= TOKEN_EQ | TOKEN_NE
+
+litExpression ::= decimalLitExpression | intLitExpression | stringLitExpression | boolLitExpression | nulLLitExpression {
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MELitExpressionMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MELitExpressionImplMixin"
+}
+
+private decimalLitExpression ::= TOKEN_MINUS? TOKEN_DEC_LIT {
+    extends = litExpression
+}
+
+private intLitExpression ::= TOKEN_MINUS? TOKEN_INT_LIT {
+    extends = litExpression
+}
+
+private stringLitExpression ::= TOKEN_STRING_TERMINATOR ( TOKEN_STRING | TOKEN_STRING_ESCAPE )* TOKEN_STRING_TERMINATOR {
+    pin = 1
+    extends = litExpression
+}
+
+private boolLitExpression ::= TOKEN_BOOL_LIT {
+    extends = litExpression
+}
+
+private nulLLitExpression ::= TOKEN_NULL_LIT {
+    extends = litExpression
+}
+
+thisExpression ::= TOKEN_THIS {
+}
+
+nameExpression ::= name !TOKEN_ASSIGN {
+    methods = [
+        MEName = "name"
+    ]
+}
+
+name ::= TOKEN_IDENTIFIER | TOKEN_WILDCARD {
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENameMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENameImplMixin"
+}
+
+arguments ::= (expression (TOKEN_COMMA expression)*)? {
+}

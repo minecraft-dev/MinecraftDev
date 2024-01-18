@@ -339,6 +339,9 @@ val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen"
 val generateLangLexer by lexer("LangLexer", "com/demonwav/mcdev/translations/lang/gen")
 val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/lang/gen")
 
+val generateMEExpressionLexer by lexer("MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
+val generateMEExpressionParser by parser("MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
+
 val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/demonwav/mcdev/translations/lang/gen")
 
 val generate by tasks.registering {
@@ -354,6 +357,8 @@ val generate by tasks.registering {
         generateNbttParser,
         generateLangLexer,
         generateLangParser,
+        generateMEExpressionLexer,
+        generateMEExpressionParser,
         generateTranslationTemplateLexer,
     )
 }
