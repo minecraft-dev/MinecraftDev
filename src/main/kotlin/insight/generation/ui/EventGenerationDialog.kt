@@ -31,7 +31,7 @@ class EventGenerationDialog(
     private val panel: EventGenerationPanel,
     className: String,
     defaultListenerName: String,
-) : DialogWrapper(editor.project, editor.component, false, IdeModalityType.PROJECT) {
+) : DialogWrapper(editor.project, editor.component, false, IdeModalityType.MODELESS) {
 
     private val wizard: EventListenerWizard = EventListenerWizard(panel.panel, className, defaultListenerName)
 

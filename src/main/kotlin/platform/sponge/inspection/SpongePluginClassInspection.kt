@@ -103,9 +103,11 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                         ctorIdentifier,
                         "Plugin class empty constructor must not be private.",
                         ProblemHighlightType.GENERIC_ERROR,
-                        ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false),
-                        ModifierFix(emptyCtor, PsiModifier.PROTECTED, true, false),
-                        ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false),
+                        *LocalQuickFix.notNullElements(
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false)),
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PROTECTED, true, false)),
+                            LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PUBLIC, true, false)),
+                        )
                     )
                 }
             }

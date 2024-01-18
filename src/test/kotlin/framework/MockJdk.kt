@@ -24,22 +24,20 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkAdditionalData
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.RootProvider
-import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.ArrayUtil
 import com.intellij.util.IncorrectOperationException
 
 @Suppress("NonExtendableApiUsage")
 class MockJdk(private val name: String, jar: VirtualFile, private val home: VirtualFile) :
-    UserDataHolderBase(), Sdk, RootProvider {
+    ProjectJdkImpl(name, JavaSdk.getInstance(), home.path, name), Sdk, RootProvider {
 
     private val urls = arrayOf(jar.url)
     private val roots = arrayOf(jar)
 
-    override fun getSdkType(): JavaSdk = JavaSdk.getInstance()
-    override fun getName() = name
     override fun getVersionString() = name
 
     override fun getHomePath() = this.home.path
