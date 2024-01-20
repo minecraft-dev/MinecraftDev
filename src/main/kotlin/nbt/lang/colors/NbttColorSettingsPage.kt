@@ -90,7 +90,10 @@ class NbttColorSettingsPage : ColorSettingsPage {
         private val DESCRIPTORS = arrayOf(
             AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.keyword.display_name"), KEYWORD),
             AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.string.display_name"), STRING),
-            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.unquoted_string.display_name"), UNQUOTED_STRING),
+            AttributesDescriptor(
+                MCDevBundle.pointer("nbt.lang.highlighting.unquoted_string.display_name"),
+                UNQUOTED_STRING
+            ),
             AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.name.display_name"), STRING_NAME),
             AttributesDescriptor(
                 MCDevBundle.pointer("nbt.lang.highlighting.unquoted_name.display_name"),

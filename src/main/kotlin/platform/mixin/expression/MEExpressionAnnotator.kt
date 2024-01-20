@@ -90,15 +90,24 @@ class MEExpressionAnnotator : Annotator {
                 }
 
                 if (!element.isNull && !element.isString && element.value == null) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("mixinextras.expression.lang.errors.invalid_number"))
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("mixinextras.expression.lang.errors.invalid_number")
+                    )
                         .range(element)
                         .create()
                 }
             }
             is MEBinaryExpression -> {
                 val rightExpr = element.rightExpr
-                if (element.operator == MEExpressionTypes.TOKEN_INSTANCEOF && rightExpr !is MENameExpression && rightExpr != null) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("mixinextras.expression.lang.errors.instanceof_non_type"))
+                if (element.operator == MEExpressionTypes.TOKEN_INSTANCEOF &&
+                    rightExpr !is MENameExpression &&
+                    rightExpr != null
+                ) {
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("mixinextras.expression.lang.errors.instanceof_non_type")
+                    )
                         .range(rightExpr)
                         .create()
                 }

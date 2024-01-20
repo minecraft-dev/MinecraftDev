@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
-import com.demonwav.mcdev.platform.mixin.expression.MEExpressionLexer
 import com.intellij.lexer.FlexAdapter
 
 class MEExpressionLexerAdapter : FlexAdapter(MEExpressionLexer(null))
