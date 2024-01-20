@@ -176,6 +176,7 @@ intellij {
         "Kotlin",
         "org.toml.lang:$pluginTomlVersion",
         "ByteCodeViewer",
+        "org.intellij.intelliLang",
         "properties",
         // needed dependencies for unit tests
         "junit"

@@ -28,6 +28,7 @@
     <depends>com.intellij.properties</depends>
     <depends>ByteCodeViewer</depends>
     <depends optional="true" config-file="toml-support.xml">org.toml.lang</depends>
+    <depends optional="true" config-file="mcdev-intellilang.xml">org.intellij.intelliLang</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
