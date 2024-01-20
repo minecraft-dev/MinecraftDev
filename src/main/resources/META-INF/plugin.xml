@@ -468,6 +468,7 @@
                                implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionParserDefinition"/>
         <lang.syntaxHighlighterFactory language="MEExpression"
                                        implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionColorSettingsPage"/>
         <!--endregion-->
 
         <!--endregion-->

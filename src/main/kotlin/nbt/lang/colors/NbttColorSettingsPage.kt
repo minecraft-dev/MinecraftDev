@@ -88,21 +88,21 @@ class NbttColorSettingsPage : ColorSettingsPage {
 
     companion object {
         private val DESCRIPTORS = arrayOf(
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.keyword.display_name"), KEYWORD),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.string.display_name"), STRING),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.unquoted_string.display_name"), UNQUOTED_STRING),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.name.display_name"), STRING_NAME),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.keyword.display_name"), KEYWORD),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.string.display_name"), STRING),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.unquoted_string.display_name"), UNQUOTED_STRING),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.name.display_name"), STRING_NAME),
             AttributesDescriptor(
-                MCDevBundle("nbt.lang.highlighting.unquoted_name.display_name"),
+                MCDevBundle.pointer("nbt.lang.highlighting.unquoted_name.display_name"),
                 UNQUOTED_STRING_NAME
             ),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.byte.display_name"), BYTE),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.short.display_name"), SHORT),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.int.display_name"), INT),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.long.display_name"), LONG),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.float.display_name"), FLOAT),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.double.display_name"), DOUBLE),
-            AttributesDescriptor(MCDevBundle("nbt.lang.highlighting.material.display_name"), MATERIAL),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.byte.display_name"), BYTE),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.short.display_name"), SHORT),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.int.display_name"), INT),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.long.display_name"), LONG),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.float.display_name"), FLOAT),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.double.display_name"), DOUBLE),
+            AttributesDescriptor(MCDevBundle.pointer("nbt.lang.highlighting.material.display_name"), MATERIAL),
         )
 
         private val map = mapOf(

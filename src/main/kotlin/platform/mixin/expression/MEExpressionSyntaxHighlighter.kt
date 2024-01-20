@@ -83,6 +83,22 @@ class MEExpressionSyntaxHighlighter : SyntaxHighlighterBase() {
             "MEEXPRESSION_IDENTIFIER",
             DefaultLanguageHighlighterColors.IDENTIFIER
         )
+        val IDENTIFIER_CALL = createTextAttributesKey(
+            "MEEXPRESSION_IDENTIFIER_CALL",
+            DefaultLanguageHighlighterColors.FUNCTION_CALL
+        )
+        val IDENTIFIER_CLASS_NAME = createTextAttributesKey(
+            "MEEXPRESSION_IDENTIFIER_CLASS_NAME",
+            DefaultLanguageHighlighterColors.CLASS_REFERENCE
+        )
+        val IDENTIFIER_MEMBER_NAME = createTextAttributesKey(
+            "MEEXPRESSION_IDENTIFIER_MEMBER_NAME",
+            DefaultLanguageHighlighterColors.INSTANCE_FIELD
+        )
+        val IDENTIFIER_VARIABLE = createTextAttributesKey(
+            "MEEXPRESSION_IDENTIFIER_VARIABLE",
+            DefaultLanguageHighlighterColors.LOCAL_VARIABLE
+        )
         val BAD_CHAR = createTextAttributesKey(
             "MEEXPRESSION_BAD_CHARACTER",
             HighlighterColors.BAD_CHARACTER

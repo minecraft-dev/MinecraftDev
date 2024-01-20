@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.asset
 
 import com.intellij.DynamicBundle
+import java.util.function.Supplier
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
@@ -36,4 +37,9 @@ object MCDevBundle : DynamicBundle(BUNDLE) {
     operator fun invoke(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any?): String {
         return getMessage(key, *params)
     }
+
+    fun pointer(@PropertyKey(resourceBundle = BUNDLE) key: String) = Supplier { invoke(key) }
+
+    fun pointer(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any?) =
+        Supplier { invoke(key, params) }
 }
