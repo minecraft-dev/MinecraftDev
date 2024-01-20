@@ -471,6 +471,10 @@
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionColorSettingsPage"/>
         <annotator language="MEExpression"
                    implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionAnnotator"/>
+        <lang.braceMatcher language="MEExpression"
+                           implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionBraceMatcher"/>
+        <lang.quoteHandler language="MEExpression"
+                           implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionQuoteHandler"/>
         <!--endregion-->
 
         <!--endregion-->
