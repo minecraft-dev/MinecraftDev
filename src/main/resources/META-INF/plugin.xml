@@ -469,6 +469,8 @@
         <lang.syntaxHighlighterFactory language="MEExpression"
                                        implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionColorSettingsPage"/>
+        <annotator language="MEExpression"
+                   implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionAnnotator"/>
         <!--endregion-->
 
         <!--endregion-->

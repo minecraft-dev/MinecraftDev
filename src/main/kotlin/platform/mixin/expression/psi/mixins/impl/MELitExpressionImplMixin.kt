@@ -66,4 +66,7 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
     }
 
     override val isNull get() = node.firstChildNode.elementType == MEExpressionTypes.TOKEN_NULL_LIT
+    override val isString get() = node.firstChildNode.elementType == MEExpressionTypes.TOKEN_STRING_TERMINATOR
+
+    override val minusToken get() = node.firstChildNode.takeIf { it.elementType == MEExpressionTypes.TOKEN_MINUS }
 }

@@ -21,8 +21,11 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpression
+import com.intellij.lang.ASTNode
 
 interface MELitExpressionMixin : MEExpression {
     val value: Any?
     val isNull: Boolean
+    val isString: Boolean
+    val minusToken: ASTNode?
 }
