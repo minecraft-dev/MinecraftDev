@@ -25,11 +25,9 @@ import com.demonwav.mcdev.platform.mixin.expression.psi.MEBinaryExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MECastExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEClassConstantExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEIdentifierAssignmentStatement
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEInstantiationExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MELitExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEMemberAccessExpression
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEMemberAssignStatement
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.psi.MENameExpression
@@ -52,8 +50,7 @@ class MEExpressionAnnotator : Annotator {
                             .range(element)
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
                             .create()
-                        is MEMemberAccessExpression,
-                        is MEMemberAssignStatement -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                        is MEMemberAccessExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                             .range(element)
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_MEMBER_NAME)
                             .create()
@@ -62,10 +59,6 @@ class MEExpressionAnnotator : Annotator {
                         is MEStaticMethodCallExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                             .range(element)
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CALL)
-                            .create()
-                        is MEIdentifierAssignmentStatement -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                            .range(element)
-                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_VARIABLE)
                             .create()
                         is MENameExpression -> {
                             val grandparent = parent.parent

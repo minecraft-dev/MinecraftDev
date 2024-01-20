@@ -41,40 +41,23 @@
 
 meExpressionFile ::= statement <<eof>>
 
-statement ::= memberAssignStatement |
-    arrayStoreStatement |
-    identifierAssignmentStatement |
+statement ::= assignStatement |
     returnStatement |
     throwStatement |
     expressionStatement {
 
 }
 
-memberAssignStatement ::= expression TOKEN_DOT name TOKEN_ASSIGN expression {
-    pin = 4
-    methods = [
-        receiverExpr = "expression[0]"
-        memberName = "name"
-        valueExpr = "expression[1]"
-    ]
-}
-
-arrayStoreStatement ::= expression TOKEN_LEFT_BRACKET expression TOKEN_RIGHT_BRACKET TOKEN_ASSIGN expression {
-    pin = 5
-    methods = [
-        arrayExpr = "expression[0]"
-        indexExpr = "expression[1]"
-        valueExpr = "expression[2]"
-    ]
-}
-
-identifierAssignmentStatement ::= name TOKEN_ASSIGN expression {
+assignStatement ::= assignableExpression TOKEN_ASSIGN expression {
     pin = 2
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEAssignStatementMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEAssignStatementImplMixin"
     methods = [
-        identifier = "name"
-        valueExpr = "expression"
+        rightExpr = "expression"
     ]
 }
+
+private assignableExpression ::= arrayAccessExpression | memberAccessExpression | nameExpression
 
 returnStatement ::= TOKEN_RETURN expression {
     pin = 1
@@ -140,7 +123,7 @@ staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN
     ]
 }
 
-arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression TOKEN_RIGHT_BRACKET !TOKEN_ASSIGN {
+arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression TOKEN_RIGHT_BRACKET {
     pin = 2
     methods = [
         arrayExpr = "expression[0]"
@@ -155,7 +138,7 @@ classConstantExpression ::= name TOKEN_DOT TOKEN_CLASS {
     ]
 }
 
-memberAccessExpression ::= expression TOKEN_DOT name !TOKEN_ASSIGN {
+memberAccessExpression ::= expression TOKEN_DOT name {
     methods = [
         receiverExpr = "expression"
         memberName = "name"
@@ -238,7 +221,7 @@ private nulLLitExpression ::= TOKEN_NULL_LIT {
 thisExpression ::= TOKEN_THIS {
 }
 
-nameExpression ::= name !TOKEN_ASSIGN {
+nameExpression ::= name {
     methods = [
         MEName = "name"
     ]
