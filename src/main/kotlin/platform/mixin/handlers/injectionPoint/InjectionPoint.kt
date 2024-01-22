@@ -36,6 +36,7 @@ import com.demonwav.mcdev.util.realName
 import com.demonwav.mcdev.util.shortName
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.KeyedExtensionCollector
@@ -48,6 +49,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiLambdaExpression
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
@@ -75,6 +77,9 @@ abstract class InjectionPoint<T : PsiElement> {
     }
 
     open fun usesMemberReference() = false
+
+    open fun onCompleted(editor: Editor, reference: PsiLiteral) {
+    }
 
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,

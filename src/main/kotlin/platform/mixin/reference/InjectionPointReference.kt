@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT_CODE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
@@ -88,18 +89,26 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
             getAllAtCodes(context.project).keys.asSequence()
                 .map {
                     PrioritizedLookupElement.withPriority(
-                        LookupElementBuilder.create(it).completeToLiteral(context),
+                        LookupElementBuilder.create(it).completeInjectionPoint(context),
                         1.0,
                     )
                 } +
                 getCustomInjectionPointInheritors(context.project).asSequence()
                     .map {
                         PrioritizedLookupElement.withPriority(
-                            LookupElementBuilder.create(it).completeToLiteral(context),
+                            LookupElementBuilder.create(it).completeInjectionPoint(context),
                             0.0,
                         )
                     }
             ).toTypedArray()
+    }
+
+    private fun LookupElementBuilder.completeInjectionPoint(context: PsiElement): LookupElementBuilder {
+        val injectionPoint = InjectionPoint.byAtCode(lookupString) ?: return completeToLiteral(context)
+
+        return completeToLiteral(context) { editor, element ->
+            injectionPoint.onCompleted(editor, element)
+        }
     }
 
     private val SLICE_SELECTORS_KEY = Key<CachedValue<List<String>>>("mcdev.sliceSelectors")
