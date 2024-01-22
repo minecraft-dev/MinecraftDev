@@ -155,6 +155,7 @@
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
+        <injectionPoint atCode="MIXINEXTRAS:EXPRESSION" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ExpressionInjectionPoint" />
 
         <injectionPointAnnotation annotation="org.spongepowered.asm.mixin.injection.Constant" atCode="CONSTANT" />
     </extensions>

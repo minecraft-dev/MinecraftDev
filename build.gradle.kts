@@ -86,11 +86,21 @@ repositories {
         }
     }
     mavenCentral()
+
+    // TODO: temporary waiting for MixinExtras expression library
+    maven("https://jitpack.io/") {
+        content {
+            includeGroupByRegex("com\\.github\\..+")
+        }
+    }
 }
 
 dependencies {
     // Add tools.jar for the JDI API
     implementation(files(Jvm.current().toolsJar))
+
+    // TODO: temporary waiting for MixinExtras expression library
+    implementation("com.github.LlamaLad7:MixinExtras:8aa79eb")
 
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))

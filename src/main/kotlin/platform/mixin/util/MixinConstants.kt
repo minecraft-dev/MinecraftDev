@@ -85,6 +85,7 @@ object MixinConstants {
         const val WRAP_OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation"
         const val LOCAL = "com.llamalad7.mixinextras.sugar.Local"
         const val LOCAL_REF_PACKAGE = "com.llamalad7.mixinextras.sugar.ref."
+        const val EXPRESSION = "com.llamalad7.mixinextras.expression.Expression"
 
         fun PsiType.unwrapLocalRef(): PsiType {
             if (this !is PsiClassType) {
