@@ -912,6 +912,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnnecessaryUnsafeInspection"/>
+        <localInspection displayName="CTOR_HEAD with enforce=POST_INIT doesn't target a field"
+                         shortName="CtorHeadPostInit"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadPostInitInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->

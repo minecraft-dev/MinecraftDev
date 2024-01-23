@@ -90,7 +90,7 @@ class CtorHeadInjectionPoint : InjectionPoint<PsiElement>() {
         return null
     }
 
-    private enum class EnforceMode {
+    enum class EnforceMode {
         DEFAULT, POST_DELEGATE, POST_INIT
     }
 
