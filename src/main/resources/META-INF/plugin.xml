@@ -431,6 +431,8 @@
         <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.AtArgsCompletionContributor"
+                                order="first"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.MethodGTDHandler" order="first"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.DescGTDHandler" order="first"/>

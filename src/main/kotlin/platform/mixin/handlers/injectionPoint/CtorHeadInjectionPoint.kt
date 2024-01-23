@@ -30,6 +30,7 @@ import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.enumValueOfOrNull
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findInspection
+import com.demonwav.mcdev.util.mapToArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -48,6 +49,7 @@ import com.intellij.psi.PsiStatement
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.JavaPsiConstructorUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
@@ -55,6 +57,10 @@ import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 class CtorHeadInjectionPoint : InjectionPoint<PsiElement>() {
+    companion object {
+        private val ARGS_KEYS = arrayOf("enforce")
+    }
+
     override fun onCompleted(editor: Editor, reference: PsiLiteral) {
         val project = reference.project
 
@@ -71,6 +77,13 @@ class CtorHeadInjectionPoint : InjectionPoint<PsiElement>() {
             JavaPsiFacade.getElementFactory(project).createLiteralExpression(true)
         )
         CodeStyleManager.getInstance(project).reformat(at)
+    }
+
+    override fun getArgsKeys(at: PsiAnnotation) = ARGS_KEYS
+    override fun getArgsValues(at: PsiAnnotation, key: String): Array<Any> = if (key == "enforce") {
+        EnforceMode.values().mapToArray { it.name }
+    } else {
+        ArrayUtilRt.EMPTY_OBJECT_ARRAY
     }
 
     override fun createNavigationVisitor(

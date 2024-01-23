@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 
 import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
@@ -34,10 +35,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiModifierList
-import com.intellij.psi.util.parents
 import java.awt.FlowLayout
 import javax.swing.JCheckBox
 import javax.swing.JComponent
@@ -96,11 +94,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
 
     companion object {
         fun mightTargetConstructor(project: Project, at: PsiAnnotation): Boolean {
-            val injectorAnnotation = at.parents(false)
-                .takeWhile { it !is PsiClass }
-                .filterIsInstance<PsiAnnotation>()
-                .firstOrNull { it.parent is PsiModifierList }
-                ?: return true
+            val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return true
             val handler = injectorAnnotation.qualifiedName?.let {
                 MixinAnnotationHandler.forMixinAnnotation(it, project)
             } ?: return true

@@ -60,6 +60,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.KeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -96,6 +97,16 @@ abstract class InjectionPoint<T : PsiElement> {
         val targetElement = formattedAt.findDeclaredAttributeValue(attributeName) ?: return
         editor.caretModel.moveToOffset(targetElement.textRange.startOffset + 1)
     }
+
+    open fun getArgsKeys(at: PsiAnnotation): Array<String> {
+        return ArrayUtilRt.EMPTY_STRING_ARRAY
+    }
+
+    open fun getArgsValues(at: PsiAnnotation, key: String): Array<Any> {
+        return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+    }
+
+    open fun isArgValueList(at: PsiAnnotation, key: String) = false
 
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,

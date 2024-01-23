@@ -33,10 +33,7 @@ import com.demonwav.mcdev.util.enumValueOfOrNull
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiModifierList
-import com.intellij.psi.util.parents
 import org.objectweb.asm.Opcodes
 
 class CtorHeadPostInitInspection : MixinInspection() {
@@ -59,11 +56,7 @@ class CtorHeadPostInitInspection : MixinInspection() {
                 return
             }
 
-            val injectorAnnotation = annotation.parents(false)
-                .takeWhile { it !is PsiClass }
-                .filterIsInstance<PsiAnnotation>()
-                .firstOrNull { it.parent is PsiModifierList }
-                ?: return
+            val injectorAnnotation = AtResolver.findInjectorAnnotation(annotation) ?: return
             val handler = injectorAnnotation.qualifiedName
                 ?.let { MixinAnnotationHandler.forMixinAnnotation(it, holder.project) }
                 ?: return
