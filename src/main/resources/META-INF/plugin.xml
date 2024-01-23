@@ -888,6 +888,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
+        <localInspection displayName="CTOR_HEAD is missing unsafe = true"
+                         shortName="CtorHeadNoUnsafe"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->

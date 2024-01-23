@@ -131,7 +131,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
 
     override fun getStaticDescription() = "@Inject into Constructor"
 
-    private class AddUnsafeFix(at: PsiAnnotation) : LocalQuickFixOnPsiElement(at) {
+    class AddUnsafeFix(at: PsiAnnotation) : LocalQuickFixOnPsiElement(at) {
         override fun getFamilyName() = "Add unsafe = true"
         override fun getText() = "Add unsafe = true"
 
