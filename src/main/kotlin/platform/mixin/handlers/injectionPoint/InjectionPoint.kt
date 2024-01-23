@@ -294,6 +294,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
         result += element
     }
 
+    open fun visitStart(executableElement: PsiElement) {
+    }
+
     open fun visitEnd(executableElement: PsiElement) {
     }
 
@@ -304,6 +307,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
 
     override fun visitMethod(method: PsiMethod) {
         if (!hasVisitedAnything) {
+            visitStart(method)
             super.visitMethod(method)
             visitEnd(method)
         }
@@ -312,6 +316,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitAnonymousClass(aClass: PsiAnonymousClass) {
         // do not recurse into anonymous classes
         if (!hasVisitedAnything) {
+            visitStart(aClass)
             super.visitAnonymousClass(aClass)
             visitEnd(aClass)
         }
@@ -320,6 +325,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitClass(aClass: PsiClass) {
         // do not recurse into inner classes
         if (!hasVisitedAnything) {
+            visitStart(aClass)
             super.visitClass(aClass)
             visitEnd(aClass)
         }
@@ -327,6 +333,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
 
     override fun visitMethodReferenceExpression(expression: PsiMethodReferenceExpression) {
         val hadVisitedAnything = hasVisitedAnything
+        if (!hadVisitedAnything) {
+            visitStart(expression)
+        }
         super.visitMethodReferenceExpression(expression)
         if (!hadVisitedAnything) {
             visitEnd(expression)
@@ -336,6 +345,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitLambdaExpression(expression: PsiLambdaExpression) {
         // do not recurse into lambda expressions
         if (!hasVisitedAnything) {
+            visitStart(expression)
             super.visitLambdaExpression(expression)
             visitEnd(expression)
         }

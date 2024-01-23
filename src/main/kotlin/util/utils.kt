@@ -388,3 +388,11 @@ fun <S : CharSequence, R> S.ifNotBlank(block: (S) -> R): R? {
 
     return null
 }
+
+inline fun <reified T : Enum<T>> enumValueOfOrNull(str: String): T? {
+    return try {
+        enumValueOf<T>(str)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+}
