@@ -201,6 +201,11 @@ fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findM
         if (actualThrowable is ProcessCanceledException) {
             throw actualThrowable
         }
+
+        if (actualThrowable is NoSuchFileException) {
+            return null
+        }
+
         val message = actualThrowable.message
         // TODO: display an error to the user?
         if (message == null || !message.contains("Unsupported class file major version")) {

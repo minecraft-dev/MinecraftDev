@@ -144,6 +144,7 @@
         <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.ModifyReturnValue" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ModifyReturnValueHandler" />
         <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler" />
         <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.WrapWithCondition" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler" />
+        <mixinAnnotationHandler annotation="com.llamalad7.mixinextras.injector.v2.WrapWithCondition" implementation="com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler" />
 
         <injectionPoint atCode="INVOKE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeInjectionPoint" />
         <injectionPoint atCode="INVOKE_ASSIGN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InvokeAssignInjectionPoint" />
@@ -153,6 +154,7 @@
         <injectionPoint atCode="HEAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.HeadInjectionPoint" />
         <injectionPoint atCode="RETURN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ReturnInjectionPoint" />
         <injectionPoint atCode="TAIL" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.TailInjectionPoint" />
+        <injectionPoint atCode="CTOR_HEAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CtorHeadInjectionPoint" />
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
@@ -445,6 +447,8 @@
         <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.AtArgsCompletionContributor"
+                                order="first"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.MethodGTDHandler" order="first"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.DescGTDHandler" order="first"/>
@@ -886,7 +890,7 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection"/>
-        <localInspection displayName="ModifyVariable may be argsOnly = true"
+        <localInspection displayName="@ModifyVariable may be argsOnly = true"
                          shortName="ModifyVariableMayBeArgsOnly"
                          groupName="Mixin"
                          language="JAVA"
@@ -902,6 +906,38 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
+        <localInspection displayName="CTOR_HEAD is missing unsafe = true"
+                         shortName="CtorHeadNoUnsafe"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection"/>
+        <localInspection displayName="CTOR_HEAD is not targeting a constructor"
+                         shortName="CtorHeadUsedForNonConstructor"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadUsedForNonConstructorInspection"/>
+        <localInspection displayName="Unnecessary unsafe = true"
+                         shortName="UnnecessaryUnsafe"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnnecessaryUnsafeInspection"/>
+        <localInspection displayName="CTOR_HEAD with enforce=POST_INIT doesn't target a field"
+                         shortName="CtorHeadPostInit"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadPostInitInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->
@@ -1018,6 +1054,22 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
+        <localInspection displayName="Unresolved @Local capture"
+                         shortName="UnresolvedLocalCapture"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnresolvedLocalCaptureInspection"/>
+        <localInspection displayName="@Local may be argsOnly = true"
+                         shortName="LocalMayBeArgsOnly"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalArgsOnlyInspection"/>
         <!--endregion-->
 
         <!--region Configuration -->

@@ -29,13 +29,13 @@ import com.demonwav.mcdev.util.onShown
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.FileModificationService
+import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.icons.AllIcons
 import com.intellij.ide.util.SuperMethodWarningUtil
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ComponentValidator
@@ -47,6 +47,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenameProcessor
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.EnumComboBoxModel
@@ -300,29 +301,30 @@ private class RenameWithInheritanceFix(
         if (isMethod) {
             val method = startElement as? PsiMethod ?: return
             if (editor != null) {
-                DumbService.getInstance(project).smartInvokeLater {
-                    SuperMethodWarningUtil.checkSuperMethod(method, { md ->
-                        RenameProcessor(project, md, newName, false, false).run()
-                        true
-                    }, editor)
-                }
+                SuperMethodWarningUtil.checkSuperMethod(method, { md ->
+                    RenameProcessor(project, md, newName, false, false).run()
+                    true
+                }, editor)
             } else {
-                DumbService.getInstance(project).smartInvokeLater {
-                    val superMethod = method.findDeepestSuperMethods().firstOrNull()
-                    for (md in listOfNotNull(superMethod, method)) {
-                        RenameProcessor(project, md, newName, false, false).run()
-                    }
+                val superMethod = method.findDeepestSuperMethods().firstOrNull()
+                for (md in listOfNotNull(superMethod, method)) {
+                    RenameProcessor(project, md, newName, false, false).run()
                 }
             }
         } else {
             if (!FileModificationService.getInstance().prepareFileForWrite(file)) {
                 return
             }
-            DumbService.getInstance(project).smartInvokeLater {
-                RenameProcessor(project, startElement, newName, false, false).run()
-            }
+            RenameProcessor(project, startElement, newName, false, false).run()
         }
     }
 
-    override fun startInWriteAction() = isMethod
+    override fun generatePreview(project: Project, editor: Editor, file: PsiFile): IntentionPreviewInfo {
+        val element = PsiTreeUtil.findSameElementInCopy(startElement, file)
+        val target = element as? PsiNamedElement ?: return IntentionPreviewInfo.EMPTY
+        target.setName(newName)
+        return IntentionPreviewInfo.DIFF
+    }
+
+    override fun startInWriteAction() = false
 }

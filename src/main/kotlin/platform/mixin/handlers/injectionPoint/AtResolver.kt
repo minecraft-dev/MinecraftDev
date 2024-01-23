@@ -37,11 +37,13 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parents
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
@@ -131,6 +133,13 @@ class AtResolver(
                 }
                 else -> constant.toString()
             }
+        }
+
+        fun findInjectorAnnotation(at: PsiAnnotation): PsiAnnotation? {
+            return at.parents(false)
+                .takeWhile { it !is PsiClass }
+                .filterIsInstance<PsiAnnotation>()
+                .firstOrNull { it.parent is PsiModifierList }
         }
     }
 

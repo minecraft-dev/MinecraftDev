@@ -109,4 +109,31 @@ modId="examplemod2"
             """,
         )
     }
+
+    @Test
+    @DisplayName("Dependency For Mod With Good Placeholder")
+    fun dependencyForModWithGoodPlaceholder() {
+        val placeholder = "\${mod_id}"
+        doTest(
+            """
+[[mods]]
+modId="$placeholder"
+[[dependencies."$placeholder"]]
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Dependency For Mod With Bad Placeholder")
+    fun dependencyForModWithBadPlaceholder() {
+        val goodPlaceholder = "\${mod_id}"
+        val badPlaceholder = "\${bad_mod_id}"
+        doTest(
+            """
+[[mods]]
+modId="$goodPlaceholder"
+[[dependencies.<error descr="Mod $badPlaceholder is not declared in this file">"$badPlaceholder"</error>]]
+            """,
+        )
+    }
 }

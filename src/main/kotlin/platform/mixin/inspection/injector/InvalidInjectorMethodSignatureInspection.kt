@@ -112,6 +112,18 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     false,
                                 ),
                             )
+                        } else if (!shouldBeStatic && modifiers.hasModifierProperty(PsiModifier.STATIC)) {
+                            reportedStatic = true
+                            holder.registerProblem(
+                                identifier,
+                                "Method must not be static",
+                                QuickFixFactory.getInstance().createModifierListFix(
+                                    modifiers,
+                                    PsiModifier.STATIC,
+                                    false,
+                                    false,
+                                ),
+                            )
                         }
                     }
 
@@ -128,10 +140,12 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         if (possibleSignatures.isEmpty()) {
                             reportedSignature = true
-                            holder.registerProblem(
-                                parameters,
-                                "There are no possible signatures for this injector",
-                            )
+                            if (handler.isUnresolved(annotation) != null) {
+                                holder.registerProblem(
+                                    parameters,
+                                    "There are no possible signatures for this injector",
+                                )
+                            }
                             continue
                         }
 

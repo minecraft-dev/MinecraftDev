@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.util.ui.ColorIcon
 import com.intellij.util.ui.JBUI
@@ -33,7 +34,7 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) {
+class ColorPicker(private val colorMap: Map<String, Color>, project: Project, parent: JComponent) {
 
     private val panel = JPanel(GridBagLayout())
 
@@ -41,7 +42,7 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
     private val dialog: ColorPickerDialog
 
     init {
-        dialog = ColorPickerDialog(parent, panel)
+        dialog = ColorPickerDialog(project, parent, panel)
     }
 
     fun showDialog(): String? {
@@ -86,8 +87,8 @@ class ColorPicker(private val colorMap: Map<String, Color>, parent: JComponent) 
         }
     }
 
-    private class ColorPickerDialog(parent: JComponent, private val component: JComponent) :
-        DialogWrapper(parent, false) {
+    private class ColorPickerDialog(project: Project, parent: JComponent, private val component: JComponent) :
+        DialogWrapper(project, parent, false, IdeModalityType.MODELESS) {
 
         init {
             title = MCDevBundle("generate.color.choose_action")
