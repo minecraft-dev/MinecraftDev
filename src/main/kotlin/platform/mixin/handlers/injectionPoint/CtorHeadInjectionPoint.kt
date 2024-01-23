@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -60,7 +61,7 @@ class CtorHeadInjectionPoint : InjectionPoint<PsiElement>() {
         // avoid adding unsafe = true when it's unnecessary on Fabric
         val noUnsafeInspection =
             project.findInspection<CtorHeadNoUnsafeInspection>(CtorHeadNoUnsafeInspection.SHORT_NAME)
-        if (noUnsafeInspection?.ignoreForFabric == true) {
+        if (reference.isFabric && noUnsafeInspection?.ignoreForFabric == true) {
             return
         }
 

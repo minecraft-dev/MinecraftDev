@@ -20,14 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
-import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
@@ -55,8 +53,7 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         if (ignoreForFabric) {
-            val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
-                ?: false
+            val isFabric = holder.file.isFabric
             if (isFabric) {
                 return PsiElementVisitor.EMPTY_VISITOR
             }

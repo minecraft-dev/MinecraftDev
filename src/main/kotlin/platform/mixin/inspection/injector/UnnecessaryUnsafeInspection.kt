@@ -20,8 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
@@ -30,7 +29,6 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findInspection
-import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
@@ -62,8 +60,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     }
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
-        val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
-            ?: false
+        val isFabric = holder.file.isFabric
         val alwaysUnnecessary = isFabric && alwaysUnnecessaryOnFabric
         val requiresUnsafeForCtorHeadOnFabric =
             holder.project.findInspection<CtorHeadNoUnsafeInspection>(CtorHeadNoUnsafeInspection.SHORT_NAME)
@@ -98,8 +95,6 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     }
 
     companion object {
-        const val SHORT_NAME = "UnnecessaryUnsafe"
-
         fun mightTargetConstructor(project: Project, at: PsiAnnotation): Boolean {
             val injectorAnnotation = at.parents(false)
                 .takeWhile { it !is PsiClass }

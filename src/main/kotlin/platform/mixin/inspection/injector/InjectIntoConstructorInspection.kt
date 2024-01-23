@@ -20,8 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
@@ -34,7 +33,6 @@ import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findAnnotations
-import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClass
@@ -61,8 +59,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
     }
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
-        val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
-            ?: false
+        val isFabric = holder.file.isFabric
         return object : JavaElementVisitor() {
             override fun visitMethod(method: PsiMethod) {
                 val injectAnnotation = method.findAnnotation(INJECT) ?: return
