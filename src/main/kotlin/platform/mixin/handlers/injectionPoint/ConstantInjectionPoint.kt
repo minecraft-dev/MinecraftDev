@@ -26,6 +26,7 @@ import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.ifNotBlank
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
@@ -38,6 +39,7 @@ import com.intellij.psi.PsiClassObjectAccessExpression
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiForeachStatement
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiSwitchLabelStatementBase
 import com.intellij.psi.util.PsiUtil
@@ -55,6 +57,10 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        completeExtraStringAtAttribute(editor, reference, "args")
+    }
+
     fun getConstantInfo(at: PsiAnnotation): ConstantInfo? {
         val args = AtResolver.getArgs(at)
         val nullValue = args["nullValue"]?.let(java.lang.Boolean::parseBoolean) ?: false

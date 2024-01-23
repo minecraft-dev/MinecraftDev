@@ -29,11 +29,13 @@ import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiReferenceExpression
@@ -48,6 +50,10 @@ import org.objectweb.asm.tree.MethodNode
 class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     companion object {
         private val VALID_OPCODES = setOf(Opcodes.GETFIELD, Opcodes.GETSTATIC, Opcodes.PUTFIELD, Opcodes.PUTSTATIC)
+    }
+
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        completeExtraStringAtAttribute(editor, reference, "target")
     }
 
     private fun getArrayAccessType(args: Map<String, String>): ArrayAccessType? {

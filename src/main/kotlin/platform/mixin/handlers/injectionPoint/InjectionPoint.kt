@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -55,6 +56,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
@@ -79,6 +81,20 @@ abstract class InjectionPoint<T : PsiElement> {
     open fun usesMemberReference() = false
 
     open fun onCompleted(editor: Editor, reference: PsiLiteral) {
+    }
+
+    protected fun completeExtraStringAtAttribute(editor: Editor, reference: PsiLiteral, attributeName: String) {
+        val at = reference.parentOfType<PsiAnnotation>() ?: return
+        if (at.findDeclaredAttributeValue(attributeName) != null) {
+            return
+        }
+        at.setDeclaredAttributeValue(
+            attributeName,
+            JavaPsiFacade.getElementFactory(reference.project).createLiteralExpression("")
+        )
+        val formattedAt = CodeStyleManager.getInstance(reference.project).reformat(at) as PsiAnnotation
+        val targetElement = formattedAt.findDeclaredAttributeValue(attributeName) ?: return
+        editor.caretModel.moveToOffset(targetElement.textRange.startOffset + 1)
     }
 
     abstract fun createNavigationVisitor(
