@@ -1,0 +1,114 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2024 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.demonwav.mcdev.platform.mixin.inspection.injector
+
+import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.isConstructor
+import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.ifEmpty
+import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaElementVisitor
+import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiModifierList
+import com.intellij.psi.util.parents
+import java.awt.FlowLayout
+import javax.swing.JCheckBox
+import javax.swing.JComponent
+import javax.swing.JPanel
+
+class UnnecessaryUnsafeInspection : MixinInspection() {
+    @JvmField
+    var alwaysUnnecessaryOnFabric = true
+
+    override fun getStaticDescription() = "Reports unnecessary unsafe = true"
+
+    override fun createOptionsPanel(): JComponent {
+        val panel = JPanel(FlowLayout(FlowLayout.LEFT))
+        val checkbox = JCheckBox("Always unnecessary in Fabric mods", alwaysUnnecessaryOnFabric)
+        checkbox.addActionListener {
+            alwaysUnnecessaryOnFabric = checkbox.isSelected
+        }
+        panel.add(checkbox)
+        return panel
+    }
+
+    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
+        val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
+            ?: false
+        val alwaysUnnecessary = isFabric && alwaysUnnecessaryOnFabric
+
+        return object : JavaElementVisitor() {
+            override fun visitAnnotation(annotation: PsiAnnotation) {
+                if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT)) {
+                    return
+                }
+                if (!alwaysUnnecessary &&
+                    annotation.findDeclaredAttributeValue("value")?.constantValue == "CTOR_HEAD"
+                ) {
+                    // this case is handled by a specific inspection for CTOR_HEAD
+                    return
+                }
+
+                val unsafeValue = annotation.findDeclaredAttributeValue("unsafe") ?: return
+                if (unsafeValue.constantValue != true) {
+                    return
+                }
+
+                if (alwaysUnnecessary || !mightTargetConstructor(holder.project, annotation)) {
+                    holder.registerProblem(
+                        unsafeValue,
+                        "Unnecessary unsafe = true",
+                        AnnotationAttributeFix(annotation, "unsafe" to null)
+                    )
+                }
+            }
+        }
+    }
+
+    companion object {
+        fun mightTargetConstructor(project: Project, at: PsiAnnotation): Boolean {
+            val injectorAnnotation = at.parents(false)
+                .takeWhile { it !is PsiClass }
+                .filterIsInstance<PsiAnnotation>()
+                .firstOrNull { it.parent is PsiModifierList }
+                ?: return true
+            val handler = injectorAnnotation.qualifiedName?.let {
+                MixinAnnotationHandler.forMixinAnnotation(it, project)
+            } ?: return true
+
+            val targets = handler.resolveTarget(injectorAnnotation)
+                .filterIsInstance<MethodTargetMember>()
+                .ifEmpty { return true }
+
+            return targets.any { it.classAndMethod.method.isConstructor }
+        }
+    }
+}

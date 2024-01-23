@@ -26,25 +26,19 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.findSuperConstructorCall
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.constantValue
-import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findModule
-import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import java.awt.FlowLayout
 import javax.swing.JCheckBox
@@ -96,7 +90,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
                             val atHasUnsafe = !atClass?.findMethodsByName("unsafe", false).isNullOrEmpty()
 
                             val quickFixes = if (atHasUnsafe) {
-                                arrayOf(AddUnsafeFix(at))
+                                arrayOf(AnnotationAttributeFix(at, "unsafe" to true))
                             } else {
                                 emptyArray()
                             }
@@ -130,15 +124,4 @@ class InjectIntoConstructorInspection : MixinInspection() {
     }
 
     override fun getStaticDescription() = "@Inject into Constructor"
-
-    class AddUnsafeFix(at: PsiAnnotation) : LocalQuickFixOnPsiElement(at) {
-        override fun getFamilyName() = "Add unsafe = true"
-        override fun getText() = "Add unsafe = true"
-
-        override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
-            val annotation = startElement as? PsiAnnotation ?: return
-            val trueExpr = JavaPsiFacade.getElementFactory(project).createLiteralExpression(true)
-            annotation.setDeclaredAttributeValue("unsafe", trueExpr)
-        }
-    }
 }

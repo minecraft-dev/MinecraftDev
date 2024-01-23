@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
@@ -76,7 +77,7 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
                 holder.registerProblem(
                     valueElement,
                     "CTOR_HEAD is missing unsafe = true",
-                    InjectIntoConstructorInspection.AddUnsafeFix(annotation),
+                    AnnotationAttributeFix(annotation, "unsafe" to true),
                 )
             }
         }

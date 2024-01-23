@@ -22,24 +22,19 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.util.constantValue
-import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.ifEmpty
-import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
-import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
 import org.objectweb.asm.Opcodes
@@ -64,20 +59,13 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
 
                 if (shouldReport(modifyVariable, wantedType, methodTargets)) {
                     val description = "@ModifyVariable may be argsOnly = true"
-                    holder.registerProblem(problemElement, description, AddArgsOnlyFix(modifyVariable))
+                    holder.registerProblem(
+                        problemElement,
+                        description,
+                        AnnotationAttributeFix(modifyVariable, "argsOnly" to true),
+                    )
                 }
             }
-        }
-    }
-
-    class AddArgsOnlyFix(annotation: PsiAnnotation) : LocalQuickFixOnPsiElement(annotation) {
-        override fun getFamilyName() = "Add argsOnly = true"
-        override fun getText() = "Add argsOnly = true"
-
-        override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
-            val annotation = startElement as? PsiAnnotation ?: return
-            val trueExpr = JavaPsiFacade.getElementFactory(project).createLiteralExpression(true)
-            annotation.setDeclaredAttributeValue("argsOnly", trueExpr)
         }
     }
 
