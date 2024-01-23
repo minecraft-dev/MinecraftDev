@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.platform.mixin.util.findSuperConstructorCall
@@ -27,6 +28,7 @@ import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.enumValueOfOrNull
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findInspection
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -53,8 +55,16 @@ import org.objectweb.asm.tree.MethodNode
 
 class CtorHeadInjectionPoint : InjectionPoint<PsiElement>() {
     override fun onCompleted(editor: Editor, reference: PsiLiteral) {
-        val at = reference.parentOfType<PsiAnnotation>() ?: return
         val project = reference.project
+
+        // avoid adding unsafe = true when it's unnecessary on Fabric
+        val noUnsafeInspection =
+            project.findInspection<CtorHeadNoUnsafeInspection>(CtorHeadNoUnsafeInspection.SHORT_NAME)
+        if (noUnsafeInspection?.ignoreForFabric == true) {
+            return
+        }
+
+        val at = reference.parentOfType<PsiAnnotation>() ?: return
         at.setDeclaredAttributeValue(
             "unsafe",
             JavaPsiFacade.getElementFactory(project).createLiteralExpression(true)

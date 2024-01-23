@@ -29,6 +29,7 @@ import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.findInspection
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
@@ -64,13 +65,16 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
         val isFabric = holder.file.findModule()?.let { MinecraftFacet.getInstance(it) }?.isOfType(FabricModuleType)
             ?: false
         val alwaysUnnecessary = isFabric && alwaysUnnecessaryOnFabric
+        val requiresUnsafeForCtorHeadOnFabric =
+            holder.project.findInspection<CtorHeadNoUnsafeInspection>(CtorHeadNoUnsafeInspection.SHORT_NAME)
+                ?.ignoreForFabric == false
 
         return object : JavaElementVisitor() {
             override fun visitAnnotation(annotation: PsiAnnotation) {
                 if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT)) {
                     return
                 }
-                if (!alwaysUnnecessary &&
+                if ((!alwaysUnnecessary || requiresUnsafeForCtorHeadOnFabric) &&
                     annotation.findDeclaredAttributeValue("value")?.constantValue == "CTOR_HEAD"
                 ) {
                     // this case is handled by a specific inspection for CTOR_HEAD
@@ -94,6 +98,8 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     }
 
     companion object {
+        const val SHORT_NAME = "UnnecessaryUnsafe"
+
         fun mightTargetConstructor(project: Project, at: PsiAnnotation): Boolean {
             val injectorAnnotation = at.parents(false)
                 .takeWhile { it !is PsiClass }

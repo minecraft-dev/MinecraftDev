@@ -82,4 +82,8 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
             }
         }
     }
+
+    companion object {
+        const val SHORT_NAME = "CtorHeadNoUnsafe"
+    }
 }
