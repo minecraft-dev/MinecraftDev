@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEUnaryExpressionMixin
 import com.intellij.lang.ASTNode
 

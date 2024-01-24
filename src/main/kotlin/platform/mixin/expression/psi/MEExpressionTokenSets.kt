@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi
 
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.intellij.psi.tree.TokenSet
 
 object MEExpressionTokenSets {

@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.intellij.lang.BracePair
 import com.intellij.lang.PairedBraceMatcher
 import com.intellij.psi.PsiFile

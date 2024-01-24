@@ -20,8 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTokenSets
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey

@@ -20,9 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.platform.mixin.expression.gen.MEExpressionParser
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTokenSets
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.openapi.project.Project

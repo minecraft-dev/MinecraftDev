@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression;
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes;
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;

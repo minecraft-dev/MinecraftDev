@@ -19,15 +19,15 @@
  */
 
 {
-    parserClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionParser"
+    parserClass="com.demonwav.mcdev.platform.mixin.expression.gen.MEExpressionParser"
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="ME"
     psiImplClassSuffix="Impl"
-    psiPackage="com.demonwav.mcdev.platform.mixin.expression.psi"
-    psiImplPackage="com.demonwav.mcdev.platform.mixin.expression.psi.impl"
+    psiPackage="com.demonwav.mcdev.platform.mixin.expression.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl"
 
-    elementTypeHolderClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes"
+    elementTypeHolderClass="com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes"
     elementTypeClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionElementType"
     tokenTypeClass="com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTokenType"
 

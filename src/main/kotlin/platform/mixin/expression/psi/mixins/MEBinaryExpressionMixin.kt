@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.intellij.psi.tree.IElementType
 
 interface MEBinaryExpressionMixin : MEExpression {

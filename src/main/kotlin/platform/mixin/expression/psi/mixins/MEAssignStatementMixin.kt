@@ -20,8 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpression
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEStatement
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 
 interface MEAssignStatementMixin : MEStatement {
     val targetExpr: MEExpression

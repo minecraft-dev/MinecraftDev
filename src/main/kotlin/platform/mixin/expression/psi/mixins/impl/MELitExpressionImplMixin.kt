@@ -20,8 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionTypes
-import com.demonwav.mcdev.platform.mixin.expression.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MELitExpressionMixin
 import com.intellij.lang.ASTNode
 import com.intellij.util.IncorrectOperationException
