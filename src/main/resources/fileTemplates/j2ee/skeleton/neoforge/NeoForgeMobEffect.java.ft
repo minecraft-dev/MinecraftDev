@@ -1,0 +1,11 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+
+public class ${NAME} extends MobEffect {
+    public ${NAME}(MobEffectCategory category, int color) {
+        super(category, color);
+    }
+}

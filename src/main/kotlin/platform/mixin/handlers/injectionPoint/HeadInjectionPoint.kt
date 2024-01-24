@@ -57,9 +57,9 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
         return null
     }
 
-    private class MyCollectVisitor(
-        private val project: Project,
-        private val clazz: ClassNode,
+    internal open class MyCollectVisitor(
+        protected val project: Project,
+        protected val clazz: ClassNode,
         mode: Mode,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {

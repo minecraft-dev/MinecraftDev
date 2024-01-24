@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.createLiteralExpression
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -55,9 +56,11 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiSubstitutor
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.KeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -80,6 +83,30 @@ abstract class InjectionPoint<T : PsiElement> {
 
     open fun onCompleted(editor: Editor, reference: PsiLiteral) {
     }
+
+    protected fun completeExtraStringAtAttribute(editor: Editor, reference: PsiLiteral, attributeName: String) {
+        val at = reference.parentOfType<PsiAnnotation>() ?: return
+        if (at.findDeclaredAttributeValue(attributeName) != null) {
+            return
+        }
+        at.setDeclaredAttributeValue(
+            attributeName,
+            JavaPsiFacade.getElementFactory(reference.project).createLiteralExpression("")
+        )
+        val formattedAt = CodeStyleManager.getInstance(reference.project).reformat(at) as PsiAnnotation
+        val targetElement = formattedAt.findDeclaredAttributeValue(attributeName) ?: return
+        editor.caretModel.moveToOffset(targetElement.textRange.startOffset + 1)
+    }
+
+    open fun getArgsKeys(at: PsiAnnotation): Array<String> {
+        return ArrayUtilRt.EMPTY_STRING_ARRAY
+    }
+
+    open fun getArgsValues(at: PsiAnnotation, key: String): Array<Any> {
+        return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+    }
+
+    open fun isArgValueList(at: PsiAnnotation, key: String) = false
 
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,
@@ -294,6 +321,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
         result += element
     }
 
+    open fun visitStart(executableElement: PsiElement) {
+    }
+
     open fun visitEnd(executableElement: PsiElement) {
     }
 
@@ -304,6 +334,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
 
     override fun visitMethod(method: PsiMethod) {
         if (!hasVisitedAnything) {
+            visitStart(method)
             super.visitMethod(method)
             visitEnd(method)
         }
@@ -312,6 +343,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitAnonymousClass(aClass: PsiAnonymousClass) {
         // do not recurse into anonymous classes
         if (!hasVisitedAnything) {
+            visitStart(aClass)
             super.visitAnonymousClass(aClass)
             visitEnd(aClass)
         }
@@ -320,6 +352,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitClass(aClass: PsiClass) {
         // do not recurse into inner classes
         if (!hasVisitedAnything) {
+            visitStart(aClass)
             super.visitClass(aClass)
             visitEnd(aClass)
         }
@@ -327,6 +360,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
 
     override fun visitMethodReferenceExpression(expression: PsiMethodReferenceExpression) {
         val hadVisitedAnything = hasVisitedAnything
+        if (!hadVisitedAnything) {
+            visitStart(expression)
+        }
         super.visitMethodReferenceExpression(expression)
         if (!hadVisitedAnything) {
             visitEnd(expression)
@@ -336,6 +372,7 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     override fun visitLambdaExpression(expression: PsiLambdaExpression) {
         // do not recurse into lambda expressions
         if (!hasVisitedAnything) {
+            visitStart(expression)
             super.visitLambdaExpression(expression)
             visitEnd(expression)
         }

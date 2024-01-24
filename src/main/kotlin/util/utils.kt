@@ -22,6 +22,7 @@ package com.demonwav.mcdev.util
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.lang.java.lexer.JavaLexer
 import com.intellij.openapi.application.AppUIExecutor
 import com.intellij.openapi.application.ApplicationManager
@@ -42,12 +43,14 @@ import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
+import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import java.lang.invoke.MethodHandles
 import java.util.Locale
 import kotlin.math.min
 import kotlin.reflect.KClass
+import org.jetbrains.annotations.NonNls
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
 
@@ -130,6 +133,11 @@ fun waitForAllSmart() {
         }
     }
 }
+
+inline fun <reified T : InspectionProfileEntry> Project.findInspection(@NonNls shortName: String): T? =
+    InspectionProfileManager.getInstance(this)
+        .currentProfile.getInspectionTool(shortName, this)
+        ?.tool as? T
 
 /**
  * Returns an untyped array for the specified [Collection].
@@ -387,4 +395,12 @@ fun <S : CharSequence, R> S.ifNotBlank(block: (S) -> R): R? {
     }
 
     return null
+}
+
+inline fun <reified T : Enum<T>> enumValueOfOrNull(str: String): T? {
+    return try {
+        enumValueOf<T>(str)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
 }

@@ -64,6 +64,7 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
                         PlatformType.PAPER -> ThreeState.NO
                         PlatformType.ARCHITECTURY -> ThreeState.YES
                         PlatformType.FORGE -> ThreeState.YES
+                        PlatformType.NEOFORGE -> ThreeState.YES
                         PlatformType.FABRIC -> ThreeState.YES
                         PlatformType.SPONGE -> ThreeState.NO
                         PlatformType.BUNGEECORD -> ThreeState.NO

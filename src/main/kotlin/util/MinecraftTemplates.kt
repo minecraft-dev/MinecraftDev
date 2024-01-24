@@ -111,6 +111,24 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             mixinGroup.addTemplate(FileTemplateDescriptor(MIXIN_OVERWRITE_FALLBACK))
         }
 
+        FileTemplateGroupDescriptor("NeoForge", PlatformAssets.NEOFORGE_ICON).let { forgeGroup ->
+            group.addTemplate(forgeGroup)
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MIXINS_JSON_TEMPLATE, PlatformAssets.NEOFORGE_ICON))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MAIN_CLASS_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_CONFIG_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_BUILD_GRADLE_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_GRADLE_PROPERTIES_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_SETTINGS_GRADLE_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MODS_TOML_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_PACK_MCMETA_TEMPLATE))
+
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_BLOCK_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_ITEM_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_PACKET_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_ENCHANTMENT_TEMPLATE))
+            forgeGroup.addTemplate(FileTemplateDescriptor(NEOFORGE_MOB_EFFECT_TEMPLATE))
+        }
+
         FileTemplateGroupDescriptor("Common", PlatformAssets.MINECRAFT_ICON).let { commonGroup ->
             group.addTemplate(commonGroup)
             commonGroup.addTemplate(FileTemplateDescriptor(GRADLE_GITIGNORE_TEMPLATE))
@@ -249,6 +267,21 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
         const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
         const val FABRIC_STATUS_EFFECT_TEMPLATE = "FabricStatusEffect.java"
+
+        const val NEOFORGE_MIXINS_JSON_TEMPLATE = "NeoForge Mixins Config.json"
+        const val NEOFORGE_MAIN_CLASS_TEMPLATE = "NeoForge Main Class.java"
+        const val NEOFORGE_CONFIG_TEMPLATE = "NeoForge Config.java"
+        const val NEOFORGE_BUILD_GRADLE_TEMPLATE = "NeoForge build.gradle"
+        const val NEOFORGE_GRADLE_PROPERTIES_TEMPLATE = "NeoForge gradle.properties"
+        const val NEOFORGE_SETTINGS_GRADLE_TEMPLATE = "NeoForge settings.gradle"
+        const val NEOFORGE_MODS_TOML_TEMPLATE = "NeoForge mods.toml"
+        const val NEOFORGE_PACK_MCMETA_TEMPLATE = "NeoForge pack.mcmeta"
+
+        const val NEOFORGE_BLOCK_TEMPLATE = "NeoForgeBlock.java"
+        const val NEOFORGE_ITEM_TEMPLATE = "NeoForgeItem.java"
+        const val NEOFORGE_PACKET_TEMPLATE = "NeoForgePacket.java"
+        const val NEOFORGE_ENCHANTMENT_TEMPLATE = "NeoForgeEnchantment.java"
+        const val NEOFORGE_MOB_EFFECT_TEMPLATE = "NeoForgeMobEffect.java"
     }
 
     private fun template(fileName: String, displayName: String? = null) = CustomDescriptor(fileName, displayName)

@@ -42,6 +42,7 @@
           <li>Paper</li>
           <li>Sponge</li>
           <li>Forge</li>
+          <li>NeoForge</li>
           <li>Fabric</li>
           <li>Architectury</li>
           <li>Velocity</li>
@@ -89,6 +90,7 @@
         <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$TypeFactory" />
 
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.forge.creator.ForgePlatformStep$Factory" />
+        <modPlatformWizard implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgePlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.fabric.creator.FabricPlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory" />
 
@@ -109,6 +111,7 @@
         <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.MavenBuildSystem" />
 
         <buildSystemSupport platform="Forge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.forge.creator.ForgeGradleSupport" />
+        <buildSystemSupport platform="NeoForge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgeGradleSupport" />
         <buildSystemSupport platform="Fabric" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.fabric.creator.FabricGradleSupport" />
         <buildSystemSupport platform="Architectury" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport" />
@@ -152,6 +155,7 @@
         <injectionPoint atCode="HEAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.HeadInjectionPoint" />
         <injectionPoint atCode="RETURN" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ReturnInjectionPoint" />
         <injectionPoint atCode="TAIL" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.TailInjectionPoint" />
+        <injectionPoint atCode="CTOR_HEAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CtorHeadInjectionPoint" />
         <injectionPoint atCode="LOAD" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.LoadInjectionPoint" />
         <injectionPoint atCode="STORE" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.StoreInjectionPoint" />
         <injectionPoint atCode="CONSTANT" implementation="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint" />
@@ -168,6 +172,7 @@
                * Bukkit
                * Sponge
                * Forge
+               * NeoForge
                * Fabric
                * MCP
                * Mixin
@@ -350,6 +355,18 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
         <!--endregion-->
 
+        <!--region NEOFORGE-->
+        <dependencySupport coordinate="net.neoforge:neoforge" kind="java"/>
+
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.neoforge.NeoForgeFileIconProvider"/>
+        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.neoforge.insight.NeoForgeImplicitUsageProvider" />
+
+        <!-- NeoForge Annotator -->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.neoforge.framework.NeoForgePresentationProvider" />
+
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.neoforge.gradle.NeoForgeRunConfigDataService" />
+        <!--endregion-->
+
         <!--region FABRIC-->
         <dependencySupport coordinate="net.fabricmc:fabric-loader" kind="java"/>
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider" />
@@ -432,6 +449,8 @@
         <superMethodsSearch implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
                                 order="last, before javaLegacy"/>
+        <completion.contributor language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.completion.AtArgsCompletionContributor"
+                                order="first"/>
         <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinReferenceContributor"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.MethodGTDHandler" order="first"/>
         <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mixin.reference.DescGTDHandler" order="first"/>
@@ -909,6 +928,38 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
+        <localInspection displayName="CTOR_HEAD is missing unsafe = true"
+                         shortName="CtorHeadNoUnsafe"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection"/>
+        <localInspection displayName="CTOR_HEAD is not targeting a constructor"
+                         shortName="CtorHeadUsedForNonConstructor"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadUsedForNonConstructorInspection"/>
+        <localInspection displayName="Unnecessary unsafe = true"
+                         shortName="UnnecessaryUnsafe"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnnecessaryUnsafeInspection"/>
+        <localInspection displayName="CTOR_HEAD with enforce=POST_INIT doesn't target a field"
+                         shortName="CtorHeadPostInit"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadPostInitInspection"/>
         <!--endregion-->
 
         <!--region Overwrite Inspections -->
