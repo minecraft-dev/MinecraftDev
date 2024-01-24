@@ -24,6 +24,10 @@ Minecraft Development for IntelliJ
         <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20233"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20233)/statusIcon.svg" alt="2023.3 Nightly Status" /></a></td>
     </tr>
     <tr>
+        <td align="left">2024.1</td>
+        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20241"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20241)/statusIcon.svg" alt="2024.1 Nightly Status" /></a></td>
+    </tr>
+    <tr>
         <td align="right"><b>OS Tests</b></td>
         <td align="left" colspan="2">
             <a href="https://github.com/minecraft-dev/MinecraftDev/actions?query=workflow%3A%22Test%22"><img src="https://github.com/minecraft-dev/MinecraftDev/workflows/Test/badge.svg?branch=dev&event=push" alt="GitHub Action Status" /></a>
@@ -31,7 +35,7 @@ Minecraft Development for IntelliJ
     </tr>
 </table>
 
-Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.6.12-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
+Info and Documentation [![Current Release](https://img.shields.io/badge/release-1.7.0-orange.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/8327)
 ----------------------
 
 <a href="https://discord.gg/j6UNcfr"><img src="https://i.imgur.com/JXu9C1G.png" height="48px"></img></a>
@@ -133,6 +137,7 @@ Supported Platforms
 - [![Sponge Icon](src/main/resources/assets/icons/platform/Sponge_dark.png?raw=true) **Sponge**](https://www.spongepowered.org/)
 - [![Architectury Icon](src/main/resources/assets/icons/platform/Architectury.png?raw=true) **Architectury**](https://github.com/architectury/architectury-api)
 - [![Forge Icon](src/main/resources/assets/icons/platform/Forge.png?raw=true) **Minecraft Forge**](https://forums.minecraftforge.net/)
+- <a href="https://neoforged.net/"><img src="src/main/resources/assets/icons/platform/NeoForge.png?raw=true" width="16" height="16"/> <b>Neoforge</b><a/>
 - [![Fabric Icon](src/main/resources/assets/icons/platform/Fabric.png?raw=true) **Fabric**](https://fabricmc.net)
 - [![Mixins Icon](src/main/resources/assets/icons/platform/Mixins_dark.png?raw=true) **Mixins**](https://github.com/SpongePowered/Mixin)
 - [![BungeeCord Icon](src/main/resources/assets/icons/platform/BungeeCord.png?raw=true) **BungeeCord**](https://www.spigotmc.org/wiki/bungeecord/) ([![Waterfall Icon](src/main/resources/assets/icons/platform/Waterfall.png?raw=true) Waterfall](https://github.com/PaperMC/Waterfall))

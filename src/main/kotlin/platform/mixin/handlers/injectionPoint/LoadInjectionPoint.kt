@@ -20,12 +20,13 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
-import com.demonwav.mcdev.platform.mixin.handlers.ModifyVariableInfo
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.AsmDfaUtil
+import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.LocalVariables
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -53,12 +54,18 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.VarInsnNode
 
 abstract class AbstractLoadInjectionPoint(private val store: Boolean) : InjectionPoint<PsiElement>() {
-    private fun getModifyVariableInfo(at: PsiAnnotation, mode: CollectVisitor.Mode?): ModifyVariableInfo? {
+    private fun getModifyVariableInfo(at: PsiAnnotation, mode: CollectVisitor.Mode?): LocalInfo? {
         val modifyVariable = at.parentOfType<PsiAnnotation>() ?: return null
         if (!modifyVariable.hasQualifiedName(MODIFY_VARIABLE)) {
             return null
         }
-        return ModifyVariableInfo.getModifyVariableInfo(modifyVariable, mode)
+
+        val method = modifyVariable.findContainingMethod() ?: return null
+        val localType = method.parameterList.getParameter(0)?.type
+        if (localType == null && mode != CollectVisitor.Mode.COMPLETION) {
+            return null
+        }
+        return LocalInfo.fromAnnotation(localType, modifyVariable)
     }
 
     override fun createNavigationVisitor(
@@ -115,7 +122,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
     }
 
     private class MyNavigationVisitor(
-        private val info: ModifyVariableInfo,
+        private val info: LocalInfo,
         private val store: Boolean,
     ) : NavigationVisitor() {
         override fun visitThisExpression(expression: PsiThisExpression) {
@@ -276,7 +283,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         private val module: Module,
         private val targetClass: ClassNode,
         mode: Mode,
-        private val info: ModifyVariableInfo,
+        private val info: LocalInfo,
         private val store: Boolean,
     ) : CollectVisitor<PsiElement>(mode) {
         override fun accept(methodNode: MethodNode) {
