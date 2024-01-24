@@ -41,6 +41,7 @@
           <li>Paper</li>
           <li>Sponge</li>
           <li>Forge</li>
+          <li>NeoForge</li>
           <li>Fabric</li>
           <li>Architectury</li>
           <li>Velocity</li>
@@ -88,6 +89,7 @@
         <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$TypeFactory" />
 
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.forge.creator.ForgePlatformStep$Factory" />
+        <modPlatformWizard implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgePlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.fabric.creator.FabricPlatformStep$Factory" />
         <modPlatformWizard implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory" />
 
@@ -108,6 +110,7 @@
         <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.MavenBuildSystem" />
 
         <buildSystemSupport platform="Forge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.forge.creator.ForgeGradleSupport" />
+        <buildSystemSupport platform="NeoForge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgeGradleSupport" />
         <buildSystemSupport platform="Fabric" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.fabric.creator.FabricGradleSupport" />
         <buildSystemSupport platform="Architectury" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport" />
         <buildSystemSupport platform="Sponge" buildSystem="Gradle" implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport" />
@@ -167,6 +170,7 @@
                * Bukkit
                * Sponge
                * Forge
+               * NeoForge
                * Fabric
                * MCP
                * Mixin
@@ -347,6 +351,18 @@
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider" />
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService" />
+        <!--endregion-->
+
+        <!--region NEOFORGE-->
+        <dependencySupport coordinate="net.neoforge:neoforge" kind="java"/>
+
+        <fileIconProvider implementation="com.demonwav.mcdev.platform.neoforge.NeoForgeFileIconProvider"/>
+        <implicitUsageProvider implementation="com.demonwav.mcdev.platform.neoforge.insight.NeoForgeImplicitUsageProvider" />
+
+        <!-- NeoForge Annotator -->
+        <library.presentationProvider implementation="com.demonwav.mcdev.platform.neoforge.framework.NeoForgePresentationProvider" />
+
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.neoforge.gradle.NeoForgeRunConfigDataService" />
         <!--endregion-->
 
         <!--region FABRIC-->

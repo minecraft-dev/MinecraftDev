@@ -49,6 +49,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
     val paper = platformState(PlatformType.PAPER)
     val sponge = platformState(PlatformType.SPONGE)
     val forge = platformState(PlatformType.FORGE)
+    val neoforge = platformState(PlatformType.NEOFORGE)
     val fabric = platformState(PlatformType.FABRIC)
     val architectury = platformState(PlatformType.ARCHITECTURY)
     val mcp = platformState(PlatformType.MCP)
@@ -102,6 +103,8 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                     }
                 },
             )
+
+            createRow(neoforge, "NeoForge", PlatformAssets.NEOFORGE_ICON_2X)
 
             createRow(
                 fabric, "Fabric", PlatformAssets.FABRIC_ICON_2X,
