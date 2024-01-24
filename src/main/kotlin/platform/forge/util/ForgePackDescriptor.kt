@@ -54,6 +54,7 @@ data class ForgePackDescriptor(val format: Int, val comment: String) {
         val FORMAT_12 = ForgePackDescriptor(12, "")
         val FORMAT_15 = ForgePackDescriptor(15, "")
         val FORMAT_18 = ForgePackDescriptor(18, "")
+        val FORMAT_26 = ForgePackDescriptor(26, "")
 
         // See https://minecraft.gamepedia.com/Tutorials/Creating_a_resource_pack#.22pack_format.22
         fun forMcVersion(version: SemanticVersion): ForgePackDescriptor? = when {
@@ -67,7 +68,8 @@ data class ForgePackDescriptor(val format: Int, val comment: String) {
             version < MinecraftVersions.MC1_19_3 -> FORMAT_10
             version < MinecraftVersions.MC1_20 -> FORMAT_12
             version < MinecraftVersions.MC1_20_2 -> FORMAT_15
-            version >= MinecraftVersions.MC1_20_2 -> FORMAT_18
+            version < MinecraftVersions.MC1_20_3 -> FORMAT_18
+            version >= MinecraftVersions.MC1_20_3 -> FORMAT_26
             else -> null
         }
     }

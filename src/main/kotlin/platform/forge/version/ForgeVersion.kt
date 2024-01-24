@@ -20,16 +20,11 @@
 
 package com.demonwav.mcdev.platform.forge.version
 
-import com.demonwav.mcdev.creator.selectProxy
-import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.sortVersions
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.requests.suspendable
 import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
-import javax.xml.stream.XMLInputFactory
-import javax.xml.stream.events.XMLEvent
 
 class ForgeVersion private constructor(val versions: List<String>) {
 
@@ -70,45 +65,8 @@ class ForgeVersion private constructor(val versions: List<String>) {
         suspend fun downloadData(): ForgeVersion? {
             try {
                 val url = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
-                val manager = FuelManager()
-                manager.proxy = selectProxy(url)
-
-                val response = manager.get(url)
-                    .header("User-Agent", PluginUtil.useragent)
-                    .suspendable()
-                    .await()
-
-                val result = mutableListOf<String>()
-                response.body().toStream().use { stream ->
-                    val inputFactory = XMLInputFactory.newInstance()
-
-                    @Suppress("UNCHECKED_CAST")
-                    val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-                    for (event in reader) {
-                        if (!event.isStartElement) {
-                            continue
-                        }
-                        val start = event.asStartElement()
-                        val name = start.name.localPart
-                        if (name != "version") {
-                            continue
-                        }
-
-                        val versionEvent = reader.next()
-                        if (!versionEvent.isCharacters) {
-                            continue
-                        }
-                        val version = versionEvent.asCharacters().data
-                        val index = version.indexOf('-')
-                        if (index == -1) {
-                            continue
-                        }
-
-                        result += version
-                    }
-                }
-
-                return ForgeVersion(result)
+                val versions = collectMavenVersions(url) { version -> version.indexOf('-') != -1 }
+                return ForgeVersion(versions)
             } catch (e: IOException) {
                 LOGGER.error("Failed to retrieve Forge version data", e)
             }
