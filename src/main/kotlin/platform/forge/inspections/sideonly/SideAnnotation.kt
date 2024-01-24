@@ -61,6 +61,12 @@ data class SideAnnotation(
                 "DEDICATED_SERVER",
             ),
             SideAnnotation(
+                "net.neoforged.api.distmarker.OnlyIn",
+                "net.neoforged.api.distmarker.Dist",
+                "CLIENT",
+                "DEDICATED_SERVER",
+            ),
+            SideAnnotation(
                 "net.fabricmc.api.Environment",
                 "net.fabricmc.api.EnvType",
                 "CLIENT",

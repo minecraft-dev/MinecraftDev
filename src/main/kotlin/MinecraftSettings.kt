@@ -35,6 +35,8 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var isShowChatColorGutterIcons: Boolean = true,
         var isShowChatColorUnderlines: Boolean = false,
         var underlineType: UnderlineType = UnderlineType.DOTTED,
+
+        var isShadowAnnotationsSameLine: Boolean = true,
     )
 
     private var state = State()
@@ -76,6 +78,12 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         get() = state.underlineType
         set(underlineType) {
             state.underlineType = underlineType
+        }
+
+    var isShadowAnnotationsSameLine: Boolean
+        get() = state.isShadowAnnotationsSameLine
+        set(shadowAnnotationsSameLine) {
+            state.isShadowAnnotationsSameLine = shadowAnnotationsSameLine
         }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {
