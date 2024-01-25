@@ -58,6 +58,10 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
                 MEExpressionSyntaxHighlighter.BRACKETS
             ),
             AttributesDescriptor(
+                MCDevBundle.pointer("mixinextras.expression.lang.highlighting.braces.display_name"),
+                MEExpressionSyntaxHighlighter.BRACES
+            ),
+            AttributesDescriptor(
                 MCDevBundle.pointer("mixinextras.expression.lang.highlighting.dot.display_name"),
                 MEExpressionSyntaxHighlighter.DOT
             ),
@@ -117,6 +121,7 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
             ?,
             <class_name>ClassName</class_name>.class,
             <variable>foo</variable>.<member_name>bar</member_name>,
+            new <class_name>int</class_name>[] { 1, 2, 3 },
             'a bad character: ' # other_identifier
         )[0]
     """.trimIndent()

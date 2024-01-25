@@ -63,6 +63,8 @@ LEFT_PAREN="("
 RIGHT_PAREN=")"
 LEFT_BRACKET="["
 RIGHT_BRACKET="]"
+LEFT_BRACE="{"
+RIGHT_BRACE="}"
 AT=@
 SHL=<<
 SHR=>>
@@ -112,6 +114,8 @@ STRING_ESCAPE=\\'|\\\\
 <YYINITIAL> {RIGHT_PAREN} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_RIGHT_PAREN; }
 <YYINITIAL> {LEFT_BRACKET} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_LEFT_BRACKET; }
 <YYINITIAL> {RIGHT_BRACKET} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_RIGHT_BRACKET; }
+<YYINITIAL> {LEFT_BRACE} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_LEFT_BRACE; }
+<YYINITIAL> {RIGHT_BRACE} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_RIGHT_BRACE; }
 <YYINITIAL> {AT} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_AT; }
 <YYINITIAL> {SHL} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_SHL; }
 <YYINITIAL> {SHR} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_SHR; }

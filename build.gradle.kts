@@ -100,7 +100,7 @@ dependencies {
     implementation(files(Jvm.current().toolsJar))
 
     // TODO: temporary waiting for MixinExtras expression library
-    implementation("com.github.LlamaLad7:MixinExtras:8aa79eb")
+    implementation("com.github.LlamaLad7:MixinExtras:e617eca")
 
     // Kotlin
     implementation(kotlin("stdlib-jdk8"))

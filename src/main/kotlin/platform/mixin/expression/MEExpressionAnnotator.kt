@@ -21,9 +21,8 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArrayAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEBinaryExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECastExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEInstantiationExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MELitExpression
@@ -31,6 +30,8 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMemberAccessExpres
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameWithDims
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewArrayExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MESuperCallExpression
 import com.intellij.lang.annotation.AnnotationHolder
@@ -43,10 +44,10 @@ class MEExpressionAnnotator : Annotator {
         when (element) {
             is MEName -> {
                 if (!element.isWildcard) {
-                    when (val parent = element.parent) {
-                        is MECastExpression,
-                        is MEClassConstantExpression,
-                        is MEInstantiationExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                    when (element.parent) {
+                        is MENameWithDims,
+                        is MEInstantiationExpression,
+                        is MENewArrayExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                             .range(element)
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
                             .create()
@@ -61,11 +62,7 @@ class MEExpressionAnnotator : Annotator {
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CALL)
                             .create()
                         is MENameExpression -> {
-                            val grandparent = parent.parent
-                            if (grandparent is MEBinaryExpression &&
-                                grandparent.operator == MEExpressionTypes.TOKEN_INSTANCEOF &&
-                                grandparent.rightExpr == parent
-                            ) {
+                            if (element.isRightOfInstanceof()) {
                                 holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                                     .range(element)
                                     .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
@@ -77,6 +74,10 @@ class MEExpressionAnnotator : Annotator {
                                     .create()
                             }
                         }
+                        else -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                            .range(element)
+                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
+                            .create()
                     }
                 }
             }
@@ -102,6 +103,7 @@ class MEExpressionAnnotator : Annotator {
                 val rightExpr = element.rightExpr
                 if (element.operator == MEExpressionTypes.TOKEN_INSTANCEOF &&
                     rightExpr !is MENameExpression &&
+                    rightExpr !is MEArrayAccessExpression &&
                     rightExpr != null
                 ) {
                     holder.newAnnotation(
@@ -112,6 +114,95 @@ class MEExpressionAnnotator : Annotator {
                         .create()
                 }
             }
+            is MEArrayAccessExpression -> {
+                if (element.isRightOfInstanceof()) {
+                    val indexExpr = element.indexExpr
+                    if (indexExpr != null) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.index_not_expected_in_type"),
+                        )
+                            .range(indexExpr)
+                            .create()
+                    }
+                    val arrayExpr = element.arrayExpr
+                    if (arrayExpr !is MEArrayAccessExpression && arrayExpr !is MENameExpression) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.instanceof_non_type"),
+                        )
+                            .range(arrayExpr)
+                            .create()
+                    }
+                } else if (element.indexExpr == null) {
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("mixinextras.expression.lang.errors.array_access_missing_index"),
+                    )
+                        .range(element.leftBracketToken)
+                        .create()
+                }
+            }
+            is MENewArrayExpression -> {
+                val initializer = element.arrayInitializer
+                if (initializer != null) {
+                    if (element.dimExprs.isNotEmpty()) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.new_array_dim_expr_with_initializer"),
+                        )
+                            .range(initializer)
+                            .create()
+                    } else if (initializer.expressionList.isEmpty()) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.empty_array_initializer"),
+                        )
+                            .range(initializer)
+                            .create()
+                    }
+                } else {
+                    if (element.dimExprs.isEmpty()) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.missing_array_length")
+                        )
+                            .range(element.dimExprTokens[0].leftBracket)
+                            .create()
+                    } else {
+                        element.dimExprTokens.asSequence().dropWhile { it.expr != null }.forEach {
+                            if (it.expr != null) {
+                                holder.newAnnotation(
+                                    HighlightSeverity.ERROR,
+                                    MCDevBundle("mixinextras.expression.lang.errors.array_length_after_empty")
+                                )
+                                    .range(it.expr)
+                                    .create()
+                            }
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    private fun PsiElement.isRightOfInstanceof(): Boolean {
+        var elt: PsiElement? = this
+        while (elt != null) {
+            when (elt) {
+                is MEName, is MENameExpression, is MEArrayAccessExpression -> {}
+                else -> return false
+            }
+            val parent = elt.parent
+            if (parent is MEBinaryExpression &&
+                parent.operator == MEExpressionTypes.TOKEN_INSTANCEOF &&
+                elt == parent.rightExpr
+            ) {
+                return true
+            }
+            elt = parent
+        }
+
+        return false
     }
 }

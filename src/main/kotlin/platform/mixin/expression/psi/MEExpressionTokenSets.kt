@@ -68,4 +68,5 @@ object MEExpressionTokenSets {
     )
     val PARENS = TokenSet.create(MEExpressionTypes.TOKEN_LEFT_PAREN, MEExpressionTypes.TOKEN_RIGHT_PAREN)
     val BRACKETS = TokenSet.create(MEExpressionTypes.TOKEN_LEFT_BRACKET, MEExpressionTypes.TOKEN_RIGHT_BRACKET)
+    val BRACES = TokenSet.create(MEExpressionTypes.TOKEN_LEFT_BRACE, MEExpressionTypes.TOKEN_RIGHT_BRACE)
 }

@@ -63,6 +63,10 @@ class MEExpressionSyntaxHighlighter : SyntaxHighlighterBase() {
             "MEEXPRESSION_BRACKETS",
             DefaultLanguageHighlighterColors.BRACKETS
         )
+        val BRACES = createTextAttributesKey(
+            "MEEXPRESSION_BRACES",
+            DefaultLanguageHighlighterColors.BRACES
+        )
         val DOT = createTextAttributesKey(
             "MEEXPRESSION_DOT",
             DefaultLanguageHighlighterColors.DOT
@@ -111,6 +115,7 @@ class MEExpressionSyntaxHighlighter : SyntaxHighlighterBase() {
         val OPERATOR_KEYS = arrayOf(OPERATOR)
         val PARENS_KEYS = arrayOf(PARENS)
         val BRACKETS_KEYS = arrayOf(BRACKETS)
+        val BRACES_KEYS = arrayOf(BRACES)
         val DOT_KEYS = arrayOf(DOT)
         val COMMA_KEYS = arrayOf(COMMA)
         val CAPTURE_KEYS = arrayOf(CAPTURE)
@@ -144,6 +149,9 @@ class MEExpressionSyntaxHighlighter : SyntaxHighlighterBase() {
         }
         if (MEExpressionTokenSets.BRACKETS.contains(tokenType)) {
             return BRACKETS_KEYS
+        }
+        if (MEExpressionTokenSets.BRACES.contains(tokenType)) {
+            return BRACES_KEYS
         }
         if (tokenType == MEExpressionTypes.TOKEN_DOT) {
             return DOT_KEYS

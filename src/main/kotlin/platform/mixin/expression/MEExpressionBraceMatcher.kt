@@ -31,6 +31,7 @@ class MEExpressionBraceMatcher : PairedBraceMatcher {
         private val PAIRS = arrayOf(
             BracePair(MEExpressionTypes.TOKEN_LEFT_PAREN, MEExpressionTypes.TOKEN_RIGHT_PAREN, false),
             BracePair(MEExpressionTypes.TOKEN_LEFT_BRACKET, MEExpressionTypes.TOKEN_RIGHT_BRACKET, false),
+            BracePair(MEExpressionTypes.TOKEN_LEFT_BRACE, MEExpressionTypes.TOKEN_RIGHT_BRACE, false),
         )
     }
 
