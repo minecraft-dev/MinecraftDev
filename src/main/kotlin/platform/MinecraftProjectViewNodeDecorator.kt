@@ -39,7 +39,7 @@ class MinecraftProjectViewNodeDecorator : ProjectViewNodeDecorator {
             return
         }
 
-        if (node !is PsiDirectoryNode) {
+        if (node !is PsiDirectoryNode || !node.isValid) {
             return
         }
 
