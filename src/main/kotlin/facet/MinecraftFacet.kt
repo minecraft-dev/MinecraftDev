@@ -121,6 +121,10 @@ class MinecraftFacet(
     }
 
     private fun updateRoots() = invokeAndWait {
+        if (module.isDisposed) {
+            return@invokeAndWait
+        }
+
         roots.clear()
         val rootManager = ModuleRootManager.getInstance(module)
 
