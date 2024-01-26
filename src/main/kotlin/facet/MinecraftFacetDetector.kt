@@ -54,6 +54,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
@@ -68,8 +69,9 @@ class MinecraftFacetDetector : ProjectActivity {
 
     override suspend fun execute(project: Project) {
         val detectorService = project.service<FacetDetectorScopeProvider>()
-        detectorService.currentJob?.let { it.cancelAndJoin() }
+        detectorService.currentJob?.cancelAndJoin()
         withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+            detectorService.currentJob = coroutineContext.job
             MinecraftModuleRootListener.doCheck(project)
         }
     }
@@ -88,8 +90,9 @@ class MinecraftFacetDetector : ProjectActivity {
             val project = event.source as? Project ?: return
             val detectorService = project.service<FacetDetectorScopeProvider>()
             detectorService.scope.launch {
-                detectorService.currentJob?.let { it.cancelAndJoin() }
+                detectorService.currentJob?.cancelAndJoin()
                 withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+                    detectorService.currentJob = coroutineContext.job
                     doCheck(project)
                 }
             }
