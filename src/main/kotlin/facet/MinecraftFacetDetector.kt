@@ -100,7 +100,7 @@ class MinecraftFacetDetector : ProjectActivity {
 
             var needsReimport = false
 
-            moduleManager.modules.asList().forEachWithProgress(false) { module ->
+            moduleManager.modules.asList().forEachWithProgress { module ->
                 val facetManager = FacetManager.getInstance(module)
                 val minecraftFacet = facetManager.getFacetByType(MinecraftFacet.ID)
 
