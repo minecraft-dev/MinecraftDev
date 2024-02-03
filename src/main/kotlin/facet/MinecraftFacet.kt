@@ -44,6 +44,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import com.intellij.util.application
 import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 import org.jetbrains.jps.model.java.JavaResourceRootType
@@ -231,7 +232,7 @@ class MinecraftFacet(
     private class RefreshRootsException : Exception()
 
     @Throws(RefreshRootsException::class)
-    private fun findFile0(path: String, type: SourceType): VirtualFile? {
+    private fun findFile0(path: String, type: SourceType): VirtualFile? = application.runReadAction<VirtualFile?> {
         val roots = roots[type]
 
         for (root in roots) {
@@ -239,10 +240,10 @@ class MinecraftFacet(
             if (!r.isValid) {
                 throw RefreshRootsException()
             }
-            return r.findFileByRelativePath(path) ?: continue
+            return@runReadAction r.findFileByRelativePath(path) ?: continue
         }
 
-        return null
+        return@runReadAction null
     }
 
     companion object {
