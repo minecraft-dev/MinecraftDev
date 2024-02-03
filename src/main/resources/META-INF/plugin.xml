@@ -266,6 +266,7 @@
         <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <annotator language="JSON" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <intentionAction>
+            <language>JAVA</language>
             <className>com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
