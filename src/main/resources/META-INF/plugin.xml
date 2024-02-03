@@ -81,7 +81,7 @@
         <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
         </extensionPoint>
-        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" />
+        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" dynamic="true" />
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
