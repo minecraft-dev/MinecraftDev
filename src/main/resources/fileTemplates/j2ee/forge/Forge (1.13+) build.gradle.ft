@@ -90,6 +90,14 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
+#if (!${MERGE_RESOURCES_AND_CLASSES})
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+#end
         }
 
         client {
@@ -217,6 +225,7 @@ tasks.named('jar', Jar).configure {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+#if (${MERGE_RESOURCES_AND_CLASSES})
 
 // Merge the resources and classes into the same directory.
 // This is done because java expects modules to be in a single directory.
@@ -227,3 +236,4 @@ sourceSets.each {
     it.output.resourcesDir = dir
     it.java.destinationDirectory = dir
 }
+#end

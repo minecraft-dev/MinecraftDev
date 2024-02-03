@@ -41,6 +41,7 @@ import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.UseMixinsStep
 import com.demonwav.mcdev.util.MinecraftTemplates
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.application.WriteAction
@@ -102,6 +103,7 @@ class ForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAs
             "AUTHOR_LIST" to authors.joinToString(", "),
             "LICENSE" to license.id,
             "HAS_DATA" to "true",
+            "MERGE_RESOURCES_AND_CLASSES" to (mcVersion >= MinecraftVersions.MC1_20_3),
         )
 
         if (javaVersion != null) {
