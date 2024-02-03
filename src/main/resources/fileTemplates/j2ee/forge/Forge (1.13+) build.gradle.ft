@@ -92,12 +92,12 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
 
-#if (${GAME_TEST_FRAMEWORK})
         client {
+#if (${GAME_TEST_FRAMEWORK})
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
-        }
 #end
+        }
 
         server {
 #if (${GAME_TEST_FRAMEWORK})
