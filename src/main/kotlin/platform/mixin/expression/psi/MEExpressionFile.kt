@@ -22,10 +22,13 @@ package com.demonwav.mcdev.platform.mixin.expression.psi
 
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionFileType
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionLanguage
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.psi.FileViewProvider
 
 class MEExpressionFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, MEExpressionLanguage) {
     override fun getFileType() = MEExpressionFileType
     override fun toString() = "MixinExtras Expression File"
+
+    val statement: MEStatement? get() = findChildByClass(MEStatement::class.java)
 }
