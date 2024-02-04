@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.filterNotNull
+import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
@@ -119,7 +120,11 @@ class MinecraftFacet(
         ProjectView.getInstance(module.project).refresh()
     }
 
-    private fun updateRoots() {
+    private fun updateRoots() = invokeAndWait {
+        if (module.isDisposed) {
+            return@invokeAndWait
+        }
+
         roots.clear()
         val rootManager = ModuleRootManager.getInstance(module)
 
