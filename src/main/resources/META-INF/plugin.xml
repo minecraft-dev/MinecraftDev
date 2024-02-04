@@ -355,7 +355,7 @@
         <!--endregion-->
 
         <!--region NEOFORGE-->
-        <dependencySupport coordinate="net.neoforge:neoforge" kind="java"/>
+        <dependencySupport coordinate="net.neoforged:neoforge" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.neoforge.NeoForgeFileIconProvider"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.neoforge.insight.NeoForgeImplicitUsageProvider" />
