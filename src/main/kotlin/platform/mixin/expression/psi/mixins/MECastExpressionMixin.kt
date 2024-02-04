@@ -18,15 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
+package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
-import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENameWithDimsMixin
-import com.intellij.extapi.psi.ASTWrapperPsiElement
-import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 
-abstract class MENameWithDimsImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), MENameWithDimsMixin {
-    override val isArray get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET) != null
-    override val dimensions get() = findChildrenByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET).size
+interface MECastExpressionMixin : MEExpression {
+    val castType: METype?
+    val castTypeExpr: MEExpression?
+    val castedExpr: MEExpression?
 }

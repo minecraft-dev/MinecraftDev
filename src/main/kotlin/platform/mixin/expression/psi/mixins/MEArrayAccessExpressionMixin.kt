@@ -25,4 +25,5 @@ import com.intellij.psi.PsiElement
 
 interface MEArrayAccessExpressionMixin : MEExpression {
     val leftBracketToken: PsiElement
+    val rightBracketToken: PsiElement?
 }

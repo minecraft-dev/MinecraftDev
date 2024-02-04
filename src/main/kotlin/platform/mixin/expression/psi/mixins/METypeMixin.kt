@@ -22,7 +22,7 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
 import com.intellij.psi.PsiElement
 
-interface MENameWithDimsMixin : PsiElement {
+interface METypeMixin : PsiElement {
     val isArray: Boolean
     val dimensions: Int
 }

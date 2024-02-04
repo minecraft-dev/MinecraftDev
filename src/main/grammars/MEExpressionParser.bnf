@@ -106,7 +106,7 @@ parenthesizedExpression ::= TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
 }
 
 superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
-    pin = 2
+    pin = 1
     methods = [
         memberName = "name"
     ]
@@ -137,7 +137,7 @@ arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression? TOKEN_RIGHT_
     ]
 }
 
-classConstantExpression ::= nameWithDims TOKEN_DOT TOKEN_CLASS {
+classConstantExpression ::= type TOKEN_DOT TOKEN_CLASS {
     pin = 3
     methods = [
         className = "name"
@@ -157,11 +157,10 @@ unaryExpression ::= ((TOKEN_MINUS !(TOKEN_DEC_LIT | TOKEN_INT_LIT)) | TOKEN_BITW
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEUnaryExpressionImplMixin"
 }
 
-castExpression ::= TOKEN_LEFT_PAREN nameWithDims TOKEN_RIGHT_PAREN expression {
+castExpression ::= parenthesizedExpression expression {
     rightAssociative = true
-    methods = [
-        type = "name"
-    ]
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MECastExpressionMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MECastExpressionImplMixin"
 }
 
 instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
@@ -247,9 +246,9 @@ nameExpression ::= name {
     ]
 }
 
-nameWithDims ::= name ( TOKEN_LEFT_BRACKET TOKEN_RIGHT_BRACKET )* {
-    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENameWithDimsMixin"
-    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENameWithDimsImplMixin"
+type ::= name ( TOKEN_LEFT_BRACKET TOKEN_RIGHT_BRACKET )* {
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.METypeMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.METypeImplMixin"
     methods = [
         MEName = "name"
     ]

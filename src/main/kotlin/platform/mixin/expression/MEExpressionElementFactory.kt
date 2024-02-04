@@ -20,9 +20,11 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFileFactory
@@ -45,6 +47,11 @@ class MEExpressionElementFactory(private val project: Project) {
     fun createExpression(text: String): MEExpression {
         return (createStatement(text) as? MEExpressionStatement)?.expression
             ?: throw IncorrectOperationException("'$text' is not an expression")
+    }
+
+    fun createType(text: String): METype {
+        return (createExpression("$text.class") as? MEClassConstantExpression)?.type
+            ?: throw IncorrectOperationException("'$text' is not a type")
     }
 }
 

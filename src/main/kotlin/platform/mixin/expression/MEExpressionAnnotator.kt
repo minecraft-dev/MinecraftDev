@@ -30,10 +30,11 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMemberAccessExpres
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameWithDims
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewArrayExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MESuperCallExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
+import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -44,8 +45,8 @@ class MEExpressionAnnotator : Annotator {
         when (element) {
             is MEName -> {
                 if (!element.isWildcard) {
-                    when (element.parent) {
-                        is MENameWithDims,
+                    when (val parent = element.parent) {
+                        is METype,
                         is MEInstantiationExpression,
                         is MENewArrayExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                             .range(element)
@@ -62,7 +63,7 @@ class MEExpressionAnnotator : Annotator {
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CALL)
                             .create()
                         is MENameExpression -> {
-                            if (element.isRightOfInstanceof()) {
+                            if (METypeUtil.isExpressionInTypePosition(parent)) {
                                 holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                                     .range(element)
                                     .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
@@ -115,7 +116,7 @@ class MEExpressionAnnotator : Annotator {
                 }
             }
             is MEArrayAccessExpression -> {
-                if (element.isRightOfInstanceof()) {
+                if (METypeUtil.isExpressionInTypePosition(element)) {
                     val indexExpr = element.indexExpr
                     if (indexExpr != null) {
                         holder.newAnnotation(
@@ -184,25 +185,5 @@ class MEExpressionAnnotator : Annotator {
                 }
             }
         }
-    }
-
-    private fun PsiElement.isRightOfInstanceof(): Boolean {
-        var elt: PsiElement? = this
-        while (elt != null) {
-            when (elt) {
-                is MEName, is MENameExpression, is MEArrayAccessExpression -> {}
-                else -> return false
-            }
-            val parent = elt.parent
-            if (parent is MEBinaryExpression &&
-                parent.operator == MEExpressionTypes.TOKEN_INSTANCEOF &&
-                elt == parent.rightExpr
-            ) {
-                return true
-            }
-            elt = parent
-        }
-
-        return false
     }
 }
