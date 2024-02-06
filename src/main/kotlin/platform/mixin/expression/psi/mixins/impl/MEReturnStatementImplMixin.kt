@@ -24,32 +24,18 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEStatementImpl
 import com.intellij.lang.ASTNode
-import com.intellij.psi.JavaTokenType
-import com.intellij.psi.PsiAssignmentExpression
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReturnStatement
 import com.intellij.psi.util.PsiUtil
-import com.siyeh.ig.PsiReplacementUtil
 
-abstract class MEAssignStatementImplMixin(node: ASTNode) : MEStatementImpl(node) {
+abstract class MEReturnStatementImplMixin(node: ASTNode) : MEStatementImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        if (java !is PsiAssignmentExpression) {
+        if (java !is PsiReturnStatement) {
             return false
         }
-        val isOperatorAssignment = java.operationTokenType != JavaTokenType.EQ
-        val expandedJava = if (isOperatorAssignment) {
-            PsiReplacementUtil.replaceOperatorAssignmentWithAssignmentExpression(java.copy() as PsiAssignmentExpression)
-                as PsiAssignmentExpression
-        } else {
-            java
-        }
-
-        val leftJava = PsiUtil.skipParenthesizedExprDown(expandedJava.lExpression) ?: return false
-        val rightJava = PsiUtil.skipParenthesizedExprDown(expandedJava.rExpression) ?: return false
-        context.fakeElementScope(isOperatorAssignment, java) {
-            return targetExpr.matchesJava(leftJava, context) && rightExpr?.matchesJava(rightJava, context) == true
-        }
+        val javaReturnValue = PsiUtil.skipParenthesizedExprDown(java.returnValue) ?: return false
+        return valueExpr?.matchesJava(javaReturnValue, context) == true
     }
 
-    protected abstract val targetExpr: MEExpression
-    protected abstract val rightExpr: MEExpression?
+    protected abstract val valueExpr: MEExpression?
 }

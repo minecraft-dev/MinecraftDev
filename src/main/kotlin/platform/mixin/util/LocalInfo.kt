@@ -24,9 +24,11 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
+import com.intellij.util.containers.sequenceOfNotNull
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -126,6 +128,27 @@ class LocalInfo(
         } else {
             emptyList()
         }
+    }
+
+    fun matchSourceLocals(
+        sourceLocals: List<LocalVariables.SourceLocalVariable>
+    ): Sequence<LocalVariables.SourceLocalVariable> {
+        if (ordinal != null) {
+            return sequenceOfNotNull(
+                sourceLocals.asSequence().filter { it.type.isErasureEquivalentTo(type) }.drop(ordinal).firstOrNull()
+            )
+        }
+        if (index != null) {
+            return sequenceOfNotNull(sourceLocals.getOrNull(index))
+        }
+        if (names.isNotEmpty()) {
+            return sourceLocals.asSequence().filter { it.mixinName in names }
+        }
+
+        // implicit mode
+        return sequenceOfNotNull(
+            sourceLocals.singleOrNull { it.type.isErasureEquivalentTo(type) }
+        )
     }
 
     companion object {

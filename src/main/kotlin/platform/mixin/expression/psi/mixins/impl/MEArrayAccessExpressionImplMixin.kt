@@ -20,13 +20,37 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEArrayAccessExpressionMixin
+import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEPsiUtil
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiUtil
 
 abstract class MEArrayAccessExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MEArrayAccessExpressionMixin {
     override val leftBracketToken get() = findNotNullChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET)
     override val rightBracketToken get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_RIGHT_BRACKET)
+
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        if (java !is PsiArrayAccessExpression) {
+            return false
+        }
+
+        val readMatch = MEPsiUtil.isAccessedForReading(this) && PsiUtil.isAccessedForReading(java)
+        val writeMatch = MEPsiUtil.isAccessedForWriting(this) && PsiUtil.isAccessedForWriting(java)
+        if (!readMatch && !writeMatch) {
+            return false
+        }
+
+        val javaArray = java.arrayExpression
+        val javaIndex = java.indexExpression ?: return false
+        return arrayExpr.matchesJava(javaArray, context) && indexExpr?.matchesJava(javaIndex, context) == true
+    }
+
+    protected abstract val arrayExpr: MEExpression
+    protected abstract val indexExpr: MEExpression?
 }

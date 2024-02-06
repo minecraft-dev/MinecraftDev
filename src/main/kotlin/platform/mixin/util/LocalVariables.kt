@@ -119,7 +119,13 @@ object LocalVariables {
 
         for (parameter in method.parameterList.parameters) {
             val mixinName = if (argsOnly) "var$argsIndex" else parameter.name
-            args += SourceLocalVariable(parameter.name, parameter.type, argsIndex, mixinName = mixinName)
+            args += SourceLocalVariable(
+                parameter.name,
+                parameter.type,
+                argsIndex,
+                mixinName = mixinName,
+                variable = parameter
+            )
             argsIndex++
             if (parameter.isDoubleSlot) {
                 argsIndex++
@@ -207,7 +213,12 @@ object LocalVariables {
                         localsHere = localsHere.copyOf(localIndex + 1)
                     }
                     val name = instruction.variable.name ?: return
-                    localsHere[localIndex] = SourceLocalVariable(name, instruction.variable.type, localIndex)
+                    localsHere[localIndex] = SourceLocalVariable(
+                        name,
+                        instruction.variable.type,
+                        localIndex,
+                        variable = instruction.variable
+                    )
                     if (instruction.variable.isDoubleSlot && localIndex + 1 < localsHere.size) {
                         localsHere[localIndex + 1] = null
                     }
@@ -855,6 +866,7 @@ object LocalVariables {
         val type: PsiType,
         val index: Int,
         val mixinName: String = name,
+        val variable: PsiVariable? = null,
         val implicitLoadCountBefore: Int = 0,
         val implicitLoadCountAfter: Int = 0,
         val implicitStoreCountBefore: Int = 0,

@@ -20,8 +20,11 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.intellij.psi.PsiElement
 
 interface MENameMixin : PsiElement {
     val isWildcard: Boolean
+
+    fun matchesJavaExpr(javaExpr: PsiElement, context: MESourceMatchContext): Boolean
 }

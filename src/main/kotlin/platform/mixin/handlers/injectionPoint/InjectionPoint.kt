@@ -321,6 +321,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
         result += element
     }
 
+    open fun configureBytecodeTarget(classNode: ClassNode, methodNode: MethodNode) {
+    }
+
     open fun visitStart(executableElement: PsiElement) {
     }
 

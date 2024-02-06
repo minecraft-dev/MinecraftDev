@@ -22,34 +22,38 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEStatementImpl
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.intellij.lang.ASTNode
-import com.intellij.psi.JavaTokenType
-import com.intellij.psi.PsiAssignmentExpression
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiModifier
+import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.util.PsiUtil
-import com.siyeh.ig.PsiReplacementUtil
 
-abstract class MEAssignStatementImplMixin(node: ASTNode) : MEStatementImpl(node) {
+abstract class MEMemberAccessExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        if (java !is PsiAssignmentExpression) {
+        if (java !is PsiReferenceExpression) {
             return false
         }
-        val isOperatorAssignment = java.operationTokenType != JavaTokenType.EQ
-        val expandedJava = if (isOperatorAssignment) {
-            PsiReplacementUtil.replaceOperatorAssignmentWithAssignmentExpression(java.copy() as PsiAssignmentExpression)
-                as PsiAssignmentExpression
-        } else {
-            java
+
+        val resolved = java.resolve() as? PsiField ?: return false
+        if (resolved.hasModifierProperty(PsiModifier.STATIC)) {
+            return false
         }
 
-        val leftJava = PsiUtil.skipParenthesizedExprDown(expandedJava.lExpression) ?: return false
-        val rightJava = PsiUtil.skipParenthesizedExprDown(expandedJava.rExpression) ?: return false
-        context.fakeElementScope(isOperatorAssignment, java) {
-            return targetExpr.matchesJava(leftJava, context) && rightExpr?.matchesJava(rightJava, context) == true
+        val javaReceiver = PsiUtil.skipParenthesizedExprDown(java.qualifierExpression)
+            ?: JavaPsiFacade.getElementFactory(context.project).createExpressionFromText("this", null)
+        context.fakeElementScope(java.qualifierExpression == null, java) {
+            if (!receiverExpr.matchesJava(javaReceiver, context)) {
+                return false
+            }
         }
+
+        return memberName.matchesJavaExpr(java, context)
     }
 
-    protected abstract val targetExpr: MEExpression
-    protected abstract val rightExpr: MEExpression?
+    protected abstract val receiverExpr: MEExpression
+    protected abstract val memberName: MEName
 }

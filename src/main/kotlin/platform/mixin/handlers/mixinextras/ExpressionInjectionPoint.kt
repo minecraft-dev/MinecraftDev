@@ -20,7 +20,9 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECapturingExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
@@ -71,6 +73,7 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.VarInsnNode
 
 private typealias IdentifierPoolFactory = (MethodNode) -> IdentifierPool
+private typealias SourceMatchContextFactory = (ClassNode, MethodNode) -> MESourceMatchContext
 
 class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
     override fun onCompleted(editor: Editor, reference: PsiLiteral) {
@@ -104,7 +107,57 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
         target: MixinSelector?,
         targetClass: PsiClass
     ): NavigationVisitor? {
-        return null
+        val project = at.project
+
+        val atId = at.findDeclaredAttributeValue("id")?.constantStringValue ?: ""
+
+        val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return null
+        val modifierList = injectorAnnotation.parent as? PsiModifierList ?: return null
+        val parsedExprs = parseExpressions(project, modifierList, atId)
+        parsedExprs.ifEmpty { return null }
+
+        val sourceMatchContextFactory = createSourceMatchContextFactory(project, modifierList)
+
+        return MyNavigationVisitor(parsedExprs.map { it.second }, sourceMatchContextFactory)
+    }
+
+    private fun createSourceMatchContextFactory(
+        project: Project,
+        modifierList: PsiModifierList
+    ): SourceMatchContextFactory = { targetClass, targetMethod ->
+        val matchContext = MESourceMatchContext(project)
+
+        for (annotation in modifierList.annotations) {
+            if (!annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
+                continue
+            }
+
+            val definitionId = annotation.findDeclaredAttributeValue("id")?.constantStringValue ?: ""
+
+            val ats = annotation.findDeclaredAttributeValue("at")?.findAnnotations() ?: emptyList()
+            for (at in ats) {
+                val matches = RecursionManager.doPreventingRecursion(at, true) {
+                    AtResolver(at, targetClass, targetMethod).resolveNavigationTargets()
+                } ?: continue
+                for (target in matches) {
+                    matchContext.addTargetedElement(definitionId, target)
+                }
+            }
+
+            val types = annotation.findDeclaredAttributeValue("type")?.resolveTypeArray() ?: emptyList()
+            for (type in types) {
+                matchContext.addType(definitionId, type.descriptor)
+            }
+
+            val locals = annotation.findDeclaredAttributeValue("local")?.findAnnotations() ?: emptyList()
+            for (localAnnotation in locals) {
+                val localType = annotation.findDeclaredAttributeValue("type")?.resolveType()
+                val localInfo = LocalInfo.fromAnnotation(localType, localAnnotation)
+                matchContext.addLocalInfo(definitionId, localInfo)
+            }
+        }
+
+        matchContext
     }
 
     override fun doCreateCollectVisitor(
@@ -133,7 +186,7 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
         project: Project,
         modifierList: PsiModifierList,
         atId: String
-    ): List<Pair<Expression, PsiElement>> {
+    ): List<Pair<Expression, MEStatement>> {
         return modifierList.annotations.asSequence()
             .filter { exprAnnotation ->
                 exprAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION) &&
@@ -141,7 +194,7 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
             }
             .flatMap { exprAnnotation ->
                 val expressionElements = exprAnnotation.findDeclaredAttributeValue("value")?.parseArray { it }
-                    ?: return@flatMap emptySequence<Pair<Expression, PsiElement>>()
+                    ?: return@flatMap emptySequence<Pair<Expression, MEStatement>>()
                 expressionElements.asSequence().mapNotNull { expressionElement ->
                     val text = expressionElement.constantStringValue ?: return@mapNotNull null
                     val rootStatementPsi = InjectedLanguageManager.getInstance(project)
@@ -289,6 +342,34 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                     addResult(insn, element)
                 }
             }
+        }
+    }
+
+    private class MyNavigationVisitor(
+        private val statements: List<MEStatement>,
+        private val matchContextFactory: SourceMatchContextFactory
+    ) : NavigationVisitor() {
+        private lateinit var matchContext: MESourceMatchContext
+
+        override fun configureBytecodeTarget(classNode: ClassNode, methodNode: MethodNode) {
+            matchContext = matchContextFactory(classNode, methodNode)
+        }
+
+        override fun visitElement(element: PsiElement) {
+            for (statement in statements) {
+                if (statement.matchesJava(element, matchContext)) {
+                    if (matchContext.captures.isNotEmpty()) {
+                        for (capture in matchContext.captures) {
+                            addResult(capture)
+                        }
+                    } else {
+                        addResult(element)
+                    }
+                }
+                matchContext.reset()
+            }
+
+            super.visitElement(element)
         }
     }
 }

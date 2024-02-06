@@ -20,12 +20,19 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArguments
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewArrayExpressionMixin
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNewExpression
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.siblings
 
 abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MENewArrayExpressionMixin {
@@ -58,4 +65,50 @@ abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(n
 
         return result
     }
+
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        if (java !is PsiNewExpression) {
+            return false
+        }
+
+        if (!java.isArrayCreation) {
+            return false
+        }
+
+        val javaArrayType = java.type as? PsiArrayType ?: return false
+        if (javaArrayType.arrayDimensions != dimensions) {
+            return false
+        }
+
+        val matchesType = context.project.meExpressionElementFactory.createType(elementType)
+            .matchesJava(javaArrayType.deepComponentType, context)
+        if (!matchesType) {
+            return false
+        }
+
+        val javaArrayDims = java.arrayDimensions
+        val arrayDims = dimExprs
+        if (javaArrayDims.size != arrayDims.size) {
+            return false
+        }
+        if (!javaArrayDims.asSequence().zip(arrayDims.asSequence()).all { (javaArrayDim, arrayDim) ->
+            val actualJavaDim = PsiUtil.skipParenthesizedExprDown(javaArrayDim) ?: return@all false
+            arrayDim.matchesJava(actualJavaDim, context)
+        }
+        ) {
+            return false
+        }
+
+        val javaArrayInitializer = java.arrayInitializer
+        val arrayInitializer = this.arrayInitializer
+        return if (javaArrayInitializer == null) {
+            arrayInitializer == null
+        } else {
+            arrayInitializer?.matchesJava(javaArrayInitializer.initializers, context) == true
+        }
+    }
+
+    protected abstract val elementType: MEName
+    protected abstract val dimExprs: List<MEExpression>
+    protected abstract val arrayInitializer: MEArguments?
 }

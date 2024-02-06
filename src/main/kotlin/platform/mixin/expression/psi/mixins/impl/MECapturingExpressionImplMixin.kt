@@ -18,15 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
+package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiType
 
-interface METypeMixin : PsiElement {
-    val isArray: Boolean
-    val dimensions: Int
+abstract class MECapturingExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        context.addCapture(java)
+        return expression?.matchesJava(java, context) == true
+    }
 
-    fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean
+    protected abstract val expression: MEExpression?
 }

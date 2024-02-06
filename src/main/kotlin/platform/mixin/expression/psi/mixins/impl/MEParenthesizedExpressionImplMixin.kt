@@ -18,11 +18,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
+package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 
-interface MEAssignStatementMixin : MEStatement {
-    val targetExpr: MEExpression
+abstract class MEParenthesizedExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        return expression?.matchesJava(java, context) == true
+    }
+
+    protected abstract val expression: MEExpression?
 }

@@ -18,15 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
+package com.demonwav.mcdev.platform.mixin.expression.psi
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiType
 
-interface METypeMixin : PsiElement {
-    val isArray: Boolean
-    val dimensions: Int
-
-    fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean
+interface MEMatchableElement : PsiElement {
+    fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean
 }

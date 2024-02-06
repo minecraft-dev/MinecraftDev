@@ -22,11 +22,13 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiExpressionList
 
-interface METypeMixin : PsiElement {
-    val isArray: Boolean
-    val dimensions: Int
+interface MEArgumentsMixin : PsiElement {
+    fun matchesJava(java: PsiExpressionList, context: MESourceMatchContext): Boolean {
+        return matchesJava(java.expressions, context)
+    }
 
-    fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean
+    fun matchesJava(java: Array<PsiExpression>, context: MESourceMatchContext): Boolean
 }

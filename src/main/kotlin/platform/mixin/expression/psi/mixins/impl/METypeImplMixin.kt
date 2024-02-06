@@ -20,13 +20,34 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.METypeMixin
+import com.demonwav.mcdev.util.descriptor
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiType
 
 abstract class METypeImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), METypeMixin {
     override val isArray get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET) != null
     override val dimensions get() = findChildrenByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET).size
+
+    override fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean {
+        if (MEName.isWildcard) {
+            return java.arrayDimensions >= dimensions
+        } else {
+            var unwrappedElementType = java
+            repeat(dimensions) {
+                unwrappedElementType = (unwrappedElementType as? PsiArrayType)?.componentType ?: return false
+            }
+            val descriptor = unwrappedElementType.descriptor
+            return context.getTypes(MEName.text).any { it == descriptor }
+        }
+    }
+
+    @Suppress("PropertyName")
+    protected abstract val MEName: MEName
 }

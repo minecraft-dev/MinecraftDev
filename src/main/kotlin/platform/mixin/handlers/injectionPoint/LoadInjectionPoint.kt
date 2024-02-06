@@ -28,7 +28,6 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.findModule
-import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.module.Module
 import com.intellij.psi.JavaPsiFacade
@@ -166,13 +165,13 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
                     val parentExpr = PsiUtil.skipParenthesizedExprUp(expression.parent)
                     val isIincUnary = parentExpr is PsiUnaryExpression &&
                         (
-                            parentExpr.operationSign.tokenType == JavaTokenType.PLUSPLUS ||
-                                parentExpr.operationSign.tokenType == JavaTokenType.MINUSMINUS
+                            parentExpr.operationTokenType == JavaTokenType.PLUSPLUS ||
+                                parentExpr.operationTokenType == JavaTokenType.MINUSMINUS
                             )
                     val isIincAssignment = parentExpr is PsiAssignmentExpression &&
                         (
-                            parentExpr.operationSign.tokenType == JavaTokenType.PLUSEQ ||
-                                parentExpr.operationSign.tokenType == JavaTokenType.MINUSEQ
+                            parentExpr.operationTokenType == JavaTokenType.PLUSEQ ||
+                                parentExpr.operationTokenType == JavaTokenType.MINUSEQ
                             ) &&
                         PsiUtil.isConstantExpression(parentExpr.rExpression) &&
                         (parentExpr.rExpression?.constantValue as? Number)?.toInt()
@@ -239,42 +238,10 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
             name: String,
             localsHere: List<LocalVariables.SourceLocalVariable>,
         ) {
-            if (info.ordinal != null) {
-                val local = localsHere.asSequence().filter {
-                    it.type.isErasureEquivalentTo(info.type)
-                }.drop(info.ordinal).firstOrNull()
-                if (name == local?.name) {
+            for (local in info.matchSourceLocals(localsHere)) {
+                if (name == local.name) {
                     addResult(location)
                 }
-                return
-            }
-
-            if (info.index != null) {
-                val local = localsHere.getOrNull(info.index)
-                if (name == local?.name) {
-                    addResult(location)
-                }
-                return
-            }
-
-            if (info.names.isNotEmpty()) {
-                val matchingLocals = localsHere.filter {
-                    info.names.contains(it.mixinName)
-                }
-                for (local in matchingLocals) {
-                    if (local.name == name) {
-                        addResult(location)
-                    }
-                }
-                return
-            }
-
-            // implicit mode
-            val local = localsHere.singleOrNull {
-                it.type.isErasureEquivalentTo(info.type)
-            }
-            if (local != null && local.name == name) {
-                addResult(location)
             }
         }
     }

@@ -20,10 +20,44 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEUnaryExpressionMixin
 import com.intellij.lang.ASTNode
+import com.intellij.psi.JavaTokenType
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteral
+import com.intellij.psi.PsiUnaryExpression
+import com.intellij.psi.util.PsiUtil
 
 abstract class MEUnaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MEUnaryExpressionMixin {
     override val operator get() = node.firstChildNode.elementType
+
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        if (java !is PsiUnaryExpression) {
+            return false
+        }
+
+        val operatorMatches = when (java.operationTokenType) {
+            JavaTokenType.MINUS -> operator == MEExpressionTypes.TOKEN_MINUS
+            JavaTokenType.TILDE -> operator == MEExpressionTypes.TOKEN_BITWISE_NOT
+            else -> false
+        }
+        if (!operatorMatches) {
+            return false
+        }
+
+        val javaOperand = PsiUtil.skipParenthesizedExprDown(java.operand) ?: return false
+
+        if (operator == MEExpressionTypes.TOKEN_MINUS && javaOperand is PsiLiteral) {
+            // avoid matching "-1" etc
+            return false
+        }
+
+        return expression?.matchesJava(javaOperand, context) == true
+    }
+
+    protected abstract val expression: MEExpression?
 }

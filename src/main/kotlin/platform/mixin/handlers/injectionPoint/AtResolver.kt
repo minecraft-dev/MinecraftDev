@@ -209,6 +209,7 @@ class AtResolver(
         val targetPsiClass = targetElement.parentOfType<PsiClass>() ?: return emptyList()
 
         val navigationVisitor = injectionPoint.createNavigationVisitor(at, target, targetPsiClass) ?: return emptyList()
+        navigationVisitor.configureBytecodeTarget(targetClass, targetMethod)
         targetElement.accept(navigationVisitor)
 
         return bytecodeResults.mapNotNull { bytecodeResult ->

@@ -45,15 +45,15 @@ statement ::= assignStatement |
     returnStatement |
     throwStatement |
     expressionStatement {
-
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.MEMatchableElement"
 }
 
 assignStatement ::= assignableExpression TOKEN_ASSIGN expression {
     pin = 2
-    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEAssignStatementMixin"
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEAssignStatementImplMixin"
     methods = [
-        rightExpr = "expression"
+        targetExpr = "expression[0]"
+        rightExpr = "expression[1]"
     ]
 }
 
@@ -61,6 +61,7 @@ private assignableExpression ::= arrayAccessExpression | memberAccessExpression 
 
 returnStatement ::= TOKEN_RETURN expression {
     pin = 1
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEReturnStatementImplMixin"
     methods = [
         valueExpr = "expression"
     ]
@@ -68,12 +69,14 @@ returnStatement ::= TOKEN_RETURN expression {
 
 throwStatement ::= TOKEN_THROW expression {
     pin = 1
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.METhrowStatementImplMixin"
     methods = [
         valueExpr = "expression"
     ]
 }
 
 expressionStatement ::= expression {
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEExpressionStatementImplMixin"
 }
 
 private exprRecover ::= !( TOKEN_COMMA | TOKEN_RIGHT_PAREN | TOKEN_RIGHT_BRACKET | TOKEN_RIGHT_BRACE )
@@ -94,19 +97,24 @@ expression ::= capturingExpression |
     litExpression |
     thisExpression |
     nameExpression {
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.MEMatchableElement"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEExpressionImplMixin"
     recoverWhile = exprRecover
 }
 
 capturingExpression ::= TOKEN_AT TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
     pin = 1
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MECapturingExpressionImplMixin"
 }
 
 parenthesizedExpression ::= TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
     pin = 1
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEParenthesizedExpressionImplMixin"
 }
 
 superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
     pin = 1
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MESuperCallExpressionImplMixin"
     methods = [
         memberName = "name"
     ]
@@ -114,6 +122,7 @@ superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TO
 
 methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
     pin = 4
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEMethodCallExpressionImplMixin"
     methods = [
         receiverExpr = "expression"
         memberName = "name"
@@ -122,6 +131,7 @@ methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments TO
 
 staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
     pin = 2
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEStaticMethodCallExpressionImplMixin"
     methods = [
         memberName = "name"
     ]
@@ -139,12 +149,14 @@ arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression? TOKEN_RIGHT_
 
 classConstantExpression ::= type TOKEN_DOT TOKEN_CLASS {
     pin = 3
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEClassConstantExpressionImplMixin"
     methods = [
         className = "name"
     ]
 }
 
 memberAccessExpression ::= expression TOKEN_DOT name {
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEMemberAccessExpressionImplMixin"
     methods = [
         receiverExpr = "expression"
         memberName = "name"
@@ -166,6 +178,7 @@ castExpression ::= parenthesizedExpression expression {
 instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
     rightAssociative = true
     pin = 3
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEInstantiationExpressionImplMixin"
     methods = [
         type = "name"
     ]
@@ -238,9 +251,11 @@ private nulLLitExpression ::= TOKEN_NULL_LIT {
 }
 
 thisExpression ::= TOKEN_THIS {
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.METhisExpressionImplMixin"
 }
 
 nameExpression ::= name {
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENameExpressionImplMixin"
     methods = [
         MEName = "name"
     ]
@@ -260,4 +275,6 @@ name ::= TOKEN_IDENTIFIER | TOKEN_WILDCARD {
 }
 
 arguments ::= (expression (TOKEN_COMMA expression)*)? {
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEArgumentsMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEArgumentsImplMixin"
 }

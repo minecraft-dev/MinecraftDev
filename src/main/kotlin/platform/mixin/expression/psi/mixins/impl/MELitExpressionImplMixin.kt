@@ -20,10 +20,16 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MELitExpressionMixin
 import com.intellij.lang.ASTNode
+import com.intellij.psi.JavaTokenType
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteral
+import com.intellij.psi.PsiUnaryExpression
+import com.intellij.psi.util.PsiUtil
 import com.intellij.util.IncorrectOperationException
 
 abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MELitExpressionMixin {
@@ -69,4 +75,35 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
     override val isString get() = node.firstChildNode.elementType == MEExpressionTypes.TOKEN_STRING_TERMINATOR
 
     override val minusToken get() = node.firstChildNode.takeIf { it.elementType == MEExpressionTypes.TOKEN_MINUS }
+
+    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        return when (java) {
+            is PsiLiteral -> {
+                val value = this.value
+                val javaValue = java.value
+                // MixinExtras compares floats as strings
+                when (value) {
+                    is Double -> javaValue is Double && value.toString() == javaValue.toString()
+                    else -> value == javaValue
+                }
+            }
+            is PsiUnaryExpression -> {
+                if (java.operationSign != JavaTokenType.MINUS) {
+                    return false
+                }
+                val javaOperand = PsiUtil.skipParenthesizedExprDown(java.operand) ?: return false
+                if (javaOperand !is PsiLiteral) {
+                    return false
+                }
+                val value = this.value
+                val javaValue = javaOperand.value
+                when (value) {
+                    is Long -> javaValue == -value
+                    is Double -> javaValue is Double && javaValue.toString() == (-value).toString()
+                    else -> false
+                }
+            }
+            else -> false
+        }
+    }
 }
