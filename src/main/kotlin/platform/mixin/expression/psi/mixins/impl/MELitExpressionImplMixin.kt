@@ -80,10 +80,15 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
         return when (java) {
             is PsiLiteral -> {
                 val value = this.value
-                val javaValue = java.value
+                val javaValue = java.value.widened
                 // MixinExtras compares floats as strings
                 when (value) {
                     is Double -> javaValue is Double && value.toString() == javaValue.toString()
+                    is String -> {
+                        val matchesChar =
+                            value.length == 1 && javaValue is Long && value.firstOrNull()?.code?.toLong() == javaValue
+                        matchesChar || value == javaValue
+                    }
                     else -> value == javaValue
                 }
             }
@@ -96,7 +101,7 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
                     return false
                 }
                 val value = this.value
-                val javaValue = javaOperand.value
+                val javaValue = javaOperand.value.widened
                 when (value) {
                     is Long -> javaValue == -value
                     is Double -> javaValue is Double && javaValue.toString() == (-value).toString()
@@ -105,5 +110,12 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
             }
             else -> false
         }
+    }
+
+    private val Any?.widened: Any? get() = when (this) {
+        is Int -> toLong()
+        is Float -> toDouble()
+        is Char -> code.toLong()
+        else -> this
     }
 }
