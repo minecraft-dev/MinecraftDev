@@ -93,7 +93,7 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
                 }
             }
             is PsiUnaryExpression -> {
-                if (java.operationSign != JavaTokenType.MINUS) {
+                if (java.operationTokenType != JavaTokenType.MINUS) {
                     return false
                 }
                 val javaOperand = PsiUtil.skipParenthesizedExprDown(java.operand) ?: return false
