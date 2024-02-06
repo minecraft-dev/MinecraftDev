@@ -25,20 +25,9 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiReferenceExpression
 
 abstract class MENameExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        if (java !is PsiReferenceExpression) {
-            return false
-        }
-        val resolved = java.resolve() ?: return false
-        if (resolved is PsiField && !resolved.hasModifierProperty(PsiModifier.STATIC)) {
-            return false
-        }
-
         return MEName.matchesJavaExpr(java, context)
     }
 
