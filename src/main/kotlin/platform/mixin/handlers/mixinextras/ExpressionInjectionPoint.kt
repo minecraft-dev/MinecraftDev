@@ -56,7 +56,7 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.parentOfType
 import com.llamalad7.mixinextras.expression.impl.ExpressionParserFacade
 import com.llamalad7.mixinextras.expression.impl.ast.expressions.Expression
 import com.llamalad7.mixinextras.expression.impl.flow.FlowInterpreter
@@ -296,11 +296,11 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                 insns.iterator().forEachRemaining { insn ->
                     val genericDecorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
                     val injectorSpecificDecorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
-                    val captured = mutableListOf<AbstractInsnNode>()
+                    val captured = mutableListOf<Pair<AbstractInsnNode, Int>>()
 
                     val sink = object : Expression.OutputSink {
-                        override fun capture(node: FlowValue) {
-                            captured += node.insn
+                        override fun capture(node: FlowValue, expr: Expression?) {
+                            captured += node.insn to (expr?.src?.startIndex ?: 0)
                         }
 
                         override fun decorate(insn: AbstractInsnNode, key: String, value: Any?) {
@@ -315,12 +315,11 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                     val flow = flows[insn] ?: return@forEachRemaining
                     try {
                         if (expr.matches(flow, ExpressionContext(pool, sink, targetClass, methodNode))) {
-                            // TODO: for now we're assuming there's only one capture in the ME expression.
-                            val capturedExpr =
-                                PsiTreeUtil.findChildOfType(psiExpr, MECapturingExpression::class.java, false)
-                                    ?.expression ?: psiExpr
-
-                            for (capturedInsn in captured) {
+                            for ((capturedInsn, startOffset) in captured) {
+                                val capturedExpr = psiExpr.findElementAt(startOffset)
+                                    ?.parentOfType<MECapturingExpression>(withSelf = true)
+                                    ?.expression
+                                    ?: psiExpr
                                 result.putIfAbsent(capturedInsn, capturedExpr)
                             }
                         }
