@@ -31,11 +31,19 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.util.PsiUtil
+import com.siyeh.ig.psiutils.ExpressionUtils
 
 abstract class MEMemberAccessExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         if (java !is PsiReferenceExpression) {
             return false
+        }
+
+        val arrayFromLength = ExpressionUtils.getArrayFromLengthExpression(java)
+        if (arrayFromLength != null) {
+            if (memberName.isWildcard || memberName.text == "length") {
+                return true
+            }
         }
 
         val resolved = java.resolve() as? PsiField ?: return false

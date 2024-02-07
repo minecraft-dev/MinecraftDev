@@ -34,6 +34,16 @@ class MESourceMatchContext(val project: Project) {
     private val targetedElements = mutableMapOf<String, MutableList<PsiElement>>()
     private val localInfos = mutableMapOf<String, MutableList<LocalInfo>>()
 
+    init {
+        addType("byte", "B")
+        addType("char", "C")
+        addType("double", "D")
+        addType("float", "F")
+        addType("int", "I")
+        addType("long", "J")
+        addType("short", "S")
+    }
+
     fun addCapture(capturedElement: PsiElement) {
         val element = realElement ?: capturedElement
         capturesInternal += element
