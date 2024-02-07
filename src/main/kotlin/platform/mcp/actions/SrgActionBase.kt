@@ -37,6 +37,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiReference
+import com.intellij.psi.util.createSmartPointer
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 import java.awt.Point
@@ -88,9 +89,10 @@ abstract class SrgActionBase : AnAction() {
 
             val project = e.project ?: return
 
+            val elementPointer = getDataFromActionEvent(e)?.element?.createSmartPointer()
+            val editor = getDataFromActionEvent(e)?.editor
             invokeLater {
-                val element = getDataFromActionEvent(e)?.element
-                val editor = getDataFromActionEvent(e)?.editor
+                val element = elementPointer?.element
                 if (element != null && editor != null) {
                     val pos = editor.offsetToVisualPosition(element.textRange.endOffset - element.textLength / 2)
                     val at = RelativePoint(
