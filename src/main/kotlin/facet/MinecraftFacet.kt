@@ -27,7 +27,6 @@ import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.filterNotNull
-import com.demonwav.mcdev.util.invokeAndWait
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.google.common.collect.HashMultimap
 import com.intellij.facet.Facet
@@ -36,6 +35,7 @@ import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.application.runWriteActionAndWait
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleGrouper
@@ -77,9 +77,9 @@ class MinecraftFacet(
         roots.clear()
     }
 
-    fun refresh() {
+    fun refresh() = runWriteActionAndWait {
         if (module.isDisposed) {
-            return
+            return@runWriteActionAndWait
         }
 
         // Don't allow parent types with child types in auto detected set
@@ -122,9 +122,9 @@ class MinecraftFacet(
         ProjectView.getInstance(module.project).refresh()
     }
 
-    private fun updateRoots() = invokeAndWait {
+    private fun updateRoots() = runWriteAction {
         if (module.isDisposed) {
-            return@invokeAndWait
+            return@runWriteAction
         }
 
         roots.clear()

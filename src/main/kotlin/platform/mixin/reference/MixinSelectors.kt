@@ -240,6 +240,11 @@ class MixinMemberParser : MixinSelectorParser {
                 }
 
                 owner = internalOwner.replace('/', '.')
+
+                // if owner is all there is to the selector, match anything with the owner
+                if (pos == reference.length - 1) {
+                    return MemberReference("", null, owner, matchAllNames = true, matchAllDescs = true)
+                }
             } else {
                 // No owner/qualifier specified
                 pos = -1

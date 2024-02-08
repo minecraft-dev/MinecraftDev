@@ -26,7 +26,6 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.demonwav.mcdev.creator.step.TemplateOutdatedStep
-import com.demonwav.mcdev.platform.MinecraftModuleType
 import com.intellij.ide.projectWizard.ProjectSettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardBuilder
@@ -37,9 +36,9 @@ import com.intellij.openapi.roots.ModifiableRootModel
 
 class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
 
-    override fun getPresentableName() = MinecraftModuleType.NAME
+    override fun getPresentableName() = "Minecraft"
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
-    override fun getGroupName() = MinecraftModuleType.NAME
+    override fun getGroupName() = "Minecraft"
     override fun getBuilderId() = "MINECRAFT_MODULE"
     override fun getDescription() = MCDevBundle("creator.ui.create_minecraft_project")
 
@@ -51,7 +50,7 @@ class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
         }
     }
 
-    override fun getParentGroup() = MinecraftModuleType.NAME
+    override fun getParentGroup() = "Minecraft"
 
     override fun createStep(context: WizardContext) = RootNewProjectWizardStep(context)
         .nextStep(::NewProjectWizardBaseStep)
