@@ -287,6 +287,7 @@ license {
     style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
 
     val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
+    exclude("META-INF/plugin.xml") // https://youtrack.jetbrains.com/issue/IDEA-345026
     include(endings.map { "**/*.$it" })
 
     exclude("com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java")

@@ -219,11 +219,30 @@ class NewInsnSelectorParser : MixinSelectorParser {
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        return NewInsnSelector(value)
+        val strippedValue = value.replace(" ", "")
+        return if (strippedValue.startsWith('(')) {
+            NewInsnDescriptorSelector(strippedValue)
+        } else {
+            NewInsnTypeSelector(strippedValue)
+        }
     }
 }
 
-private class NewInsnSelector(
+private class NewInsnTypeSelector(
+    override val owner: String,
+) : MixinSelector {
+    override fun matchField(owner: String, name: String, desc: String) = false
+
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        return name == "<init>" && owner == this.owner
+    }
+
+    override val fieldDescriptor = null
+    override val methodDescriptor = null
+    override val displayName = owner
+}
+
+private class NewInsnDescriptorSelector(
     override val methodDescriptor: String,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean = false

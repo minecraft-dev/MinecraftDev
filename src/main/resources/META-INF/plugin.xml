@@ -15,7 +15,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see https://www.gnu.org/licenses/.
 -->
 
 <idea-plugin require-restart="true">
@@ -81,7 +81,7 @@
         <extensionPoint name="injectionPoint" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint"/>
         </extensionPoint>
-        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" />
+        <extensionPoint name="injectionPointAnnotation" beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointAnnotation" dynamic="true" />
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
@@ -181,11 +181,11 @@
         <!--region NO PLATFORM-->
         <!---->
 
-        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
@@ -266,6 +266,7 @@
         <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <annotator language="JSON" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <intentionAction>
+            <language>JAVA</language>
             <className>com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
@@ -354,7 +355,7 @@
         <!--endregion-->
 
         <!--region NEOFORGE-->
-        <dependencySupport coordinate="net.neoforge:neoforge" kind="java"/>
+        <dependencySupport coordinate="net.neoforged:neoforge" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.neoforge.NeoForgeFileIconProvider"/>
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.neoforge.insight.NeoForgeImplicitUsageProvider" />

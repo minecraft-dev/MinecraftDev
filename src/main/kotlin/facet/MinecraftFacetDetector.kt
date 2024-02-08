@@ -50,12 +50,16 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.Key
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.intellij.platform.util.progress.forEachWithProgress
+import com.intellij.util.concurrency.NonUrgentExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
 class MinecraftFacetDetector : ProjectActivity {
@@ -69,15 +73,13 @@ class MinecraftFacetDetector : ProjectActivity {
 
     override suspend fun execute(project: Project) {
         val detectorService = project.service<FacetDetectorScopeProvider>()
-        detectorService.currentJob?.cancelAndJoin()
-        withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
-            detectorService.currentJob = coroutineContext.job
-            MinecraftModuleRootListener.doCheck(project)
-        }
+        MinecraftModuleRootListener.doCheckUnderProgress(project, detectorService)
     }
 
     @Service(Service.Level.PROJECT)
     private class FacetDetectorScopeProvider(val scope: CoroutineScope) {
+        val dispatcher = NonUrgentExecutor.getInstance().asCoroutineDispatcher()
+        val lock = Mutex()
         var currentJob: Job? = null
     }
 
@@ -89,12 +91,18 @@ class MinecraftFacetDetector : ProjectActivity {
 
             val project = event.source as? Project ?: return
             val detectorService = project.service<FacetDetectorScopeProvider>()
-            detectorService.scope.launch {
-                detectorService.currentJob?.cancelAndJoin()
-                withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+            detectorService.scope.launch(detectorService.dispatcher) {
+                doCheckUnderProgress(project, detectorService)
+            }
+        }
+
+        suspend fun doCheckUnderProgress(project: Project, detectorService: FacetDetectorScopeProvider) {
+            withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+                detectorService.lock.withLock {
+                    detectorService.currentJob?.cancelAndJoin()
                     detectorService.currentJob = coroutineContext.job
-                    doCheck(project)
                 }
+                doCheck(project)
             }
         }
 
