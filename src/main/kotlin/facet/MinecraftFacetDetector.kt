@@ -41,11 +41,11 @@ import com.intellij.openapi.roots.libraries.LibraryDetectionManager
 import com.intellij.openapi.roots.libraries.LibraryKind
 import com.intellij.openapi.roots.libraries.LibraryProperties
 import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.Key
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
-class MinecraftFacetDetector : StartupActivity {
+class MinecraftFacetDetector : ProjectActivity {
     companion object {
         private val libraryVersionsKey = Key<MutableMap<LibraryKind, String>>("mcdev.libraryVersions")
 
@@ -54,7 +54,7 @@ class MinecraftFacetDetector : StartupActivity {
         }
     }
 
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         MinecraftModuleRootListener.doCheck(project)
     }
 
