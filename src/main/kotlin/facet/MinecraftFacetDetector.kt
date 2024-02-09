@@ -27,10 +27,12 @@ import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModel
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.ifEmpty
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.framework.library.LibraryVersionProperties
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -88,7 +90,9 @@ class MinecraftFacetDetector : ProjectActivity {
             }
 
             if (needsReimport) {
-                ProjectReimporter.reimport(project)
+                runInEdt {
+                    ProjectReimporter.reimport(project)
+                }
             }
         }
 
