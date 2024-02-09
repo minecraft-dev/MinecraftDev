@@ -34,7 +34,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.17.0"
+    id("org.jetbrains.intellij") version "1.17.1"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
