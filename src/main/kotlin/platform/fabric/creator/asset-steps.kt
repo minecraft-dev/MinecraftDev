@@ -76,7 +76,7 @@ class FabricBaseFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
 
         assets.addTemplateProperties(
             "MAIN_PACKAGE" to packageName,
-            "CLIENT_PACKAGE" to "${packageName}.client",
+            "CLIENT_PACKAGE" to "$packageName.client",
             "MAIN_CLASS_NAME" to mainClassName,
             "CLIENT_CLASS_NAME" to clientClassName,
             "MAIN_CLASS" to mainClass,
@@ -126,7 +126,8 @@ class FabricBaseFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
             GeneratorEmptyDirectory("src/main/resources"),
         )
 
-        assets.addTemplates(project,
+        assets.addTemplates(
+            project,
             "src/main/java/${mainClass.replace(".", "/")}.java" to FABRIC_MOD_CLASS_TEMPLATE,
             "src/main/java/${clientClass.replace(".", "/")}.java" to FABRIC_MOD_CLIENT_CLASS_TEMPLATE,
             "src/main/resources/fabric.mod.json" to FABRIC_MOD_JSON_TEMPLATE
@@ -140,7 +141,6 @@ class FabricBaseFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
 
             dir.findOrCreateChildData(this, MAGIC_DEFERRED_INIT_FILE)
         }
-
     }
 }
 
