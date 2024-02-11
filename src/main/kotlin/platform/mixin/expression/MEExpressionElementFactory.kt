@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpre
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
@@ -48,6 +49,11 @@ class MEExpressionElementFactory(private val project: Project) {
     fun createExpression(text: String): MEExpression {
         return (createStatement(text) as? MEExpressionStatement)?.expression
             ?: throw IncorrectOperationException("'$text' is not an expression")
+    }
+
+    fun createName(text: String): MEName {
+        return (createExpression(text) as? MENameExpression)?.meName
+            ?: throw IncorrectOperationException("'$text' is not a name")
     }
 
     fun createType(text: String): METype {

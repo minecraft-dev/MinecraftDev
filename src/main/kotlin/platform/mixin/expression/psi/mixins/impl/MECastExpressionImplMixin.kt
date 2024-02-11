@@ -24,9 +24,9 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEParenthesizedExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.psi.MEPsiUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MECastExpressionMixin
-import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEPsiUtil
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInstanceOfExpression

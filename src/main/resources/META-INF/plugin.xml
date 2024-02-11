@@ -497,6 +497,12 @@
                            implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionBraceMatcher"/>
         <lang.quoteHandler language="MEExpression"
                            implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionQuoteHandler"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName"
+                                 implementationClass="com.demonwav.mcdev.platform.mixin.expression.MENameElementManipulator"/>
+        <usageTargetProvider implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionUsageTargetProvider"/>
+        <lang.findUsagesProvider language="JAVA"
+                                 implementationClass="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionFindUsagesProvider"/>
+        <referencesSearch implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionReferencesSearcher"/>
         <!--endregion-->
 
         <!--endregion-->

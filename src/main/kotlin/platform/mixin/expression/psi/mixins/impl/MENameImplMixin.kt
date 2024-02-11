@@ -22,12 +22,15 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENameMixin
+import com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionReference
 import com.demonwav.mcdev.platform.mixin.util.LocalVariables
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiVariable
 import com.intellij.psi.util.PsiUtil
@@ -71,5 +74,12 @@ abstract class MENameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), MENa
         }
 
         return false
+    }
+
+    override fun getReference(): PsiReference? {
+        if (isWildcard) {
+            return null
+        }
+        return MEDefinitionReference(this as MEName)
     }
 }

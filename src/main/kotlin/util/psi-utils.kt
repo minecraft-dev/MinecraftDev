@@ -36,6 +36,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiElement
@@ -51,6 +52,7 @@ import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifier.ModifierConstant
 import com.intellij.psi.PsiModifierList
+import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiReference
@@ -81,6 +83,10 @@ fun PsiElement.findContainingMember(): PsiMember? = findParent(resolveReferences
 fun PsiElement.findContainingMethod(): PsiMethod? = findParent(resolveReferences = false) { it is PsiClass }
 
 fun PsiElement.findContainingModifierList(): PsiModifierList? = findParent(resolveReferences = false) { it is PsiClass }
+
+fun PsiElement.findContainingNameValuePair(): PsiNameValuePair? = findParent(resolveReferences = false) {
+    it is PsiClass || it is PsiMethod || it is PsiAnnotation
+}
 
 private val PsiElement.ancestors: Sequence<PsiElement>
     get() = generateSequence(this) { if (it is PsiFile) null else it.parent }
