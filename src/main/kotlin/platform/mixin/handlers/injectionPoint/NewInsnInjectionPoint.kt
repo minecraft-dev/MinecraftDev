@@ -20,8 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
 import com.demonwav.mcdev.platform.mixin.util.findMethod
@@ -32,18 +34,22 @@ import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.shortName
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.ArrayUtilRt
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -52,6 +58,32 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.TypeInsnNode
 
 class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        completeExtraStringAtAttribute(editor, reference, "target")
+    }
+
+    override fun getArgsKeys(at: PsiAnnotation) = ARGS_KEYS
+
+    override fun getArgsValues(at: PsiAnnotation, key: String): Array<Any> {
+        if (key != "class") {
+            return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+        }
+
+        val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+        val handler = injectorAnnotation.qualifiedName
+            ?.let { MixinAnnotationHandler.forMixinAnnotation(it, at.project) }
+            ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+
+        return handler.resolveTarget(injectorAnnotation).asSequence()
+            .filterIsInstance<MethodTargetMember>()
+            .flatMap { target ->
+                target.classAndMethod.method.instructions?.asSequence()?.mapNotNull { insn ->
+                    (insn as? TypeInsnNode)?.desc?.takeIf { insn.opcode == Opcodes.NEW }
+                } ?: emptySequence()
+            }
+            .toTypedArray()
+    }
+
     private fun getTarget(at: PsiAnnotation, target: MixinSelector?): MixinSelector? {
         if (target != null) {
             return target
@@ -151,6 +183,8 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
     }
 
     companion object {
+        private val ARGS_KEYS = arrayOf("class")
+
         fun findInitCall(newInsn: TypeInsnNode): MethodInsnNode? {
             var newInsns = 0
             var insn: AbstractInsnNode? = newInsn
@@ -185,11 +219,30 @@ class NewInsnSelectorParser : MixinSelectorParser {
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        return NewInsnSelector(value)
+        val strippedValue = value.replace(" ", "")
+        return if (strippedValue.startsWith('(')) {
+            NewInsnDescriptorSelector(strippedValue)
+        } else {
+            NewInsnTypeSelector(strippedValue)
+        }
     }
 }
 
-private class NewInsnSelector(
+private class NewInsnTypeSelector(
+    override val owner: String,
+) : MixinSelector {
+    override fun matchField(owner: String, name: String, desc: String) = false
+
+    override fun matchMethod(owner: String, name: String, desc: String): Boolean {
+        return name == "<init>" && owner == this.owner
+    }
+
+    override val fieldDescriptor = null
+    override val methodDescriptor = null
+    override val displayName = owner
+}
+
+private class NewInsnDescriptorSelector(
     override val methodDescriptor: String,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean = false

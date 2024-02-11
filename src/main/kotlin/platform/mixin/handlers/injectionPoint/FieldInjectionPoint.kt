@@ -29,15 +29,18 @@ import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.util.PsiUtil
+import com.intellij.util.ArrayUtilRt
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -48,7 +51,18 @@ import org.objectweb.asm.tree.MethodNode
 class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
     companion object {
         private val VALID_OPCODES = setOf(Opcodes.GETFIELD, Opcodes.GETSTATIC, Opcodes.PUTFIELD, Opcodes.PUTSTATIC)
+        private val ARGS_KEYS = arrayOf("array")
+        private val ARRAY_VALUES = arrayOf<Any>("length", "get", "set")
     }
+
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        completeExtraStringAtAttribute(editor, reference, "target")
+    }
+
+    override fun getArgsKeys(at: PsiAnnotation) = ARGS_KEYS
+
+    override fun getArgsValues(at: PsiAnnotation, key: String): Array<Any> =
+        ARRAY_VALUES.takeIf { key == "array" } ?: ArrayUtilRt.EMPTY_OBJECT_ARRAY
 
     private fun getArrayAccessType(args: Map<String, String>): ArrayAccessType? {
         return when (args["array"]) {

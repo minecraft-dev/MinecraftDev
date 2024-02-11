@@ -1,0 +1,28 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+#parse("File Header.java")
+
+import net.minecraft.network.FriendlyByteBuf;
+import net.neoforged.neoforge.network.NetworkEvent;
+import java.util.function.Supplier;
+
+public class ${NAME} {
+
+    public ${NAME}() {
+
+    }
+
+    public ${NAME}(FriendlyByteBuf buf) {
+
+    }
+
+    public void toBytes(FriendlyByteBuf buf) {
+
+    }
+
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+
+        });
+        ctx.get().setPacketHandled(true);
+    }
+}
