@@ -317,6 +317,7 @@ license {
 
 ktlint {
     disabledRules.add("filename")
+    disabledRules.add("no-wildcard-imports")
 }
 tasks.withType<BaseKtLintCheckTask>().configureEach {
     workerMaxHeapSize.set("512m")

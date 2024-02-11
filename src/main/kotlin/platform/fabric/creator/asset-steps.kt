@@ -97,7 +97,7 @@ class FabricBaseFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
         }
 
         if (authors.isNotEmpty()) {
-            assets.addTemplateProperties("AUTHOR_LIST" to authors.map { s -> "\u0022${s}\u0022" }.joinToString(","))
+            assets.addTemplateProperties("AUTHOR_LIST" to authors.joinToString(",") { s -> "\u0022${s}\u0022" })
         }
 
         if (website.isNotBlank()) {
