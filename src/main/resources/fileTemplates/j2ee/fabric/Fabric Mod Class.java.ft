@@ -1,0 +1,12 @@
+package ${MAIN_PACKAGE};
+
+import net.fabricmc.api.ModInitializer;
+
+public class ${MAIN_CLASS_NAME} implements ModInitializer {
+
+    @Override
+    public void onInitialize() {
+
+    }
+
+}

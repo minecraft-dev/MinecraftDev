@@ -1,0 +1,12 @@
+package ${CLIENT_PACKAGE};
+
+import net.fabricmc.api.ClientModInitializer;
+
+public class ${CLIENT_CLASS_NAME} implements ClientModInitializer {
+
+    @Override
+    public void onInitializeClient() {
+
+    }
+
+}

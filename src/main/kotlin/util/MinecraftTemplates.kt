@@ -97,10 +97,10 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricGroup ->
             group.addTemplate(fabricGroup)
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_CLASS_TEMPLATE))
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_CLIENT_CLASS_TEMPLATE))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_BUILD_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
-            fabricGroup.addTemplate(
-                FileTemplateDescriptor(FABRIC_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON),
-            )
+            fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_GRADLE_PROPERTIES_TEMPLATE, PlatformAssets.FABRIC_ICON),)
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MIXINS_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_MOD_JSON_TEMPLATE, PlatformAssets.FABRIC_ICON))
             fabricGroup.addTemplate(FileTemplateDescriptor(FABRIC_SETTINGS_GRADLE_TEMPLATE, PlatformAssets.FABRIC_ICON))
@@ -221,6 +221,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val MODS_TOML_TEMPLATE = "mods.toml"
         const val PACK_MCMETA_TEMPLATE = "pack.mcmeta"
 
+        const val FABRIC_MOD_CLASS_TEMPLATE = "Fabric Mod Class.java"
+        const val FABRIC_MOD_CLIENT_CLASS_TEMPLATE = "Fabric Mod Client Class.java"
         const val FABRIC_BUILD_GRADLE_TEMPLATE = "fabric_build.gradle"
         const val FABRIC_GRADLE_PROPERTIES_TEMPLATE = "fabric_gradle.properties"
         const val FABRIC_MIXINS_JSON_TEMPLATE = "fabric_mixins.json"
