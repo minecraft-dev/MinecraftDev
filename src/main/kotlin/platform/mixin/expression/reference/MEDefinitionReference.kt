@@ -21,26 +21,18 @@
 package com.demonwav.mcdev.platform.mixin.expression.reference
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.util.constantStringValue
-import com.intellij.lang.injection.InjectedLanguageManager
+import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.parentOfType
 
 class MEDefinitionReference(name: MEName) : PsiReferenceBase<MEName>(name) {
     override fun resolve(): PsiElement? {
-        val injectionHost = InjectedLanguageManager.getInstance(element.project).getInjectionHost(element)
-            ?: return null
-        val modifierList = injectionHost.parentOfType<PsiModifierList>() ?: return null
-        for (annotation in modifierList.annotations) {
-            if (!annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
-                continue
-            }
-            val definitionId = annotation.findDeclaredAttributeValue("id") ?: return null
-            if (definitionId.constantStringValue == element.text) {
-                return definitionId
+        val file = element.parentOfType<MEExpressionFile>() ?: return null
+        val name = element.text
+        for (declaration in file.declarations) {
+            if (declaration.name == name) {
+                return declaration
             }
         }
 

@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
@@ -29,6 +30,7 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.util.IncorrectOperationException
 
@@ -41,8 +43,13 @@ class MEExpressionElementFactory(private val project: Project) {
         ) as MEExpressionFile
     }
 
+    fun createDeclaration(name: String): MEDeclaration {
+        return createFile("class $name").declarations.firstOrNull()
+            ?: throw IncorrectOperationException("'$name' is not a declaration")
+    }
+
     fun createStatement(text: String): MEStatement {
-        return createFile(text).statement
+        return createFile("do {$text}").statement
             ?: throw IncorrectOperationException("'$text' is not a statement")
     }
 
@@ -54,6 +61,11 @@ class MEExpressionElementFactory(private val project: Project) {
     fun createName(text: String): MEName {
         return (createExpression(text) as? MENameExpression)?.meName
             ?: throw IncorrectOperationException("'$text' is not a name")
+    }
+
+    fun createIdentifier(text: String): PsiElement {
+        return createName(text).identifierElement
+            ?: throw IncorrectOperationException("'$text' is not an identifier")
     }
 
     fun createType(text: String): METype {

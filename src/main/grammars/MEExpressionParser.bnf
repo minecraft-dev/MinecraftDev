@@ -39,7 +39,24 @@
     extends(".+Statement") = statement
 }
 
-meExpressionFile ::= statement <<eof>>
+meExpressionFile ::= item* <<eof>>
+
+item ::= declaration | statementItem
+
+declaration ::= TOKEN_CLASS TOKEN_IDENTIFIER {
+    pin = 1
+    extends = item
+    implements = [
+        "com.intellij.psi.PsiNamedElement"
+        "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEDeclarationMixin"
+    ]
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEDeclarationImplMixin"
+}
+
+statementItem ::= TOKEN_DO TOKEN_LEFT_BRACE statement TOKEN_RIGHT_BRACE {
+    pin = 1
+    extends = item
+}
 
 statement ::= assignStatement |
     returnStatement |

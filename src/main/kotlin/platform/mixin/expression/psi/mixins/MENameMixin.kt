@@ -25,6 +25,7 @@ import com.intellij.psi.PsiElement
 
 interface MENameMixin : PsiElement {
     val isWildcard: Boolean
+    val identifierElement: PsiElement?
 
     fun matchesJavaExpr(javaExpr: PsiElement, context: MESourceMatchContext): Boolean
 }

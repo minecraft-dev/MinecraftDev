@@ -37,6 +37,7 @@ import com.intellij.psi.util.PsiUtil
 
 abstract class MENameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), MENameMixin {
     override val isWildcard get() = node.firstChildNode.elementType == MEExpressionTypes.TOKEN_WILDCARD
+    override val identifierElement get() = if (isWildcard) null else firstChild
 
     override fun matchesJavaExpr(javaExpr: PsiElement, context: MESourceMatchContext): Boolean {
         if (isWildcard) {

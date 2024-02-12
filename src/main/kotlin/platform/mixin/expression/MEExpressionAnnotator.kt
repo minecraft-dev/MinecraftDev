@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.expression
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArrayAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEBinaryExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEInstantiationExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MELitExpression
@@ -35,14 +36,37 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallEx
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MESuperCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.lang.injection.InjectedLanguageManager
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.parentOfType
 
 class MEExpressionAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         when (element) {
+            is MEDeclaration -> {
+                val injectionHost = InjectedLanguageManager.getInstance(element.project).getInjectionHost(element)
+                    ?: return
+                val declarationAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return
+                if (!declarationAnnotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
+                    return
+                }
+                if (declarationAnnotation.findDeclaredAttributeValue("type") != null) {
+                    holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                        .range(element)
+                        .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_TYPE_DECLARATION)
+                        .create()
+                } else {
+                    holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                        .range(element)
+                        .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_DECLARATION)
+                        .create()
+                }
+            }
             is MEName -> {
                 if (!element.isWildcard) {
                     when (val parent = element.parent) {

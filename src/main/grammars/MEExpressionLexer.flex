@@ -37,12 +37,13 @@ import com.intellij.psi.TokenType;
 %eof}
 
 WHITE_SPACE=[\ \n\t\r]
-RESERVED=assert|break|case|catch|const|continue|default|do|else|finally|for|goto|if|switch|synchronized|try|while|yield|_
+RESERVED=assert|break|case|catch|const|continue|default|else|finally|for|goto|if|switch|synchronized|try|while|yield|_
 WILDCARD="?"
 NEW=new
 INSTANCEOF=instanceof
 BOOL_LIT=true|false
 NULL_LIT=null
+DO=do
 RETURN=return
 THROW=throw
 THIS=this
@@ -94,6 +95,7 @@ STRING_ESCAPE=\\'|\\\\
 <YYINITIAL> {INSTANCEOF} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_INSTANCEOF; }
 <YYINITIAL> {BOOL_LIT} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_BOOL_LIT; }
 <YYINITIAL> {NULL_LIT} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_NULL_LIT; }
+<YYINITIAL> {DO} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_DO; }
 <YYINITIAL> {RETURN} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_RETURN; }
 <YYINITIAL> {THROW} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_THROW; }
 <YYINITIAL> {THIS} { yybegin(YYINITIAL); return MEExpressionTypes.TOKEN_THIS; }

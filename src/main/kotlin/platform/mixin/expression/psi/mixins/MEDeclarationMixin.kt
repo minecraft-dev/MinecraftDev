@@ -18,19 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.reference
+package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
-import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
 
-class MEDefinitionFindUsagesProvider : FindUsagesProvider {
-    override fun canFindUsagesFor(element: PsiElement) = MEReferenceUtil.isDefinitionId(element)
-
-    override fun getHelpId(psiElement: PsiElement): String? = null
-
-    override fun getType(element: PsiElement) = "definition id"
-
-    override fun getDescriptiveName(element: PsiElement) = "Definition ID"
-
-    override fun getNodeText(element: PsiElement, useFullName: Boolean): String = element.text
+interface MEDeclarationMixin : PsiElement {
+    val nameIdentifier: PsiElement?
 }

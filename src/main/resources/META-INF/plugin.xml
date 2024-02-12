@@ -28,7 +28,6 @@
     <depends>com.intellij.properties</depends>
     <depends>ByteCodeViewer</depends>
     <depends optional="true" config-file="toml-support.xml">org.toml.lang</depends>
-    <depends optional="true" config-file="mcdev-intellilang.xml">org.intellij.intelliLang</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
@@ -499,10 +498,11 @@
                            implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionQuoteHandler"/>
         <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName"
                                  implementationClass="com.demonwav.mcdev.platform.mixin.expression.MENameElementManipulator"/>
-        <usageTargetProvider implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionUsageTargetProvider"/>
-        <lang.findUsagesProvider language="JAVA"
-                                 implementationClass="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionFindUsagesProvider"/>
-        <referencesSearch implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionReferencesSearcher"/>
+<!--        <usageTargetProvider implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionUsageTargetProvider"/>-->
+<!--        <lang.findUsagesProvider language="JAVA"-->
+<!--                                 implementationClass="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionFindUsagesProvider"/>-->
+<!--        <referencesSearch implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionReferencesSearcher"/>-->
+        <multiHostInjector implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionInjector"/>
         <!--endregion-->
 
         <!--endregion-->

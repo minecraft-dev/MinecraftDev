@@ -36,6 +36,7 @@ object MEExpressionTokenSets {
     val KEYWORDS = TokenSet.create(
         MEExpressionTypes.TOKEN_BOOL_LIT,
         MEExpressionTypes.TOKEN_NULL_LIT,
+        MEExpressionTypes.TOKEN_DO,
         MEExpressionTypes.TOKEN_INSTANCEOF,
         MEExpressionTypes.TOKEN_NEW,
         MEExpressionTypes.TOKEN_RETURN,
