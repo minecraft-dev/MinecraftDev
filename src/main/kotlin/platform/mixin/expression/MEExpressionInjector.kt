@@ -71,7 +71,10 @@ class MEExpressionInjector : MultiHostInjector {
         val modCount = PsiModificationTracker.getInstance(project).modificationCount
         val primaryElement = PrimaryElement(modCount, context)
         val existingElement = (anchor as UserDataHolderEx).putUserDataIfAbsent(PRIMARY_ELEMENT_KEY, primaryElement)
-        if (existingElement !== primaryElement && existingElement.modCount == modCount && context != existingElement.element) {
+        if (existingElement !== primaryElement &&
+            existingElement.modCount == modCount &&
+            context != existingElement.element
+        ) {
             return
         }
 

@@ -43,4 +43,8 @@ abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), MEDecla
 
     override val nameIdentifier: PsiElement?
         get() = node.findChildByType(MEExpressionTypes.TOKEN_IDENTIFIER)?.psi
+
+    override fun getNavigationElement() = nameIdentifier ?: this
+
+    override fun getTextOffset() = nameIdentifier?.textOffset ?: super.getTextOffset()
 }

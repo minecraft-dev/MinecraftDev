@@ -98,7 +98,9 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
                 MEExpressionSyntaxHighlighter.IDENTIFIER_VARIABLE
             ),
             AttributesDescriptor(
-                MCDevBundle.pointer("mixinextras.expression.lang.highlighting.type_declaration_identifier.display_name"),
+                MCDevBundle.pointer(
+                    "mixinextras.expression.lang.highlighting.type_declaration_identifier.display_name"
+                ),
                 MEExpressionSyntaxHighlighter.IDENTIFIER_TYPE_DECLARATION
             ),
             AttributesDescriptor(

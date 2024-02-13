@@ -49,7 +49,11 @@ class MEExpressionAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         when (element) {
             is MEDeclaration -> {
-                val injectionHost = InjectedLanguageManager.getInstance(element.project).getInjectionHost(element)
+                val nameIdentifier = element.nameIdentifier ?: return
+                val injectManager = InjectedLanguageManager.getInstance(element.project)
+                val hostFile = injectManager.getInjectionHost(element)?.containingFile ?: return
+                val injectionHost = hostFile
+                    .findElementAt(injectManager.injectedToHost(element, nameIdentifier.textOffset, false))
                     ?: return
                 val declarationAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return
                 if (!declarationAnnotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
