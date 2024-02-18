@@ -113,7 +113,6 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     }
                 }
                 "clientSideOnly" -> {
-                    val value = keyValue.value ?: return
                     val forgeVersion = runCatching {
                         keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
                     }.getOrNull()
