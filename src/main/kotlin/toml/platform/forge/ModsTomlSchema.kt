@@ -48,8 +48,7 @@ license="All rights reserved"
 showAsResourcePack=false
 # A URL to refer people to when problems occur with this mod.
 issueTrackerURL="http://my.issue.tracker/"
-# If your mod is purely client-side and has no multiplayer functionality (be it dedicated servers or Open to LAN),
-# set this to true, and Forge will set the correct displayTest for you and skip loading your mod on dedicated servers.
+# If your mod is purely client-side and has no multiplayer functionality (be it dedicated servers or Open to LAN), set this to true, and Forge will set the correct displayTest for you and skip loading your mod on dedicated servers.
 clientSideOnly=false
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]]
