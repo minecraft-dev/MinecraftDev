@@ -176,6 +176,10 @@ class ForgeRunConfigDataService : AbstractProjectDataService<ProjectData, Projec
             }
         }
 
+        if (project.isDisposed) {
+            return
+        }
+
         project.guessProjectDir()?.let { dir ->
             LocalFileSystem.getInstance().refreshFiles(listOf(dir), true, true, null)
         }
