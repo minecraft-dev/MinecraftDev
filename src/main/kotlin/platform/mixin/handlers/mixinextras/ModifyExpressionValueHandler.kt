@@ -21,9 +21,12 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
+import com.llamalad7.mixinextras.utils.Decorations
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -31,7 +34,8 @@ import org.objectweb.asm.tree.MethodNode
 
 class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
     override val supportedInstructionTypes = listOf(
-        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.INSTANTIATION, InstructionType.CONSTANT
+        InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.INSTANTIATION, InstructionType.CONSTANT,
+        InstructionType.SIMPLE_EXPRESSION
     )
 
     override fun extraTargetRestrictions(insn: AbstractInsnNode): Boolean {
@@ -43,9 +47,23 @@ class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        insn: AbstractInsnNode
+        target: TargetInsn
     ): Pair<ParameterGroup, PsiType>? {
-        val psiType = getPsiReturnType(insn, annotation) ?: return null
+        val psiType = getReturnType(target, annotation) ?: return null
         return ParameterGroup(listOf(Parameter("original", psiType))) to psiType
+    }
+
+    private fun getReturnType(
+        target: TargetInsn,
+        annotation: PsiAnnotation
+    ): PsiType? {
+        val psiReturnType = getPsiReturnType(target.insn, annotation)
+        val rawReturnType = getInsnReturnType(target.insn)
+        val exprType = target.getDecoration<Type>(Decorations.SIMPLE_EXPRESSION_TYPE)
+        if (exprType != null && rawReturnType != exprType) {
+            // The expression knows more than the standard logic does.
+            return exprType.toPsiType(JavaPsiFacade.getElementFactory(annotation.project))
+        }
+        return psiReturnType
     }
 }

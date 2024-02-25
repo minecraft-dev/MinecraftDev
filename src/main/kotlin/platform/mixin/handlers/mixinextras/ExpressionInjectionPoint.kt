@@ -290,29 +290,29 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                 return
             }
 
-            val result = IdentityHashMap<AbstractInsnNode, PsiElement>()
+            val result = IdentityHashMap<AbstractInsnNode, Pair<PsiElement, Map<String, Any?>>>()
 
             for ((expr, psiExpr) in expressions) {
-                insns.iterator().forEachRemaining { insn ->
-                    val genericDecorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
-                    val injectorSpecificDecorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
-                    val captured = mutableListOf<Pair<AbstractInsnNode, Int>>()
-
+                val decorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
+                val captured = mutableListOf<Pair<AbstractInsnNode, Int>>()
+                for (insn in insns) {
                     val sink = object : Expression.OutputSink {
                         override fun capture(node: FlowValue, expr: Expression?) {
                             captured += node.insn to (expr?.src?.startIndex ?: 0)
+                            decorations.getOrPut(insn, ::mutableMapOf).putAll(node.decorations)
                         }
 
                         override fun decorate(insn: AbstractInsnNode, key: String, value: Any?) {
-                            genericDecorations.computeIfAbsent(insn) { mutableMapOf() }[key] = value
+                            decorations.getOrPut(insn, ::mutableMapOf)[key] = value
                         }
 
                         override fun decorateInjectorSpecific(insn: AbstractInsnNode, key: String, value: Any?) {
-                            injectorSpecificDecorations.computeIfAbsent(insn) { mutableMapOf() }[key] = value
+                            // Our maps are per-injector anyway, so this is just a normal decoration.
+                            decorations.getOrPut(insn, ::mutableMapOf)[key] = value
                         }
                     }
 
-                    val flow = flows[insn] ?: return@forEachRemaining
+                    val flow = flows[insn] ?: continue
                     try {
                         if (expr.matches(flow, ExpressionContext(pool, sink, targetClass, methodNode))) {
                             for ((capturedInsn, startOffset) in captured) {
@@ -320,7 +320,7 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                                     ?.parentOfType<MECapturingExpression>(withSelf = true)
                                     ?.expression
                                     ?: psiExpr
-                                result.putIfAbsent(capturedInsn, capturedExpr)
+                                result.putIfAbsent(capturedInsn, capturedExpr to decorations[capturedInsn].orEmpty())
                             }
                         }
                     } catch (e: ProcessCanceledException) {
@@ -335,11 +335,9 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                 return
             }
 
-            insns.iterator().forEachRemaining { insn ->
-                val element = result[insn]
-                if (element != null) {
-                    addResult(insn, element)
-                }
+            for (insn in insns) {
+                val (element, decorations) = result[insn] ?: continue
+                addResult(insn, element, decorations = decorations)
             }
         }
     }

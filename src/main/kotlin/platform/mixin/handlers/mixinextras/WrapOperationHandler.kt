@@ -22,20 +22,22 @@ package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.OPERATION
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
-import org.objectweb.asm.tree.AbstractInsnNode
+import com.llamalad7.mixinextras.utils.Decorations
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
     override val supportedInstructionTypes = listOf(
         InstructionType.METHOD_CALL, InstructionType.FIELD_GET, InstructionType.FIELD_SET, InstructionType.INSTANCEOF,
-        InstructionType.INSTANTIATION
+        InstructionType.INSTANTIATION, InstructionType.SIMPLE_OPERATION
     )
 
     override fun getAtKey(annotation: PsiAnnotation): String {
@@ -46,14 +48,33 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        insn: AbstractInsnNode
+        target: TargetInsn
     ): Pair<ParameterGroup, PsiType>? {
-        val params = getPsiParameters(insn, targetClass, annotation) ?: return null
-        val returnType = getPsiReturnType(insn, annotation) ?: return null
+        val params = getParameterTypes(target, targetClass, annotation) ?: return null
+        val returnType = getReturnType(target, annotation) ?: return null
         val operationType = getOperationType(annotation, returnType) ?: return null
         return ParameterGroup(
             params + Parameter("original", operationType)
         ) to returnType
+    }
+
+    private fun getParameterTypes(
+        target: TargetInsn,
+        targetClass: ClassNode,
+        annotation: PsiAnnotation
+    ): List<Parameter>? {
+        getPsiParameters(target.insn, targetClass, annotation)?.let { return it }
+        val args = target.getDecoration<Array<Type>>(Decorations.SIMPLE_OPERATION_ARGS) ?: return null
+        return args.toList().toParameters(annotation)
+    }
+
+    private fun getReturnType(
+        target: TargetInsn,
+        annotation: PsiAnnotation
+    ): PsiType? {
+        getPsiReturnType(target.insn, annotation)?.let { return it }
+        val type = target.getDecoration<Type>(Decorations.SIMPLE_OPERATION_RETURN_TYPE) ?: return null
+        return type.toPsiType(JavaPsiFacade.getElementFactory(annotation.project))
     }
 
     private fun getOperationType(context: PsiElement, type: PsiType): PsiType? {

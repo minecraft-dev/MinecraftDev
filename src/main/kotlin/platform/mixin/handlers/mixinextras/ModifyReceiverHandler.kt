@@ -44,9 +44,9 @@ class ModifyReceiverHandler : MixinExtrasInjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        insn: AbstractInsnNode
+        target: TargetInsn
     ): Pair<ParameterGroup, PsiType>? {
-        val params = getPsiParameters(insn, targetClass, annotation) ?: return null
+        val params = getPsiParameters(target.insn, targetClass, annotation) ?: return null
         return ParameterGroup(params) to params[0].type
     }
 }

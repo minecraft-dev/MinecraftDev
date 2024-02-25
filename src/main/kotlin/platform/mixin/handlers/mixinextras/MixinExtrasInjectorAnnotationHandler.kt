@@ -35,8 +35,10 @@ import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.toJavaIdentifier
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
+import com.llamalad7.mixinextras.utils.Decorations
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -52,30 +54,38 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
 
     enum class InstructionType {
         METHOD_CALL {
-            override fun matches(insn: AbstractInsnNode) = insn is MethodInsnNode && insn.name != "<init>"
+            override fun matches(target: TargetInsn) = target.insn is MethodInsnNode && target.insn.name != "<init>"
         },
         FIELD_GET {
-            override fun matches(insn: AbstractInsnNode) =
-                insn.opcode == Opcodes.GETFIELD || insn.opcode == Opcodes.GETSTATIC
+            override fun matches(target: TargetInsn) =
+                target.insn.opcode == Opcodes.GETFIELD || target.insn.opcode == Opcodes.GETSTATIC
         },
         FIELD_SET {
-            override fun matches(insn: AbstractInsnNode) =
-                insn.opcode == Opcodes.PUTFIELD || insn.opcode == Opcodes.PUTSTATIC
+            override fun matches(target: TargetInsn) =
+                target.insn.opcode == Opcodes.PUTFIELD || target.insn.opcode == Opcodes.PUTSTATIC
         },
         INSTANTIATION {
-            override fun matches(insn: AbstractInsnNode) = insn.opcode == Opcodes.NEW
+            override fun matches(target: TargetInsn) = target.insn.opcode == Opcodes.NEW
         },
         INSTANCEOF {
-            override fun matches(insn: AbstractInsnNode) = insn.opcode == Opcodes.INSTANCEOF
+            override fun matches(target: TargetInsn) = target.insn.opcode == Opcodes.INSTANCEOF
         },
         CONSTANT {
-            override fun matches(insn: AbstractInsnNode) = isConstant(insn)
+            override fun matches(target: TargetInsn) = isConstant(target.insn)
         },
         RETURN {
-            override fun matches(insn: AbstractInsnNode) = insn.opcode in Opcodes.IRETURN..Opcodes.ARETURN
+            override fun matches(target: TargetInsn) = target.insn.opcode in Opcodes.IRETURN..Opcodes.ARETURN
+        },
+        SIMPLE_OPERATION {
+            override fun matches(target: TargetInsn) =
+                target.hasDecoration(Decorations.SIMPLE_OPERATION_ARGS) &&
+                    target.hasDecoration(Decorations.SIMPLE_OPERATION_RETURN_TYPE)
+        },
+        SIMPLE_EXPRESSION {
+            override fun matches(target: TargetInsn) = target.hasDecoration(Decorations.SIMPLE_EXPRESSION_TYPE)
         };
 
-        abstract fun matches(insn: AbstractInsnNode): Boolean
+        abstract fun matches(target: TargetInsn): Boolean
     }
 
     abstract val supportedInstructionTypes: Collection<InstructionType>
@@ -86,7 +96,7 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-        insn: AbstractInsnNode
+        target: TargetInsn,
     ): Pair<ParameterGroup, PsiType>?
 
     override val allowCoerce = true
@@ -98,9 +108,11 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
     ): List<MethodSignature>? {
         val insns = resolveInstructions(annotation, targetClass, targetMethod)
             .ifEmpty { return emptyList() }
-            .map { it.insn }
+            .map { TargetInsn(it.insn, it.decorations) }
         if (insns.any { insn -> supportedInstructionTypes.none { it.matches(insn) } }) return emptyList()
-        val signatures = insns.map { expectedMethodSignature(annotation, targetClass, targetMethod, it) }
+        val signatures = insns.map { insn ->
+            expectedMethodSignature(annotation, targetClass, targetMethod, insn)
+        }
         val firstMatch = signatures[0] ?: return emptyList()
         if (signatures.drop(1).any { it != firstMatch }) return emptyList()
         return listOf(
@@ -287,7 +299,12 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
             }
 
             else -> null
-        } ?: getInsnArgTypes(insn, targetClass)?.map { Parameter(null, it.toPsiType(elementFactory)) }
+        } ?: getInsnArgTypes(insn, targetClass)?.toParameters(annotation)
+    }
+
+    protected fun List<Type>.toParameters(context: PsiElement): List<Parameter> {
+        val elementFactory = JavaPsiFacade.getElementFactory(context.project)
+        return map { Parameter(null, it.toPsiType(elementFactory)) }
     }
 }
 
