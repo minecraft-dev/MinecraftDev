@@ -95,6 +95,7 @@ class VelocityVersionStep(
     private fun applyJdkVersion() {
         SemanticVersion.tryParse(version)?.let { version ->
             val preferredJdk = when {
+                version >= SemanticVersion.release(3, 3) -> JavaSdkVersion.JDK_17
                 version >= SemanticVersion.release(3) -> JavaSdkVersion.JDK_11
                 else -> JavaSdkVersion.JDK_1_8
             }
