@@ -31,6 +31,7 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.facet.FacetManager
 import com.intellij.facet.impl.ui.libraries.LibrariesValidatorContextImpl
 import com.intellij.framework.library.LibraryVersionProperties
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -88,7 +89,9 @@ class MinecraftFacetDetector : ProjectActivity {
             }
 
             if (needsReimport) {
-                ProjectReimporter.reimport(project)
+                runInEdt {
+                    ProjectReimporter.reimport(project)
+                }
             }
         }
 

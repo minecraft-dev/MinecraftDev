@@ -112,6 +112,15 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                         holder.registerProblem(value, TextRange(1, endOffset), "Order $order does not exist")
                     }
                 }
+                "clientSideOnly" -> {
+                    val forgeVersion = runCatching {
+                        keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
+                    }.getOrNull()
+                    val minVersion = ForgeConstants.CLIENT_ONLY_MANIFEST_VERSION
+                    if (forgeVersion != null && forgeVersion < minVersion) {
+                        holder.registerProblem(keyValue.key, "ClientSideOnly is only available since $minVersion")
+                    }
+                }
             }
         }
 
