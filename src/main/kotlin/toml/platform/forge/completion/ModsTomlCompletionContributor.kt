@@ -58,6 +58,7 @@ class ModsTomlCompletionContributor : CompletionContributor() {
         extendBooleanValues("showAsResourcePack")
         extendBooleanValues("logoBlur")
         extendBooleanValues("mandatory")
+        extendBooleanValues("clientSideOnly")
     }
 
     private fun extendKnownValues(key: String, values: Set<String>) =

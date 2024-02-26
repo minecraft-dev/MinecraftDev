@@ -103,12 +103,12 @@ class VelocityModifyMainClassStep(
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val dependencies = data.getUserData(DependStep.KEY) ?: emptyList()
 
-        NonProjectFileWritingAccessProvider.disableChecksDuring {
-            project.runWriteTaskInSmartMode {
+        project.runWriteTaskInSmartMode {
+            NonProjectFileWritingAccessProvider.disableChecksDuring {
                 val mainClassVirtualFile = VfsUtil.findFile(Path.of(mainClassFile), true)
-                    ?: return@runWriteTaskInSmartMode
+                    ?: return@disableChecksDuring
                 val mainClassPsi = PsiManager.getInstance(project).findFile(mainClassVirtualFile) as? PsiJavaFile
-                    ?: return@runWriteTaskInSmartMode
+                    ?: return@disableChecksDuring
 
                 val psiClass = mainClassPsi.classes[0]
                 val annotation = buildString {

@@ -53,6 +53,7 @@ class ModsTomlCompletionTest : BasePlatformTestCase() {
             "license",
             "showAsResourcePack",
             "issueTrackerURL",
+            "clientSideOnly",
         )
     }
 
