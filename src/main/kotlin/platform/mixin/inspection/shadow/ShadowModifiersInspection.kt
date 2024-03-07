@@ -103,8 +103,10 @@ class ShadowModifiersInspection : MixinInspection() {
             // TODO: Would it make sense to apply the @Final check to methods?
             if (member !is PsiField) {
                 return
-            } else if (member.hasInitializer()) {
-                // @Final annotation doesn't apply to members that are initialized in the mixin class
+            }
+
+            // @Final annotation doesn't apply to members that are initialized in the mixin class
+            if (member.hasInitializer()) {
                 return
             }
 
