@@ -15,7 +15,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see https://www.gnu.org/licenses/.
 -->
 
 <idea-plugin require-restart="true">
@@ -182,11 +182,11 @@
         <!--region NO PLATFORM-->
         <!---->
 
-        <moduleType id="MINECRAFT_MODULE_TYPE" implementationClass="com.demonwav.mcdev.platform.MinecraftModuleType"/>
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>

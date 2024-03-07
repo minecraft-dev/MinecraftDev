@@ -223,7 +223,7 @@ class NewInsnSelectorParser : MixinSelectorParser {
         return if (strippedValue.startsWith('(')) {
             NewInsnDescriptorSelector(strippedValue)
         } else {
-            NewInsnTypeSelector(strippedValue)
+            NewInsnTypeSelector(strippedValue.removeSurrounding("L", ";"))
         }
     }
 }

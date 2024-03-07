@@ -34,7 +34,7 @@ plugins {
     mcdev
     groovy
     idea
-    id("org.jetbrains.intellij") version "1.17.0"
+    id("org.jetbrains.intellij") version "1.17.2"
     id("org.cadixdev.licenser")
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -298,6 +298,7 @@ license {
     style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
 
     val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
+    exclude("META-INF/plugin.xml") // https://youtrack.jetbrains.com/issue/IDEA-345026
     include(endings.map { "**/*.$it" })
 
     exclude("com/demonwav/mcdev/platform/mixin/invalidInjectorMethodSignature/*.java")

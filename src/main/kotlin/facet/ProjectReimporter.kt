@@ -20,6 +20,9 @@
 
 package com.demonwav.mcdev.facet
 
+import com.demonwav.mcdev.asset.MCDevBundle
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.diagnostic.logger
@@ -57,7 +60,23 @@ object ProjectReimporter {
             true
         )
         callback.doWhenRejected { error ->
-            log.error("Rejected refresh all projects: $error")
+            if (error == null) {
+                Notification(
+                    "Minecraft facet",
+                    MCDevBundle("facet.reimport.failed.title"),
+                    MCDevBundle("facet.reimport.failed.content.no_error"),
+                    NotificationType.WARNING
+                ).notify(project)
+                log.warn("Rejected refresh all projects, no details provided")
+            } else {
+                Notification(
+                    "Minecraft facet",
+                    MCDevBundle("facet.reimport.failed.title"),
+                    MCDevBundle("facet.reimport.failed.content.with_error", error),
+                    NotificationType.WARNING
+                ).notify(project)
+                log.error("Rejected refresh all projects: $error")
+            }
         }
     }
 }
