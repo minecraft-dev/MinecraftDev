@@ -105,6 +105,11 @@ class ShadowModifiersInspection : MixinInspection() {
                 return
             }
 
+            // @Final annotation doesn't apply to members that are initialized in the mixin class
+            if (member.hasInitializer()) {
+                return
+            }
+
             // Check @Final
             val targetFinal = (target.access and Opcodes.ACC_FINAL) != 0
             val shadowFinal = shadowModifierList.findAnnotation(FINAL)
