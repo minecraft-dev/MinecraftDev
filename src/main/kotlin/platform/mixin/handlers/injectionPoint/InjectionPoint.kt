@@ -410,6 +410,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
         insn: AbstractInsnNode,
         element: T,
         qualifier: String? = null,
+        decorations: Map<String, Any?> = emptyMap(),
     ) {
         // apply shift.
         // being able to break out of the shift loops is important to prevent IDE freezes in case of large shift bys.
@@ -430,7 +431,14 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
             }
         }
 
-        val result = Result(nextIndex++, insn, shiftedInsn ?: return, element, qualifier)
+        val result = Result(
+            nextIndex++,
+            insn,
+            shiftedInsn ?: return,
+            element,
+            qualifier,
+            if (insn === shiftedInsn) decorations else emptyMap()
+        )
         var isFiltered = false
         for ((name, filter) in resultFilters) {
             if (!filter(result, method)) {
@@ -466,6 +474,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
         val insn: AbstractInsnNode,
         val target: T,
         val qualifier: String? = null,
+        val decorations: Map<String, Any?>
     )
 
     enum class Mode { MATCH_ALL, MATCH_FIRST, COMPLETION }

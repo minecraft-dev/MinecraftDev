@@ -101,7 +101,7 @@ dependencies {
     implementation(files(Jvm.current().toolsJar))
 
     // TODO: temporary waiting for MixinExtras expression library
-    implementation("com.github.LlamaLad7.MixinExtras:mixinextras-common:fe1e2b9")
+    implementation("com.github.LlamaLad7.MixinExtras:mixinextras-common:debfdc8")
     implementation("org.spongepowered:mixin:0.8.4")
     implementation("org.ow2.asm:asm-util:9.3")
 
