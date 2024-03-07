@@ -13,7 +13,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          target: /\b(?!dev\b).*?\b/
+          target: /\d+\.\d/
           exclude: dev
           change-to: dev
           already-exists-action: nothing
