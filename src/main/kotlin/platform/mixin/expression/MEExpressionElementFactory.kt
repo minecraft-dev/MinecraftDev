@@ -21,7 +21,6 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
@@ -41,11 +40,6 @@ class MEExpressionElementFactory(private val project: Project) {
             MEExpressionFileType,
             text
         ) as MEExpressionFile
-    }
-
-    fun createDeclaration(name: String): MEDeclaration {
-        return createFile("class $name").declarations.firstOrNull()
-            ?: throw IncorrectOperationException("'$name' is not a declaration")
     }
 
     fun createStatement(text: String): MEStatement {

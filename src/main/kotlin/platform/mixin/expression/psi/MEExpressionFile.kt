@@ -22,7 +22,7 @@ package com.demonwav.mcdev.platform.mixin.expression.psi
 
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionFileType
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionLanguage
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclarationItem
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEItem
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatementItem
@@ -34,6 +34,6 @@ class MEExpressionFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvide
     override fun toString() = "MixinExtras Expression File"
 
     val items: Array<MEItem> get() = findChildrenByClass(MEItem::class.java)
-    val declarations: List<MEDeclaration> get() = items.filterIsInstance<MEDeclaration>()
+    val declarations: List<MEDeclarationItem> get() = items.filterIsInstance<MEDeclarationItem>()
     val statement: MEStatement? get() = items.asSequence().filterIsInstance<MEStatementItem>().singleOrNull()?.statement
 }

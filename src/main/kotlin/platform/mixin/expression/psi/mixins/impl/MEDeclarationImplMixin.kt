@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEItemImpl
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEDeclarationMixin
@@ -29,22 +28,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 
 abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), MEDeclarationMixin, PsiNamedElement {
-    override fun getName() = nameIdentifier?.text
+    override fun getName(): String = nameIdentifier.text
 
     override fun setName(name: String): PsiElement {
-        val nameIdentifier = this.nameIdentifier
-        if (nameIdentifier != null) {
-            nameIdentifier.replace(project.meExpressionElementFactory.createIdentifier(name))
-            return this
-        } else {
-            return replace(project.meExpressionElementFactory.createDeclaration(name))
-        }
+        this.nameIdentifier.replace(project.meExpressionElementFactory.createIdentifier(name))
+        return this
     }
 
-    override val nameIdentifier: PsiElement?
-        get() = node.findChildByType(MEExpressionTypes.TOKEN_IDENTIFIER)?.psi
-
-    override fun getNavigationElement() = nameIdentifier ?: this
-
-    override fun getTextOffset() = nameIdentifier?.textOffset ?: super.getTextOffset()
+    override val nameIdentifier: PsiElement
+        get() = firstChild
 }

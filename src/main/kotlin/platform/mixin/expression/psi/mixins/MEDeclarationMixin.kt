@@ -23,5 +23,5 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 import com.intellij.psi.PsiElement
 
 interface MEDeclarationMixin : PsiElement {
-    val nameIdentifier: PsiElement?
+    val nameIdentifier: PsiElement
 }

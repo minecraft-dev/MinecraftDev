@@ -21,21 +21,44 @@
 package com.demonwav.mcdev.platform.mixin.expression.reference
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
+import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.PsiReference
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.IncorrectOperationException
 
-class MEDefinitionReference(name: MEName) : PsiReferenceBase<MEName>(name) {
+class MEDefinitionReference(private var name: MEName) : PsiReference {
+    override fun getElement() = name
+
+    override fun getRangeInElement() = TextRange(0, name.textLength)
+
     override fun resolve(): PsiElement? {
         val file = element.parentOfType<MEExpressionFile>() ?: return null
         val name = element.text
-        for (declaration in file.declarations) {
-            if (declaration.name == name) {
+        for (declItem in file.declarations) {
+            val declaration = declItem.declaration
+            if (declaration?.name == name) {
                 return declaration
             }
         }
 
         return null
     }
+
+    override fun getCanonicalText(): String = name.text
+
+    override fun handleElementRename(newElementName: String): PsiElement {
+        name = name.replace(name.project.meExpressionElementFactory.createName(newElementName)) as MEName
+        return name
+    }
+
+    override fun bindToElement(element: PsiElement): PsiElement {
+        throw IncorrectOperationException()
+    }
+
+    override fun isReferenceTo(element: PsiElement) = element.manager.areElementsEquivalent(element, resolve())
+
+    override fun isSoft() = false
 }

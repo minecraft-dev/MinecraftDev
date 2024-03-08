@@ -41,11 +41,14 @@
 
 meExpressionFile ::= item* <<eof>>
 
-item ::= declaration | statementItem
+item ::= declarationItem | statementItem
 
-declaration ::= TOKEN_CLASS TOKEN_IDENTIFIER {
+declarationItem ::= TOKEN_CLASS declaration {
     pin = 1
     extends = item
+}
+
+declaration ::= TOKEN_IDENTIFIER {
     implements = [
         "com.intellij.psi.PsiNamedElement"
         "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEDeclarationMixin"
