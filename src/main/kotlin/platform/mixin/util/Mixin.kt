@@ -234,3 +234,6 @@ fun isMixinEntryPoint(element: PsiElement?): Boolean {
     }
     return false
 }
+
+val PsiElement.isFabricMixin: Boolean get() =
+    JavaPsiFacade.getInstance(project).findClass(MixinConstants.Classes.FABRIC_UTIL, resolveScope) != null

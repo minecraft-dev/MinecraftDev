@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -28,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
+import com.demonwav.mcdev.platform.mixin.util.isFabricMixin
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findInspection
 import com.demonwav.mcdev.util.ifEmpty
@@ -49,7 +49,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Always unnecessary in Fabric mods", alwaysUnnecessaryOnFabric)
+        val checkbox = JCheckBox("Always unnecessary when Fabric Mixin is present", alwaysUnnecessaryOnFabric)
         checkbox.addActionListener {
             alwaysUnnecessaryOnFabric = checkbox.isSelected
         }
@@ -58,7 +58,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     }
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
-        val isFabric = holder.file.isFabric
+        val isFabric = holder.file.isFabricMixin
         val alwaysUnnecessary = isFabric && alwaysUnnecessaryOnFabric
         val requiresUnsafeForCtorHeadOnFabric =
             holder.project.findInspection<CtorHeadNoUnsafeInspection>(CtorHeadNoUnsafeInspection.SHORT_NAME)

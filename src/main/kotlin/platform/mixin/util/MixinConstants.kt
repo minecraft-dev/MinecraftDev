@@ -47,6 +47,8 @@ object MixinConstants {
 
         const val SERIALIZED_NAME = "com.google.gson.annotations.SerializedName"
         const val MIXIN_SERIALIZED_NAME = "org.spongepowered.include.$SERIALIZED_NAME"
+
+        const val FABRIC_UTIL = "org.spongepowered.asm.mixin.FabricUtil"
     }
 
     object Annotations {

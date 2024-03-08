@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
@@ -30,6 +29,7 @@ import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.findSuperConstructorCall
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
+import com.demonwav.mcdev.platform.mixin.util.isFabricMixin
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findAnnotations
@@ -50,7 +50,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Always allow @Inject into constructors in Fabric", allowOnFabric)
+        val checkbox = JCheckBox("Allow @Inject into constructors when Fabric Mixin is present", allowOnFabric)
         checkbox.addActionListener {
             allowOnFabric = checkbox.isSelected
         }
@@ -59,7 +59,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
     }
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
-        val isFabric = holder.file.isFabric
+        val isFabric = holder.file.isFabricMixin
         return object : JavaElementVisitor() {
             override fun visitMethod(method: PsiMethod) {
                 val injectAnnotation = method.findAnnotation(INJECT) ?: return

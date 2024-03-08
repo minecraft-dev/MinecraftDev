@@ -20,10 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.fabric.util.isFabric
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.isFabricMixin
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.intellij.codeInspection.ProblemsHolder
@@ -41,7 +41,7 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Ignore in Fabric mods", ignoreForFabric)
+        val checkbox = JCheckBox("Ignore when Fabric Mixin is present", ignoreForFabric)
         checkbox.addActionListener {
             ignoreForFabric = checkbox.isSelected
         }
@@ -53,7 +53,7 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         if (ignoreForFabric) {
-            val isFabric = holder.file.isFabric
+            val isFabric = holder.file.isFabricMixin
             if (isFabric) {
                 return PsiElementVisitor.EMPTY_VISITOR
             }
