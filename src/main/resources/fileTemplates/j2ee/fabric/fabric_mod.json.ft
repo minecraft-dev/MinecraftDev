@@ -6,26 +6,46 @@
 
   "name": "${MOD_NAME}",
   "description": "${MOD_DESCRIPTION}",
+#if (${AUTHOR_LIST})
+  "authors": [${AUTHOR_LIST}],
+#else
   "authors": [],
-  "contact": {},
+#end
+
+  "contact": {
+#if (${WEBSITE})
+    "website": "${WEBSITE}"#if (${REPOSITORY}),
+#end
+#end
+#if (${REPOSITORY})
+    "repo": "${REPOSITORY}"
+#end
+  },
 
   "license": "${LICENSE}",
   "icon": "assets/${MOD_ID}/icon.png",
 
   "environment": "${MOD_ENVIRONMENT}",
-  "entrypoints": {},
+  "entrypoints": {
+    "main": [
+      "${MAIN_CLASS}"
+    ],
+    "client": [
+      "${CLIENT_CLASS}"
+    ]
+  },
 
-    #if (${MIXINS})
-      "mixins": [
-        "${MOD_ID}.mixins.json"
-      ],
-    #end
+#if (${MIXINS})
+  "mixins": [
+    "${MOD_ID}.mixins.json"
+  ],
+#end
 
   "depends": {
     "fabricloader": ">=${d}{loader_version}",
-      #if (${API_VERSION})
-        "fabric": "*",
-      #end
+  #if (${API_VERSION})
+    "fabric": "*",
+  #end
     "minecraft": "${d}{minecraft_version}"
   }
 }
