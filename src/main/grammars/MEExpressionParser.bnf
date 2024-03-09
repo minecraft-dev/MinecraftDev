@@ -51,7 +51,7 @@ declarationItem ::= TOKEN_CLASS declaration {
 declaration ::= TOKEN_IDENTIFIER {
     implements = [
         "com.intellij.psi.PsiNamedElement"
-        "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEDeclarationMixin"
+        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEDeclarationImplMixin"
 }

@@ -22,12 +22,13 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEItemImpl
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
-import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEDeclarationMixin
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.search.LocalSearchScope
 
-abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), MEDeclarationMixin, PsiNamedElement {
+abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), PsiNamedElement, PsiNameIdentifierOwner {
     override fun getName(): String = nameIdentifier.text
 
     override fun setName(name: String): PsiElement {
@@ -35,6 +36,7 @@ abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), MEDecla
         return this
     }
 
-    override val nameIdentifier: PsiElement
-        get() = firstChild
+    override fun getNameIdentifier(): PsiElement = firstChild
+
+    override fun getUseScope() = containingFile?.let(::LocalSearchScope) ?: super.getUseScope()
 }

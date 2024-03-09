@@ -502,6 +502,7 @@
 <!--        <lang.findUsagesProvider language="JAVA"-->
 <!--                                 implementationClass="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionFindUsagesProvider"/>-->
 <!--        <referencesSearch implementation="com.demonwav.mcdev.platform.mixin.expression.reference.MEDefinitionReferencesSearcher"/>-->
+        <lang.refactoringSupport language="MEExpression" implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionRefactoringSupport"/>
         <multiHostInjector implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionInjector"/>
         <!--endregion-->
 

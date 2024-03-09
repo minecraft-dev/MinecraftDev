@@ -18,10 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
+package com.demonwav.mcdev.platform.mixin.expression
 
+import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.psi.PsiElement
 
-interface MEDeclarationMixin : PsiElement {
-    val nameIdentifier: PsiElement
+class MEExpressionRefactoringSupport : RefactoringSupportProvider() {
+    // TODO inplace refactoring doesn't seem to work
+    override fun isInplaceRenameAvailable(element: PsiElement, context: PsiElement?) = false
 }
