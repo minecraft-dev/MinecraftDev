@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -41,7 +40,9 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
@@ -167,43 +168,34 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         if (!isValid) {
                             val (expectedParameters, expectedReturnType) = possibleSignatures[0]
 
-                            val checkResult = checkParameters(parameters, expectedParameters, handler.allowCoerce)
-                            if (checkResult != CheckResult.OK) {
+                            val paramsCheck = checkParameters(parameters, expectedParameters, handler.allowCoerce)
+                            val isWarning = paramsCheck == CheckResult.WARNING
+                            val methodReturnType = method.returnType
+                            val returnTypeOk = methodReturnType != null &&
+                                checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
+                            val isError = paramsCheck == CheckResult.ERROR || !returnTypeOk
+                            if (isWarning || isError) {
                                 reportedSignature = true
 
                                 val description =
-                                    "Method parameters do not match expected parameters for $annotationName"
-                                val quickFix = ParametersQuickFix(
-                                    expectedParameters,
-                                    handler is InjectAnnotationHandler,
+                                    "Method signature does not match expected signature for $annotationName"
+                                val quickFix = SignatureQuickFix(
+                                    expectedParameters.takeUnless { paramsCheck == CheckResult.OK },
+                                    expectedReturnType.takeUnless { returnTypeOk },
                                 )
-                                if (checkResult == CheckResult.ERROR) {
-                                    holder.registerProblem(parameters, description, quickFix)
-                                } else {
-                                    holder.registerProblem(
-                                        parameters,
-                                        description,
-                                        ProblemHighlightType.WARNING,
-                                        quickFix,
-                                    )
-                                }
-                            }
-
-                            val methodReturnType = method.returnType
-                            if (methodReturnType == null ||
-                                !checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
-                            ) {
-                                reportedSignature = true
-
+                                val highlightType =
+                                    if (isError)
+                                        ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+                                    else
+                                        ProblemHighlightType.WARNING
+                                val declarationStart = (method.returnTypeElement ?: identifier).startOffsetInParent
+                                val declarationEnd = method.parameterList.textRangeInParent.endOffset
                                 holder.registerProblem(
-                                    method.returnTypeElement ?: identifier,
-                                    "Expected return type '${expectedReturnType.presentableText}' " +
-                                        "for $annotationName method",
-                                    QuickFixFactory.getInstance().createMethodReturnFix(
-                                        method,
-                                        expectedReturnType,
-                                        false,
-                                    ),
+                                    method,
+                                    description,
+                                    highlightType,
+                                    TextRange.create(declarationStart, declarationEnd),
+                                    quickFix
                                 )
                             }
                         }
@@ -283,22 +275,27 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
         OK, WARNING, ERROR
     }
 
-    private class ParametersQuickFix(
+    private class SignatureQuickFix(
         @SafeFieldForPreview
-        private val expected: List<ParameterGroup>,
-        isInject: Boolean,
+        private val expectedParams: List<ParameterGroup>?,
+        @SafeFieldForPreview
+        private val expectedReturnType: PsiType?,
     ) : LocalQuickFix {
 
-        private val fixName = if (isInject) {
-            "Fix method parameters"
-        } else {
-            "Fix method parameters (won't keep captured locals)"
-        }
+        private val fixName = "Fix method signature"
 
         override fun getFamilyName() = fixName
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-            val parameters = descriptor.psiElement as PsiParameterList
+            val method = descriptor.psiElement as PsiMethod
+            fixParameters(project, method.parameterList)
+            fixReturnType(method)
+        }
+
+        private fun fixParameters(project: Project, parameters: PsiParameterList) {
+            if (expectedParams == null) {
+                return
+            }
             // We want to preserve captured locals
             val locals = parameters.parameters.dropWhile {
                 val fqname = (it.type as? PsiClassType)?.fullQualifiedName ?: return@dropWhile true
@@ -310,7 +307,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             // We want to preserve sugars, and while we're at it, we might as well move them all to the end
             val sugars = parameters.parameters.filter { it.isMixinExtrasSugar }
 
-            val newParams = expected.flatMapTo(mutableListOf()) {
+            val newParams = expectedParams.flatMapTo(mutableListOf()) {
                 if (it.default) {
                     val nameHelper = PsiNameHelper.getInstance(project)
                     val languageLevel = PsiUtil.getLanguageLevel(parameters)
@@ -329,7 +326,20 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             // Restore the captured locals and sugars before applying the fix
             newParams.addAll(locals)
             newParams.addAll(sugars)
-            parameters.synchronize(newParams)
+            runWriteAction {
+                parameters.synchronize(newParams)
+            }
         }
+
+        private fun fixReturnType(method: PsiMethod) {
+            if (expectedReturnType == null) {
+                return
+            }
+            QuickFixFactory.getInstance()
+                .createMethodReturnFix(method, expectedReturnType, false)
+                .applyFix()
+        }
+
+        override fun startInWriteAction() = false
     }
 }
