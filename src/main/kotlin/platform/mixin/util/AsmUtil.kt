@@ -67,11 +67,13 @@ import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
 import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtil
 import com.intellij.refactoring.util.LambdaRefactoringUtil
 import com.intellij.util.CommonJavaRefactoringUtil
+import com.llamalad7.mixinextras.utils.TypeUtils
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import org.objectweb.asm.ClassReader
@@ -129,6 +131,9 @@ private fun hasModifier(access: Int, @PsiModifier.ModifierConstant modifier: Str
 }
 
 fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = null): PsiType {
+    if (this == TypeUtils.INTLIKE_TYPE) {
+        return PsiTypes.intType()
+    }
     val javaClassName = className.replace("(\\$)(\\D)".toRegex()) { "." + it.groupValues[2] }
     return elementFactory.createTypeFromText(javaClassName, context)
 }

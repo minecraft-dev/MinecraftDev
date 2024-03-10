@@ -20,6 +20,24 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypeElement
 
-data class MethodSignature(val parameters: List<ParameterGroup>, val returnType: PsiType)
+data class MethodSignature(
+    val parameters: List<ParameterGroup>,
+    val returnType: PsiType,
+    val intLikeTypes: List<TypePosition> = emptyList()
+) {
+    sealed interface TypePosition {
+        fun getElement(method: PsiMethod): PsiTypeElement?
+
+        data object Return : TypePosition {
+            override fun getElement(method: PsiMethod) = method.returnTypeElement
+        }
+
+        data class Param(val index: Int) : TypePosition {
+            override fun getElement(method: PsiMethod) = method.parameterList.parameters[index].typeElement
+        }
+    }
+}

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
@@ -27,6 +28,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
 import com.llamalad7.mixinextras.utils.Decorations
+import com.llamalad7.mixinextras.utils.TypeUtils
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -51,6 +53,14 @@ class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
     ): Pair<ParameterGroup, PsiType>? {
         val psiType = getReturnType(target, annotation) ?: return null
         return ParameterGroup(listOf(Parameter("original", psiType))) to psiType
+    }
+
+    override fun intLikeTypePositions(target: TargetInsn): List<MethodSignature.TypePosition> {
+        val expressionType = target.getDecoration<Type>(Decorations.SIMPLE_EXPRESSION_TYPE)
+        if (expressionType == TypeUtils.INTLIKE_TYPE) {
+            return listOf(MethodSignature.TypePosition.Return, MethodSignature.TypePosition.Param(0))
+        }
+        return emptyList()
     }
 
     private fun getReturnType(

@@ -99,6 +99,10 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         target: TargetInsn,
     ): Pair<ParameterGroup, PsiType>?
 
+    open fun intLikeTypePositions(
+        target: TargetInsn
+    ): List<MethodSignature.TypePosition> = emptyList()
+
     override val allowCoerce = true
 
     override fun expectedMethodSignature(
@@ -115,20 +119,74 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         }
         val firstMatch = signatures[0] ?: return emptyList()
         if (signatures.drop(1).any { it != firstMatch }) return emptyList()
-        return listOf(
-            MethodSignature(
-                listOf(
-                    firstMatch.first,
-                    ParameterGroup(
-                        collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
-                        required = ParameterGroup.RequiredLevel.OPTIONAL,
-                        isVarargs = true,
-                    ),
-                ),
-                firstMatch.second
-            )
+        val intLikeTypePositions = insns.map { intLikeTypePositions(it) }.distinct().singleOrNull().orEmpty()
+        return allPossibleSignatures(
+            annotation,
+            targetClass,
+            targetMethod,
+            firstMatch.first,
+            firstMatch.second,
+            intLikeTypePositions
         )
     }
+
+    private fun allPossibleSignatures(
+        annotation: PsiAnnotation,
+        targetClass: ClassNode,
+        targetMethod: MethodNode,
+        params: ParameterGroup,
+        returnType: PsiType,
+        intLikeTypePositions: List<MethodSignature.TypePosition>
+    ): List<MethodSignature> {
+        if (intLikeTypePositions.isEmpty()) {
+            return listOf(
+                makeSignature(annotation, targetClass, targetMethod, params, returnType, intLikeTypePositions)
+            )
+        }
+        return buildList {
+            for (actualType in intLikePsiTypes) {
+                val newParams = params.parameters.toMutableList()
+                var newReturnType = returnType
+                for (pos in intLikeTypePositions) {
+                    when (pos) {
+                        is MethodSignature.TypePosition.Return -> newReturnType = actualType
+                        is MethodSignature.TypePosition.Param ->
+                            newParams[pos.index] = newParams[pos.index].copy(type = actualType)
+                    }
+                }
+                add(
+                    makeSignature(
+                        annotation,
+                        targetClass,
+                        targetMethod,
+                        ParameterGroup(newParams),
+                        newReturnType,
+                        intLikeTypePositions
+                    )
+                )
+            }
+        }
+    }
+
+    private fun makeSignature(
+        annotation: PsiAnnotation,
+        targetClass: ClassNode,
+        targetMethod: MethodNode,
+        params: ParameterGroup,
+        returnType: PsiType,
+        intLikeTypePositions: List<MethodSignature.TypePosition>
+    ) = MethodSignature(
+        listOf(
+            params,
+            ParameterGroup(
+                collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+                required = ParameterGroup.RequiredLevel.OPTIONAL,
+                isVarargs = true,
+            ),
+        ),
+        returnType,
+        intLikeTypePositions
+    )
 
     protected fun getInsnReturnType(insn: AbstractInsnNode): Type? {
         return when {
@@ -365,3 +423,7 @@ private fun getConstantType(insn: AbstractInsnNode?): Type? {
         }
     }
 }
+
+private val intLikePsiTypes = listOf(
+    PsiTypes.intType(), PsiTypes.booleanType(), PsiTypes.charType(), PsiTypes.byteType(), PsiTypes.shortType()
+)
