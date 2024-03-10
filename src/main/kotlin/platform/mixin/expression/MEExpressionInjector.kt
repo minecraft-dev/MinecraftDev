@@ -38,7 +38,6 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiParenthesizedExpression
 import com.intellij.psi.PsiPolyadicExpression
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.intellij.psi.impl.source.tree.injected.JavaConcatenationToInjectorAdapter
 import com.intellij.psi.util.PsiLiteralUtil
 import com.intellij.psi.util.PsiModificationTracker
@@ -144,7 +143,8 @@ class MEExpressionInjector : MultiHostInjector {
         )
 
         if (isFrankenstein) {
-            InjectedLanguageUtil.putInjectedFileUserData(
+            @Suppress("DEPRECATION") // no replacement for this method
+            com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil.putInjectedFileUserData(
                 context,
                 MEExpressionLanguage,
                 InjectedLanguageManager.FRANKENSTEIN_INJECTION,
