@@ -35,6 +35,7 @@ import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.synchronize
+import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInsight.lookup.LookupElement
@@ -316,6 +317,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             startElement: PsiElement,
             endElement: PsiElement,
         ) {
+            if (!FileModificationService.getInstance().preparePsiElementForWrite(startElement)) {
+                return
+            }
             val method = startElement as PsiMethod
             fixParameters(project, method.parameterList)
             fixReturnType(method)

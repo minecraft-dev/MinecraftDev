@@ -33,7 +33,7 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
     private fun doTest(testName: String) {
         fixture.enableInspections(InvalidInjectorMethodSignatureInspection::class)
-        testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method parameters")
+        testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method signature")
     }
 
     @Test
