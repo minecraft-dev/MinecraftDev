@@ -20,15 +20,20 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEItemImpl
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.intellij.lang.ASTNode
+import com.intellij.navigation.ItemPresentation
+import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.search.LocalSearchScope
 
-abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), PsiNamedElement, PsiNameIdentifierOwner {
+abstract class MEDeclarationImplMixin(
+    node: ASTNode
+) : MEItemImpl(node), PsiNamedElement, PsiNameIdentifierOwner, NavigatablePsiElement {
     override fun getName(): String = nameIdentifier.text
 
     override fun setName(name: String): PsiElement {
@@ -39,4 +44,10 @@ abstract class MEDeclarationImplMixin(node: ASTNode) : MEItemImpl(node), PsiName
     override fun getNameIdentifier(): PsiElement = firstChild
 
     override fun getUseScope() = containingFile?.let(::LocalSearchScope) ?: super.getUseScope()
+
+    override fun getPresentation() = object : ItemPresentation {
+        override fun getPresentableText() = name
+
+        override fun getIcon(unused: Boolean) = PlatformAssets.MIXIN_ICON
+    }
 }

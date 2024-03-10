@@ -104,7 +104,7 @@ class MEExpressionInjector : MultiHostInjector {
                 iterateConcatenation(idExpr) { op ->
                     if (op is PsiLanguageInjectionHost) {
                         for (textRange in getTextRanges(op)) {
-                            val prefix = " class ".takeIf { needsPrefix }
+                            val prefix = "\nclass ".takeIf { needsPrefix }
                             needsPrefix = false
                             registrar.addPlace(prefix, null, op, textRange)
                         }
@@ -127,7 +127,7 @@ class MEExpressionInjector : MultiHostInjector {
                 if (places.isNotEmpty()) {
                     for ((i, place) in places.withIndex()) {
                         val (host, range) = place
-                        val prefix = " do { ".takeIf { i == 0 }
+                        val prefix = "\ndo { ".takeIf { i == 0 }
                         val suffix = " }".takeIf { i == places.size - 1 }
                         registrar.addPlace(prefix, suffix, host, range)
                     }

@@ -52,6 +52,7 @@ declaration ::= TOKEN_IDENTIFIER {
     implements = [
         "com.intellij.psi.PsiNamedElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.intellij.psi.NavigatablePsiElement"
     ]
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEDeclarationImplMixin"
 }
