@@ -33,20 +33,33 @@ import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.synchronize
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInsight.intention.QuickFixFactory
-import com.intellij.codeInspection.LocalQuickFix
-import com.intellij.codeInspection.ProblemDescriptor
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.template.Expression
+import com.intellij.codeInsight.template.ExpressionContext
+import com.intellij.codeInsight.template.Template
+import com.intellij.codeInsight.template.TemplateBuilderImpl
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.TextResult
+import com.intellij.codeInsight.template.impl.VariableNode
+import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.command.WriteCommandAction
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNameHelper
@@ -57,6 +70,8 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
+import com.intellij.psi.util.parentOfType
+import com.intellij.refactoring.suggested.startOffset
 import org.objectweb.asm.Opcodes
 
 class InvalidInjectorMethodSignatureInspection : MixinInspection() {
@@ -166,7 +181,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         }
 
                         if (!isValid) {
-                            val (expectedParameters, expectedReturnType) = possibleSignatures[0]
+                            val (expectedParameters, expectedReturnType, intLikeTypePositions) = possibleSignatures[0]
 
                             val paramsCheck = checkParameters(parameters, expectedParameters, handler.allowCoerce)
                             val isWarning = paramsCheck == CheckResult.WARNING
@@ -180,8 +195,10 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                 val description =
                                     "Method signature does not match expected signature for $annotationName"
                                 val quickFix = SignatureQuickFix(
+                                    method,
                                     expectedParameters.takeUnless { paramsCheck == CheckResult.OK },
                                     expectedReturnType.takeUnless { returnTypeOk },
+                                    intLikeTypePositions
                                 )
                                 val highlightType =
                                     if (isError)
@@ -276,20 +293,33 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
     }
 
     private class SignatureQuickFix(
+        method: PsiMethod,
         @SafeFieldForPreview
         private val expectedParams: List<ParameterGroup>?,
         @SafeFieldForPreview
         private val expectedReturnType: PsiType?,
-    ) : LocalQuickFix {
+        private val intLikeTypePositions: List<MethodSignature.TypePosition>
+    ) : LocalQuickFixAndIntentionActionOnPsiElement(method) {
 
         private val fixName = "Fix method signature"
 
         override fun getFamilyName() = fixName
 
-        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-            val method = descriptor.psiElement as PsiMethod
+        override fun getText() = familyName
+
+        override fun startInWriteAction() = false
+
+        override fun invoke(
+            project: Project,
+            file: PsiFile,
+            editor: Editor?,
+            startElement: PsiElement,
+            endElement: PsiElement,
+        ) {
+            val method = startElement as PsiMethod
             fixParameters(project, method.parameterList)
             fixReturnType(method)
+            fixIntLikeTypes(method, editor ?: return)
         }
 
         private fun fixParameters(project: Project, parameters: PsiParameterList) {
@@ -340,6 +370,67 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 .applyFix()
         }
 
-        override fun startInWriteAction() = false
+        private fun fixIntLikeTypes(method: PsiMethod, editor: Editor) {
+            if (intLikeTypePositions.isEmpty()) {
+                return
+            }
+            invokeLater {
+                WriteCommandAction.runWriteCommandAction(
+                    method.project,
+                    "Choose Int-Like Type",
+                    null,
+                    {
+                        val template = makeIntLikeTypeTemplate(method, intLikeTypePositions)
+                        if (template != null) {
+                            editor.caretModel.moveToOffset(method.startOffset)
+                            TemplateManager.getInstance(method.project)
+                                .startTemplate(editor, template)
+                        }
+                    },
+                    method.parentOfType<PsiFile>()!!
+                )
+            }
+        }
+
+        private fun makeIntLikeTypeTemplate(
+            method: PsiMethod,
+            positions: List<MethodSignature.TypePosition>
+        ): Template? {
+            val builder = TemplateBuilderImpl(method)
+            builder.replaceElement(
+                positions.first().getElement(method) ?: return null,
+                "intliketype",
+                ChooseIntLikeTypeExpression(),
+                true
+            )
+            for (pos in positions.drop(1)) {
+                builder.replaceElement(
+                    pos.getElement(method) ?: return null,
+                    VariableNode("intliketype", null),
+                    false
+                )
+            }
+            return builder.buildInlineTemplate()
+        }
+    }
+}
+
+private class ChooseIntLikeTypeExpression : Expression() {
+    private val lookupItems: Array<LookupElement> = intLikeTypes.map(LookupElementBuilder::create).toTypedArray()
+
+    override fun calculateLookupItems(context: ExpressionContext) = if (lookupItems.size > 1) lookupItems else null
+
+    override fun calculateQuickResult(context: ExpressionContext) = calculateResult(context)
+
+    override fun calculateResult(context: ExpressionContext) = TextResult("int")
+
+    private companion object {
+        private val intLikeTypes = listOf(
+            "int",
+            "char",
+            "boolean",
+            "byte",
+            "short"
+        )
     }
 }

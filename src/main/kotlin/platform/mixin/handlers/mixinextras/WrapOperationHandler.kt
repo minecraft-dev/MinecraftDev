@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.MixinExtras.OPERATION
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
@@ -30,6 +31,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.llamalad7.mixinextras.utils.Decorations
+import com.llamalad7.mixinextras.utils.TypeUtils
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
@@ -56,6 +58,17 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         return ParameterGroup(
             params + Parameter("original", operationType)
         ) to returnType
+    }
+
+    override fun intLikeTypePositions(target: TargetInsn) = buildList {
+        if (target.getDecoration<Type>(Decorations.SIMPLE_OPERATION_RETURN_TYPE) == TypeUtils.INTLIKE_TYPE) {
+            add(MethodSignature.TypePosition.Return)
+        }
+        target.getDecoration<Array<Type>>(Decorations.SIMPLE_OPERATION_ARGS)?.forEachIndexed { i, it ->
+            if (it == TypeUtils.INTLIKE_TYPE) {
+                add(MethodSignature.TypePosition.Param(i))
+            }
+        }
     }
 
     private fun getParameterTypes(
