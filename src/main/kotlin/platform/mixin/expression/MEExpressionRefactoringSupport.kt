@@ -24,6 +24,6 @@ import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.psi.PsiElement
 
 class MEExpressionRefactoringSupport : RefactoringSupportProvider() {
-    // TODO inplace refactoring doesn't seem to work
+    // Inplace renaming doesn't work due to IDEA-348784
     override fun isInplaceRenameAvailable(element: PsiElement, context: PsiElement?) = false
 }

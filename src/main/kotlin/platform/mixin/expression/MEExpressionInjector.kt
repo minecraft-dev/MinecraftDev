@@ -28,7 +28,6 @@ import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.util.UserDataHolderEx
 import com.intellij.openapi.util.component1
 import com.intellij.openapi.util.component2
 import com.intellij.psi.ElementManipulators
@@ -50,35 +49,51 @@ import com.intellij.util.SmartList
 class MEExpressionInjector : MultiHostInjector {
     companion object {
         private val ELEMENTS = listOf(PsiLiteralExpression::class.java)
-        private val PRIMARY_ELEMENT_KEY = Key.create<PrimaryElement>("mcdev.anchorModCount")
+        private val ME_EXPRESSION_INJECTION = Key.create<MEExpressionInjection>("mcdev.meExpressionInjection")
+
+        private val CLASS_INJECTION_RESULT =
+            Class.forName("com.intellij.psi.impl.source.tree.injected.InjectionResult")
+        private val CLASS_INJECTION_REGISTRAR_IMPL =
+            Class.forName("com.intellij.psi.impl.source.tree.injected.InjectionRegistrarImpl")
+        @JvmStatic
+        private val METHOD_ADD_TO_RESULTS =
+            CLASS_INJECTION_REGISTRAR_IMPL.getDeclaredMethod("addToResults", CLASS_INJECTION_RESULT)
+                .also { it.isAccessible = true }
+        @JvmStatic
+        private val METHOD_GET_INJECTED_RESULT =
+            CLASS_INJECTION_REGISTRAR_IMPL.getDeclaredMethod("getInjectedResult")
+                .also { it.isAccessible = true }
     }
 
-    private data class PrimaryElement(val modCount: Long, val element: PsiElement)
+    private data class MEExpressionInjection(val modCount: Long, val injectionResult: Any)
+
+    private fun shouldInjectIn(anchor: PsiElement): Boolean {
+        val nameValuePair = anchor.findContainingNameValuePair() ?: return false
+        return when (nameValuePair.name) {
+            "value", null -> nameValuePair.parentOfType<PsiAnnotation>()
+                ?.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION) == true
+            "id" -> nameValuePair.parentOfType<PsiAnnotation>()
+                ?.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) == true
+            else -> false
+        }
+    }
 
     override fun getLanguagesToInject(registrar: MultiHostRegistrar, context: PsiElement) {
         val project = context.project
-        val (anchor, operands) = JavaConcatenationToInjectorAdapter(project).computeAnchorAndOperands(context)
+        val (anchor, _) = JavaConcatenationToInjectorAdapter(project).computeAnchorAndOperands(context)
 
-        val nameValuePair = anchor.findContainingNameValuePair() ?: return
-        if (nameValuePair.name != "value" && nameValuePair.name != null) {
+        if (!shouldInjectIn(anchor)) {
             return
         }
-        val expressionAnnotation = nameValuePair.parentOfType<PsiAnnotation>() ?: return
-        if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
-            return
-        }
+
+        val modifierList = anchor.findContainingModifierList() ?: return
 
         val modCount = PsiModificationTracker.getInstance(project).modificationCount
-        val primaryElement = PrimaryElement(modCount, context)
-        val existingElement = (anchor as UserDataHolderEx).putUserDataIfAbsent(PRIMARY_ELEMENT_KEY, primaryElement)
-        if (existingElement !== primaryElement &&
-            existingElement.modCount == modCount &&
-            context != existingElement.element
-        ) {
+        val primaryElement = modifierList.getUserData(ME_EXPRESSION_INJECTION)
+        if (primaryElement != null && primaryElement.modCount == modCount) {
+            METHOD_ADD_TO_RESULTS.invoke(registrar, primaryElement.injectionResult)
             return
         }
-
-        val modifierList = expressionAnnotation.findContainingModifierList() ?: return
 
         var isFrankenstein = false
         registrar.startInjecting(MEExpressionLanguage)
@@ -98,17 +113,16 @@ class MEExpressionInjector : MultiHostInjector {
                         isFrankenstein = true
                     }
                 }
-            } else if (annotation == expressionAnnotation) {
+            } else if (annotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
+                val valueExpr = annotation.findDeclaredAttributeValue("value") ?: continue
                 val places = mutableListOf<Pair<PsiLanguageInjectionHost, TextRange>>()
-                for (operand in operands) {
-                    iterateConcatenation(operand) { op ->
-                        if (op is PsiLanguageInjectionHost) {
-                            for (textRange in getTextRanges(op)) {
-                                places += op to textRange
-                            }
-                        } else {
-                            isFrankenstein = true
+                iterateConcatenation(valueExpr) { op ->
+                    if (op is PsiLanguageInjectionHost) {
+                        for (textRange in getTextRanges(op)) {
+                            places += op to textRange
                         }
+                    } else {
+                        isFrankenstein = true
                     }
                 }
                 if (places.isNotEmpty()) {
@@ -123,6 +137,11 @@ class MEExpressionInjector : MultiHostInjector {
         }
 
         registrar.doneInjecting()
+
+        modifierList.putUserData(
+            ME_EXPRESSION_INJECTION,
+            MEExpressionInjection(modCount, METHOD_GET_INJECTED_RESULT.invoke(registrar))
+        )
 
         if (isFrankenstein) {
             InjectedLanguageUtil.putInjectedFileUserData(

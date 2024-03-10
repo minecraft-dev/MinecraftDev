@@ -18,19 +18,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.reference
+package com.demonwav.mcdev.platform.mixin.expression.psi
 
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiNameValuePair
-import com.intellij.psi.util.parentOfType
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
+import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.AbstractElementManipulator
 
-object MEReferenceUtil {
-    fun isDefinitionId(element: PsiElement): Boolean {
-        val parent = element.parent
-        return parent is PsiNameValuePair &&
-            parent.name == "id" &&
-            parent.parentOfType<PsiAnnotation>()?.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) == true
+class MENameElementManipulator : AbstractElementManipulator<MEName>() {
+    override fun handleContentChange(element: MEName, range: TextRange, newContent: String): MEName {
+        val text = element.text
+        val newText = text.substring(0, range.startOffset) + newContent + text.substring(range.endOffset)
+        return element.project.meExpressionElementFactory.createName(newText)
     }
 }
