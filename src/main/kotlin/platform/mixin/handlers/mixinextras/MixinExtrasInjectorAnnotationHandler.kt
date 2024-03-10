@@ -302,9 +302,9 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
         } ?: getInsnArgTypes(insn, targetClass)?.toParameters(annotation)
     }
 
-    protected fun List<Type>.toParameters(context: PsiElement): List<Parameter> {
+    protected fun List<Type>.toParameters(context: PsiElement, names: Array<String>? = null): List<Parameter> {
         val elementFactory = JavaPsiFacade.getElementFactory(context.project)
-        return map { Parameter(null, it.toPsiType(elementFactory)) }
+        return mapIndexed { i, it -> Parameter(names?.getOrNull(i), it.toPsiType(elementFactory)) }
     }
 }
 

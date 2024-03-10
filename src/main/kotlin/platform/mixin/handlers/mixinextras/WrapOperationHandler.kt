@@ -65,7 +65,7 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
     ): List<Parameter>? {
         getPsiParameters(target.insn, targetClass, annotation)?.let { return it }
         val args = target.getDecoration<Array<Type>>(Decorations.SIMPLE_OPERATION_ARGS) ?: return null
-        return args.toList().toParameters(annotation)
+        return args.toList().toParameters(annotation, target.getDecoration(Decorations.SIMPLE_OPERATION_PARAM_NAMES))
     }
 
     private fun getReturnType(
