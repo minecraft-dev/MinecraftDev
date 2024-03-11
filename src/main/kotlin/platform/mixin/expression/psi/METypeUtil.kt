@@ -106,11 +106,11 @@ object METypeUtil {
         return false
     }
 
-    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.inTypePosition(): Self =
+    fun <T : PsiElement, Self : ObjectPattern<T, Self>> ObjectPattern<T, Self>.inTypePosition(): Self =
         with(InTypePositionCondition)
-    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.notInTypePosition(): Self =
+    fun <T : PsiElement, Self : ObjectPattern<T, Self>> ObjectPattern<T, Self>.notInTypePosition(): Self =
         without(InTypePositionCondition)
-    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.validType(): Self =
+    fun <T : PsiElement, Self : ObjectPattern<T, Self>> ObjectPattern<T, Self>.validType(): Self =
         with(ValidTypeCondition)
 
     private object InTypePositionCondition : PatternCondition<PsiElement>("inTypePosition") {
