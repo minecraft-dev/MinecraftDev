@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi
 
+import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionFileType
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionLanguage
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclarationItem
@@ -32,6 +33,7 @@ import com.intellij.psi.FileViewProvider
 class MEExpressionFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, MEExpressionLanguage) {
     override fun getFileType() = MEExpressionFileType
     override fun toString() = "MixinExtras Expression File"
+    override fun getIcon(flags: Int) = PlatformAssets.MIXIN_ICON
 
     val items: Array<MEItem> get() = findChildrenByClass(MEItem::class.java)
     val declarations: List<MEDeclarationItem> get() = items.filterIsInstance<MEDeclarationItem>()

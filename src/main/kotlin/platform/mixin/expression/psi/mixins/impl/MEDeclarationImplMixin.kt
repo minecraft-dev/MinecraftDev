@@ -21,15 +21,19 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclarationItem
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEItemImpl
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.intellij.lang.ASTNode
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.util.Iconable
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.search.LocalSearchScope
+import com.intellij.util.PlatformIcons
+import javax.swing.Icon
 
 abstract class MEDeclarationImplMixin(
     node: ASTNode
@@ -48,6 +52,12 @@ abstract class MEDeclarationImplMixin(
     override fun getPresentation() = object : ItemPresentation {
         override fun getPresentableText() = name
 
-        override fun getIcon(unused: Boolean) = PlatformAssets.MIXIN_ICON
+        override fun getIcon(unused: Boolean) = this@MEDeclarationImplMixin.getIcon(Iconable.ICON_FLAG_VISIBILITY)
+    }
+
+    override fun getIcon(flags: Int): Icon = if ((parent as? MEDeclarationItem)?.isType == true) {
+        PlatformIcons.CLASS_ICON
+    } else {
+        PlatformAssets.MIXIN_ICON
     }
 }

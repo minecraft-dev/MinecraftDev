@@ -27,6 +27,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.ArrayUtilRt
 import com.intellij.util.IncorrectOperationException
 
 class MEDefinitionReference(private var name: MEName) : PsiReference {
@@ -61,4 +62,9 @@ class MEDefinitionReference(private var name: MEName) : PsiReference {
     override fun isReferenceTo(element: PsiElement) = element.manager.areElementsEquivalent(element, resolve())
 
     override fun isSoft() = false
+
+    override fun getVariants(): Array<Any> {
+        return (name.containingFile as? MEExpressionFile)?.declarations?.mapNotNull { it.declaration }?.toTypedArray()
+            ?: ArrayUtilRt.EMPTY_OBJECT_ARRAY
+    }
 }
