@@ -27,9 +27,14 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEParenthesizedExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
+import com.intellij.patterns.ObjectPattern
+import com.intellij.patterns.PatternCondition
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.parentOfType
+import com.intellij.util.ProcessingContext
 
 object METypeUtil {
     fun convertExpressionToType(expr: MEExpression): METype? {
@@ -56,7 +61,7 @@ object METypeUtil {
         }
     }
 
-    fun isExpressionInTypePosition(expr: MEExpression): Boolean {
+    fun isExpressionDirectlyInTypePosition(expr: MEExpression): Boolean {
         var e: PsiElement? = expr
         while (e != null) {
             val parent = e.parent
@@ -75,5 +80,46 @@ object METypeUtil {
         }
 
         return false
+    }
+
+    fun isExpressionInTypePosition(expr: MEExpression): Boolean {
+        var e: PsiElement? = expr
+        while (e != null) {
+            val parent = e.parent
+            when (parent) {
+                is MEParenthesizedExpression -> {
+                    val grandparent = parent.parent
+                    if (grandparent is MECastExpression && e == grandparent.castTypeExpr) {
+                        return true
+                    }
+                }
+                is MEBinaryExpression -> {
+                    if (parent.operator == MEExpressionTypes.TOKEN_INSTANCEOF && e == parent.rightExpr) {
+                        return true
+                    }
+                }
+                is MEStatement -> return false
+            }
+            e = parent
+        }
+
+        return false
+    }
+
+    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.inTypePosition(): Self =
+        with(InTypePositionCondition)
+    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.notInTypePosition(): Self =
+        without(InTypePositionCondition)
+    fun <T: PsiElement, Self: ObjectPattern<T, Self>> ObjectPattern<T, Self>.validType(): Self =
+        with(ValidTypeCondition)
+
+    private object InTypePositionCondition : PatternCondition<PsiElement>("inTypePosition") {
+        override fun accepts(t: PsiElement, context: ProcessingContext?) =
+            t.parentOfType<MEExpression>()?.let(::isExpressionInTypePosition) == true
+    }
+
+    private object ValidTypeCondition : PatternCondition<PsiElement>("validType") {
+        override fun accepts(t: PsiElement, context: ProcessingContext?) =
+            t.parentOfType<MEExpression>(withSelf = true)?.let(::isExpressionValidType) == true
     }
 }

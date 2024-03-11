@@ -91,7 +91,7 @@ class MEExpressionAnnotator : Annotator {
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CALL)
                             .create()
                         is MENameExpression -> {
-                            if (METypeUtil.isExpressionInTypePosition(parent)) {
+                            if (METypeUtil.isExpressionDirectlyInTypePosition(parent)) {
                                 holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                                     .range(element)
                                     .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
@@ -144,7 +144,7 @@ class MEExpressionAnnotator : Annotator {
                 }
             }
             is MEArrayAccessExpression -> {
-                if (METypeUtil.isExpressionInTypePosition(element)) {
+                if (METypeUtil.isExpressionDirectlyInTypePosition(element)) {
                     val indexExpr = element.indexExpr
                     if (indexExpr != null) {
                         holder.newAnnotation(

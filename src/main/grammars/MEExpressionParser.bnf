@@ -21,6 +21,7 @@
 {
     parserClass="com.demonwav.mcdev.platform.mixin.expression.gen.MEExpressionParser"
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+    parserImports = ["static com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionParserUtil.*"]
 
     psiClassPrefix="ME"
     psiImplClassSuffix="Impl"
@@ -62,11 +63,15 @@ statementItem ::= TOKEN_DO TOKEN_LEFT_BRACE statement TOKEN_RIGHT_BRACE {
     extends = item
 }
 
+private statementRecover ::= !TOKEN_RIGHT_BRACE
+
 statement ::= assignStatement |
     returnStatement |
     throwStatement |
     expressionStatement {
     implements = "com.demonwav.mcdev.platform.mixin.expression.psi.MEMatchableElement"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEStatementImplMixin"
+    recoverWhile = statementRecover
 }
 
 assignStatement ::= assignableExpression TOKEN_ASSIGN expression {
@@ -123,17 +128,21 @@ expression ::= capturingExpression |
     recoverWhile = exprRecover
 }
 
-capturingExpression ::= TOKEN_AT TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
+external rightParen ::= parseToRightBracket exprRecover TOKEN_RIGHT_PAREN
+external rightBracket ::= parseToRightBracket exprRecover TOKEN_RIGHT_BRACKET
+external rightBrace ::= parseToRightBracket exprRecover TOKEN_RIGHT_BRACE
+
+capturingExpression ::= TOKEN_AT TOKEN_LEFT_PAREN expression rightParen {
     pin = 1
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MECapturingExpressionImplMixin"
 }
 
-parenthesizedExpression ::= TOKEN_LEFT_PAREN expression TOKEN_RIGHT_PAREN {
+parenthesizedExpression ::= TOKEN_LEFT_PAREN expression rightParen {
     pin = 1
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEParenthesizedExpressionImplMixin"
 }
 
-superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments rightParen {
     pin = 1
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MESuperCallExpressionImplMixin"
     methods = [
@@ -141,7 +150,7 @@ superCallExpression ::= TOKEN_SUPER TOKEN_DOT name TOKEN_LEFT_PAREN arguments TO
     ]
 }
 
-methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments rightParen {
     pin = 4
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEMethodCallExpressionImplMixin"
     methods = [
@@ -150,7 +159,7 @@ methodCallExpression ::= expression TOKEN_DOT name TOKEN_LEFT_PAREN arguments TO
     ]
 }
 
-staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments rightParen {
     pin = 2
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEStaticMethodCallExpressionImplMixin"
     methods = [
@@ -158,7 +167,7 @@ staticMethodCallExpression ::= name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN
     ]
 }
 
-arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression? TOKEN_RIGHT_BRACKET {
+arrayAccessExpression ::= expression TOKEN_LEFT_BRACKET expression? rightBracket {
     pin = 2
     implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEArrayAccessExpressionMixin"
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEArrayAccessExpressionImplMixin"
@@ -196,7 +205,7 @@ castExpression ::= parenthesizedExpression expression {
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MECastExpressionImplMixin"
 }
 
-instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments TOKEN_RIGHT_PAREN {
+instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments rightParen {
     rightAssociative = true
     pin = 3
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEInstantiationExpressionImplMixin"
@@ -232,9 +241,9 @@ private comparisonOp ::= TOKEN_LT | TOKEN_LE | TOKEN_GT | TOKEN_GE
 private equalityOp ::= TOKEN_EQ | TOKEN_NE
 
 newArrayExpression ::= TOKEN_NEW name
-    TOKEN_LEFT_BRACKET expression? TOKEN_RIGHT_BRACKET
-    ( TOKEN_LEFT_BRACKET expression? TOKEN_RIGHT_BRACKET )*
-    ( TOKEN_LEFT_BRACE arguments TOKEN_RIGHT_BRACE )? {
+    TOKEN_LEFT_BRACKET expression? rightBracket
+    ( TOKEN_LEFT_BRACKET expression? rightBracket )*
+    ( TOKEN_LEFT_BRACE arguments rightBrace )? {
     pin = 3
     implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewArrayExpressionMixin"
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENewArrayExpressionImplMixin"

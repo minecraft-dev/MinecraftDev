@@ -501,6 +501,8 @@
         <lang.findUsagesProvider language="MEExpression"
                                  implementationClass="com.demonwav.mcdev.platform.mixin.expression.reference.MEExpressionFindUsagesProvider"/>
         <lang.refactoringSupport language="MEExpression" implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionRefactoringSupport"/>
+        <completion.contributor language="MEExpression"
+                                implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEExpressionCompletionContributor"/>
         <multiHostInjector implementation="com.demonwav.mcdev.platform.mixin.expression.MEExpressionInjector"/>
         <!--endregion-->
 
