@@ -100,11 +100,12 @@ class MEExpressionInjector : MultiHostInjector {
         for (annotation in modifierList.annotations) {
             if (annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
                 val idExpr = annotation.findDeclaredAttributeValue("id") ?: continue
+                val isType = annotation.findDeclaredAttributeValue("type") != null
                 var needsPrefix = true
                 iterateConcatenation(idExpr) { op ->
                     if (op is PsiLanguageInjectionHost) {
                         for (textRange in getTextRanges(op)) {
-                            val prefix = "\nclass ".takeIf { needsPrefix }
+                            val prefix = "\nclass $isType ".takeIf { needsPrefix }
                             needsPrefix = false
                             registrar.addPlace(prefix, null, op, textRange)
                         }
