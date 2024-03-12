@@ -32,6 +32,7 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.impl.OrderEntryUtil
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.UserDataHolderEx
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
@@ -60,6 +61,7 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
+import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
@@ -68,6 +70,10 @@ import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.intellij.util.IncorrectOperationException
 import com.siyeh.ig.psiutils.ImportUtils
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
@@ -229,6 +235,42 @@ val <T : PsiElement> T.manipulator: ElementManipulator<T>?
 inline fun <T> PsiElement.cached(vararg dependencies: Any, crossinline compute: () -> T): T {
     return CachedValuesManager.getCachedValue(this) {
         CachedValueProvider.Result.create(compute(), *(dependencies.toList() + this).toTypedArray())
+    }
+}
+
+@PublishedApi
+internal val CACHE_LOCKS_KEY = Key.create<ConcurrentMap<Key<*>, ReadWriteLock>>("mcdev.cacheLock")
+
+inline fun <T> PsiElement.lockedCached(
+    key: Key<CachedValue<T>>,
+    vararg dependencies: Any,
+    crossinline compute: () -> T,
+): T {
+    val cacheLocks = (this as UserDataHolderEx).putUserDataIfAbsent(CACHE_LOCKS_KEY, ConcurrentHashMap())
+    val cacheLock = cacheLocks.computeIfAbsent(key) { ReentrantReadWriteLock() }
+
+    cacheLock.readLock().lock()
+    try {
+        val value = getUserData(key)?.upToDateOrNull
+        if (value != null) {
+            return value.get()
+        }
+    } finally {
+        cacheLock.readLock().unlock()
+    }
+
+    cacheLock.writeLock().lock()
+    try {
+        val value = getUserData(key)?.upToDateOrNull
+        if (value != null) {
+            return value.get()
+        }
+
+        return CachedValuesManager.getCachedValue(this, key) {
+            CachedValueProvider.Result.create(compute(), *(dependencies.toList() + this).toTypedArray())
+        }
+    } finally {
+        cacheLock.writeLock().unlock()
     }
 }
 

@@ -43,7 +43,7 @@ class MEExpressionElementFactory(private val project: Project) {
     }
 
     fun createStatement(text: String): MEStatement {
-        return createFile("do {$text}").statement
+        return createFile("do {$text}").statements.singleOrNull()
             ?: throw IncorrectOperationException("'$text' is not a statement")
     }
 

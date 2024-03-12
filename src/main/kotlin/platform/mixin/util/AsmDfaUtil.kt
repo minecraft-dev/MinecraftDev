@@ -41,8 +41,8 @@ import org.objectweb.asm.tree.analysis.SimpleVerifier
 object AsmDfaUtil {
     private val LOGGER = thisLogger()
 
-    fun analyzeMethod(project: Project, clazz: ClassNode, method: MethodNode): Array<Frame<BasicValue>?>? {
-        return method.cached(clazz, project) {
+    fun analyzeMethod(project: Project, classIn: ClassNode, methodIn: MethodNode): Array<Frame<BasicValue>?>? {
+        return methodIn.cached(classIn, project) { clazz, method ->
             try {
                 Analyzer(
                     PsiBytecodeInterpreter(

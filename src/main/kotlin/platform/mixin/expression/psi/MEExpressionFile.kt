@@ -37,5 +37,5 @@ class MEExpressionFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvide
 
     val items: Array<MEItem> get() = findChildrenByClass(MEItem::class.java)
     val declarations: List<MEDeclarationItem> get() = items.filterIsInstance<MEDeclarationItem>()
-    val statement: MEStatement? get() = items.asSequence().filterIsInstance<MEStatementItem>().singleOrNull()?.statement
+    val statements: List<MEStatement> get() = items.mapNotNull { (it as? MEStatementItem)?.statement }
 }

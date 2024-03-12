@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.expression.IdentifierPoolFactory
+import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECapturingExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
@@ -44,8 +46,6 @@ import com.demonwav.mcdev.util.resolveTypeArray
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.JavaPsiFacade
@@ -59,20 +59,11 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.parentOfType
 import com.llamalad7.mixinextras.expression.impl.ExpressionParserFacade
 import com.llamalad7.mixinextras.expression.impl.ast.expressions.Expression
-import com.llamalad7.mixinextras.expression.impl.flow.FlowInterpreter
-import com.llamalad7.mixinextras.expression.impl.flow.FlowValue
-import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
-import com.llamalad7.mixinextras.expression.impl.pool.IdentifierPool
-import java.util.Collections
 import java.util.IdentityHashMap
-import org.objectweb.asm.Opcodes
-import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
-import org.objectweb.asm.tree.VarInsnNode
 
-private typealias IdentifierPoolFactory = (MethodNode) -> IdentifierPool
 private typealias SourceMatchContextFactory = (ClassNode, MethodNode) -> MESourceMatchContext
 
 class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
@@ -177,9 +168,9 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
 
         val module = at.findModule() ?: return null
 
-        val poolFactory = createIdentifierPoolFactory(module, targetClass, modifierList)
+        val poolFactory = MEExpressionMatchUtil.createIdentifierPoolFactory(module, targetClass, modifierList)
 
-        return MyCollectVisitor(mode, targetClass, parsedExprs, poolFactory)
+        return MyCollectVisitor(mode, project, targetClass, parsedExprs, poolFactory)
     }
 
     private fun parseExpressions(
@@ -197,10 +188,11 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                     ?: return@flatMap emptySequence<Pair<Expression, MEStatement>>()
                 expressionElements.asSequence().mapNotNull { expressionElement ->
                     val text = expressionElement.constantStringValue ?: return@mapNotNull null
+                    // TODO: get the right statement from the injected file
                     val rootStatementPsi = InjectedLanguageManager.getInstance(project)
                         .getInjectedPsiFiles(expressionElement)?.firstOrNull()
-                        ?.let { (it.first as? MEExpressionFile)?.statement }
-                        ?: project.meExpressionElementFactory.createFile(text).statement
+                        ?.let { (it.first as? MEExpressionFile)?.statements?.singleOrNull() }
+                        ?: project.meExpressionElementFactory.createFile("do {$text}").statements.singleOrNull()
                         ?: project.meExpressionElementFactory.createStatement("empty")
                     try {
                         ExpressionParserFacade.parse(text) to rootStatementPsi
@@ -212,61 +204,6 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
             .toList()
     }
 
-    private fun createIdentifierPoolFactory(
-        module: Module,
-        targetClass: ClassNode,
-        modifierList: PsiModifierList,
-    ): IdentifierPoolFactory = { targetMethod ->
-        val pool = IdentifierPool()
-
-        for (annotation in modifierList.annotations) {
-            if (!annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)) {
-                continue
-            }
-
-            val definitionId = annotation.findDeclaredAttributeValue("id")?.constantStringValue ?: ""
-
-            val ats = annotation.findDeclaredAttributeValue("at")?.findAnnotations() ?: emptyList()
-            for (at in ats) {
-                val matchingInsns = RecursionManager.doPreventingRecursion(at, true) {
-                    AtResolver(at, targetClass, targetMethod)
-                        .resolveInstructions()
-                        .mapTo(Collections.newSetFromMap(IdentityHashMap())) { it.insn }
-                } ?: emptySet()
-                pool.addMember(definitionId) { it in matchingInsns }
-            }
-
-            val types = annotation.findDeclaredAttributeValue("type")?.resolveTypeArray() ?: emptyList()
-            for (type in types) {
-                val asmType = Type.getType(type.descriptor)
-                pool.addType(definitionId) { it == asmType }
-            }
-
-            val locals = annotation.findDeclaredAttributeValue("local")?.findAnnotations() ?: emptyList()
-            for (localAnnotation in locals) {
-                val localType = annotation.findDeclaredAttributeValue("type")?.resolveType()
-                val localInfo = LocalInfo.fromAnnotation(localType, localAnnotation)
-                pool.addMember(definitionId) { insn ->
-                    if (insn !is VarInsnNode) {
-                        return@addMember false
-                    }
-                    val actualInsn = if (insn.opcode >= Opcodes.ISTORE && insn.opcode <= Opcodes.ASTORE) {
-                        insn.next ?: return@addMember false
-                    } else {
-                        insn
-                    }
-
-                    val unfilteredLocals = localInfo.getLocals(module, targetClass, targetMethod, actualInsn)
-                        ?: return@addMember false
-                    val filteredLocals = localInfo.matchLocals(unfilteredLocals, CollectVisitor.Mode.MATCH_ALL)
-                    filteredLocals.any { it.index == insn.`var` }
-                }
-            }
-        }
-
-        pool
-    }
-
     override fun createLookup(
         targetClass: ClassNode,
         result: CollectVisitor.Result<PsiElement>
@@ -276,6 +213,7 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
 
     private class MyCollectVisitor(
         mode: Mode,
+        private val project: Project,
         private val targetClass: ClassNode,
         private val expressions: List<Pair<Expression, PsiElement>>,
         private val poolFactory: IdentifierPoolFactory,
@@ -284,50 +222,25 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
             val insns = methodNode.instructions ?: return
 
             val pool = poolFactory(methodNode)
-            val flows = try {
-                FlowInterpreter.analyze(targetClass, methodNode)
-            } catch (e: RuntimeException) {
-                return
-            }
+            val flows = MEExpressionMatchUtil.getFlowMap(project, targetClass, methodNode) ?: return
 
             val result = IdentityHashMap<AbstractInsnNode, Pair<PsiElement, Map<String, Any?>>>()
 
             for ((expr, psiExpr) in expressions) {
-                val decorations = IdentityHashMap<AbstractInsnNode, MutableMap<String, Any?>>()
-                val captured = mutableListOf<Pair<AbstractInsnNode, Int>>()
-                for (insn in insns) {
-                    val sink = object : Expression.OutputSink {
-                        override fun capture(node: FlowValue, expr: Expression?) {
-                            captured += node.insn to (expr?.src?.startIndex ?: 0)
-                            decorations.getOrPut(insn, ::mutableMapOf).putAll(node.decorations)
-                        }
-
-                        override fun decorate(insn: AbstractInsnNode, key: String, value: Any?) {
-                            decorations.getOrPut(insn, ::mutableMapOf)[key] = value
-                        }
-
-                        override fun decorateInjectorSpecific(insn: AbstractInsnNode, key: String, value: Any?) {
-                            // Our maps are per-injector anyway, so this is just a normal decoration.
-                            decorations.getOrPut(insn, ::mutableMapOf)[key] = value
-                        }
-                    }
-
-                    val flow = flows[insn] ?: continue
-                    try {
-                        if (expr.matches(flow, ExpressionContext(pool, sink, targetClass, methodNode))) {
-                            for ((capturedInsn, startOffset) in captured) {
-                                val capturedExpr = psiExpr.findElementAt(startOffset)
-                                    ?.parentOfType<MECapturingExpression>(withSelf = true)
-                                    ?.expression
-                                    ?: psiExpr
-                                result.putIfAbsent(capturedInsn, capturedExpr to decorations[capturedInsn].orEmpty())
-                            }
-                        }
-                    } catch (e: ProcessCanceledException) {
-                        throw e
-                    } catch (ignored: Exception) {
-                        // MixinExtras throws lots of different exceptions
-                    }
+                MEExpressionMatchUtil.findMatchingInstructions(
+                    targetClass,
+                    methodNode,
+                    pool,
+                    flows,
+                    expr,
+                    insns,
+                    false
+                ) { match ->
+                    val capturedExpr = psiExpr.findElementAt(match.startOffset)
+                        ?.parentOfType<MECapturingExpression>(withSelf = true)
+                        ?.expression
+                        ?: psiExpr
+                    result.putIfAbsent(match.flow.insn, capturedExpr to match.decorations)
                 }
             }
 
