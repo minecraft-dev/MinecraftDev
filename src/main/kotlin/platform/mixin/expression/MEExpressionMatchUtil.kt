@@ -55,6 +55,7 @@ import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.findMultiInjectionHost
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.packageName
 import com.demonwav.mcdev.util.resolveType
@@ -63,7 +64,6 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.TailTypeDecorator
-import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -305,9 +305,8 @@ object MEExpressionMatchUtil {
     fun getCompletionVariantsFromBytecode(project: Project, contextElement: PsiElement): List<LookupElement> {
         val statement = contextElement.parentOfType<MEStatement>() ?: return emptyList()
 
-        val expressionAnnotation =
-            InjectedLanguageManager.getInstance(project).getInjectionHost(statement)?.parentOfType<PsiAnnotation>()
-                ?: return emptyList()
+        val expressionAnnotation = contextElement.findMultiInjectionHost()?.parentOfType<PsiAnnotation>()
+            ?: return emptyList()
         if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
             return emptyList()
         }
@@ -726,7 +725,9 @@ object MEExpressionMatchUtil {
     }
 
     private fun String.filterInvalidIdentifierChars(): String {
-        return asSequence().map { if (MEPsiUtil.isIdentifierPart(it)) it else '_' }.joinToString()
+        return asSequence().joinToString("") {
+            if (MEPsiUtil.isIdentifierPart(it)) it.toString() else "_"
+        }
     }
 
     private fun Type.presentableName(): String = when (sort) {
@@ -763,8 +764,8 @@ object MEExpressionMatchUtil {
     }
 
     private fun LookupElementBuilder.withDefinition(id: String, at: String) = withInsertHandler { context, _ ->
-        val injectionHost = InjectedLanguageManager.getInstance(context.project).getInjectionHost(context.file)
-            ?: return@withInsertHandler
+        val contextElement = context.file.findElementAt(context.startOffset) ?: return@withInsertHandler
+        val injectionHost = contextElement.findMultiInjectionHost() ?: return@withInsertHandler
         val expressionAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return@withInsertHandler
         if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
             return@withInsertHandler
@@ -785,7 +786,7 @@ object MEExpressionMatchUtil {
             "@${MixinConstants.MixinExtras.DEFINITION}(id = \"$id\", $at)",
             modifierList,
         )
-        val addedAnnotation = modifierList.add(newAnnotation)
+        val addedAnnotation = modifierList.addAfter(newAnnotation, modifierList.annotations.lastOrNull())
 
         // add imports and reformat
         JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(addedAnnotation)

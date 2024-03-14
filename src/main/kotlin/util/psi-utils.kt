@@ -24,6 +24,7 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
@@ -47,6 +48,7 @@ import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiKeyword
+import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodReferenceExpression
@@ -67,6 +69,7 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.TypeConversionUtil
+import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
 import com.intellij.util.IncorrectOperationException
 import com.siyeh.ig.psiutils.ImportUtils
@@ -185,6 +188,18 @@ inline fun <reified T : PsiElement> PsiElement.childrenOfType(): Collection<T> =
 
 inline fun <reified T : PsiElement> PsiElement.childOfType(): T? =
     PsiTreeUtil.findChildOfType(this, T::class.java)
+
+/**
+ * [InjectedLanguageManager.getInjectionHost] returns the first host of a multi-host injection for some reason.
+ * Use this method as a workaround.
+ */
+fun PsiElement.findMultiInjectionHost(): PsiLanguageInjectionHost? {
+    val injectedLanguageManager = InjectedLanguageManager.getInstance(project)
+    val hostFile = injectedLanguageManager.getInjectionHost(this)?.containingFile ?: return null
+    val hostOffset = injectedLanguageManager.injectedToHost(this, textRange.startOffset)
+    val hostElement = hostFile.findElementAt(hostOffset) ?: return null
+    return hostElement.parentOfType<PsiLanguageInjectionHost>(withSelf = true)
+}
 
 fun <T : Any> Sequence<T>.filter(filter: ElementFilter?, context: PsiElement): Sequence<T> {
     filter ?: return this
