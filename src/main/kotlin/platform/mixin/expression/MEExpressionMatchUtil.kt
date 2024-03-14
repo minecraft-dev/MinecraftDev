@@ -786,7 +786,10 @@ object MEExpressionMatchUtil {
             "@${MixinConstants.MixinExtras.DEFINITION}(id = \"$id\", $at)",
             modifierList,
         )
-        val addedAnnotation = modifierList.addAfter(newAnnotation, modifierList.annotations.lastOrNull())
+        val addedAnnotation = modifierList.addAfter(
+            newAnnotation,
+            modifierList.annotations.lastOrNull { it.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) }
+        )
 
         // add imports and reformat
         JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(addedAnnotation)
