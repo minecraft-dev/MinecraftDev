@@ -18,21 +18,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
+package com.demonwav.mcdev.platform.mixin.expression.psi
 
-import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
-import com.intellij.lang.ASTNode
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEVisitor
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiRecursiveVisitor
+import com.intellij.psi.PsiWalkingState
 
-abstract class MECapturingExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
-    override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        context.addCapture(java)
-        return expression?.matchesJava(java, context) == true
+abstract class MERecursiveWalkingVisitor : MEVisitor(), PsiRecursiveVisitor {
+    private val walkingState = object : PsiWalkingState(this) {
+        override fun elementFinished(element: PsiElement) {
+            this@MERecursiveWalkingVisitor.elementFinished(element)
+        }
     }
 
-    override fun getInputExprs() = listOfNotNull(expression)
+    override fun visitElement(element: PsiElement) {
+        walkingState.elementStarted(element)
+    }
 
-    protected abstract val expression: MEExpression?
+    open fun elementFinished(element: PsiElement) {
+    }
+
+    fun stopWalking() {
+        walkingState.stopWalking()
+    }
 }

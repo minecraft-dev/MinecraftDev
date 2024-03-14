@@ -62,6 +62,8 @@ abstract class MEMemberAccessExpressionImplMixin(node: ASTNode) : MEExpressionIm
         return memberName.matchesJavaExpr(java, context)
     }
 
+    override fun getInputExprs() = listOf(receiverExpr)
+
     protected abstract val receiverExpr: MEExpression
     protected abstract val memberName: MEName
 }

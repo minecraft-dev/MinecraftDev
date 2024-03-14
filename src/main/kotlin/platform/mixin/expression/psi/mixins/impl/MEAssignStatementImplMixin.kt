@@ -50,6 +50,8 @@ abstract class MEAssignStatementImplMixin(node: ASTNode) : MEStatementImpl(node)
         }
     }
 
+    override fun getInputExprs() = listOfNotNull(targetExpr, rightExpr)
+
     protected abstract val targetExpr: MEExpression
     protected abstract val rightExpr: MEExpression?
 }

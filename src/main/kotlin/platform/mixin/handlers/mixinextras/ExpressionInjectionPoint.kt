@@ -57,7 +57,6 @@ import com.intellij.psi.PsiModifierList
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.parentOfType
-import com.llamalad7.mixinextras.expression.impl.ExpressionParserFacade
 import com.llamalad7.mixinextras.expression.impl.ast.expressions.Expression
 import java.util.IdentityHashMap
 import org.objectweb.asm.tree.AbstractInsnNode
@@ -194,11 +193,7 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                         ?.let { (it.first as? MEExpressionFile)?.statements?.singleOrNull() }
                         ?: project.meExpressionElementFactory.createFile("do {$text}").statements.singleOrNull()
                         ?: project.meExpressionElementFactory.createStatement("empty")
-                    try {
-                        ExpressionParserFacade.parse(text) to rootStatementPsi
-                    } catch (e: Exception) {
-                        null
-                    }
+                    MEExpressionMatchUtil.createExpression(text)?.let { it to rootStatementPsi }
                 }
             }
             .toList()

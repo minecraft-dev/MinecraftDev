@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEMatchableElement
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
@@ -29,5 +30,9 @@ import com.intellij.psi.PsiElement
 abstract class MEStatementImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), MEMatchableElement {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         throw UnsupportedOperationException("Please implement matchesJava for your statement type")
+    }
+
+    override fun getInputExprs(): List<MEExpression> {
+        throw UnsupportedOperationException("Please implement getInputExprs for your statement type")
     }
 }

@@ -46,6 +46,8 @@ abstract class MEInstantiationExpressionImplMixin(node: ASTNode) : MEExpressionI
             arguments?.matchesJava(javaArgs, context) == true
     }
 
+    override fun getInputExprs() = arguments?.expressionList ?: emptyList()
+
     protected abstract val type: MEName
     protected abstract val arguments: MEArguments?
 }

@@ -59,5 +59,7 @@ abstract class MEUnaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node
         return expression?.matchesJava(javaOperand, context) == true
     }
 
+    override fun getInputExprs() = listOfNotNull(expression)
+
     protected abstract val expression: MEExpression?
 }

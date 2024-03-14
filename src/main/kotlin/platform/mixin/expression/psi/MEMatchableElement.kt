@@ -21,8 +21,11 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.intellij.psi.PsiElement
 
 interface MEMatchableElement : PsiElement {
     fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean
+
+    fun getInputExprs(): List<MEExpression>
 }

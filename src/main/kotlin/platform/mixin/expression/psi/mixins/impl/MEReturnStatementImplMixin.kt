@@ -37,5 +37,7 @@ abstract class MEReturnStatementImplMixin(node: ASTNode) : MEStatementImpl(node)
         return valueExpr?.matchesJava(javaReturnValue, context) == true
     }
 
+    override fun getInputExprs() = listOfNotNull(valueExpr)
+
     protected abstract val valueExpr: MEExpression?
 }

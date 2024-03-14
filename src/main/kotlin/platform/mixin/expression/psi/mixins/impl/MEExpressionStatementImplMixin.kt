@@ -31,5 +31,7 @@ abstract class MEExpressionStatementImplMixin(node: ASTNode) : MEStatementImpl(n
         return expression.matchesJava(java, context)
     }
 
+    override fun getInputExprs() = listOf(expression)
+
     protected abstract val expression: MEExpression
 }

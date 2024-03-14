@@ -108,6 +108,8 @@ abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(n
         }
     }
 
+    override fun getInputExprs() = dimExprs + (arrayInitializer?.expressionList ?: emptyList())
+
     protected abstract val elementType: MEName
     protected abstract val dimExprs: List<MEExpression>
     protected abstract val arrayInitializer: MEArguments?

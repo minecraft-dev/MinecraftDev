@@ -31,5 +31,7 @@ abstract class MEParenthesizedExpressionImplMixin(node: ASTNode) : MEExpressionI
         return expression?.matchesJava(java, context) == true
     }
 
+    override fun getInputExprs() = listOfNotNull(expression)
+
     protected abstract val expression: MEExpression?
 }

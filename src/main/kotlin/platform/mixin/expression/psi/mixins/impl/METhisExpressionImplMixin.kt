@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
@@ -30,4 +31,6 @@ abstract class METhisExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node)
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         return java is PsiThisExpression && java.qualifier == null
     }
+
+    override fun getInputExprs() = emptyList<MEExpression>()
 }

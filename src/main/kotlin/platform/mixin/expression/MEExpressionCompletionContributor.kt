@@ -36,11 +36,13 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.TailTypeDecorator
+import com.intellij.openapi.editor.Editor
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.StandardPatterns.and
 import com.intellij.patterns.StandardPatterns.not
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
+import com.intellij.util.text.CharArrayUtil
 
 class MEExpressionCompletionContributor : CompletionContributor() {
     companion object {
@@ -86,6 +88,26 @@ class MEExpressionCompletionContributor : CompletionContributor() {
             NORMAL_ELEMENT,
             AFTER_END_EXPRESSION_PATTERN,
         )
+        private val FROM_BYTECODE_PLACE = psiElement()
+            .inside(MEStatement::class.java)
+            .andNot(psiElement().inside(MELitExpression::class.java))
+
+        val DOT_CLASS_TAIL = object : TailType() {
+            override fun processTail(editor: Editor, tailOffset: Int): Int {
+                editor.document.insertString(tailOffset, ".class")
+                return moveCaret(editor, tailOffset, 6)
+            }
+
+            override fun isApplicable(context: InsertionContext): Boolean {
+                val chars = context.document.charsSequence
+                val dotOffset = CharArrayUtil.shiftForward(chars, context.tailOffset, " \n\t")
+                if (!CharArrayUtil.regionMatches(chars, dotOffset, ".")) {
+                    return true
+                }
+                val classOffset = CharArrayUtil.shiftForward(chars, dotOffset + 1, " \n\t")
+                return !CharArrayUtil.regionMatches(chars, classOffset, "class")
+            }
+        }
     }
 
     init {
@@ -123,6 +145,22 @@ class MEExpressionCompletionContributor : CompletionContributor() {
                 Keyword("instanceof", TailType.INSERT_SPACE)
             )
         )
+        extend(
+            CompletionType.BASIC,
+            FROM_BYTECODE_PLACE,
+            object : CompletionProvider<CompletionParameters>() {
+                override fun addCompletions(
+                    parameters: CompletionParameters,
+                    context: ProcessingContext,
+                    result: CompletionResultSet
+                ) {
+                    val project = parameters.originalFile.project
+                    result.addAllElements(
+                        MEExpressionMatchUtil.getCompletionVariantsFromBytecode(project, parameters.position)
+                    )
+                }
+            }
+        )
     }
 
     private class KeywordCompletionProvider(
@@ -149,4 +187,28 @@ class MEExpressionCompletionContributor : CompletionContributor() {
     }
 
     private class Keyword(val name: String, val tailType: TailType = TailType.NONE)
+
+    class BracketsTailType(private val dimensions: Int) : TailType() {
+        override fun processTail(editor: Editor, tailOffset: Int): Int {
+            editor.document.insertString(tailOffset, "[]".repeat(dimensions))
+            return moveCaret(editor, tailOffset, 2 * dimensions)
+        }
+
+        override fun isApplicable(context: InsertionContext): Boolean {
+            val chars = context.document.charsSequence
+            var offset = context.tailOffset
+            repeat(dimensions) {
+                offset = CharArrayUtil.shiftForward(chars, offset, " \n\t")
+                if (!CharArrayUtil.regionMatches(chars, offset, "[")) {
+                    return true
+                }
+                offset = CharArrayUtil.shiftForward(chars, offset, " \n\t")
+                if (!CharArrayUtil.regionMatches(chars, offset, "]")) {
+                    return true
+                }
+            }
+
+            return false
+        }
+    }
 }

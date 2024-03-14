@@ -63,6 +63,8 @@ abstract class MEMethodCallExpressionImplMixin(node: ASTNode) : MEExpressionImpl
         return arguments?.matchesJava(java.argumentList, context) == true
     }
 
+    override fun getInputExprs() = listOf(receiverExpr) + (arguments?.expressionList ?: emptyList())
+
     protected abstract val receiverExpr: MEExpression
     protected abstract val memberName: MEName
     protected abstract val arguments: MEArguments?

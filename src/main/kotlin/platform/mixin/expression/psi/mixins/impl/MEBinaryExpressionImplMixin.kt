@@ -89,6 +89,12 @@ abstract class MEBinaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(nod
         }
     }
 
+    override fun getInputExprs() = if (operator == MEExpressionTypes.TOKEN_INSTANCEOF) {
+        listOf(leftExpr)
+    } else {
+        listOfNotNull(leftExpr, rightExpr)
+    }
+
     protected abstract val leftExpr: MEExpression
     protected abstract val rightExpr: MEExpression?
 

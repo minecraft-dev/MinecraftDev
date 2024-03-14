@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.intellij.lang.ASTNode
@@ -52,6 +53,8 @@ abstract class MEClassConstantExpressionImplMixin(node: ASTNode) : MEExpressionI
             else -> false
         }
     }
+
+    override fun getInputExprs() = emptyList<MEExpression>()
 
     protected abstract val type: METype
 }

@@ -143,6 +143,18 @@ fun Type.toPsiType(elementFactory: PsiElementFactory, context: PsiElement? = nul
     return elementFactory.createTypeFromText(javaClassName, context)
 }
 
+val Type.canonicalName get() = computeCanonicalName(this)
+
+private fun computeCanonicalName(type: Type): String {
+    return when (type.sort) {
+        Type.ARRAY -> computeCanonicalName(type.elementType) + "[]".repeat(type.dimensions)
+        Type.OBJECT -> type.className.replace('$', '.')
+        else -> type.className
+    }
+}
+
+val Type.isPrimitive get() = sort != Type.ARRAY && sort != Type.OBJECT && sort != Type.METHOD
+
 private fun hasAccess(access: Int, flag: Int) = (access and flag) != 0
 
 // ClassNode

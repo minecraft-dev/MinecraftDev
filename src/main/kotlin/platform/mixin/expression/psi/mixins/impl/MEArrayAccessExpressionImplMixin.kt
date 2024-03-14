@@ -51,6 +51,8 @@ abstract class MEArrayAccessExpressionImplMixin(node: ASTNode) : MEExpressionImp
         return arrayExpr.matchesJava(javaArray, context) && indexExpr?.matchesJava(javaIndex, context) == true
     }
 
+    override fun getInputExprs() = listOfNotNull(arrayExpr, indexExpr)
+
     protected abstract val arrayExpr: MEExpression
     protected abstract val indexExpr: MEExpression?
 }

@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MELitExpressionMixin
@@ -111,6 +112,8 @@ abstract class MELitExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
             else -> false
         }
     }
+
+    override fun getInputExprs() = emptyList<MEExpression>()
 
     private val Any?.widened: Any? get() = when (this) {
         is Int -> toLong()

@@ -47,4 +47,12 @@ object MEPsiUtil {
         val actualExpr = skipParenthesizedExprDown(expr) ?: return false
         return actualExpr is MENameExpression && actualExpr.meName.isWildcard
     }
+
+    fun isIdentifierStart(char: Char): Boolean {
+        return char in 'a'..'z' || char in 'A'..'Z' || char == '_'
+    }
+
+    fun isIdentifierPart(char: Char): Boolean {
+        return isIdentifierStart(char) || char in '0'..'9'
+    }
 }

@@ -47,6 +47,8 @@ abstract class MEStaticMethodCallExpressionImplMixin(node: ASTNode) : MEExpressi
         return arguments?.matchesJava(java.argumentList, context) == true
     }
 
+    override fun getInputExprs() = arguments?.expressionList ?: emptyList()
+
     protected abstract val memberName: MEName
     protected abstract val arguments: MEArguments?
 }
