@@ -322,7 +322,7 @@ object MEExpressionMatchUtil {
             handler to annotation
         } ?: return emptyList()
 
-        val cursorOffset = contextElement.textRange.startOffset
+        val cursorOffset = contextElement.textRange.startOffset - statement.textRange.startOffset
 
         return mixinClass.mixinTargets.flatMap { targetClass ->
             val poolFactory = createIdentifierPoolFactory(module, targetClass, modifierList)
@@ -363,6 +363,8 @@ object MEExpressionMatchUtil {
         removeExplicitCaptures(statement, cursorOffset)
         replaceUnknownNamesWithWildcards(project, statement, cursorOffset, pool)
 
+        val elementAtCursor = statement.findElementAt(cursorOffset.toInt()) ?: return emptyList()
+
         val statementToMatch = statement.copy() as MEStatement
         replaceCursorInputWithWildcard(project, statementToMatch, cursorOffset.toInt())
 
@@ -388,6 +390,7 @@ object MEExpressionMatchUtil {
             val inputExprOnCursor = subExpr.getInputExprs().firstOrNull { it.textRange.contains(cursorOffset.toInt()) }
                 ?: break
             val exprToMatch = inputExprOnCursor.copy() as MEExpression
+            cursorOffset.setValue(cursorOffset.toInt() - inputExprOnCursor.textRange.startOffset)
             replaceCursorInputWithWildcard(project, exprToMatch, cursorOffset.toInt())
             val meExpression = createExpression(exprToMatch.text) ?: return emptyList()
 
@@ -423,8 +426,6 @@ object MEExpressionMatchUtil {
         for (flow in matchingFlows) {
             getInstructionsInFlowTree(flow, cursorInstructions, false)
         }
-
-        val elementAtCursor = statement.findElementAt(cursorOffset.toInt()) ?: return emptyList()
 
         val isInsideMeType = PsiTreeUtil.getParentOfType(
             elementAtCursor,
