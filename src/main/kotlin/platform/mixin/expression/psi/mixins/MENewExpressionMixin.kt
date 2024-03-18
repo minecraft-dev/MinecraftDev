@@ -20,12 +20,16 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArguments
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.intellij.psi.PsiElement
 
-interface MENewArrayExpressionMixin : MEExpression {
+interface MENewExpressionMixin : PsiElement {
+    val isArrayCreation: Boolean
+    val hasConstructorArguments: Boolean
     val dimensions: Int
     val dimExprTokens: List<DimExprTokens>
+    val arrayInitializer: MEArguments?
 
     class DimExprTokens(val leftBracket: PsiElement, val expr: MEExpression?, val rightBracket: PsiElement?)
 }

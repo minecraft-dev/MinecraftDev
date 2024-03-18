@@ -26,13 +26,12 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEBinaryExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclarationItem
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEInstantiationExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MELitExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMemberAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewArrayExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MESuperCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
@@ -63,8 +62,7 @@ class MEExpressionAnnotator : Annotator {
                 if (!element.isWildcard) {
                     when (val parent = element.parent) {
                         is METype,
-                        is MEInstantiationExpression,
-                        is MENewArrayExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                        is MENewExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
                             .range(element)
                             .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
                             .create()
@@ -160,43 +158,55 @@ class MEExpressionAnnotator : Annotator {
                         .create()
                 }
             }
-            is MENewArrayExpression -> {
-                val initializer = element.arrayInitializer
-                if (initializer != null) {
-                    if (element.dimExprs.isNotEmpty()) {
-                        holder.newAnnotation(
-                            HighlightSeverity.ERROR,
-                            MCDevBundle("mixinextras.expression.lang.errors.new_array_dim_expr_with_initializer"),
-                        )
-                            .range(initializer)
-                            .create()
-                    } else if (initializer.expressionList.isEmpty()) {
-                        holder.newAnnotation(
-                            HighlightSeverity.ERROR,
-                            MCDevBundle("mixinextras.expression.lang.errors.empty_array_initializer"),
-                        )
-                            .range(initializer)
-                            .create()
-                    }
-                } else {
-                    if (element.dimExprs.isEmpty()) {
-                        holder.newAnnotation(
-                            HighlightSeverity.ERROR,
-                            MCDevBundle("mixinextras.expression.lang.errors.missing_array_length")
-                        )
-                            .range(element.dimExprTokens[0].leftBracket)
-                            .create()
+            is MENewExpression -> {
+                if (element.isArrayCreation) {
+                    val initializer = element.arrayInitializer
+                    if (initializer != null) {
+                        if (element.dimExprs.isNotEmpty()) {
+                            holder.newAnnotation(
+                                HighlightSeverity.ERROR,
+                                MCDevBundle("mixinextras.expression.lang.errors.new_array_dim_expr_with_initializer"),
+                            )
+                                .range(initializer)
+                                .create()
+                        } else if (initializer.expressionList.isEmpty()) {
+                            holder.newAnnotation(
+                                HighlightSeverity.ERROR,
+                                MCDevBundle("mixinextras.expression.lang.errors.empty_array_initializer"),
+                            )
+                                .range(initializer)
+                                .create()
+                        }
                     } else {
-                        element.dimExprTokens.asSequence().dropWhile { it.expr != null }.forEach {
-                            if (it.expr != null) {
-                                holder.newAnnotation(
-                                    HighlightSeverity.ERROR,
-                                    MCDevBundle("mixinextras.expression.lang.errors.array_length_after_empty")
-                                )
-                                    .range(it.expr)
-                                    .create()
+                        if (element.dimExprs.isEmpty()) {
+                            holder.newAnnotation(
+                                HighlightSeverity.ERROR,
+                                MCDevBundle("mixinextras.expression.lang.errors.missing_array_length")
+                            )
+                                .range(element.dimExprTokens[0].leftBracket)
+                                .create()
+                        } else {
+                            element.dimExprTokens.asSequence().dropWhile { it.expr != null }.forEach {
+                                if (it.expr != null) {
+                                    holder.newAnnotation(
+                                        HighlightSeverity.ERROR,
+                                        MCDevBundle("mixinextras.expression.lang.errors.array_length_after_empty")
+                                    )
+                                        .range(it.expr)
+                                        .create()
+                                }
                             }
                         }
+                    }
+                } else if (!element.hasConstructorArguments) {
+                    val type = element.type
+                    if (type != null) {
+                        holder.newAnnotation(
+                            HighlightSeverity.ERROR,
+                            MCDevBundle("mixinextras.expression.lang.errors.new_no_constructor_args_or_array"),
+                        )
+                            .range(type)
+                            .create()
                     }
                 }
             }

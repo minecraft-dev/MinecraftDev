@@ -27,7 +27,7 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
-import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewArrayExpressionMixin
+import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewExpressionMixin
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
@@ -35,11 +35,15 @@ import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.siblings
 
-abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MENewArrayExpressionMixin {
+abstract class MENewExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MENewExpressionMixin {
+    override val isArrayCreation get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET) != null
+
+    override val hasConstructorArguments get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_PAREN) != null
+
     override val dimensions get() = findChildrenByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET).size
 
-    override val dimExprTokens: List<MENewArrayExpressionMixin.DimExprTokens> get() {
-        val result = mutableListOf<MENewArrayExpressionMixin.DimExprTokens>()
+    override val dimExprTokens: List<MENewExpressionMixin.DimExprTokens> get() {
+        val result = mutableListOf<MENewExpressionMixin.DimExprTokens>()
 
         var leftBracket: PsiElement? = findNotNullChildByType(MEExpressionTypes.TOKEN_LEFT_BRACKET)
         while (leftBracket != null) {
@@ -59,11 +63,17 @@ abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(n
                     }
                 }
             }
-            result += MENewArrayExpressionMixin.DimExprTokens(leftBracket, expr, rightBracket)
+            result += MENewExpressionMixin.DimExprTokens(leftBracket, expr, rightBracket)
             leftBracket = nextLeftBracket
         }
 
         return result
+    }
+
+    override val arrayInitializer get() = if (isArrayCreation) {
+        arguments
+    } else {
+        null
     }
 
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
@@ -71,46 +81,58 @@ abstract class MENewArrayExpressionImplMixin(node: ASTNode) : MEExpressionImpl(n
             return false
         }
 
-        if (!java.isArrayCreation) {
-            return false
-        }
+        if (isArrayCreation) {
+            if (!java.isArrayCreation) {
+                return false
+            }
 
-        val javaArrayType = java.type as? PsiArrayType ?: return false
-        if (javaArrayType.arrayDimensions != dimensions) {
-            return false
-        }
+            val javaArrayType = java.type as? PsiArrayType ?: return false
+            if (javaArrayType.arrayDimensions != dimensions) {
+                return false
+            }
 
-        val matchesType = context.project.meExpressionElementFactory.createType(elementType)
-            .matchesJava(javaArrayType.deepComponentType, context)
-        if (!matchesType) {
-            return false
-        }
+            val matchesType = context.project.meExpressionElementFactory.createType(type)
+                .matchesJava(javaArrayType.deepComponentType, context)
+            if (!matchesType) {
+                return false
+            }
 
-        val javaArrayDims = java.arrayDimensions
-        val arrayDims = dimExprs
-        if (javaArrayDims.size != arrayDims.size) {
-            return false
-        }
-        if (!javaArrayDims.asSequence().zip(arrayDims.asSequence()).all { (javaArrayDim, arrayDim) ->
-            val actualJavaDim = PsiUtil.skipParenthesizedExprDown(javaArrayDim) ?: return@all false
-            arrayDim.matchesJava(actualJavaDim, context)
-        }
-        ) {
-            return false
-        }
+            val javaArrayDims = java.arrayDimensions
+            val arrayDims = dimExprs
+            if (javaArrayDims.size != arrayDims.size) {
+                return false
+            }
+            if (!javaArrayDims.asSequence().zip(arrayDims.asSequence()).all { (javaArrayDim, arrayDim) ->
+                val actualJavaDim = PsiUtil.skipParenthesizedExprDown(javaArrayDim) ?: return@all false
+                arrayDim.matchesJava(actualJavaDim, context)
+            }
+            ) {
+                return false
+            }
 
-        val javaArrayInitializer = java.arrayInitializer
-        val arrayInitializer = this.arrayInitializer
-        return if (javaArrayInitializer == null) {
-            arrayInitializer == null
-        } else {
-            arrayInitializer?.matchesJava(javaArrayInitializer.initializers, context) == true
+            val javaArrayInitializer = java.arrayInitializer
+            val arrayInitializer = this.arrayInitializer
+            return if (javaArrayInitializer == null) {
+                arrayInitializer == null
+            } else {
+                arrayInitializer?.matchesJava(javaArrayInitializer.initializers, context) == true
+            }
+        } else { // !isArrayCreation
+            if (java.isArrayCreation) {
+                return false
+            }
+
+            val javaType = java.type ?: return false
+            val javaArgs = java.argumentList ?: return false
+
+            return context.project.meExpressionElementFactory.createType(type).matchesJava(javaType, context) &&
+                arguments?.matchesJava(javaArgs, context) == true
         }
     }
 
-    override fun getInputExprs() = dimExprs + (arrayInitializer?.expressionList ?: emptyList())
+    override fun getInputExprs() = dimExprs + (arguments?.expressionList ?: emptyList())
 
-    protected abstract val elementType: MEName
+    protected abstract val type: MEName
     protected abstract val dimExprs: List<MEExpression>
-    protected abstract val arrayInitializer: MEArguments?
+    protected abstract val arguments: MEArguments?
 }

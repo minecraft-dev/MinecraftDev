@@ -122,8 +122,7 @@ expression ::= capturingExpression |
     methodCallExpression |
     arrayAccessExpression |
     memberAccessExpression |
-    instantiationExpression |
-    newArrayExpression |
+    newExpression |
     litExpression |
     thisExpression |
     nameExpression {
@@ -209,15 +208,6 @@ castExpression ::= parenthesizedExpression expression {
     mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MECastExpressionImplMixin"
 }
 
-instantiationExpression ::= TOKEN_NEW name TOKEN_LEFT_PAREN arguments rightParen {
-    rightAssociative = true
-    pin = 3
-    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MEInstantiationExpressionImplMixin"
-    methods = [
-        type = "name"
-    ]
-}
-
 binaryExpression ::= expression binaryOp expression {
     pin = 2
     implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEBinaryExpressionMixin"
@@ -244,17 +234,20 @@ private shiftOp ::= TOKEN_SHL | TOKEN_SHR | TOKEN_USHR
 private comparisonOp ::= TOKEN_LT | TOKEN_LE | TOKEN_GT | TOKEN_GE
 private equalityOp ::= TOKEN_EQ | TOKEN_NE
 
-newArrayExpression ::= TOKEN_NEW name
-    TOKEN_LEFT_BRACKET expression? rightBracket
-    ( TOKEN_LEFT_BRACKET expression? rightBracket )*
-    ( TOKEN_LEFT_BRACE arguments rightBrace )? {
-    pin = 3
-    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewArrayExpressionMixin"
-    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENewArrayExpressionImplMixin"
+newExpression ::= TOKEN_NEW name (
+    (TOKEN_LEFT_PAREN arguments rightParen) |
+    (
+        TOKEN_LEFT_BRACKET expression? rightBracket
+        ( TOKEN_LEFT_BRACKET expression? rightBracket )*
+        ( TOKEN_LEFT_BRACE arguments rightBrace )?
+    )
+) {
+    pin = 1
+    implements = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewExpressionMixin"
+    mixin = "com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl.MENewExpressionImplMixin"
     methods = [
-        elementType = "name"
+        type = "name"
         dimExprs = "expression"
-        arrayInitializer = "arguments"
     ]
 }
 

@@ -23,14 +23,15 @@ package com.demonwav.mcdev.platform.mixin.expression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArrayAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEAssignStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECapturingExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECastExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEClassConstantExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEInstantiationExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMemberAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEMethodCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENameExpression
-import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewArrayExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MENewExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEParenthesizedExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallExpression
@@ -50,6 +51,7 @@ import com.demonwav.mcdev.platform.mixin.util.cached
 import com.demonwav.mcdev.platform.mixin.util.canonicalName
 import com.demonwav.mcdev.platform.mixin.util.isPrimitive
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.platform.mixin.util.textify
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotations
@@ -116,6 +118,7 @@ typealias FlowMap = Map<AbstractInsnNode, FlowValue>
 
 object MEExpressionMatchUtil {
     private val LOGGER = logger<MEExpressionMatchUtil>()
+    private const val DEBUG_COMPLETION = false
 
     fun getFlowMap(project: Project, classIn: ClassNode, methodIn: MethodNode): FlowMap? {
         if (methodIn.instructions == null) {
@@ -353,6 +356,10 @@ object MEExpressionMatchUtil {
         targetMethod: MethodNode,
         poolFactory: IdentifierPoolFactory,
     ): List<LookupElement> {
+        if (DEBUG_COMPLETION) {
+            println("======")
+        }
+
         if (targetMethod.instructions == null) {
             return emptyList()
         }
@@ -371,6 +378,10 @@ object MEExpressionMatchUtil {
 
         var matchingFlows = mutableListOf<FlowValue>()
         for (statementToMatch in getStatementVariants(project.meExpressionElementFactory, wildcardReplacedStatement)) {
+            if (DEBUG_COMPLETION) {
+                println("Matching against statement ${statementToMatch.text}")
+            }
+
             val meStatement = createExpression(statementToMatch.text) ?: continue
             findMatchingInstructions(
                 targetClass,
@@ -382,6 +393,9 @@ object MEExpressionMatchUtil {
                 true
             ) { match ->
                 matchingFlows += match.flow
+                if (DEBUG_COMPLETION) {
+                    println("Matched ${match.flow.insn.textify()}")
+                }
             }
         }
         if (matchingFlows.isEmpty()) {
@@ -398,6 +412,10 @@ object MEExpressionMatchUtil {
 
             val newMatchingFlows = mutableSetOf<FlowValue>()
             for (exprToMatch in getExpressionVariants(project.meExpressionElementFactory, wildcardReplacedExpr)) {
+                if (DEBUG_COMPLETION) {
+                    println("Matching against expression ${exprToMatch.text}")
+                }
+
                 val meExpression = createExpression(exprToMatch.text) ?: continue
 
                 val flattenedInstructions = mutableSetOf<AbstractInsnNode>()
@@ -419,6 +437,9 @@ object MEExpressionMatchUtil {
                     true
                 ) { match ->
                     newMatchingFlows += match.flow
+                    if (DEBUG_COMPLETION) {
+                        println("Matched ${match.flow.insn.textify()}")
+                    }
                 }
             }
 
@@ -435,15 +456,28 @@ object MEExpressionMatchUtil {
             getInstructionsInFlowTree(flow, cursorInstructions, false)
         }
 
+        if (DEBUG_COMPLETION) {
+            println("Found ${cursorInstructions.size} matching instructions:")
+            for (insn in cursorInstructions) {
+                println("- ${insn.textify()}")
+            }
+        }
+
         val isInsideMeType = PsiTreeUtil.getParentOfType(
             elementAtCursor,
             METype::class.java,
             false,
             MEExpression::class.java
         ) != null
+        val isInsideNewExpr = PsiTreeUtil.getParentOfType(
+            elementAtCursor,
+            MENewExpression::class.java,
+            false,
+            MEExpression::class.java
+        ) != null
         val cursorExprInTypePosition = !isInsideMeType &&
             elementAtCursor.parentOfType<MEExpression>()?.let(METypeUtil::isExpressionInTypePosition) == true
-        val inTypePosition = isInsideMeType || cursorExprInTypePosition
+        val inTypePosition = isInsideMeType || isInsideNewExpr || cursorExprInTypePosition
         val isPossiblyIncompleteCast = !inTypePosition &&
             elementAtCursor.parentOfType<MEExpression>()
                 ?.parents(false)
@@ -518,20 +552,12 @@ object MEExpressionMatchUtil {
                 super.visitMemberAccessExpression(o)
             }
 
-            override fun visitInstantiationExpression(o: MEInstantiationExpression) {
+            override fun visitNewExpression(o: MENewExpression) {
                 val name = o.type
-                if (!name.isWildcard && !pool.typeExists(name.text)) {
+                if (name != null && !name.isWildcard && !pool.typeExists(name.text)) {
                     unknownNames += name
                 }
-                super.visitInstantiationExpression(o)
-            }
-
-            override fun visitNewArrayExpression(o: MENewArrayExpression) {
-                val name = o.elementType
-                if (!name.isWildcard && !pool.typeExists(name.text)) {
-                    unknownNames += name
-                }
-                super.visitNewArrayExpression(o)
+                super.visitNewExpression(o)
             }
         })
 
@@ -826,6 +852,40 @@ object MEExpressionMatchUtil {
         val assignmentStatement = factory.createStatement("? = ?") as MEAssignStatement
         assignmentStatement.targetExpr.replace(expression.copy())
         variants += assignmentStatement
+
+        when (expression) {
+            is MEParenthesizedExpression -> {
+                val castExpr = factory.createExpression("(?) ?") as MECastExpression
+                castExpr.castTypeExpr!!.replace(expression.copy())
+                variants += castExpr
+            }
+            is MENameExpression -> {
+                val callExpr = factory.createExpression("?()") as MEStaticMethodCallExpression
+                callExpr.memberName.replace(expression.meName)
+                variants += callExpr
+
+                val classExpr = factory.createExpression("${expression.text}.class") as MEClassConstantExpression
+                variants += classExpr
+            }
+            is MEMemberAccessExpression -> {
+                val callExpr = factory.createExpression("?.?()") as MEMethodCallExpression
+                callExpr.receiverExpr.replace(expression.receiverExpr)
+                callExpr.memberName.replace(expression.memberName)
+                variants += callExpr
+            }
+            is MENewExpression -> {
+                val type = expression.type
+                if (type != null && !expression.hasConstructorArguments && !expression.isArrayCreation) {
+                    val fixedNewExpr = factory.createExpression("new ?()") as MENewExpression
+                    fixedNewExpr.type!!.replace(type)
+                    variants += fixedNewExpr
+
+                    val fixedNewArrayExpr = factory.createExpression("new ?[?]") as MENewExpression
+                    fixedNewArrayExpr.type!!.replace(type)
+                    variants += fixedNewArrayExpr
+                }
+            }
+        }
 
         return variants
     }
