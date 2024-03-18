@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArrayAccessExpression
+import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEAssignStatement
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECapturingExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionStatement
@@ -365,21 +366,23 @@ object MEExpressionMatchUtil {
 
         val elementAtCursor = statement.findElementAt(cursorOffset.toInt()) ?: return emptyList()
 
-        val statementToMatch = statement.copy() as MEStatement
-        replaceCursorInputWithWildcard(project, statementToMatch, cursorOffset.toInt())
+        val wildcardReplacedStatement = statement.copy() as MEStatement
+        replaceCursorInputWithWildcard(project, wildcardReplacedStatement, cursorOffset.toInt())
 
-        val meStatement = createExpression(statementToMatch.text) ?: return emptyList()
-        val matchingFlows = mutableListOf<FlowValue>()
-        findMatchingInstructions(
-            targetClass,
-            targetMethod,
-            pool,
-            flows,
-            meStatement,
-            targetMethod.instructions,
-            true
-        ) { match ->
-            matchingFlows += match.flow
+        var matchingFlows = mutableListOf<FlowValue>()
+        for (statementToMatch in getStatementVariants(project.meExpressionElementFactory, wildcardReplacedStatement)) {
+            val meStatement = createExpression(statementToMatch.text) ?: continue
+            findMatchingInstructions(
+                targetClass,
+                targetMethod,
+                pool,
+                flows,
+                meStatement,
+                targetMethod.instructions,
+                true
+            ) { match ->
+                matchingFlows += match.flow
+            }
         }
         if (matchingFlows.isEmpty()) {
             return emptyList()
@@ -389,35 +392,40 @@ object MEExpressionMatchUtil {
         while (true) {
             val inputExprOnCursor = subExpr.getInputExprs().firstOrNull { it.textRange.contains(cursorOffset.toInt()) }
                 ?: break
-            val exprToMatch = inputExprOnCursor.copy() as MEExpression
+            val wildcardReplacedExpr = inputExprOnCursor.copy() as MEExpression
             cursorOffset.setValue(cursorOffset.toInt() - inputExprOnCursor.textRange.startOffset)
-            replaceCursorInputWithWildcard(project, exprToMatch, cursorOffset.toInt())
-            val meExpression = createExpression(exprToMatch.text) ?: return emptyList()
+            replaceCursorInputWithWildcard(project, wildcardReplacedExpr, cursorOffset.toInt())
 
-            val flattenedInstructions = mutableSetOf<AbstractInsnNode>()
-            for (flow in matchingFlows) {
-                getInstructionsInFlowTree(
-                    flow,
+            val newMatchingFlows = mutableSetOf<FlowValue>()
+            for (exprToMatch in getExpressionVariants(project.meExpressionElementFactory, wildcardReplacedExpr)) {
+                val meExpression = createExpression(exprToMatch.text) ?: continue
+
+                val flattenedInstructions = mutableSetOf<AbstractInsnNode>()
+                for (flow in matchingFlows) {
+                    getInstructionsInFlowTree(
+                        flow,
+                        flattenedInstructions,
+                        subExpr !is MEExpressionStatement && subExpr !is MEParenthesizedExpression
+                    )
+                }
+
+                findMatchingInstructions(
+                    targetClass,
+                    targetMethod,
+                    pool,
+                    flows,
+                    meExpression,
                     flattenedInstructions,
-                    subExpr !is MEExpressionStatement && subExpr !is MEParenthesizedExpression
-                )
+                    true
+                ) { match ->
+                    newMatchingFlows += match.flow
+                }
             }
 
-            matchingFlows.clear()
-            findMatchingInstructions(
-                targetClass,
-                targetMethod,
-                pool,
-                flows,
-                meExpression,
-                flattenedInstructions,
-                true
-            ) { match ->
-                matchingFlows += match.flow
-            }
-            if (matchingFlows.isEmpty()) {
+            if (newMatchingFlows.isEmpty()) {
                 return emptyList()
             }
+            matchingFlows = newMatchingFlows.toMutableList()
 
             subExpr = inputExprOnCursor
         }
@@ -796,6 +804,30 @@ object MEExpressionMatchUtil {
         JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(addedAnnotation)
         JavaCodeStyleManager.getInstance(context.project).optimizeImports(modifierList.containingFile)
         CodeStyleManager.getInstance(context.project).reformat(modifierList)
+    }
+
+    private fun getStatementVariants(
+        factory: MEExpressionElementFactory,
+        statement: MEStatement
+    ): List<MEMatchableElement> {
+        return if (statement is MEExpressionStatement) {
+            getExpressionVariants(factory, statement.expression)
+        } else {
+            listOf(statement)
+        }
+    }
+
+    private fun getExpressionVariants(
+        factory: MEExpressionElementFactory,
+        expression: MEExpression
+    ): List<MEMatchableElement> {
+        val variants = mutableListOf<MEMatchableElement>(expression)
+
+        val assignmentStatement = factory.createStatement("? = ?") as MEAssignStatement
+        assignmentStatement.targetExpr.replace(expression.copy())
+        variants += assignmentStatement
+
+        return variants
     }
 
     class ExpressionMatch @PublishedApi internal constructor(
