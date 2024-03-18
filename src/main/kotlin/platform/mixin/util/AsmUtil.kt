@@ -77,6 +77,8 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.refactoring.util.LambdaRefactoringUtil
 import com.intellij.util.CommonJavaRefactoringUtil
 import com.llamalad7.mixinextras.utils.TypeUtils
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
@@ -87,6 +89,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.signature.SignatureReader
 import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.FieldNode
@@ -96,6 +99,10 @@ import org.objectweb.asm.tree.InvokeDynamicInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.VarInsnNode
+import org.objectweb.asm.util.Textifier
+import org.objectweb.asm.util.TraceAnnotationVisitor
+import org.objectweb.asm.util.TraceClassVisitor
+import org.objectweb.asm.util.TraceMethodVisitor
 
 private val LOGGER = loggerForTopLevel()
 
@@ -979,4 +986,44 @@ fun MethodInsnNode.fakeResolve(): ClassAndMethodNode {
     clazz.methods = mutableListOf(method)
     addConstructorToFakeClass(clazz)
     return ClassAndMethodNode(clazz, method)
+}
+
+// Textifier
+
+fun ClassNode.textify(): String {
+    val sw = StringWriter()
+    accept(TraceClassVisitor(PrintWriter(sw)))
+    return sw.toString().replaceIndent().trimEnd()
+}
+
+fun FieldNode.textify(): String {
+    val cv = TraceClassVisitor(null)
+    accept(cv)
+    val sw = StringWriter()
+    cv.p.print(PrintWriter(sw))
+    return sw.toString().replaceIndent().trimEnd()
+}
+
+fun MethodNode.textify(): String {
+    val cv = TraceClassVisitor(null)
+    accept(cv)
+    val sw = StringWriter()
+    cv.p.print(PrintWriter(sw))
+    return sw.toString().replaceIndent().trimEnd()
+}
+
+fun AnnotationNode.textify(): String {
+    val textifier = Textifier()
+    accept(TraceAnnotationVisitor(textifier))
+    val sw = StringWriter()
+    textifier.print(PrintWriter(sw))
+    return sw.toString().replaceIndent().trimEnd()
+}
+
+fun AbstractInsnNode.textify(): String {
+    val mv = TraceMethodVisitor(Textifier())
+    accept(mv)
+    val sw = StringWriter()
+    mv.p.print(PrintWriter(sw))
+    return sw.toString().replaceIndent().trimEnd()
 }
