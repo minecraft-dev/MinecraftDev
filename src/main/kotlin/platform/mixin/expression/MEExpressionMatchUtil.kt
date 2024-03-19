@@ -88,12 +88,14 @@ import com.intellij.psi.util.parents
 import com.intellij.util.PlatformIcons
 import com.llamalad7.mixinextras.expression.impl.ExpressionParserFacade
 import com.llamalad7.mixinextras.expression.impl.ast.expressions.Expression
+import com.llamalad7.mixinextras.expression.impl.flow.ComplexDataException
 import com.llamalad7.mixinextras.expression.impl.flow.ComplexFlowValue
 import com.llamalad7.mixinextras.expression.impl.flow.DummyFlowValue
 import com.llamalad7.mixinextras.expression.impl.flow.FlowInterpreter
 import com.llamalad7.mixinextras.expression.impl.flow.FlowValue
 import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import com.llamalad7.mixinextras.expression.impl.pool.IdentifierPool
+import com.llamalad7.mixinextras.utils.Decorations
 import java.util.Collections
 import java.util.IdentityHashMap
 import org.apache.commons.lang3.mutable.MutableInt
@@ -295,7 +297,8 @@ object MEExpressionMatchUtil {
             try {
                 if (expr.matches(flow, ExpressionContext(pool, sink, targetClass, targetMethod, forCompletion))) {
                     for ((capturedFlow, startOffset) in captured) {
-                        callback(ExpressionMatch(flow, startOffset, decorations[capturedFlow.insn].orEmpty()))
+                        val capturedInsn = capturedFlow.insnOrNull ?: continue
+                        callback(ExpressionMatch(flow, startOffset, decorations[capturedInsn].orEmpty()))
                     }
                 }
             } catch (e: ProcessCanceledException) {
@@ -394,7 +397,7 @@ object MEExpressionMatchUtil {
             ) { match ->
                 matchingFlows += match.flow
                 if (DEBUG_COMPLETION) {
-                    println("Matched ${match.flow.insn.textify()}")
+                    println("Matched ${match.flow.insnOrNull?.textify()}")
                 }
             }
         }
@@ -438,7 +441,7 @@ object MEExpressionMatchUtil {
                 ) { match ->
                     newMatchingFlows += match.flow
                     if (DEBUG_COMPLETION) {
-                        println("Matched ${match.flow.insn.textify()}")
+                        println("Matched ${match.flow.insnOrNull?.textify()}")
                     }
                 }
             }
@@ -486,7 +489,7 @@ object MEExpressionMatchUtil {
         val canCompleteTypes = inTypePosition || isPossiblyIncompleteCast
 
         return cursorInstructions.mapNotNull { insn ->
-            getCompletionForInstruction(insn, mixinClass, canCompleteExprs, canCompleteTypes)
+            getCompletionForInstruction(insn, flows, mixinClass, canCompleteExprs, canCompleteTypes)
         }
     }
 
@@ -623,6 +626,7 @@ object MEExpressionMatchUtil {
 
     private fun getCompletionForInstruction(
         insn: AbstractInsnNode,
+        flows: FlowMap,
         mixinClass: PsiClass,
         canCompleteExprs: Boolean,
         canCompleteTypes: Boolean
@@ -672,52 +676,82 @@ object MEExpressionMatchUtil {
                     if (insn.opcode == Opcodes.INVOKESTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
                     }
-                    return lookup
+                    return object : TailTypeDecorator<LookupElement>(lookup) {
+                        override fun computeTailType(context: InsertionContext?) =
+                            MEExpressionCompletionContributor.ParenthesesTailType(!insn.desc.startsWith("()"))
+                    }
                 }
             }
             is TypeInsnNode -> {
-                // TODO: put cursor in right position for array lengths for array creation
                 val type = Type.getObjectType(insn.desc)
                 if (canCompleteTypes && type.isAccessibleFrom(mixinClass)) {
                     val lookup = createTypeLookup(type)
-                    if (insn.opcode == Opcodes.ANEWARRAY) {
-                        return object : TailTypeDecorator<LookupElement>(lookup) {
-                            override fun computeTailType(context: InsertionContext?) =
-                                MEExpressionCompletionContributor.BracketsTailType(1)
+                    when (insn.opcode) {
+                        Opcodes.ANEWARRAY -> {
+                            return object : TailTypeDecorator<LookupElement>(lookup) {
+                                override fun computeTailType(context: InsertionContext?) =
+                                    MEExpressionCompletionContributor.BracketsTailType(
+                                        1,
+                                        flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                                    )
+                            }
                         }
-                    } else {
-                        return lookup
+                        Opcodes.NEW -> {
+                            val initCall = flows[insn]?.next?.firstOrNull {
+                                val nextInsn = it.left.insnOrNull ?: return@firstOrNull false
+                                it.right == 0 &&
+                                    nextInsn.opcode == Opcodes.INVOKESPECIAL &&
+                                    (nextInsn as MethodInsnNode).name == "<init>"
+                            }?.left?.insn as MethodInsnNode?
+                            return object : TailTypeDecorator<LookupElement>(lookup) {
+                                override fun computeTailType(context: InsertionContext?) =
+                                    MEExpressionCompletionContributor.ParenthesesTailType(
+                                        initCall?.desc?.startsWith("()") == false
+                                    )
+                            }
+                        }
+                        else -> return lookup
                     }
                 }
             }
             is IntInsnNode -> {
                 if (insn.opcode == Opcodes.NEWARRAY) {
-                    val type = when (insn.operand) {
-                        Opcodes.T_BOOLEAN -> "boolean"
-                        Opcodes.T_CHAR -> "char"
-                        Opcodes.T_FLOAT -> "float"
-                        Opcodes.T_DOUBLE -> "double"
-                        Opcodes.T_BYTE -> "byte"
-                        Opcodes.T_SHORT -> "short"
-                        Opcodes.T_INT -> "int"
-                        Opcodes.T_LONG -> "long"
-                        else -> "unknown" // wtf?
-                    }
-                    return object : TailTypeDecorator<LookupElement>(
-                        LookupElementBuilder.create(type).withIcon(PlatformIcons.CLASS_ICON)
-                    ) {
-                        override fun computeTailType(context: InsertionContext?) =
-                            MEExpressionCompletionContributor.BracketsTailType(1)
+                    if (canCompleteTypes) {
+                        val type = when (insn.operand) {
+                            Opcodes.T_BOOLEAN -> "boolean"
+                            Opcodes.T_CHAR -> "char"
+                            Opcodes.T_FLOAT -> "float"
+                            Opcodes.T_DOUBLE -> "double"
+                            Opcodes.T_BYTE -> "byte"
+                            Opcodes.T_SHORT -> "short"
+                            Opcodes.T_INT -> "int"
+                            Opcodes.T_LONG -> "long"
+                            else -> "unknown" // wtf?
+                        }
+                        return object : TailTypeDecorator<LookupElement>(
+                            LookupElementBuilder.create(type).withIcon(PlatformIcons.CLASS_ICON)
+                        ) {
+                            override fun computeTailType(context: InsertionContext?) =
+                                MEExpressionCompletionContributor.BracketsTailType(
+                                    1,
+                                    flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                                )
+                        }
                     }
                 }
             }
             is MultiANewArrayInsnNode -> {
-                val type = Type.getType(insn.desc)
-                return object : TailTypeDecorator<LookupElement>(
-                    createTypeLookup(type.elementType)
-                ) {
-                    override fun computeTailType(context: InsertionContext?) =
-                        MEExpressionCompletionContributor.BracketsTailType(type.dimensions)
+                if (canCompleteTypes) {
+                    val type = Type.getType(insn.desc)
+                    return object : TailTypeDecorator<LookupElement>(
+                        createTypeLookup(type.elementType)
+                    ) {
+                        override fun computeTailType(context: InsertionContext?) =
+                            MEExpressionCompletionContributor.BracketsTailType(
+                                type.dimensions,
+                                flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                            )
+                    }
                 }
             }
             is InsnNode -> {
@@ -888,6 +922,12 @@ object MEExpressionMatchUtil {
         }
 
         return variants
+    }
+
+    val FlowValue.insnOrNull: AbstractInsnNode? get() = try {
+        insn
+    } catch (e: ComplexDataException) {
+        null
     }
 
     class ExpressionMatch @PublishedApi internal constructor(

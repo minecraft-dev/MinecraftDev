@@ -188,27 +188,29 @@ class MEExpressionCompletionContributor : CompletionContributor() {
 
     private class Keyword(val name: String, val tailType: TailType = TailType.NONE)
 
-    class BracketsTailType(private val dimensions: Int) : TailType() {
+    class ParenthesesTailType(private val hasParameters: Boolean) : TailType() {
         override fun processTail(editor: Editor, tailOffset: Int): Int {
-            editor.document.insertString(tailOffset, "[]".repeat(dimensions))
-            return moveCaret(editor, tailOffset, 2 * dimensions)
+            editor.document.insertString(tailOffset, "()")
+            return moveCaret(editor, tailOffset, if (hasParameters) 1 else 2)
         }
 
         override fun isApplicable(context: InsertionContext): Boolean {
             val chars = context.document.charsSequence
-            var offset = context.tailOffset
-            repeat(dimensions) {
-                offset = CharArrayUtil.shiftForward(chars, offset, " \n\t")
-                if (!CharArrayUtil.regionMatches(chars, offset, "[")) {
-                    return true
-                }
-                offset = CharArrayUtil.shiftForward(chars, offset, " \n\t")
-                if (!CharArrayUtil.regionMatches(chars, offset, "]")) {
-                    return true
-                }
-            }
+            val offset = CharArrayUtil.shiftForward(chars, context.tailOffset, " \n\t")
+            return !CharArrayUtil.regionMatches(chars, offset, "(")
+        }
+    }
 
-            return false
+    class BracketsTailType(private val dimensions: Int, private val hasInitializer: Boolean) : TailType() {
+        override fun processTail(editor: Editor, tailOffset: Int): Int {
+            editor.document.insertString(tailOffset, "[]".repeat(dimensions) + if (hasInitializer) "{}" else "")
+            return moveCaret(editor, tailOffset, if (hasInitializer) 2 * dimensions + 1 else 1)
+        }
+
+        override fun isApplicable(context: InsertionContext): Boolean {
+            val chars = context.document.charsSequence
+            val offset = CharArrayUtil.shiftForward(chars, context.tailOffset, " \n\t")
+            return !CharArrayUtil.regionMatches(chars, offset, "[")
         }
     }
 }

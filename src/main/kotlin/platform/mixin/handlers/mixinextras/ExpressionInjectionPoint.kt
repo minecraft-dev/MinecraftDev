@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.expression.IdentifierPoolFactory
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
+import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil.insnOrNull
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MECapturingExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStatement
@@ -235,7 +236,10 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
                         ?.parentOfType<MECapturingExpression>(withSelf = true)
                         ?.expression
                         ?: psiExpr
-                    result.putIfAbsent(match.flow.insn, capturedExpr to match.decorations)
+                    val insn = match.flow.insnOrNull
+                    if (insn != null) {
+                        result.putIfAbsent(insn, capturedExpr to match.decorations)
+                    }
                 }
             }
 
