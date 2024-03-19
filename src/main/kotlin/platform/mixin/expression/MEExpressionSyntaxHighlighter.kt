@@ -95,6 +95,10 @@ class MEExpressionSyntaxHighlighter : SyntaxHighlighterBase() {
             "MEEXPRESSION_IDENTIFIER_CLASS_NAME",
             DefaultLanguageHighlighterColors.CLASS_REFERENCE
         )
+        val IDENTIFIER_PRIMITIVE_TYPE = createTextAttributesKey(
+            "MEEXPRESSION_IDENTIFIER_PRIMITIVE_TYPE",
+            DefaultLanguageHighlighterColors.KEYWORD
+        )
         val IDENTIFIER_MEMBER_NAME = createTextAttributesKey(
             "MEEXPRESSION_IDENTIFIER_MEMBER_NAME",
             DefaultLanguageHighlighterColors.INSTANCE_FIELD

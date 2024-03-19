@@ -36,10 +36,21 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEStaticMethodCallEx
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MESuperCallExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.util.findMultiInjectionHost
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.RemoveAnnotationQuickFix
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiModifierListOwner
+import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.util.TypeConversionUtil
+import com.intellij.psi.util.parentOfType
 
 class MEExpressionAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
@@ -47,52 +58,43 @@ class MEExpressionAnnotator : Annotator {
             is MEDeclaration -> {
                 val parent = element.parent as? MEDeclarationItem ?: return
                 if (parent.isType) {
-                    holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                        .range(element)
-                        .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_TYPE_DECLARATION)
-                        .create()
+                    highlightDeclaration(holder, element, MEExpressionSyntaxHighlighter.IDENTIFIER_TYPE_DECLARATION)
                 } else {
-                    holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                        .range(element)
-                        .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_DECLARATION)
-                        .create()
+                    highlightDeclaration(holder, element, MEExpressionSyntaxHighlighter.IDENTIFIER_DECLARATION)
                 }
             }
             is MEName -> {
                 if (!element.isWildcard) {
                     when (val parent = element.parent) {
                         is METype,
-                        is MENewExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                            .range(element)
-                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
-                            .create()
-                        is MEMemberAccessExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                            .range(element)
-                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_MEMBER_NAME)
-                            .create()
+                        is MENewExpression -> highlightType(holder, element)
+                        is MEMemberAccessExpression -> highlightVariable(
+                            holder,
+                            element,
+                            MEExpressionSyntaxHighlighter.IDENTIFIER_MEMBER_NAME,
+                            true,
+                        )
                         is MESuperCallExpression,
                         is MEMethodCallExpression,
-                        is MEStaticMethodCallExpression -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                            .range(element)
-                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CALL)
-                            .create()
+                        is MEStaticMethodCallExpression -> highlightVariable(
+                            holder,
+                            element,
+                            MEExpressionSyntaxHighlighter.IDENTIFIER_CALL,
+                            false,
+                        )
                         is MENameExpression -> {
                             if (METypeUtil.isExpressionDirectlyInTypePosition(parent)) {
-                                holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                                    .range(element)
-                                    .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
-                                    .create()
+                                highlightType(holder, element)
                             } else {
-                                holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                                    .range(element)
-                                    .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_VARIABLE)
-                                    .create()
+                                highlightVariable(
+                                    holder,
+                                    element,
+                                    MEExpressionSyntaxHighlighter.IDENTIFIER_VARIABLE,
+                                    false,
+                                )
                             }
                         }
-                        else -> holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
-                            .range(element)
-                            .textAttributes(MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME)
-                            .create()
+                        else -> highlightType(holder, element)
                     }
                 }
             }
@@ -210,6 +212,102 @@ class MEExpressionAnnotator : Annotator {
                     }
                 }
             }
+        }
+    }
+
+    private fun highlightDeclaration(
+        holder: AnnotationHolder,
+        declaration: MEDeclaration,
+        defaultColor: TextAttributesKey,
+    ) {
+        val isUnused = ReferencesSearch.search(declaration).findFirst() == null
+
+        if (isUnused) {
+            val message = MCDevBundle("mixinextras.expression.lang.errors.unused_definition")
+            val annotation = holder.newAnnotation(HighlightSeverity.WARNING, message)
+                .range(declaration)
+                .highlightType(ProblemHighlightType.LIKE_UNUSED_SYMBOL)
+
+            val containingAnnotation = declaration.findMultiInjectionHost()?.parentOfType<PsiAnnotation>()?.takeIf {
+                it.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION)
+            }
+            if (containingAnnotation != null) {
+                val inspectionManager = InspectionManager.getInstance(containingAnnotation.project)
+                @Suppress("StatefulEp") // IntelliJ is wrong here
+                val fix = object : RemoveAnnotationQuickFix(
+                    containingAnnotation,
+                    containingAnnotation.parentOfType<PsiModifierListOwner>()
+                ) {
+                    override fun getFamilyName() = MCDevBundle("mixinextras.expression.lang.errors.unused_symbol.fix")
+                }
+                val problemDescriptor = inspectionManager.createProblemDescriptor(
+                    declaration,
+                    message,
+                    fix,
+                    ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
+                    true
+                )
+                annotation.newLocalQuickFix(fix, problemDescriptor).registerFix()
+            }
+
+            annotation.create()
+        } else {
+            holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                .range(declaration)
+                .textAttributes(defaultColor)
+                .create()
+        }
+    }
+
+    private fun highlightType(holder: AnnotationHolder, type: MEName) {
+        val typeName = type.text
+        val isPrimitive = typeName != "void" && TypeConversionUtil.isPrimitive(typeName)
+        val isUnresolved = !isPrimitive && type.reference?.resolve() == null
+
+        if (isUnresolved) {
+            holder.newAnnotation(
+                HighlightSeverity.ERROR,
+                MCDevBundle("mixinextras.expression.lang.errors.unresolved_symbol")
+            )
+                .range(type)
+                .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                .create()
+        } else {
+            holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                .range(type)
+                .textAttributes(
+                    if (isPrimitive) {
+                        MEExpressionSyntaxHighlighter.IDENTIFIER_PRIMITIVE_TYPE
+                    } else {
+                        MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME
+                    }
+                )
+                .create()
+        }
+    }
+
+    private fun highlightVariable(
+        holder: AnnotationHolder,
+        variable: MEName,
+        defaultColor: TextAttributesKey,
+        isMember: Boolean,
+    ) {
+        val variableName = variable.text
+        val isUnresolved = (variableName != "length" || !isMember) && variable.reference?.resolve() == null
+
+        if (isUnresolved) {
+            holder.newAnnotation(
+                HighlightSeverity.ERROR,
+                MCDevBundle("mixinextras.expression.lang.errors.unresolved_symbol")
+            )
+                .range(variable)
+                .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
+                .create()
+        } else {
+            holder.newSilentAnnotation(HighlightSeverity.TEXT_ATTRIBUTES)
+                .range(variable)
+                .textAttributes(defaultColor)
+                .create()
         }
     }
 }

@@ -90,6 +90,10 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
                 MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME
             ),
             AttributesDescriptor(
+                MCDevBundle.pointer("mixinextras.expression.lang.highlighting.primitive_type_identifier.display_name"),
+                MEExpressionSyntaxHighlighter.IDENTIFIER_PRIMITIVE_TYPE
+            ),
+            AttributesDescriptor(
                 MCDevBundle.pointer("mixinextras.expression.lang.highlighting.member_name_identifier.display_name"),
                 MEExpressionSyntaxHighlighter.IDENTIFIER_MEMBER_NAME
             ),
@@ -117,6 +121,7 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
             "call" to MEExpressionSyntaxHighlighter.IDENTIFIER_CALL,
             "class_name" to MEExpressionSyntaxHighlighter.IDENTIFIER_CLASS_NAME,
             "member_name" to MEExpressionSyntaxHighlighter.IDENTIFIER_MEMBER_NAME,
+            "primitive_type" to MEExpressionSyntaxHighlighter.IDENTIFIER_PRIMITIVE_TYPE,
             "variable" to MEExpressionSyntaxHighlighter.IDENTIFIER_VARIABLE,
         )
     }
@@ -131,7 +136,7 @@ class MEExpressionColorSettingsPage : ColorSettingsPage {
             ?,
             <class_name>ClassName</class_name>.class,
             <variable>foo</variable>.<member_name>bar</member_name>,
-            new <class_name>int</class_name>[] { 1, 2, 3 },
+            new <primitive_type>int</primitive_type>[] { 1, 2, 3 },
             'a bad character: ' # other_identifier
         )[0]
     """.trimIndent()
