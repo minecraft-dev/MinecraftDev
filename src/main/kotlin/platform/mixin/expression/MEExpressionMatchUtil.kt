@@ -424,7 +424,7 @@ object MEExpressionMatchUtil {
                 val flattenedInstructions = mutableSetOf<AbstractInsnNode>()
                 for (flow in matchingFlows) {
                     getInstructionsInFlowTree(
-                        flow,
+                        findFlowTreeRoot(flow),
                         flattenedInstructions,
                         subExpr !is MEExpressionStatement && subExpr !is MEParenthesizedExpression
                     )
@@ -456,7 +456,7 @@ object MEExpressionMatchUtil {
 
         val cursorInstructions = mutableSetOf<AbstractInsnNode>()
         for (flow in matchingFlows) {
-            getInstructionsInFlowTree(flow, cursorInstructions, false)
+            getInstructionsInFlowTree(findFlowTreeRoot(flow), cursorInstructions, false)
         }
 
         if (DEBUG_COMPLETION) {
@@ -604,6 +604,20 @@ object MEExpressionMatchUtil {
                 input.replace(project.meExpressionElementFactory.createExpression("?"))
                 return
             }
+        }
+    }
+
+    private fun findFlowTreeRoot(flow: FlowValue): FlowValue {
+        val insn = flow.insnOrNull ?: return flow
+        return if (insn.opcode == Opcodes.NEW) {
+            flow.next.firstOrNull {
+                val nextInsn = it.left.insnOrNull ?: return@firstOrNull false
+                it.right == 0 &&
+                    nextInsn.opcode == Opcodes.INVOKESPECIAL &&
+                    (nextInsn as MethodInsnNode).name == "<init>"
+            }?.left ?: flow
+        } else {
+            flow
         }
     }
 
