@@ -782,8 +782,8 @@ object MEExpressionCompletionUtil {
         }
 
         var argumentsSize = Type.getArgumentsAndReturnSizes(targetMethod.desc) shr 2
-        if (!targetMethod.hasAccess(Opcodes.ACC_STATIC)) {
-            argumentsSize++
+        if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) {
+            argumentsSize--
         }
         val isArgsOnly = index < argumentsSize
 
@@ -805,16 +805,19 @@ object MEExpressionCompletionUtil {
                 } else {
                     Type.getType(localVariable.desc).toPsiType(elementFactory, mixinClass)
                 }
-                val ordinal = localsHere.filter { it.desc == localVariable.desc }.indexOf(localVariable)
+                val localsOfMyType = localsHere.filter { it.desc == localVariable.desc }
+                val ordinal = localsOfMyType.indexOf(localVariable)
+                val isImplicit = localsOfMyType.size == 1
                 LookupElementBuilder.create(localVariable.name.toValidIdentifier())
                     .withIcon(PlatformIcons.VARIABLE_ICON)
-                    .withTailText(localPsiType.presentableText)
+                    .withTypeText(localPsiType.presentableText)
                     .withLocalDefinition(
                         localVariable.name.toValidIdentifier(),
                         Type.getType(localVariable.desc),
                         ordinal,
                         isArgsOnly,
-                        mixinClass
+                        isImplicit,
+                        mixinClass,
                     )
             }
         }
@@ -825,11 +828,12 @@ object MEExpressionCompletionUtil {
         val localType = localTypes.getOrNull(index) ?: return emptyList()
         val ordinal = localTypes.asSequence().take(index).filter { it == localType }.count()
         val localName = localType.typeNameToInsert().replace("[]", "Array") + (ordinal + 1)
+        val isImplicit = localTypes.count { it == localType } == 1
         return listOf(
             LookupElementBuilder.create(localName)
                 .withIcon(PlatformIcons.VARIABLE_ICON)
-                .withTailText(localType.presentableName())
-                .withLocalDefinition(localName, localType, ordinal, isArgsOnly, mixinClass)
+                .withTypeText(localType.presentableName())
+                .withLocalDefinition(localName, localType, ordinal, isArgsOnly, isImplicit, mixinClass)
         )
     }
 
@@ -865,21 +869,35 @@ object MEExpressionCompletionUtil {
         type: Type,
         ordinal: Int,
         isArgsOnly: Boolean,
+        isImplicit: Boolean,
         mixinClass: PsiClass,
     ): LookupElementBuilder {
         val definitionLocal = buildString {
             append("local = @${MixinConstants.MixinExtras.LOCAL}(")
-            if (type.isAccessibleFrom(mixinClass)) {
+            val isTypeAccessible = type.isAccessibleFrom(mixinClass)
+            if (isTypeAccessible) {
                 append("type = ${type.className}.class, ")
             }
-            append("ordinal = ")
-            append(ordinal)
-            if (isArgsOnly) {
-                append(", argsOnly = true")
+            if (!isTypeAccessible || !isImplicit) {
+                append("ordinal = ")
+                append(ordinal)
+                append(", ")
             }
+            if (isArgsOnly) {
+                append("argsOnly = true, ")
+            }
+
+            if (endsWith(", ")) {
+                setLength(length - 2)
+            }
+
             append(")")
         }
         return withDefinition(name, definitionLocal) { context, annotation ->
+            if (isImplicit) {
+                return@withDefinition
+            }
+
             invokeLater {
                 WriteCommandAction.runWriteCommandAction(
                     context.project,
