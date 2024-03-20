@@ -57,6 +57,7 @@ import com.demonwav.mcdev.platform.mixin.util.textify
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingModifierList
+import com.demonwav.mcdev.util.findContainingNameValuePair
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.findMultiInjectionHost
 import com.demonwav.mcdev.util.mapFirstNotNull
@@ -66,7 +67,10 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.TailTypeDecorator
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.patterns.StandardPatterns
@@ -75,6 +79,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiModifierList
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.tree.TokenSet
@@ -711,37 +716,75 @@ object MEExpressionCompletionUtil {
     }
 
     private fun LookupElementBuilder.withDefinition(id: String, at: String) = withInsertHandler { context, _ ->
-        val contextElement = context.file.findElementAt(context.startOffset) ?: return@withInsertHandler
-        val injectionHost = contextElement.findMultiInjectionHost() ?: return@withInsertHandler
-        val expressionAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return@withInsertHandler
-        if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
-            return@withInsertHandler
+        context.laterRunnable = Runnable {
+            context.commitDocument()
+            CommandProcessor.getInstance().runUndoTransparentAction {
+                runWriteAction {
+                    addDefinition(context, id, at)
+                }
+            }
         }
-        val modifierList = expressionAnnotation.findContainingModifierList() ?: return@withInsertHandler
+    }
+
+    private fun addDefinition(context: InsertionContext, id: String, at: String) {
+        val contextElement = context.file.findElementAt(context.startOffset) ?: return
+        val injectionHost = contextElement.findMultiInjectionHost() ?: return
+        val expressionAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return
+        if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
+            return
+        }
+        val modifierList = expressionAnnotation.findContainingModifierList() ?: return
 
         // look for an existing definition with this id, skip if it exists
         for (annotation in modifierList.annotations) {
             if (annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) &&
                 annotation.findDeclaredAttributeValue("id")?.constantStringValue == id
             ) {
-                return@withInsertHandler
+                return
             }
         }
 
         // create and add the new @Definition annotation
-        val newAnnotation = JavaPsiFacade.getElementFactory(context.project).createAnnotationFromText(
+        var newAnnotation = JavaPsiFacade.getElementFactory(context.project).createAnnotationFromText(
             "@${MixinConstants.MixinExtras.DEFINITION}(id = \"$id\", $at)",
             modifierList,
         )
-        val addedAnnotation = modifierList.addAfter(
+        newAnnotation = modifierList.addAfter(
             newAnnotation,
             modifierList.annotations.lastOrNull { it.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) }
-        )
+        ) as PsiAnnotation
 
         // add imports and reformat
-        JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(addedAnnotation)
+        newAnnotation =
+            JavaCodeStyleManager.getInstance(context.project).shortenClassReferences(newAnnotation) as PsiAnnotation
         JavaCodeStyleManager.getInstance(context.project).optimizeImports(modifierList.containingFile)
-        CodeStyleManager.getInstance(context.project).reformat(modifierList)
+        val annotationIndex = modifierList.annotations.indexOf(newAnnotation)
+        val formattedModifierList =
+            CodeStyleManager.getInstance(context.project).reformat(modifierList) as PsiModifierList
+        newAnnotation = formattedModifierList.annotations.getOrNull(annotationIndex) ?: return
+
+        // fold @At.target
+        val foldingModel = context.editor.foldingModel
+        val regionsToFold = mutableListOf<FoldRegion>()
+        val annotationRange = newAnnotation.textRange
+        for (foldRegion in foldingModel.allFoldRegions) {
+            if (!annotationRange.contains(foldRegion.textRange)) {
+                continue
+            }
+            val nameValuePair = newAnnotation.findElementAt(foldRegion.startOffset - annotationRange.startOffset)
+                ?.findContainingNameValuePair() ?: continue
+            if (nameValuePair.name == "target" &&
+                nameValuePair.parentOfType<PsiAnnotation>()?.hasQualifiedName(MixinConstants.Annotations.AT) == true
+            ) {
+                regionsToFold += foldRegion
+            }
+        }
+
+        foldingModel.runBatchFoldingOperation {
+            for (foldRegion in regionsToFold) {
+                foldRegion.isExpanded = false
+            }
+        }
     }
 
     private fun getStatementVariants(
