@@ -48,18 +48,23 @@ import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil.notInTypePosition
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil.validType
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.util.AsmDfaUtil
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.platform.mixin.util.SignatureToPsi
 import com.demonwav.mcdev.platform.mixin.util.canonicalName
+import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isPrimitive
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.textify
+import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findContainingNameValuePair
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.findMultiInjectionHost
+import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.packageName
 import com.intellij.codeInsight.TailType
@@ -67,8 +72,16 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.TailTypeDecorator
+import com.intellij.codeInsight.template.Expression
+import com.intellij.codeInsight.template.ExpressionContext
+import com.intellij.codeInsight.template.Template
+import com.intellij.codeInsight.template.TemplateBuilderImpl
+import com.intellij.codeInsight.template.TemplateEditingAdapter
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.TextResult
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.project.Project
@@ -78,13 +91,17 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageEditorUtil
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
+import com.intellij.psi.util.createSmartPointer
 import com.intellij.psi.util.parentOfType
 import com.intellij.psi.util.parents
 import com.intellij.util.PlatformIcons
@@ -97,6 +114,7 @@ import com.llamalad7.mixinextras.utils.Decorations
 import org.apache.commons.lang3.mutable.MutableInt
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import org.objectweb.asm.signature.SignatureReader
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldInsnNode
@@ -231,6 +249,8 @@ object MEExpressionCompletionUtil {
     ): List<LookupElement> {
         if (DEBUG_COMPLETION) {
             println("======")
+            println(targetMethod.textify())
+            println("======")
         }
 
         if (targetMethod.instructions == null) {
@@ -358,8 +378,17 @@ object MEExpressionCompletionUtil {
         val canCompleteExprs = !inTypePosition
         val canCompleteTypes = inTypePosition || isPossiblyIncompleteCast
 
-        return cursorInstructions.mapNotNull { insn ->
-            getCompletionForInstruction(insn, flows, mixinClass, canCompleteExprs, canCompleteTypes)
+        return cursorInstructions.flatMap { insn ->
+            getCompletionsForInstruction(
+                project,
+                targetClass,
+                targetMethod,
+                insn,
+                flows,
+                mixinClass,
+                canCompleteExprs,
+                canCompleteTypes
+            )
         }
     }
 
@@ -508,32 +537,47 @@ object MEExpressionCompletionUtil {
         }
     }
 
-    private fun getCompletionForInstruction(
+    private fun getCompletionsForInstruction(
+        project: Project,
+        targetClass: ClassNode,
+        targetMethod: MethodNode,
         insn: AbstractInsnNode,
         flows: FlowMap,
         mixinClass: PsiClass,
         canCompleteExprs: Boolean,
         canCompleteTypes: Boolean
-    ): LookupElement? {
+    ): List<LookupElement> {
         when (insn) {
             is LdcInsnNode -> {
                 when (val cst = insn.cst) {
                     is Type -> {
                         if (canCompleteTypes && cst.isAccessibleFrom(mixinClass)) {
-                            return object : TailTypeDecorator<LookupElement>(createTypeLookup(cst)) {
-                                override fun computeTailType(context: InsertionContext?) = DOT_CLASS_TAIL
-                            }
+                            return listOf(
+                                object : TailTypeDecorator<LookupElement>(createTypeLookup(cst)) {
+                                    override fun computeTailType(context: InsertionContext?) = DOT_CLASS_TAIL
+                                }
+                            )
                         }
                     }
                     // TODO: string literals?
                 }
             }
-            is VarInsnNode -> {
-                // TODO: local variables
-            }
-            is IincInsnNode -> {
-                // TODO: local variables
-            }
+            is VarInsnNode -> return createLocalVariableLookups(
+                project,
+                targetClass,
+                targetMethod,
+                insn,
+                insn.`var`,
+                mixinClass
+            )
+            is IincInsnNode -> return createLocalVariableLookups(
+                project,
+                targetClass,
+                targetMethod,
+                insn,
+                insn.`var`,
+                mixinClass
+            )
             is FieldInsnNode -> {
                 if (canCompleteExprs) {
                     val at = "at = @${MixinConstants.Annotations.AT}(value = \"FIELD\"," +
@@ -541,11 +585,11 @@ object MEExpressionCompletionUtil {
                     var lookup = LookupElementBuilder.create(insn.name.toValidIdentifier())
                         .withIcon(PlatformIcons.FIELD_ICON)
                         .withPresentableText(insn.owner.substringAfterLast('/') + "." + insn.name)
-                        .withDefinition(insn.name.toValidIdentifier(), at)
+                        .withDefinitionAndFoldTarget(insn.name.toValidIdentifier(), at)
                     if (insn.opcode == Opcodes.GETSTATIC || insn.opcode == Opcodes.PUTSTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
                     }
-                    return lookup
+                    return listOf(lookup)
                 }
             }
             is MethodInsnNode -> {
@@ -555,14 +599,16 @@ object MEExpressionCompletionUtil {
                     var lookup = LookupElementBuilder.create(insn.name.toValidIdentifier())
                         .withIcon(PlatformIcons.METHOD_ICON)
                         .withPresentableText(insn.owner.substringAfterLast('/') + "." + insn.name)
-                        .withDefinition(insn.name.toValidIdentifier(), at)
+                        .withDefinitionAndFoldTarget(insn.name.toValidIdentifier(), at)
                     if (insn.opcode == Opcodes.INVOKESTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
                     }
-                    return object : TailTypeDecorator<LookupElement>(lookup) {
-                        override fun computeTailType(context: InsertionContext?) =
-                            ParenthesesTailType(!insn.desc.startsWith("()"))
-                    }
+                    return listOf(
+                        object : TailTypeDecorator<LookupElement>(lookup) {
+                            override fun computeTailType(context: InsertionContext?) =
+                                ParenthesesTailType(!insn.desc.startsWith("()"))
+                        }
+                    )
                 }
             }
             is TypeInsnNode -> {
@@ -571,13 +617,15 @@ object MEExpressionCompletionUtil {
                     val lookup = createTypeLookup(type)
                     when (insn.opcode) {
                         Opcodes.ANEWARRAY -> {
-                            return object : TailTypeDecorator<LookupElement>(lookup) {
-                                override fun computeTailType(context: InsertionContext?) =
-                                    BracketsTailType(
-                                        1,
-                                        flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
-                                    )
-                            }
+                            return listOf(
+                                object : TailTypeDecorator<LookupElement>(lookup) {
+                                    override fun computeTailType(context: InsertionContext?) =
+                                        BracketsTailType(
+                                            1,
+                                            flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                                        )
+                                }
+                            )
                         }
                         Opcodes.NEW -> {
                             val initCall = flows[insn]?.next?.firstOrNull {
@@ -586,14 +634,16 @@ object MEExpressionCompletionUtil {
                                     nextInsn.opcode == Opcodes.INVOKESPECIAL &&
                                     (nextInsn as MethodInsnNode).name == "<init>"
                             }?.left?.insn as MethodInsnNode?
-                            return object : TailTypeDecorator<LookupElement>(lookup) {
-                                override fun computeTailType(context: InsertionContext?) =
-                                    ParenthesesTailType(
-                                        initCall?.desc?.startsWith("()") == false
-                                    )
-                            }
+                            return listOf(
+                                object : TailTypeDecorator<LookupElement>(lookup) {
+                                    override fun computeTailType(context: InsertionContext?) =
+                                        ParenthesesTailType(
+                                            initCall?.desc?.startsWith("()") == false
+                                        )
+                                }
+                            )
                         }
-                        else -> return lookup
+                        else -> return listOf(lookup)
                     }
                 }
             }
@@ -611,45 +661,48 @@ object MEExpressionCompletionUtil {
                             Opcodes.T_LONG -> "long"
                             else -> "unknown" // wtf?
                         }
-                        return object : TailTypeDecorator<LookupElement>(
-                            LookupElementBuilder.create(type).withIcon(PlatformIcons.CLASS_ICON)
-                        ) {
-                            override fun computeTailType(context: InsertionContext?) =
-                                BracketsTailType(
-                                    1,
-                                    flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
-                                )
-                        }
+                        return listOf(
+                            object : TailTypeDecorator<LookupElement>(
+                                LookupElementBuilder.create(type).withIcon(PlatformIcons.CLASS_ICON)
+                            ) {
+                                override fun computeTailType(context: InsertionContext?) =
+                                    BracketsTailType(
+                                        1,
+                                        flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                                    )
+                            }
+                        )
                     }
                 }
             }
             is MultiANewArrayInsnNode -> {
                 if (canCompleteTypes) {
                     val type = Type.getType(insn.desc)
-                    return object : TailTypeDecorator<LookupElement>(
-                        createTypeLookup(type.elementType)
-                    ) {
-                        override fun computeTailType(context: InsertionContext?) =
-                            BracketsTailType(
-                                type.dimensions,
-                                flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
-                            )
-                    }
+                    return listOf(
+                        object : TailTypeDecorator<LookupElement>(
+                            createTypeLookup(type.elementType)
+                        ) {
+                            override fun computeTailType(context: InsertionContext?) =
+                                BracketsTailType(
+                                    type.dimensions,
+                                    flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
+                                )
+                        }
+                    )
                 }
             }
             is InsnNode -> {
                 when (insn.opcode) {
                     Opcodes.ARRAYLENGTH -> {
                         if (canCompleteExprs) {
-                            return LookupElementBuilder.create("length")
-                                .withIcon(PlatformIcons.FIELD_ICON)
+                            return listOf(LookupElementBuilder.create("length").withIcon(PlatformIcons.FIELD_ICON))
                         }
                     }
                 }
             }
         }
 
-        return null
+        return emptyList()
     }
 
     private fun Type.typeNameToInsert(): String {
@@ -715,32 +768,210 @@ object MEExpressionCompletionUtil {
         }
     }
 
-    private fun LookupElementBuilder.withDefinition(id: String, at: String) = withInsertHandler { context, _ ->
+    private fun createLocalVariableLookups(
+        project: Project,
+        targetClass: ClassNode,
+        targetMethod: MethodNode,
+        insn: AbstractInsnNode,
+        index: Int,
+        mixinClass: PsiClass,
+    ): List<LookupElement> {
+        // ignore "this"
+        if (!targetMethod.hasAccess(Opcodes.ACC_STATIC) && index == 0) {
+            return emptyList()
+        }
+
+        var argumentsSize = Type.getArgumentsAndReturnSizes(targetMethod.desc) shr 2
+        if (!targetMethod.hasAccess(Opcodes.ACC_STATIC)) {
+            argumentsSize++
+        }
+        val isArgsOnly = index < argumentsSize
+
+        if (targetMethod.localVariables != null) {
+            val localsHere = targetMethod.localVariables.filter { localVariable ->
+                val validRange = targetMethod.instructions.indexOf(localVariable.start) + 1 until
+                    targetMethod.instructions.indexOf(localVariable.end)
+                targetMethod.instructions.indexOf(insn) in validRange
+            }
+            val locals = localsHere.filter { it.index == index }
+
+            val elementFactory = JavaPsiFacade.getElementFactory(project)
+
+            return locals.map { localVariable ->
+                val localPsiType = if (localVariable.signature != null) {
+                    val sigToPsi = SignatureToPsi(elementFactory, mixinClass)
+                    SignatureReader(localVariable.signature).acceptType(sigToPsi)
+                    sigToPsi.type
+                } else {
+                    Type.getType(localVariable.desc).toPsiType(elementFactory, mixinClass)
+                }
+                val ordinal = localsHere.filter { it.desc == localVariable.desc }.indexOf(localVariable)
+                LookupElementBuilder.create(localVariable.name.toValidIdentifier())
+                    .withIcon(PlatformIcons.VARIABLE_ICON)
+                    .withTailText(localPsiType.presentableText)
+                    .withLocalDefinition(
+                        localVariable.name.toValidIdentifier(),
+                        Type.getType(localVariable.desc),
+                        ordinal,
+                        isArgsOnly,
+                        mixinClass
+                    )
+            }
+        }
+
+        // fallback to ASM dataflow
+        val localTypes = AsmDfaUtil.getLocalVariableTypes(project, targetClass, targetMethod, insn)
+            ?: return emptyList()
+        val localType = localTypes.getOrNull(index) ?: return emptyList()
+        val ordinal = localTypes.asSequence().take(index).filter { it == localType }.count()
+        val localName = localType.typeNameToInsert().replace("[]", "Array") + (ordinal + 1)
+        return listOf(
+            LookupElementBuilder.create(localName)
+                .withIcon(PlatformIcons.VARIABLE_ICON)
+                .withTailText(localType.presentableName())
+                .withLocalDefinition(localName, localType, ordinal, isArgsOnly, mixinClass)
+        )
+    }
+
+    private fun LookupElementBuilder.withDefinition(id: String, at: String) = withDefinition(id, at) { _, _ -> }
+
+    private fun LookupElementBuilder.withDefinitionAndFoldTarget(id: String, at: String) =
+        withDefinition(id, at) { context, annotation ->
+            val foldingModel = InjectedLanguageEditorUtil.getTopLevelEditor(context.editor).foldingModel
+            val regionsToFold = mutableListOf<FoldRegion>()
+            val annotationRange = annotation.textRange
+            for (foldRegion in foldingModel.allFoldRegions) {
+                if (!annotationRange.contains(foldRegion.textRange)) {
+                    continue
+                }
+                val nameValuePair = annotation.findElementAt(foldRegion.startOffset - annotationRange.startOffset)
+                    ?.findContainingNameValuePair() ?: continue
+                if (nameValuePair.name == "target" &&
+                    nameValuePair.parentOfType<PsiAnnotation>()?.hasQualifiedName(MixinConstants.Annotations.AT) == true
+                ) {
+                    regionsToFold += foldRegion
+                }
+            }
+
+            foldingModel.runBatchFoldingOperation {
+                for (foldRegion in regionsToFold) {
+                    foldRegion.isExpanded = false
+                }
+            }
+        }
+
+    private fun LookupElementBuilder.withLocalDefinition(
+        name: String,
+        type: Type,
+        ordinal: Int,
+        isArgsOnly: Boolean,
+        mixinClass: PsiClass,
+    ): LookupElementBuilder {
+        val definitionLocal = buildString {
+            append("local = @${MixinConstants.MixinExtras.LOCAL}(")
+            if (type.isAccessibleFrom(mixinClass)) {
+                append("type = ${type.className}.class, ")
+            }
+            append("ordinal = ")
+            append(ordinal)
+            if (isArgsOnly) {
+                append(", argsOnly = true")
+            }
+            append(")")
+        }
+        return withDefinition(name, definitionLocal) { context, annotation ->
+            invokeLater {
+                WriteCommandAction.runWriteCommandAction(
+                    context.project,
+                    "Choose How to Target Local Variable",
+                    null,
+                    { runLocalTemplate(context.project, context.editor, context.file, annotation, ordinal, name) },
+                    annotation.containingFile,
+                )
+            }
+        }
+    }
+
+    private fun runLocalTemplate(
+        project: Project,
+        editor: Editor,
+        file: PsiFile,
+        annotation: PsiAnnotation,
+        ordinal: Int,
+        name: String
+    ) {
+        val elementToReplace =
+            (annotation.findDeclaredAttributeValue("local") as? PsiAnnotation)
+                ?.findDeclaredAttributeValue("ordinal")
+                ?.findContainingNameValuePair() ?: return
+
+        val hostEditor = InjectedLanguageEditorUtil.getTopLevelEditor(editor)
+        val hostElement = file.findElementAt(editor.caretModel.offset)?.findMultiInjectionHost() ?: return
+
+        val template = TemplateBuilderImpl(annotation)
+        val lookupItems = arrayOf(
+            LookupElementBuilder.create("ordinal = $ordinal"),
+            LookupElementBuilder.create("name = \"$name\"")
+        )
+        template.replaceElement(
+            elementToReplace,
+            object : Expression() {
+                override fun calculateLookupItems(context: ExpressionContext?) = lookupItems
+                override fun calculateQuickResult(context: ExpressionContext?) = calculateResult(context)
+                override fun calculateResult(context: ExpressionContext?) = TextResult("ordinal = $ordinal")
+            },
+            true,
+        )
+
+        val prevCursorPosInLiteral = hostEditor.caretModel.offset - hostElement.textRange.startOffset
+        val hostElementPtr = hostElement.createSmartPointer(project)
+        hostEditor.caretModel.moveToOffset(annotation.textRange.startOffset)
+        TemplateManager.getInstance(project).startTemplate(
+            hostEditor,
+            template.buildInlineTemplate(),
+            object : TemplateEditingAdapter() {
+                override fun templateFinished(template: Template, brokenOff: Boolean) {
+                    PsiDocumentManager.getInstance(project).commitDocument(hostEditor.document)
+                    val newHostElement = hostElementPtr.element ?: return
+                    hostEditor.caretModel.moveToOffset(newHostElement.textRange.startOffset + prevCursorPosInLiteral)
+                }
+            }
+        )
+    }
+
+    private inline fun LookupElementBuilder.withDefinition(
+        id: String,
+        at: String,
+        crossinline andThen: (InsertionContext, PsiAnnotation) -> Unit
+    ) = withInsertHandler { context, _ ->
         context.laterRunnable = Runnable {
             context.commitDocument()
             CommandProcessor.getInstance().runUndoTransparentAction {
                 runWriteAction {
-                    addDefinition(context, id, at)
+                    val annotation = addDefinition(context, id, at)
+                    if (annotation != null) {
+                        andThen(context, annotation)
+                    }
                 }
             }
         }
     }
 
-    private fun addDefinition(context: InsertionContext, id: String, at: String) {
-        val contextElement = context.file.findElementAt(context.startOffset) ?: return
-        val injectionHost = contextElement.findMultiInjectionHost() ?: return
-        val expressionAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return
+    private fun addDefinition(context: InsertionContext, id: String, at: String): PsiAnnotation? {
+        val contextElement = context.file.findElementAt(context.startOffset) ?: return null
+        val injectionHost = contextElement.findMultiInjectionHost() ?: return null
+        val expressionAnnotation = injectionHost.parentOfType<PsiAnnotation>() ?: return null
         if (!expressionAnnotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
-            return
+            return null
         }
-        val modifierList = expressionAnnotation.findContainingModifierList() ?: return
+        val modifierList = expressionAnnotation.findContainingModifierList() ?: return null
 
         // look for an existing definition with this id, skip if it exists
         for (annotation in modifierList.annotations) {
             if (annotation.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) &&
                 annotation.findDeclaredAttributeValue("id")?.constantStringValue == id
             ) {
-                return
+                return null
             }
         }
 
@@ -761,30 +992,7 @@ object MEExpressionCompletionUtil {
         val annotationIndex = modifierList.annotations.indexOf(newAnnotation)
         val formattedModifierList =
             CodeStyleManager.getInstance(context.project).reformat(modifierList) as PsiModifierList
-        newAnnotation = formattedModifierList.annotations.getOrNull(annotationIndex) ?: return
-
-        // fold @At.target
-        val foldingModel = context.editor.foldingModel
-        val regionsToFold = mutableListOf<FoldRegion>()
-        val annotationRange = newAnnotation.textRange
-        for (foldRegion in foldingModel.allFoldRegions) {
-            if (!annotationRange.contains(foldRegion.textRange)) {
-                continue
-            }
-            val nameValuePair = newAnnotation.findElementAt(foldRegion.startOffset - annotationRange.startOffset)
-                ?.findContainingNameValuePair() ?: continue
-            if (nameValuePair.name == "target" &&
-                nameValuePair.parentOfType<PsiAnnotation>()?.hasQualifiedName(MixinConstants.Annotations.AT) == true
-            ) {
-                regionsToFold += foldRegion
-            }
-        }
-
-        foldingModel.runBatchFoldingOperation {
-            for (foldRegion in regionsToFold) {
-                foldRegion.isExpanded = false
-            }
-        }
+        return formattedModifierList.annotations.getOrNull(annotationIndex)
     }
 
     private fun getStatementVariants(
