@@ -869,16 +869,18 @@ object MEExpressionCompletionUtil {
         type: Type,
         ordinal: Int,
         isArgsOnly: Boolean,
-        isImplicit: Boolean,
+        canBeImplicit: Boolean,
         mixinClass: PsiClass,
     ): LookupElementBuilder {
+        val isTypeAccessible = type.isAccessibleFrom(mixinClass)
+        val isImplicit = canBeImplicit && isTypeAccessible
+
         val definitionLocal = buildString {
             append("local = @${MixinConstants.MixinExtras.LOCAL}(")
-            val isTypeAccessible = type.isAccessibleFrom(mixinClass)
             if (isTypeAccessible) {
                 append("type = ${type.className}.class, ")
             }
-            if (!isTypeAccessible || !isImplicit) {
+            if (!isImplicit) {
                 append("ordinal = ")
                 append(ordinal)
                 append(", ")
