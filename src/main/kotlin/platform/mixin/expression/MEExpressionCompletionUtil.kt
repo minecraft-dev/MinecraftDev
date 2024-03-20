@@ -585,6 +585,7 @@ object MEExpressionCompletionUtil {
                     var lookup = LookupElementBuilder.create(insn.name.toValidIdentifier())
                         .withIcon(PlatformIcons.FIELD_ICON)
                         .withPresentableText(insn.owner.substringAfterLast('/') + "." + insn.name)
+                        .withTypeText(Type.getType(insn.desc).presentableName())
                         .withDefinitionAndFoldTarget(insn.name.toValidIdentifier(), at)
                     if (insn.opcode == Opcodes.GETSTATIC || insn.opcode == Opcodes.PUTSTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
@@ -599,6 +600,10 @@ object MEExpressionCompletionUtil {
                     var lookup = LookupElementBuilder.create(insn.name.toValidIdentifier())
                         .withIcon(PlatformIcons.METHOD_ICON)
                         .withPresentableText(insn.owner.substringAfterLast('/') + "." + insn.name)
+                        .withTailText(
+                            "(" + Type.getArgumentTypes(insn.desc).joinToString { it.presentableName() } + ")"
+                        )
+                        .withTypeText(Type.getReturnType(insn.desc).presentableName())
                         .withDefinitionAndFoldTarget(insn.name.toValidIdentifier(), at)
                     if (insn.opcode == Opcodes.INVOKESTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
@@ -695,7 +700,11 @@ object MEExpressionCompletionUtil {
                 when (insn.opcode) {
                     Opcodes.ARRAYLENGTH -> {
                         if (canCompleteExprs) {
-                            return listOf(LookupElementBuilder.create("length").withIcon(PlatformIcons.FIELD_ICON))
+                            return listOf(
+                                LookupElementBuilder.create("length")
+                                    .withIcon(PlatformIcons.FIELD_ICON)
+                                    .withTypeText("int")
+                            )
                         }
                     }
                 }
