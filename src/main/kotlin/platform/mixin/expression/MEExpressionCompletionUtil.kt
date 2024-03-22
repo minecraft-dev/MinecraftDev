@@ -267,7 +267,9 @@ object MEExpressionCompletionUtil {
         val elementAtCursor = statement.findElementAt(cursorOffset.toInt()) ?: return emptyList()
 
         val wildcardReplacedStatement = statement.copy() as MEStatement
-        replaceCursorInputWithWildcard(project, wildcardReplacedStatement, cursorOffset.toInt())
+        var cursorOffsetInCopyFile =
+            cursorOffset.toInt() - statement.textRange.startOffset + wildcardReplacedStatement.textRange.startOffset
+        replaceCursorInputWithWildcard(project, wildcardReplacedStatement, cursorOffsetInCopyFile)
 
         var matchingFlows = mutableListOf<FlowValue>()
         for (statementToMatch in getStatementVariants(project.meExpressionElementFactory, wildcardReplacedStatement)) {
@@ -295,13 +297,27 @@ object MEExpressionCompletionUtil {
             return emptyList()
         }
 
+        var roundNumber = 0
         var subExpr: MEMatchableElement = statement
         while (true) {
             val inputExprOnCursor = subExpr.getInputExprs().firstOrNull { it.textRange.contains(cursorOffset.toInt()) }
                 ?: break
             val wildcardReplacedExpr = inputExprOnCursor.copy() as MEExpression
-            cursorOffset.setValue(cursorOffset.toInt() - inputExprOnCursor.textRange.startOffset)
-            replaceCursorInputWithWildcard(project, wildcardReplacedExpr, cursorOffset.toInt())
+            cursorOffsetInCopyFile = cursorOffset.toInt() -
+                inputExprOnCursor.textRange.startOffset + wildcardReplacedExpr.textRange.startOffset
+
+            if (DEBUG_COMPLETION) {
+                val exprText = wildcardReplacedExpr.text
+                val cursorOffsetInExpr = cursorOffsetInCopyFile - wildcardReplacedExpr.textRange.startOffset
+                val exprWithCaretMarker = when {
+                    cursorOffsetInExpr < 0 -> "<caret=$cursorOffset>$exprText"
+                    cursorOffsetInExpr > exprText.length -> "$exprText<caret=$cursorOffset>"
+                    else -> exprText.replaceRange(cursorOffsetInExpr, cursorOffsetInExpr, "<caret>")
+                }
+                println("=== Round ${++roundNumber}: handling $exprWithCaretMarker")
+            }
+
+            replaceCursorInputWithWildcard(project, wildcardReplacedExpr, cursorOffsetInCopyFile)
 
             val newMatchingFlows = mutableSetOf<FlowValue>()
             for (exprToMatch in getExpressionVariants(project.meExpressionElementFactory, wildcardReplacedExpr)) {
@@ -374,11 +390,17 @@ object MEExpressionCompletionUtil {
         val isPossiblyIncompleteCast = !inTypePosition &&
             elementAtCursor.parentOfType<MEExpression>()
                 ?.parents(false)
-                ?.dropWhile { it is MEArrayAccessExpression && it.indexExpr == null } is MEParenthesizedExpression
+                ?.dropWhile { it is MEArrayAccessExpression && it.indexExpr == null }
+                ?.firstOrNull() is MEParenthesizedExpression
         val canCompleteExprs = !inTypePosition
         val canCompleteTypes = inTypePosition || isPossiblyIncompleteCast
 
-        return cursorInstructions.flatMap { insn ->
+        if (DEBUG_COMPLETION) {
+            println("canCompleteExprs = $canCompleteExprs")
+            println("canCompleteTypes = $canCompleteTypes")
+        }
+
+        val eliminableResults = cursorInstructions.flatMap { insn ->
             getCompletionsForInstruction(
                 project,
                 targetClass,
@@ -390,6 +412,11 @@ object MEExpressionCompletionUtil {
                 canCompleteTypes
             )
         }
+
+        // In the case of multiple instructions producing the same lookup, attempt to show only the "best" lookup.
+        // For example, if a local variable is only sometimes able to be targeted using implicit ordinals in this
+        // expression, prefer specifying the ordinal.
+        return eliminableResults.groupBy { it.lookupElement.lookupString }.values.map { it.max().lookupElement }
     }
 
     private fun replaceUnknownNamesWithWildcards(
@@ -546,7 +573,7 @@ object MEExpressionCompletionUtil {
         mixinClass: PsiClass,
         canCompleteExprs: Boolean,
         canCompleteTypes: Boolean
-    ): List<LookupElement> {
+    ): List<EliminableLookup> {
         when (insn) {
             is LdcInsnNode -> {
                 when (val cst = insn.cst) {
@@ -555,7 +582,7 @@ object MEExpressionCompletionUtil {
                             return listOf(
                                 object : TailTypeDecorator<LookupElement>(createTypeLookup(cst)) {
                                     override fun computeTailType(context: InsertionContext?) = DOT_CLASS_TAIL
-                                }
+                                }.createEliminable()
                             )
                         }
                     }
@@ -568,6 +595,7 @@ object MEExpressionCompletionUtil {
                 targetMethod,
                 insn,
                 insn.`var`,
+                insn.opcode in Opcodes.ISTORE..Opcodes.ASTORE,
                 mixinClass
             )
             is IincInsnNode -> return createLocalVariableLookups(
@@ -576,6 +604,7 @@ object MEExpressionCompletionUtil {
                 targetMethod,
                 insn,
                 insn.`var`,
+                false,
                 mixinClass
             )
             is FieldInsnNode -> {
@@ -590,7 +619,7 @@ object MEExpressionCompletionUtil {
                     if (insn.opcode == Opcodes.GETSTATIC || insn.opcode == Opcodes.PUTSTATIC) {
                         lookup = lookup.withLookupString(insn.owner.substringAfterLast('/') + "." + insn.name)
                     }
-                    return listOf(lookup)
+                    return listOf(lookup.createEliminable())
                 }
             }
             is MethodInsnNode -> {
@@ -612,7 +641,7 @@ object MEExpressionCompletionUtil {
                         object : TailTypeDecorator<LookupElement>(lookup) {
                             override fun computeTailType(context: InsertionContext?) =
                                 ParenthesesTailType(!insn.desc.startsWith("()"))
-                        }
+                        }.createEliminable()
                     )
                 }
             }
@@ -629,7 +658,7 @@ object MEExpressionCompletionUtil {
                                             1,
                                             flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
                                         )
-                                }
+                                }.createEliminable()
                             )
                         }
                         Opcodes.NEW -> {
@@ -645,10 +674,10 @@ object MEExpressionCompletionUtil {
                                         ParenthesesTailType(
                                             initCall?.desc?.startsWith("()") == false
                                         )
-                                }
+                                }.createEliminable()
                             )
                         }
-                        else -> return listOf(lookup)
+                        else -> return listOf(lookup.createEliminable())
                     }
                 }
             }
@@ -675,7 +704,7 @@ object MEExpressionCompletionUtil {
                                         1,
                                         flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
                                     )
-                            }
+                            }.createEliminable()
                         )
                     }
                 }
@@ -692,7 +721,7 @@ object MEExpressionCompletionUtil {
                                     type.dimensions,
                                     flows[insn]?.hasDecoration(Decorations.ARRAY_CREATION_INFO) == true,
                                 )
-                        }
+                        }.createEliminable()
                     )
                 }
             }
@@ -704,6 +733,7 @@ object MEExpressionCompletionUtil {
                                 LookupElementBuilder.create("length")
                                     .withIcon(PlatformIcons.FIELD_ICON)
                                     .withTypeText("int")
+                                    .createEliminable()
                             )
                         }
                     }
@@ -783,8 +813,9 @@ object MEExpressionCompletionUtil {
         targetMethod: MethodNode,
         insn: AbstractInsnNode,
         index: Int,
+        isStore: Boolean,
         mixinClass: PsiClass,
-    ): List<LookupElement> {
+    ): List<EliminableLookup> {
         // ignore "this"
         if (!targetMethod.hasAccess(Opcodes.ACC_STATIC) && index == 0) {
             return emptyList()
@@ -798,7 +829,16 @@ object MEExpressionCompletionUtil {
 
         if (targetMethod.localVariables != null) {
             val localsHere = targetMethod.localVariables.filter { localVariable ->
-                val validRange = targetMethod.instructions.indexOf(localVariable.start) + 1 until
+                val firstValidInstruction = if (isStore) {
+                    generateSequence<AbstractInsnNode>(localVariable.start) { it.previous }
+                        .firstOrNull { it.opcode >= 0 }
+                } else {
+                    localVariable.start.next
+                }
+                if (firstValidInstruction == null) {
+                    return@filter false
+                }
+                val validRange = targetMethod.instructions.indexOf(firstValidInstruction) until
                     targetMethod.instructions.indexOf(localVariable.end)
                 targetMethod.instructions.indexOf(insn) in validRange
             }
@@ -828,6 +868,7 @@ object MEExpressionCompletionUtil {
                         isImplicit,
                         mixinClass,
                     )
+                    .createEliminable(if (isImplicit) -1 else 0)
             }
         }
 
@@ -843,6 +884,7 @@ object MEExpressionCompletionUtil {
                 .withIcon(PlatformIcons.VARIABLE_ICON)
                 .withTypeText(localType.presentableName())
                 .withLocalDefinition(localName, localType, ordinal, isArgsOnly, isImplicit, mixinClass)
+                .createEliminable(if (isImplicit) -1 else 0)
         )
     }
 
@@ -1080,6 +1122,15 @@ object MEExpressionCompletionUtil {
         }
 
         return variants
+    }
+
+    private fun LookupElement.createEliminable(priority: Int = 0) = EliminableLookup(this, priority)
+
+    private class EliminableLookup(
+        val lookupElement: LookupElement,
+        private val priority: Int
+    ) : Comparable<EliminableLookup> {
+        override fun compareTo(other: EliminableLookup) = priority.compareTo(other.priority)
     }
 
     private class ParenthesesTailType(private val hasParameters: Boolean) : TailType() {

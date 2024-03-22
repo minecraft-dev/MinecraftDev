@@ -34,20 +34,23 @@ import org.junit.jupiter.api.BeforeEach
 abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
 
     private var mixinLibrary: Library? = null
+    private var mixinExtrasLibrary: Library? = null
     private var testDataLibrary: Library? = null
 
     @BeforeEach
     fun initMixin() {
         runWriteTask {
             mixinLibrary = createLibrary(project, "mixin")
+            mixinExtrasLibrary = createLibrary(project, "mixinextras-common") // TODO: this will probably change
             testDataLibrary = createLibrary(project, "mixin-test-data")
         }
 
         ModuleRootModificationUtil.updateModel(module) { model ->
             model.addLibraryEntry(mixinLibrary ?: throw IllegalStateException("Mixin library not created"))
+            model.addLibraryEntry(mixinExtrasLibrary ?: throw IllegalStateException("MixinExtras library not created"))
             model.addLibraryEntry(testDataLibrary ?: throw IllegalStateException("Test data library not created"))
             val orderEntries = model.orderEntries
-            orderEntries.rotate(2)
+            orderEntries.rotate(3)
             model.rearrangeOrderEntries(orderEntries)
         }
     }
