@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev
 
+import com.demonwav.mcdev.util.BeforeOrAfter
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
@@ -32,6 +33,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
 class MinecraftProjectSettings : PersistentStateComponent<MinecraftProjectSettings> {
     var isShadowAnnotationsSameLine = true
+    var definitionPosRelativeToExpression = BeforeOrAfter.AFTER
 
     override fun getState() = this
     override fun loadState(state: MinecraftProjectSettings) {

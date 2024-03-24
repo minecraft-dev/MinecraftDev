@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.MinecraftProjectSettings
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil.insnOrNull
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArrayAccessExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEAssignStatement
@@ -58,6 +59,7 @@ import com.demonwav.mcdev.platform.mixin.util.isPrimitive
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.platform.mixin.util.textify
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
+import com.demonwav.mcdev.util.BeforeOrAfter
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingModifierList
@@ -1054,10 +1056,15 @@ object MEExpressionCompletionUtil {
             "@${MixinConstants.MixinExtras.DEFINITION}(id = \"$id\", $at)",
             modifierList,
         )
-        newAnnotation = modifierList.addAfter(
-            newAnnotation,
-            modifierList.annotations.lastOrNull { it.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) }
-        ) as PsiAnnotation
+        var anchor = modifierList.annotations.lastOrNull { it.hasQualifiedName(MixinConstants.MixinExtras.DEFINITION) }
+        if (anchor == null) {
+            val definitionPosRelativeToExpression =
+                MinecraftProjectSettings.getInstance(context.project).definitionPosRelativeToExpression
+            if (definitionPosRelativeToExpression == BeforeOrAfter.AFTER) {
+                anchor = expressionAnnotation
+            }
+        }
+        newAnnotation = modifierList.addAfter(newAnnotation, anchor) as PsiAnnotation
 
         // add imports and reformat
         newAnnotation =

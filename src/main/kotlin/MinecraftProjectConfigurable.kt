@@ -21,9 +21,12 @@
 package com.demonwav.mcdev
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.util.BeforeOrAfter
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.EnumComboBoxModel
+import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.JComponent
@@ -42,6 +45,13 @@ class MinecraftProjectConfigurable(private val project: Project) : Configurable 
             row {
                 checkBox(MCDevBundle("minecraft.settings.mixin.shadow_annotation_same_line"))
                     .bindSelected(settings::isShadowAnnotationsSameLine)
+            }
+            row {
+                label(MCDevBundle("minecraft.settings.mixin.definition_pos_relative_to_expression"))
+                comboBox(EnumComboBoxModel(BeforeOrAfter::class.java))
+                    .bindItem(settings::definitionPosRelativeToExpression) {
+                        settings.definitionPosRelativeToExpression = it ?: BeforeOrAfter.AFTER
+                    }
             }
         }
     }.also { panel = it }

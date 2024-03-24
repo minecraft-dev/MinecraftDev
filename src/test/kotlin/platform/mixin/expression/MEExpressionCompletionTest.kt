@@ -20,8 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.MinecraftProjectSettings
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import com.demonwav.mcdev.util.BeforeOrAfter
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -77,6 +79,8 @@ class MEExpressionCompletionTest : BaseMixinTest() {
                 java("MEExpressionCompletionTest.java", code)
             }
         }
+
+        MinecraftProjectSettings.getInstance(fixture.project).definitionPosRelativeToExpression = BeforeOrAfter.BEFORE
 
         val possibleItems = fixture.completeBasic()
         if (possibleItems != null) {
