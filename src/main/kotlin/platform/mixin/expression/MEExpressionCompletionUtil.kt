@@ -69,6 +69,7 @@ import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.packageName
 import com.intellij.codeInsight.TailType
 import com.intellij.codeInsight.completion.InsertionContext
+import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.TailTypeDecorator
@@ -892,7 +893,9 @@ object MEExpressionCompletionUtil {
 
     private fun LookupElementBuilder.withDefinitionAndFoldTarget(id: String, at: String) =
         withDefinition(id, at) { context, annotation ->
-            val foldingModel = InjectedLanguageEditorUtil.getTopLevelEditor(context.editor).foldingModel
+            val hostEditor = InjectedLanguageEditorUtil.getTopLevelEditor(context.editor)
+            CodeFoldingManager.getInstance(context.project).updateFoldRegions(hostEditor)
+            val foldingModel = hostEditor.foldingModel
             val regionsToFold = mutableListOf<FoldRegion>()
             val annotationRange = annotation.textRange
             for (foldRegion in foldingModel.allFoldRegions) {
