@@ -25,66 +25,22 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.markup.EffectType
+import com.intellij.util.xmlb.XmlSerializerUtil
 
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
-class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
+class MinecraftSettings : PersistentStateComponent<MinecraftSettings> {
+    override fun getState() = this
 
-    data class State(
-        var isShowProjectPlatformIcons: Boolean = true,
-        var isShowEventListenerGutterIcons: Boolean = true,
-        var isShowChatColorGutterIcons: Boolean = true,
-        var isShowChatColorUnderlines: Boolean = false,
-        var underlineType: UnderlineType = UnderlineType.DOTTED,
-
-        var isShadowAnnotationsSameLine: Boolean = true,
-    )
-
-    private var state = State()
-
-    override fun getState(): State {
-        return state
+    override fun loadState(state: MinecraftSettings) {
+        XmlSerializerUtil.copyBean(state, this)
     }
 
-    override fun loadState(state: State) {
-        this.state = state
-    }
+    var isShowProjectPlatformIcons = true
+    var isShowEventListenerGutterIcons = true
+    var isShowChatColorGutterIcons = true
+    var isShowChatColorUnderlines = false
 
-    // State mappings
-    var isShowProjectPlatformIcons: Boolean
-        get() = state.isShowProjectPlatformIcons
-        set(showProjectPlatformIcons) {
-            state.isShowProjectPlatformIcons = showProjectPlatformIcons
-        }
-
-    var isShowEventListenerGutterIcons: Boolean
-        get() = state.isShowEventListenerGutterIcons
-        set(showEventListenerGutterIcons) {
-            state.isShowEventListenerGutterIcons = showEventListenerGutterIcons
-        }
-
-    var isShowChatColorGutterIcons: Boolean
-        get() = state.isShowChatColorGutterIcons
-        set(showChatColorGutterIcons) {
-            state.isShowChatColorGutterIcons = showChatColorGutterIcons
-        }
-
-    var isShowChatColorUnderlines: Boolean
-        get() = state.isShowChatColorUnderlines
-        set(showChatColorUnderlines) {
-            state.isShowChatColorUnderlines = showChatColorUnderlines
-        }
-
-    var underlineType: UnderlineType
-        get() = state.underlineType
-        set(underlineType) {
-            state.underlineType = underlineType
-        }
-
-    var isShadowAnnotationsSameLine: Boolean
-        get() = state.isShadowAnnotationsSameLine
-        set(shadowAnnotationsSameLine) {
-            state.isShadowAnnotationsSameLine = shadowAnnotationsSameLine
-        }
+    var underlineType = UnderlineType.DOTTED
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {
 

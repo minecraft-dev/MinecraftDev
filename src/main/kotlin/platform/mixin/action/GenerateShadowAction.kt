@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
-import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.MinecraftProjectSettings
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
@@ -237,7 +237,7 @@ private fun copyAnnotation(modifiers: PsiModifierList, newModifiers: PsiModifier
 }
 
 inline fun disableAnnotationWrapping(project: Project, func: () -> Unit) {
-    if (!MinecraftSettings.instance.isShadowAnnotationsSameLine) {
+    if (!MinecraftProjectSettings.getInstance(project).isShadowAnnotationsSameLine) {
         func()
         return
     }

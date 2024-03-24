@@ -84,13 +84,6 @@ class MinecraftConfigurable : Configurable {
             }
         }
 
-        group(MCDevBundle("minecraft.settings.mixin")) {
-            row {
-                checkBox(MCDevBundle("minecraft.settings.mixin.shadow_annotation_same_line"))
-                    .bindSelected(settings::isShadowAnnotationsSameLine)
-            }
-        }
-
         onApply {
             for (project in ProjectManager.getInstance().openProjects) {
                 ProjectView.getInstance(project).refresh()

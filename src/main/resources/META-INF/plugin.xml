@@ -212,6 +212,10 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+        <projectConfigurable displayName="Project-Specific Settings"
+                             id="Settings.Minecraft.Project"
+                             parentId="Settings.Minecraft"
+                             instance="com.demonwav.mcdev.MinecraftProjectConfigurable"/>
         <projectConfigurable displayName="Language Template"
                              id="Settings.Minecraft.TranslationTemplate"
                              parentId="Settings.Minecraft"
@@ -285,6 +289,7 @@
         <externalAnnotationsArtifactsResolver implementation="com.demonwav.mcdev.translations.identification.TranslationExternalAnnotationsArtifactsResolver" order="first"/>
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
+        <projectService serviceImplementation="com.demonwav.mcdev.MinecraftProjectSettings"/>
 
         <errorHandler implementation="com.demonwav.mcdev.errorreporter.ErrorReporter"/>
         <!--endregion-->
