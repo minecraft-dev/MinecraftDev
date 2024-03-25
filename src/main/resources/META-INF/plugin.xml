@@ -438,6 +438,7 @@
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinObjectCastFoldingBuilder"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.MixinTargetDescriptorFoldingBuilder"/>
         <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.folding.AccessorMixinFoldingBuilder"/>
+        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.platform.mixin.expression.MEDefinitionFoldingBuilder"/>
 
         <implicitUsageProvider implementation="com.demonwav.mcdev.platform.mixin.insight.MixinImplicitUsageProvider"/>
         <deadCode implementation="com.demonwav.mcdev.platform.mixin.insight.MixinEntryPoint"/>

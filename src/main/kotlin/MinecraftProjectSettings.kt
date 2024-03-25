@@ -33,7 +33,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
 class MinecraftProjectSettings : PersistentStateComponent<MinecraftProjectSettings> {
     var isShadowAnnotationsSameLine = true
-    var definitionPosRelativeToExpression = BeforeOrAfter.AFTER
+    var definitionPosRelativeToExpression = BeforeOrAfter.BEFORE
 
     override fun getState() = this
     override fun loadState(state: MinecraftProjectSettings) {

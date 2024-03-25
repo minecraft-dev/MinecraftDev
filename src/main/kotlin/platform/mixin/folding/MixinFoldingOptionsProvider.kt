@@ -56,5 +56,10 @@ class MixinFoldingOptionsProvider :
             { settings.state.foldAccessorMethodCalls },
             { b -> settings.state.foldAccessorMethodCalls = b },
         )
+        checkBox(
+            "Fold MixinExtras expression definitions",
+            { settings.state.foldDefinitions },
+            { b -> settings.state.foldDefinitions = b },
+        )
     }
 }

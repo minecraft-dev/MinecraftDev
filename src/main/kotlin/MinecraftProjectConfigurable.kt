@@ -50,7 +50,7 @@ class MinecraftProjectConfigurable(private val project: Project) : Configurable 
                 label(MCDevBundle("minecraft.settings.mixin.definition_pos_relative_to_expression"))
                 comboBox(EnumComboBoxModel(BeforeOrAfter::class.java))
                     .bindItem(settings::definitionPosRelativeToExpression) {
-                        settings.definitionPosRelativeToExpression = it ?: BeforeOrAfter.AFTER
+                        settings.definitionPosRelativeToExpression = it ?: BeforeOrAfter.BEFORE
                     }
             }
         }
