@@ -109,6 +109,7 @@ import com.intellij.psi.util.parentOfType
 import com.intellij.psi.util.parents
 import com.intellij.util.PlatformIcons
 import com.intellij.util.text.CharArrayUtil
+import com.llamalad7.mixinextras.expression.impl.flow.ArrayCreationInfo
 import com.llamalad7.mixinextras.expression.impl.flow.ComplexFlowValue
 import com.llamalad7.mixinextras.expression.impl.flow.DummyFlowValue
 import com.llamalad7.mixinextras.expression.impl.flow.FlowValue
@@ -333,7 +334,7 @@ object MEExpressionCompletionUtil {
                 val flattenedInstructions = mutableSetOf<AbstractInsnNode>()
                 for (flow in matchingFlows) {
                     getInstructionsInFlowTree(
-                        findFlowTreeRoot(flow),
+                        flow,
                         flattenedInstructions,
                         subExpr !is MEExpressionStatement && subExpr !is MEParenthesizedExpression
                     )
@@ -365,7 +366,7 @@ object MEExpressionCompletionUtil {
 
         val cursorInstructions = mutableSetOf<AbstractInsnNode>()
         for (flow in matchingFlows) {
-            getInstructionsInFlowTree(findFlowTreeRoot(flow), cursorInstructions, false)
+            getInstructionsInFlowTree(flow, cursorInstructions, false)
         }
 
         if (DEBUG_COMPLETION) {
@@ -536,34 +537,42 @@ object MEExpressionCompletionUtil {
         }
     }
 
-    private fun findFlowTreeRoot(flow: FlowValue): FlowValue {
-        val insn = flow.insnOrNull ?: return flow
-        return if (insn.opcode == Opcodes.NEW) {
-            flow.next.firstOrNull {
+    private fun getFlowInputs(flow: FlowValue): List<FlowValue> {
+        val arrayCreationInfo = flow.getDecoration<ArrayCreationInfo>(Decorations.ARRAY_CREATION_INFO)
+        if (arrayCreationInfo != null) {
+            return arrayCreationInfo.values
+        }
+
+        var rootFlow = flow
+        val insn = flow.insnOrNull ?: return emptyList()
+        if (insn.opcode == Opcodes.NEW) {
+            rootFlow = flow.next.firstOrNull {
                 val nextInsn = it.left.insnOrNull ?: return@firstOrNull false
                 it.right == 0 &&
                     nextInsn.opcode == Opcodes.INVOKESPECIAL &&
-                    (nextInsn as MethodInsnNode).name == "<init>"
-            }?.left ?: flow
-        } else {
-            flow
+                        (nextInsn as MethodInsnNode).name == "<init>"
+            }?.left ?: rootFlow
         }
+
+        return (0 until rootFlow.inputCount()).map(rootFlow::getInput)
     }
 
     private fun getInstructionsInFlowTree(
         flow: FlowValue,
         outInstructions: MutableSet<AbstractInsnNode>,
-        strict: Boolean
+        strict: Boolean,
     ) {
         if (flow is DummyFlowValue || flow is ComplexFlowValue) {
             return
         }
 
         if (!strict) {
-            outInstructions += flow.insn
+            if (!outInstructions.add(flow.insn)) {
+                return
+            }
         }
-        for (i in 0 until flow.inputCount()) {
-            getInstructionsInFlowTree(flow.getInput(i), outInstructions, false)
+        for (input in getFlowInputs(flow)) {
+            getInstructionsInFlowTree(input, outInstructions, false)
         }
     }
 

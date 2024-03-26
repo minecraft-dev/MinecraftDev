@@ -35,6 +35,9 @@ public class MEExpressionTestData {
         InaccessibleType varOfInaccessibleType = new InaccessibleType();
         acceptInaccessibleType(varOfInaccessibleType);
         noArgMethod();
+
+        String[] strings1 = new String[] { local1, local2 };
+        String[] strings2 = new String[one];
     }
 
     private static void acceptInaccessibleType(InaccessibleType type) {

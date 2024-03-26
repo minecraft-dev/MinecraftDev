@@ -411,6 +411,46 @@ class MEExpressionCompletionTest : BaseMixinTest() {
     }
 
     @Test
+    @DisplayName("Array Creation Completion Test")
+    fun arrayCreationCompletionTest() {
+        doBeforeAfterTest(
+            "String",
+            """
+            package test;
+            
+            import com.demonwav.mcdev.mixintestdata.meExpression.MEExpressionTestData;
+            import com.llamalad7.mixinextras.expression.Expression;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            
+            @Mixin(MEExpressionTestData.class)
+            class MEExpressionCompletionTest {
+                @Expression("new <caret>")
+                @Inject(method = "complexFunction", at = @At("MIXINEXTRAS:EXPRESSION"))
+            }
+            """.trimIndent(),
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.meExpression.MEExpressionTestData;
+            import com.llamalad7.mixinextras.expression.Definition;
+            import com.llamalad7.mixinextras.expression.Expression;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+
+            @Mixin(MEExpressionTestData.class)
+            class MEExpressionCompletionTest {
+                @Definition(id = "String", type = String.class)
+                @Expression("new String[<caret>]")
+                @Inject(method = "complexFunction", at = @At("MIXINEXTRAS:EXPRESSION"))
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
     @DisplayName("LHS Of Complete Assignment Test")
     fun lhsOfCompleteAssignmentTest() {
         assertLookupAppears(
@@ -477,6 +517,56 @@ class MEExpressionCompletionTest : BaseMixinTest() {
                 @Definition(id = "synchedData", at = @At(value = "FIELD", target = "Lcom/demonwav/mcdev/mixintestdata/meExpression/MEExpressionTestData;synchedData:Lcom/demonwav/mcdev/mixintestdata/meExpression/MEExpressionTestData${'$'}SynchedDataManager;"))
                 @Expression("(Integer) this.synchedData.<caret>")
                 @Inject(method = "getStingerCount", at = @At("MIXINEXTRAS:EXPRESSION"))
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    @DisplayName("Array Length Test")
+    fun arrayLengthTest() {
+        assertLookupAppears(
+            "one",
+            """
+            package test;
+            
+            import com.demonwav.mcdev.mixintestdata.meExpression.MEExpressionTestData;
+            import com.llamalad7.mixinextras.expression.Definition;
+            import com.llamalad7.mixinextras.expression.Expression;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            
+            @Mixin(MEExpressionTestData.class)
+            class MEExpressionCompletionTest {
+                @Definition(id = "String", type = String.class)
+                @Expression("new String[<caret>]")
+                @Inject(method = "complexFunction", at = @At("MIXINEXTRAS:EXPRESSION"))
+            }
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    @DisplayName("Array Element Test")
+    fun arrayElementTest() {
+        assertLookupAppears(
+            "local2",
+            """
+            package test;
+            
+            import com.demonwav.mcdev.mixintestdata.meExpression.MEExpressionTestData;
+            import com.llamalad7.mixinextras.expression.Definition;
+            import com.llamalad7.mixinextras.expression.Expression;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            
+            @Mixin(MEExpressionTestData.class)
+            class MEExpressionCompletionTest {
+                @Definition(id = "String", type = String.class)
+                @Expression("new String[]{?, <caret>}")
+                @Inject(method = "complexFunction", at = @At("MIXINEXTRAS:EXPRESSION"))
             }
             """.trimIndent()
         )
