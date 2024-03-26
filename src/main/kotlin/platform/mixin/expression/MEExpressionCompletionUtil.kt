@@ -550,7 +550,7 @@ object MEExpressionCompletionUtil {
                 val nextInsn = it.left.insnOrNull ?: return@firstOrNull false
                 it.right == 0 &&
                     nextInsn.opcode == Opcodes.INVOKESPECIAL &&
-                        (nextInsn as MethodInsnNode).name == "<init>"
+                    (nextInsn as MethodInsnNode).name == "<init>"
             }?.left ?: rootFlow
         }
 
