@@ -29,6 +29,8 @@ asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
 
+gson = "com.google.code.gson:gson:2.10.1"
+
 # Testing
 test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
 test-mixin = "org.spongepowered:mixin:0.8.5"

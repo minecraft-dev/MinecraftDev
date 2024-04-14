@@ -28,6 +28,6 @@ sealed class HttpConnectionFactory {
     open fun openHttpConnection(url: String) = URL(url).openConnection() as HttpURLConnection
 }
 
-object ProxyHttpConnectionFactory : HttpConnectionFactory() {
+data object ProxyHttpConnectionFactory : HttpConnectionFactory() {
     override fun openHttpConnection(url: String) = HttpConfigurable.getInstance().openHttpConnection(url)
 }

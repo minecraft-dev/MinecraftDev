@@ -18,7 +18,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * This package was taken from https://github.com/go-lang-plugin-org/go-lang-idea-plugin/pull/909
- */
-package com.demonwav.mcdev.errorreporter
+package com.demonwav.mcdev.errorreporter.submission
+
+sealed interface SubmissionResponse
+
+@JvmRecord
+data class SubmissionResponseSuccess(
+    val isDuplicate: Boolean,
+    val issueNumber: Int,
+    val issueUrl: String,
+) : SubmissionResponse
+
+@JvmRecord
+data class SubmissionResponseError(
+    val message: String,
+) : SubmissionResponse

@@ -103,6 +103,7 @@ dependencies {
     implementation(libs.bundles.asm)
 
     implementation(libs.bundles.fuel)
+    implementation(libs.gson)
 
     jflex(libs.jflex.lib)
     jflexSkeleton(libs.jflex.skeleton) {

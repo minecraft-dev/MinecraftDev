@@ -25,9 +25,6 @@ import com.demonwav.mcdev.update.PluginUtil
 import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
 import com.intellij.idea.IdeaLogger
-import com.intellij.notification.BrowseNotificationAction
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
@@ -40,21 +37,14 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.Consumer
 import errorreporter.submission.Submission
 import errorreporter.submission.SubmissionAttachment
-import errorreporter.submission.SubmissionError
-import errorreporter.submission.SubmissionErrorContent
+import errorreporter.submission.SubmissionContent
 import errorreporter.submission.SubmissionMetadata
-import errorreporter.submission.SubmissionStacktrace
 import java.awt.Component
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 
 class ErrorReporter : ErrorReportSubmitter() {
-    private val ignoredErrorMessages = listOf(
-        "Key com.demonwav.mcdev.translations.TranslationFoldingSettings duplicated",
-        "Inspection #EntityConstructor has no description",
-        "VFS name enumerator corrupted",
-        "PersistentEnumerator storage corrupted",
-    )
+
     override fun getReportActionText() = MCDevBundle("error_reporter.submit.action")
 
     override fun submit(
@@ -84,7 +74,7 @@ class ErrorReporter : ErrorReportSubmitter() {
         )
 
         val errorDetails = events.map { event ->
-            SubmissionError(
+            SubmissionContent(
                 message = event.message,
                 description = additionalInfo,
                 stacktrace = event.throwableText,
@@ -113,53 +103,12 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         val submission = Submission(meta, errorDetails)
 
-        val (reportValues, attachments) = errorData.formatErrorData()
-
-        val task = AnonymousFeedbackTask(
+        val task = ErrorReporterTask(
             project,
             "Submitting error report",
             true,
-            reportValues,
-            attachments,
-            { htmlUrl, token, isDuplicate ->
-                val type = if (isDuplicate) {
-                    SubmittedReportInfo.SubmissionStatus.DUPLICATE
-                } else {
-                    SubmittedReportInfo.SubmissionStatus.NEW_ISSUE
-                }
-
-                val message = if (!isDuplicate) {
-                    "<html>${MCDevBundle("error_reporter.report.created", token)}</html>"
-                } else {
-                    "<html>${MCDevBundle("error_reporter.report.commented", token)}</html>"
-                }
-                val actionText = if (!isDuplicate) {
-                    MCDevBundle("error_reporter.report.created.action")
-                } else {
-                    MCDevBundle("error_reporter.report.commented.action")
-                }
-
-                NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
-                    MCDevBundle("error_reporter.report.title"),
-                    message,
-                    NotificationType.INFORMATION,
-                ).addAction(BrowseNotificationAction(actionText, htmlUrl)).setImportant(false).notify(project)
-
-                val reportInfo = SubmittedReportInfo(htmlUrl, "Issue #$token", type)
-                consumer.consume(reportInfo)
-            },
-            { e ->
-                val message = "<html>${MCDevBundle("error_reporter.report.error", e.message)}</html>"
-                val actionText = MCDevBundle("error_reporter.report.error.action")
-                val userUrl = "https://github.com/minecraft-dev/MinecraftDev/issues"
-                NotificationGroupManager.getInstance().getNotificationGroup("Error Report").createNotification(
-                    MCDevBundle("error_reporter.report.title"),
-                    message,
-                    NotificationType.ERROR,
-                ).addAction(BrowseNotificationAction(actionText, userUrl)).setImportant(false).notify(project)
-
-                consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.FAILED))
-            },
+            submission,
+            consumer,
         )
 
         if (project == null) {
