@@ -42,6 +42,10 @@ class ErrorData(var throwable: Throwable?, private val lastAction: String?) {
         Regex("""(?<intellijVersion>\d{4}\.\d)-(?<pluginVersion>\d+\.\d+\.\d+)""")
     }
 
+    fun collectErrorData() {
+
+    }
+
     fun formatErrorData(): Pair<LinkedHashMap<String, String?>, List<Attachment>> {
         val appInfo = ApplicationInfoEx.getInstanceEx()
         val namesInfo = ApplicationNamesInfo.getInstance()

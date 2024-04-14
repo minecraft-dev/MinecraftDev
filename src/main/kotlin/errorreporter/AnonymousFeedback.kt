@@ -28,6 +28,7 @@ import com.google.gson.Gson
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.util.text.StringUtil
+import errorreporter.submission.SubmissionMetadata
 import java.net.HttpURLConnection
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
@@ -67,10 +68,13 @@ object AnonymousFeedback {
         val result = LinkedHashMap<String, String>(5)
         result["title"] = "[auto-generated] Exception in plugin"
         result["body"] = generateGitHubIssueBody(envDetails, attachments)
+
+
         return Gson().toJson(result).toByteArray()
     }
 
     private fun generateGitHubIssueBody(body: LinkedHashMap<String, String?>, attachments: List<Attachment>): String {
+
         val errorDescription = body.remove("error.description") ?: ""
 
         var errorMessage = body.remove("error.message")

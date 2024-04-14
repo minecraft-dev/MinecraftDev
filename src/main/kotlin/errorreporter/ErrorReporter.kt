@@ -24,21 +24,29 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.update.PluginUtil
 import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
-import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.idea.IdeaLogger
 import com.intellij.notification.BrowseNotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.application.ApplicationNamesInfo
+import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent
 import com.intellij.openapi.diagnostic.SubmittedReportInfo
 import com.intellij.openapi.progress.EmptyProgressIndicator
-import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.Consumer
+import errorreporter.submission.Submission
+import errorreporter.submission.SubmissionAttachment
+import errorreporter.submission.SubmissionError
+import errorreporter.submission.SubmissionErrorContent
+import errorreporter.submission.SubmissionMetadata
+import errorreporter.submission.SubmissionStacktrace
 import java.awt.Component
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 
 class ErrorReporter : ErrorReportSubmitter() {
     private val ignoredErrorMessages = listOf(
@@ -58,38 +66,52 @@ class ErrorReporter : ErrorReportSubmitter() {
         val dataContext = DataManager.getInstance().getDataContext(parentComponent)
         val project = CommonDataKeys.PROJECT.getData(dataContext)
 
-        val event = events[0]
-        val errorMessage = event.throwableText
-        if (errorMessage.isNotBlank() && ignoredErrorMessages.any(errorMessage::contains)) {
-            val task = object : Task.Backgroundable(project, MCDevBundle("error_reporter.submit.ignored")) {
-                override fun run(indicator: ProgressIndicator) {
-                    consumer.consume(SubmittedReportInfo(null, null, SubmittedReportInfo.SubmissionStatus.DUPLICATE))
-                }
-            }
-            if (project == null) {
-                task.run(EmptyProgressIndicator())
-            } else {
-                ProgressManager.getInstance().run(task)
-            }
-            return true
+        val plugin = PluginUtil.plugin
+        val appInfo = ApplicationInfoEx.getInstanceEx()
+        val namesInfo = ApplicationNamesInfo.getInstance()
+
+        val meta = SubmissionMetadata(
+            pluginName = plugin.name,
+            pluginVersion = plugin.version,
+            osName = SystemInfo.OS_NAME,
+            javaVersion = SystemInfo.JAVA_VERSION,
+            javaVmVendor = SystemInfo.JAVA_VENDOR,
+            isEap = appInfo.isEAP,
+            appName = namesInfo.fullProductName,
+            ideaBuild = appInfo.build.toString(),
+            ideaVersion = appInfo.fullVersion,
+            lastAction = IdeaLogger.ourLastActionId
+        )
+
+        val errorDetails = events.map { event ->
+            SubmissionError(
+                message = event.message,
+                description = additionalInfo,
+                stacktrace = event.throwableText,
+                attachments = (event.data as? LogMessage)?.let { msg ->
+                    msg.includedAttachments.map { attachment ->
+                        val text = runCatching {
+                            Charsets.UTF_8.newDecoder()
+                                .onMalformedInput(CodingErrorAction.REPORT)
+                                .onUnmappableCharacter(CodingErrorAction.REPORT)
+                                .decode(ByteBuffer.wrap(attachment.bytes))
+                                .toString()
+                        }.getOrNull()
+
+                        val bodyText = text?.takeIf { it != attachment.displayText }
+                        val bytes = if (text == null) attachment.encodedBytes else null
+                        SubmissionAttachment(
+                            name = attachment.name,
+                            displayText = attachment.displayText,
+                            body = bodyText,
+                            bytes = bytes
+                        )
+                    }
+                } ?: listOf()
+            )
         }
 
-        val errorData = ErrorData(event.throwable, IdeaLogger.ourLastActionId)
-
-        errorData.description = additionalInfo
-        errorData.message = event.message
-
-        PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)?.let { plugin ->
-            errorData.pluginName = plugin.name
-            errorData.pluginVersion = plugin.version
-        }
-
-        val data = event.data
-
-        if (data is LogMessage) {
-            errorData.throwable = data.throwable
-            errorData.attachments = data.includedAttachments
-        }
+        val submission = Submission(meta, errorDetails)
 
         val (reportValues, attachments) = errorData.formatErrorData()
 
