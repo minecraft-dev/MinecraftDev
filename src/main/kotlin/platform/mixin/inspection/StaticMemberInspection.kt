@@ -37,7 +37,7 @@ import com.intellij.psi.PsiModifier
 class StaticMemberInspection : MixinInspection() {
 
     override fun getStaticDescription() =
-        "A mixin class does not exist at runtime, and thus having them public does not make sense. " +
+        "A mixin class does not exist at runtime, and thus having them not private does not make sense. " +
             "Make the field/method private instead."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
@@ -56,7 +56,7 @@ class StaticMemberInspection : MixinInspection() {
             if (isProblematic(member)) {
                 holder.registerProblem(
                     member,
-                    "Public static members are not allowed in Mixin classes",
+                    "Non-private static members are not allowed in Mixin classes",
                     QuickFixFactory.getInstance().createModifierListFix(member, PsiModifier.PRIVATE, true, false),
                 )
             }
@@ -70,7 +70,7 @@ class StaticMemberInspection : MixinInspection() {
 
             val modifiers = member.modifierList!!
 
-            return modifiers.hasModifierProperty(PsiModifier.PUBLIC) &&
+            return !modifiers.hasModifierProperty(PsiModifier.PRIVATE) &&
                 modifiers.hasModifierProperty(PsiModifier.STATIC) &&
                 modifiers.findAnnotation(SHADOW) == null &&
                 modifiers.findAnnotation(OVERWRITE) == null &&
