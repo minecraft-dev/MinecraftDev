@@ -22,6 +22,7 @@ data class PropertyDerivation(
     val method: String,
     val default: Any,
     val whenModified: Boolean?,
+    val parameters: Map<String, Any?>?,
 )
 
 data class TemplateFile(

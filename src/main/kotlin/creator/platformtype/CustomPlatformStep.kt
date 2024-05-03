@@ -24,6 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.custom.DerivationMethods
+import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateProperty
@@ -38,7 +39,6 @@ import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.GraphProperty
-import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.toStringProperty
@@ -163,6 +163,8 @@ class CustomPlatformStep(
                     graphProp.bindStorage(makeStorageKey(prop))
                 }
 
+                setupPropertyDerivation(graphProp, prop.derives) { it?.toString() ?: "" }
+
                 graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { ClassFqn(graphProp.get()) }
 
@@ -172,16 +174,19 @@ class CustomPlatformStep(
             }
 
             "boolean" -> {
-                val graphProp = propertyGraph.property(prop.default as? Boolean ?: false)
+                val defaultValue = prop.default as? Boolean ?: false
+                val graphProp = propertyGraph.property(defaultValue)
                 if (prop.remember == true) {
                     graphProp.bindBooleanStorage(makeStorageKey(prop))
                 }
+
+                setupPropertyDerivation(graphProp, prop.derives) { it as? Boolean ?: defaultValue }
 
                 graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { graphProp.get() }
 
                 row(prop.label) {
-                    checkBox("").bindSelected(graphProp).enabled(prop.editable != false)
+                    checkBox(prop.label).bindSelected(graphProp).enabled(prop.editable != false)
                 }.visible(prop.hidden != true)
             }
 
@@ -192,6 +197,10 @@ class CustomPlatformStep(
 
                 if (prop.remember == true && prop.options.all { it is String }) {
                     graphProp.toStringProperty { it }.bindStorage(makeStorageKey(prop))
+                }
+
+                setupPropertyDerivation(graphProp, prop.derives) {
+                    it?.toString()?.takeIf(prop.options::contains) ?: defaultValue
                 }
 
                 graphProperties[prop.name] = graphProp
@@ -208,25 +217,7 @@ class CustomPlatformStep(
                     graphProp.bindStorage(makeStorageKey(prop))
                 }
 
-                if (prop.derives != null) {
-                    val parentProperty = graphProperties[prop.derives.from]
-                    if (parentProperty == null) {
-                        thisLogger().error("Unknown parent property '${prop.derives.from}'")
-                        return
-                    }
-
-                    val method = DerivationMethods.methods[prop.derives.method]
-                    if (method == null) {
-                        thisLogger().error("Unknown derivation method '${prop.derives.method}'")
-                        return
-                    }
-
-                    graphProp.set(method(parentProperty.get())?.toString() ?: prop.derives.default as String)
-
-                    graphProp.dependsOn(parentProperty, prop.derives.whenModified != false) {
-                        method(parentProperty.get())?.toString() ?: prop.derives.default as String
-                    }
-                }
+                setupPropertyDerivation(graphProp, prop.derives) { it?.toString() ?: "" }
 
                 graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { graphProp.get() }
@@ -260,7 +251,7 @@ class CustomPlatformStep(
             "VERSION" to buildSystemProps.version,
         )
 
-        templateProperties.mapValuesTo(assets.templateProperties) { (_, property) -> property() }
+        collectTemplateProperties(assets.templateProperties)
 
         thisLogger().debug("Template properties: $templateProperties")
 
@@ -292,6 +283,38 @@ class CustomPlatformStep(
             val template = CustomFileTemplate(baseFileName, extension)
             template.text = templatePath.readText()
             assets.addAssets(GeneratorTemplateFile(rootPath.relativize(destPath).toString(), template))
+        }
+    }
+
+    private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()) =
+        templateProperties.mapValuesTo(into) { (_, property) -> property() }
+
+    private fun callDerivationMethod(derivation: PropertyDerivation): Any? {
+        val method = DerivationMethods.methods[derivation.method]
+        if (method == null) {
+            thisLogger().error("Unknown derivation method '${derivation.method}'")
+            return null
+        }
+
+        val properties = collectTemplateProperties()
+        val parameters = derivation.parameters ?: mapOf()
+        return method(properties[derivation.from], properties, parameters) ?: derivation.default
+    }
+
+    private fun <T> setupPropertyDerivation(graphProperty: GraphProperty<T>, derivation: PropertyDerivation?, transform: (Any?) -> T) {
+        if (derivation == null) {
+            return
+        }
+
+        val parentProperty = graphProperties[derivation.from]
+        if (parentProperty == null) {
+            thisLogger().error("Unknown parent property '${derivation.from}'")
+            return
+        }
+
+        graphProperty.set(transform(callDerivationMethod(derivation)))
+        graphProperty.dependsOn(parentProperty, derivation.whenModified != false) {
+            transform(callDerivationMethod(derivation))
         }
     }
 
