@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.platformtype
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
+import com.demonwav.mcdev.creator.custom.DerivationMethods
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateProperty
@@ -36,6 +37,7 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
@@ -43,7 +45,6 @@ import com.intellij.openapi.observable.util.toStringProperty
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
-import com.intellij.openapi.progress.withBackgroundProgress
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.validation.validationErrorIf
@@ -59,14 +60,12 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
-import com.intellij.util.application
 import com.intellij.util.io.readText
 import java.nio.file.Path
 import javax.swing.JComponent
 import kotlin.collections.set
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
-import kotlinx.coroutines.Dispatchers
 
 /**
  * The step to select a custom template repo.
@@ -85,6 +84,7 @@ class CustomPlatformStep(
     val descriptorProperty = propertyGraph.property<TemplateDescriptor?>(null)
     var descriptor by descriptorProperty
 
+    private val graphProperties = mutableMapOf<String, GraphProperty<*>>()
     private val templateProperties = mutableMapOf<String, () -> Any>()
 
     override fun setupUI(builder: Panel) {
@@ -159,37 +159,80 @@ class CustomPlatformStep(
         when (prop.type) {
             "class_fqn" -> {
                 val graphProp = propertyGraph.property("")
-                    .bindStorage(makeStorageKey(prop))
+                if (prop.remember == true) {
+                    graphProp.bindStorage(makeStorageKey(prop))
+                }
+
+                graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { ClassFqn(graphProp.get()) }
 
                 row(MCDevBundle("creator.ui.custom.property.${prop.type}.label")) {
-                    textField().bindText(graphProp).columns(COLUMNS_LARGE)
+                    textField().bindText(graphProp).columns(COLUMNS_LARGE).enabled(prop.editable != false)
                 }
             }
 
             "boolean" -> {
                 val graphProp = propertyGraph.property(prop.default as? Boolean ?: false)
-                    .bindBooleanStorage(makeStorageKey(prop))
+                if (prop.remember == true) {
+                    graphProp.bindBooleanStorage(makeStorageKey(prop))
+                }
+
+                graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { graphProp.get() }
 
                 row(prop.label) {
-                    checkBox("").bindSelected(graphProp)
+                    checkBox("").bindSelected(graphProp).enabled(prop.editable != false)
                 }
             }
 
             "dropdown" -> {
                 val defaultIndex = prop.default as? Int
                 val defaultValue = defaultIndex?.let { prop.options.getOrNull(it) } ?: prop.options.first()
-                val graphProp: ObservableMutableProperty<Any> = propertyGraph.property(defaultValue)
+                val graphProp = propertyGraph.property(defaultValue)
 
-                if (prop.options.all { it is String }) {
+                if (prop.remember == true && prop.options.all { it is String }) {
                     graphProp.toStringProperty { it }.bindStorage(makeStorageKey(prop))
                 }
 
+                graphProperties[prop.name] = graphProp
                 templateProperties[prop.name] = { graphProp.get() }
 
                 row(prop.label) {
-                    comboBox(prop.options).bindItem(graphProp)
+                    comboBox(prop.options).bindItem(graphProp).enabled(prop.editable != false)
+                }
+            }
+
+            "textfield" -> {
+                val graphProp = propertyGraph.property(prop.default as? String ?: "")
+                if (prop.remember == true) {
+                    graphProp.bindStorage(makeStorageKey(prop))
+                }
+
+                if (prop.derives != null) {
+                    val parentProperty = graphProperties[prop.derives.from]
+                    if (parentProperty == null) {
+                        thisLogger().error("Unknown parent property '${prop.derives.from}'")
+                        return
+                    }
+
+                    val method = DerivationMethods.methods[prop.derives.method]
+                    if (method == null) {
+                        thisLogger().error("Unknown derivation method '${prop.derives.method}'")
+                        return
+                    }
+
+                    graphProp.set(method(parentProperty.get())?.toString() ?: prop.derives.default as String)
+
+                    graphProp.dependsOn(parentProperty, prop.derives.whenModified != false) {
+                        method(parentProperty.get())?.toString() ?: prop.derives.default as String
+                    }
+                }
+
+                graphProperties[prop.name] = graphProp
+                templateProperties[prop.name] = { graphProp.get() }
+
+                row(prop.label) {
+                    textField().bindText(graphProp).enabled(prop.editable != false)
                 }
             }
 
