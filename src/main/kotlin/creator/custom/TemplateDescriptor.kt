@@ -11,6 +11,7 @@ data class TemplateProperty(
     val label: String,
     val options: List<Any>,
     val remember: Boolean?,
+    val hidden: Boolean?,
     val editable: Boolean?,
     val default: Any,
     val derives: PropertyDerivation?,

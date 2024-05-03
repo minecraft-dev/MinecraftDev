@@ -168,7 +168,7 @@ class CustomPlatformStep(
 
                 row(MCDevBundle("creator.ui.custom.property.${prop.type}.label")) {
                     textField().bindText(graphProp).columns(COLUMNS_LARGE).enabled(prop.editable != false)
-                }
+                }.visible(prop.hidden != true)
             }
 
             "boolean" -> {
@@ -182,7 +182,7 @@ class CustomPlatformStep(
 
                 row(prop.label) {
                     checkBox("").bindSelected(graphProp).enabled(prop.editable != false)
-                }
+                }.visible(prop.hidden != true)
             }
 
             "dropdown" -> {
@@ -199,7 +199,7 @@ class CustomPlatformStep(
 
                 row(prop.label) {
                     comboBox(prop.options).bindItem(graphProp).enabled(prop.editable != false)
-                }
+                }.visible(prop.hidden != true)
             }
 
             "textfield" -> {
@@ -233,7 +233,7 @@ class CustomPlatformStep(
 
                 row(prop.label) {
                     textField().bindText(graphProp).enabled(prop.editable != false)
-                }
+                }.visible(prop.hidden != true)
             }
 
             else -> thisLogger().error("Unknown template property type ${prop.type}")
