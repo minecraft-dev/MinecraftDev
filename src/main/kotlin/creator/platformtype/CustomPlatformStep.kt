@@ -22,13 +22,16 @@ package com.demonwav.mcdev.creator.platformtype
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
+import com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep.Companion.PLATFORM_NAME_KEY
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
-import com.demonwav.mcdev.creator.custom.DerivationMethods
-import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateProperty
-import com.demonwav.mcdev.creator.custom.model.ClassFqn
+import com.demonwav.mcdev.creator.custom.types.BooleanPropertyType
+import com.demonwav.mcdev.creator.custom.types.ClassFqnPropertyType
+import com.demonwav.mcdev.creator.custom.types.PropertyType
+import com.demonwav.mcdev.creator.custom.types.SemanticVersionPropertyType
+import com.demonwav.mcdev.creator.custom.types.StringPropertyType
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.util.fromJson
@@ -38,10 +41,7 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.observable.properties.GraphProperty
-import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.bindStorage
-import com.intellij.openapi.observable.util.toStringProperty
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -50,12 +50,12 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
@@ -63,7 +63,6 @@ import com.intellij.ui.dsl.builder.textValidation
 import com.intellij.util.io.readText
 import java.nio.file.Path
 import javax.swing.JComponent
-import kotlin.collections.set
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
 
@@ -84,8 +83,7 @@ class CustomPlatformStep(
     val descriptorProperty = propertyGraph.property<TemplateDescriptor?>(null)
     var descriptor by descriptorProperty
 
-    private val graphProperties = mutableMapOf<String, GraphProperty<*>>()
-    private val templateProperties = mutableMapOf<String, () -> Any>()
+    private val properties = mutableMapOf<String, CreatorProperty<*>>()
 
     override fun setupUI(builder: Panel) {
         var taskParentComponent: JComponent? = null
@@ -118,7 +116,11 @@ class CustomPlatformStep(
         }
     }
 
-    private fun createOptionsPanelInBackground(path: String, placeholder: Placeholder, taskParentComponent: JComponent?) {
+    private fun createOptionsPanelInBackground(
+        path: String,
+        placeholder: Placeholder,
+        taskParentComponent: JComponent?
+    ) {
         val task = object : Task.WithResult<DialogPanel?, Exception>(
             context.project,
             taskParentComponent,
@@ -139,7 +141,7 @@ class CustomPlatformStep(
     }
 
     private fun doCreateOptionsPanel(path: String): DialogPanel? {
-        templateProperties.clear()
+        properties.clear()
         descriptor = null
         val templateDescriptorPath = Path.of(path, ".mcdev.template.json")
         if (!templateDescriptorPath.exists()) {
@@ -156,79 +158,51 @@ class CustomPlatformStep(
     }
 
     private fun Panel.makeField(prop: TemplateProperty) {
-        when (prop.type) {
-            "class_fqn" -> {
-                val graphProp = propertyGraph.property("")
-                if (prop.remember == true) {
-                    graphProp.bindStorage(makeStorageKey(prop))
-                }
-
-                setupPropertyDerivation(graphProp, prop.derives) { it?.toString() ?: "" }
-
-                graphProperties[prop.name] = graphProp
-                templateProperties[prop.name] = { ClassFqn(graphProp.get()) }
-
-                row(MCDevBundle("creator.ui.custom.property.${prop.type}.label")) {
-                    textField().bindText(graphProp).columns(COLUMNS_LARGE).enabled(prop.editable != false)
-                }.visible(prop.hidden != true)
-            }
-
-            "boolean" -> {
-                val defaultValue = prop.default as? Boolean ?: false
-                val graphProp = propertyGraph.property(defaultValue)
-                if (prop.remember == true) {
-                    graphProp.bindBooleanStorage(makeStorageKey(prop))
-                }
-
-                setupPropertyDerivation(graphProp, prop.derives) { it as? Boolean ?: defaultValue }
-
-                graphProperties[prop.name] = graphProp
-                templateProperties[prop.name] = { graphProp.get() }
-
-                row(prop.label) {
-                    checkBox(prop.label).bindSelected(graphProp).enabled(prop.editable != false)
-                }.visible(prop.hidden != true)
-            }
-
-            "dropdown" -> {
-                val defaultIndex = prop.default as? Int
-                val defaultValue = defaultIndex?.let { prop.options.getOrNull(it) } ?: prop.options.first()
-                val graphProp = propertyGraph.property(defaultValue)
-
-                if (prop.remember == true && prop.options.all { it is String }) {
-                    graphProp.toStringProperty { it }.bindStorage(makeStorageKey(prop))
-                }
-
-                setupPropertyDerivation(graphProp, prop.derives) {
-                    it?.toString()?.takeIf(prop.options::contains) ?: defaultValue
-                }
-
-                graphProperties[prop.name] = graphProp
-                templateProperties[prop.name] = { graphProp.get() }
-
-                row(prop.label) {
-                    comboBox(prop.options).bindItem(graphProp).enabled(prop.editable != false)
-                }.visible(prop.hidden != true)
-            }
-
-            "textfield" -> {
-                val graphProp = propertyGraph.property(prop.default as? String ?: "")
-                if (prop.remember == true) {
-                    graphProp.bindStorage(makeStorageKey(prop))
-                }
-
-                setupPropertyDerivation(graphProp, prop.derives) { it?.toString() ?: "" }
-
-                graphProperties[prop.name] = graphProp
-                templateProperties[prop.name] = { graphProp.get() }
-
-                row(prop.label) {
-                    textField().bindText(graphProp).enabled(prop.editable != false)
-                }.visible(prop.hidden != true)
-            }
-
-            else -> thisLogger().error("Unknown template property type ${prop.type}")
+        if (prop.name in properties.keys) {
+            return thisLogger().error("Duplicate property name ${prop.name}")
         }
+
+        @Suppress("UNCHECKED_CAST")
+        val type = when (prop.type) {
+            "string" -> StringPropertyType()
+            "boolean" -> BooleanPropertyType()
+            "class_fqn" -> ClassFqnPropertyType()
+            "semantic_version" -> SemanticVersionPropertyType()
+            else -> return thisLogger().error("Unknown template property type ${prop.type}")
+        } as PropertyType<Any?>
+
+        val isDropdown = !prop.options.isNullOrEmpty()
+        val options = prop.options?.filterIsInstance<String>()?.map(type::deserialize) ?: emptyList()
+        val defaultOptionIndex = if (isDropdown) prop.default as? Int ?: 0 else null
+        val defaultValue = type.createDefaultValue(if (isDropdown) prop.options!![defaultOptionIndex!!] else prop.default)
+        val graphProp = propertyGraph.property(defaultValue)
+
+        if (prop.remember != false && prop.derives == null) {
+            type.toStringProperty(graphProp).bindStorage(makeStorageKey(prop))
+        }
+
+        if (prop.derives != null) {
+            val parentProperty = properties[prop.derives.from]
+                ?: return thisLogger().error("Unknown parent property '${prop.derives.from}'")
+
+            graphProp.set(type.derive(graphProp, parentProperty, properties, prop.derives))
+            graphProp.dependsOn(parentProperty.graphProperty, prop.derives.whenModified != false) {
+                type.derive(graphProp, parentProperty, properties, prop.derives)
+            }
+        }
+
+        if (isDropdown) {
+            row(prop.label) {
+                comboBox(options)
+                    .bindItem(graphProp)
+                    .enabled(prop.editable != false)
+                    .also { ComboboxSpeedSearch.installOn(it.component) }
+            }.visible(prop.hidden != false)
+        } else {
+            with(type) { buildUi(graphProp, prop) }
+        }
+
+        properties[prop.name] = CreatorProperty(graphProp, type)
     }
 
     private fun makeStorageKey(prop: TemplateProperty) =
@@ -253,11 +227,11 @@ class CustomPlatformStep(
 
         collectTemplateProperties(assets.templateProperties)
 
-        thisLogger().debug("Template properties: $templateProperties")
+        thisLogger().debug("Template properties: ${assets.templateProperties}")
 
         for (file in descriptor.files) {
             if (file.condition != null &&
-                TemplateEvaluator.condition(assets.templateProperties, file.condition).getOrElse { false }
+                !TemplateEvaluator.condition(assets.templateProperties, file.condition).getOrElse { false }
             ) {
                 continue
             }
@@ -287,36 +261,7 @@ class CustomPlatformStep(
     }
 
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()) =
-        templateProperties.mapValuesTo(into) { (_, property) -> property() }
-
-    private fun callDerivationMethod(derivation: PropertyDerivation): Any? {
-        val method = DerivationMethods.methods[derivation.method]
-        if (method == null) {
-            thisLogger().error("Unknown derivation method '${derivation.method}'")
-            return null
-        }
-
-        val properties = collectTemplateProperties()
-        val parameters = derivation.parameters ?: mapOf()
-        return method(properties[derivation.from], properties, parameters) ?: derivation.default
-    }
-
-    private fun <T> setupPropertyDerivation(graphProperty: GraphProperty<T>, derivation: PropertyDerivation?, transform: (Any?) -> T) {
-        if (derivation == null) {
-            return
-        }
-
-        val parentProperty = graphProperties[derivation.from]
-        if (parentProperty == null) {
-            thisLogger().error("Unknown parent property '${derivation.from}'")
-            return
-        }
-
-        graphProperty.set(transform(callDerivationMethod(derivation)))
-        graphProperty.dependsOn(parentProperty, derivation.whenModified != false) {
-            transform(callDerivationMethod(derivation))
-        }
-    }
+        properties.mapValuesTo(into) { (_, prop) -> prop.graphProperty.get() }
 
     class TypeFactory : PlatformTypeStep.Factory {
         override val name

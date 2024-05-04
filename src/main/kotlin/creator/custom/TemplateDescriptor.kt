@@ -9,7 +9,7 @@ data class TemplateProperty(
     val name: String,
     val type: String,
     val label: String,
-    val options: List<Any>,
+    val options: List<Any>?,
     val remember: Boolean?,
     val hidden: Boolean?,
     val editable: Boolean?,

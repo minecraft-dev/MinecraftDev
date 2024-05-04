@@ -19,7 +19,7 @@ object TemplateEvaluator {
     }
 
     fun condition(properties: Map<String, Any?>, condition: String): Result<Boolean> {
-        val actualCondition = "#if ($condition) true#else false#end"
-        return evaluate(properties, actualCondition).map { it.second.toBoolean() }
+        val actualCondition = "#if ($condition) true #else false #end"
+        return evaluate(properties, actualCondition).map { it.second.trim().toBoolean() }
     }
 }
