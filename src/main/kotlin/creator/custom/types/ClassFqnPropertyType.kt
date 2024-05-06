@@ -1,7 +1,9 @@
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateProperty
 import com.demonwav.mcdev.creator.custom.model.ClassFqn
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
@@ -16,11 +18,32 @@ class ClassFqnPropertyType : PropertyType<ClassFqn> {
 
     override fun deserialize(string: String): ClassFqn = ClassFqn(string)
 
-    override fun Panel.buildUi(graphProperty: GraphProperty<ClassFqn>, property: TemplateProperty) {
+    override fun Panel.buildUi(
+        context: WizardContext,
+        graphProperty: GraphProperty<ClassFqn>,
+        property: TemplateProperty
+    ) {
         row(property.label) {
             textField().bindText(toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .enabled(property.editable != false)
         }.visible(property.hidden != false)
+    }
+
+    override fun derive(
+        property: GraphProperty<ClassFqn>,
+        parentValues: List<Any?>,
+        properties: Map<String, Any?>,
+        derivation: PropertyDerivation
+    ): ClassFqn {
+        return when (derivation.method) {
+            "suggestClassName" -> suggestClassName(parentValues)
+            else -> throw IllegalArgumentException("Unknown method derivation $derivation")
+        }
+    }
+
+    private fun suggestClassName(parentValues: List<Any?>): ClassFqn {
+        val (groupId, name) = parentValues
+        return ClassFqn("$groupId.$name.$name")
     }
 }

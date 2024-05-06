@@ -28,6 +28,7 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.JavaSdkVersion
@@ -126,7 +127,9 @@ class JdkProjectSetupFinalizer(
     private var preferredJdkLabel: Placeholder? = null
     private var preferredJdkReason = MCDevBundle("creator.validation.jdk_preferred_default_reason")
 
-    var preferredJdk: JavaSdkVersion = JavaSdkVersion.JDK_17
+    val preferredJdkProperty = propertyGraph.property(JavaSdkVersion.JDK_17)
+
+    var preferredJdk: JavaSdkVersion by preferredJdkProperty
         private set
 
     fun setPreferredJdk(value: JavaSdkVersion, reason: String) {

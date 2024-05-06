@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.TemplateProperty
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
@@ -19,7 +20,7 @@ class StringPropertyType : PropertyType<String> {
     override fun toStringProperty(graphProperty: GraphProperty<String>): ObservableMutableProperty<String> =
         graphProperty
 
-    override fun Panel.buildUi(graphProperty: GraphProperty<String>, property: TemplateProperty) {
+    override fun Panel.buildUi(context: WizardContext, graphProperty: GraphProperty<String>, property: TemplateProperty) {
         row(property.label) {
             textField().bindText(toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)

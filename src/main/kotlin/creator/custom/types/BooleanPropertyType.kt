@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.TemplateProperty
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindSelected
@@ -13,7 +14,11 @@ class BooleanPropertyType : PropertyType<Boolean> {
 
     override fun deserialize(string: String): Boolean = string.toBoolean()
 
-    override fun Panel.buildUi(graphProperty: GraphProperty<Boolean>, property: TemplateProperty) {
+    override fun Panel.buildUi(
+        context: WizardContext,
+        graphProperty: GraphProperty<Boolean>,
+        property: TemplateProperty
+    ) {
         row(property.label) {
             checkBox(property.label)
                 .bindSelected(graphProperty)

@@ -2,8 +2,8 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateProperty
-import com.demonwav.mcdev.creator.platformtype.CreatorProperty
 import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.Panel
@@ -20,7 +20,11 @@ class SemanticVersionPropertyType : PropertyType<SemanticVersion> {
     override fun deserialize(string: String): SemanticVersion =
         SemanticVersion.tryParse(string) ?: SemanticVersion(emptyList())
 
-    override fun Panel.buildUi(graphProperty: GraphProperty<SemanticVersion>, property: TemplateProperty) {
+    override fun Panel.buildUi(
+        context: WizardContext,
+        graphProperty: GraphProperty<SemanticVersion>,
+        property: TemplateProperty
+    ) {
         row(property.label) {
             textField().bindText(toStringProperty(graphProperty))
                 .columns(COLUMNS_SHORT)
@@ -30,12 +34,12 @@ class SemanticVersionPropertyType : PropertyType<SemanticVersion> {
 
     override fun derive(
         property: GraphProperty<SemanticVersion>,
-        parent: CreatorProperty<*>,
-        properties: Map<String, CreatorProperty<*>>,
+        parentValues: List<Any?>,
+        properties: Map<String, Any?>,
         derivation: PropertyDerivation
     ): SemanticVersion {
         return when (derivation.method) {
-            "extractVersionMajorMinor" -> extractVersionMajorMinor(parent.graphProperty.get())
+            "extractVersionMajorMinor" -> extractVersionMajorMinor(parentValues[0])
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
     }

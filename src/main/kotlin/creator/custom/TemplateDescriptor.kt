@@ -15,10 +15,11 @@ data class TemplateProperty(
     val editable: Boolean?,
     val default: Any,
     val derives: PropertyDerivation?,
+    val inheritFrom: String?
 )
 
 data class PropertyDerivation(
-    val from: String,
+    val parents: List<String>?,
     val method: String,
     val default: Any,
     val whenModified: Boolean?,
