@@ -93,4 +93,12 @@ class BuildSystemCoordinatesCreatorProperty(
         }.expanded = true
 
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = BuildSystemCoordinatesCreatorProperty(graph, descriptor, properties)
+    }
 }

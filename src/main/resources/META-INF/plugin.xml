@@ -74,6 +74,10 @@
 
         <extensionPoint name="gradleFileType" interface="com.demonwav.mcdev.creator.buildsystem.GradleFile$Type" dynamic="true" />
 
+        <extensionPoint name="creatorPropertyType" beanClass="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactoryBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory"/>
+        </extensionPoint>
+
         <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" dynamic="true" />
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler"/>
@@ -124,6 +128,14 @@
         <buildSystemSupport platform="BungeeCord" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMavenSupport" />
 
         <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type" />
+        
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BooleanCreatorProperty$Factory" type="boolean" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty$Factory" type="build_system_coordinates" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty$Factory" type="class_fqn" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.IntegerCreatorProperty$Factory" type="integer" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty$Factory" type="jdk" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />

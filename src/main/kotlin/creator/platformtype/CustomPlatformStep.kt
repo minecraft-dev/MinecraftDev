@@ -31,6 +31,7 @@ import com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProp
 import com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty
 import com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
+import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
 import com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty
 import com.demonwav.mcdev.creator.custom.types.StringCreatorProperty
@@ -182,22 +183,12 @@ class CustomPlatformStep(
             return null
         }
 
-        // TODO make this an EP
-        val propFactory: (PropertyGraph, TemplatePropertyDescriptor, Map<String, CreatorProperty<*>>) -> CreatorProperty<*> = when (descriptor.type) {
-            "string" -> ::StringCreatorProperty
-            "integer" -> ::IntegerCreatorProperty
-            "boolean" -> ::BooleanCreatorProperty
-            "class_fqn" -> ::ClassFqnCreatorProperty
-            "semantic_version" -> ::SemanticVersionCreatorProperty
-            "jdk" -> ::JdkCreatorProperty
-            "build_system_coordinates" -> ::BuildSystemCoordinatesCreatorProperty
-            else -> {
-                thisLogger().error("Unknown template property type ${descriptor.type}")
-                return null
-            }
+        val prop = CreatorPropertyFactory.createFromType(descriptor.type, descriptor, propertyGraph, properties)
+        if (prop == null) {
+            thisLogger().error("Unknown template property type ${descriptor.type}")
+            return null
         }
 
-        val prop = propFactory(propertyGraph, descriptor, properties)
         prop.setupProperty()
 
         properties[descriptor.name] = prop

@@ -47,4 +47,12 @@ class ClassFqnCreatorProperty(
             ?: throw RuntimeException("Expected parent 1 to be a string")
         return ClassFqn("${coords.groupId}.${name.decapitalize()}.${name.capitalize()}")
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = ClassFqnCreatorProperty(graph, descriptor, properties)
+    }
 }

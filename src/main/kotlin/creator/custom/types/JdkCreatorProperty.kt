@@ -43,4 +43,12 @@ class JdkCreatorProperty(
             }
         }
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = JdkCreatorProperty(graph, descriptor, properties)
+    }
 }

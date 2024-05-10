@@ -30,4 +30,12 @@ class StringCreatorProperty(
                 .enabled(descriptor.editable != false)
         }.visible(descriptor.hidden != true)
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = StringCreatorProperty(graph, descriptor, properties)
+    }
 }

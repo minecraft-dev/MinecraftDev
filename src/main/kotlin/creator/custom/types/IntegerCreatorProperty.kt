@@ -45,4 +45,12 @@ class IntegerCreatorProperty(
 
         return MinecraftVersions.requiredJavaVersion(from).ordinal
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = IntegerCreatorProperty(graph, descriptor, properties)
+    }
 }

@@ -58,4 +58,12 @@ class SemanticVersionCreatorProperty(
 
         return SemanticVersion(emptyList())
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = SemanticVersionCreatorProperty(graph, descriptor, properties)
+    }
 }

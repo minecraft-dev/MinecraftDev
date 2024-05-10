@@ -25,4 +25,12 @@ class BooleanCreatorProperty(
                 .enabled(descriptor.editable != false)
         }.visible(descriptor.hidden != true)
     }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = BooleanCreatorProperty(graph, descriptor, properties)
+    }
 }
