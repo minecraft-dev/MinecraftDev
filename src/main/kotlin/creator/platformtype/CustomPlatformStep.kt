@@ -25,14 +25,16 @@ import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
 import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
-import com.demonwav.mcdev.creator.custom.TemplateProperty
-import com.demonwav.mcdev.creator.custom.types.BooleanPropertyType
-import com.demonwav.mcdev.creator.custom.types.ClassFqnPropertyType
-import com.demonwav.mcdev.creator.custom.types.JdkPropertyType
-import com.demonwav.mcdev.creator.custom.types.PropertyType
-import com.demonwav.mcdev.creator.custom.types.SemanticVersionPropertyType
-import com.demonwav.mcdev.creator.custom.types.StringPropertyType
-import com.demonwav.mcdev.creator.custom.types.creator.custom.types.IntegerPropertyType
+import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.types.BooleanCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.CreatorProperty
+import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.StringCreatorProperty
+import com.demonwav.mcdev.creator.custom.types.IntegerCreatorProperty
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.util.fromJson
@@ -42,6 +44,7 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -50,12 +53,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
-import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
@@ -69,9 +70,6 @@ import kotlin.collections.MutableMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.emptyList
-import kotlin.collections.filterIsInstance
-import kotlin.collections.isNullOrEmpty
-import kotlin.collections.map
 import kotlin.collections.mapNotNull
 import kotlin.collections.mapOf
 import kotlin.collections.mapValuesTo
@@ -98,7 +96,7 @@ class CustomPlatformStep(
     val descriptorProperty = propertyGraph.property<TemplateDescriptor?>(null)
     var descriptor by descriptorProperty
 
-    private val properties = mutableMapOf<String, CreatorProperty<*>>()
+    private var properties = mutableMapOf<String, CreatorProperty<*>>()
 
     override fun setupUI(builder: Panel) {
         var taskParentComponent: JComponent? = null
@@ -136,21 +134,13 @@ class CustomPlatformStep(
         placeholder: Placeholder,
         taskParentComponent: JComponent?
     ) {
-        properties.clear()
+        properties = mutableMapOf()
         descriptor = null
 
         val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
             ?: return thisLogger().error("Could not find wizard base data")
-//        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-//
-//        properties["GROUP_ID"] = CreatorProperty(buildSystemProps.groupIdProperty, StringPropertyType())
-//        properties["ARTIFACT_ID"] = CreatorProperty(buildSystemProps.artifactIdProperty, StringPropertyType())
-//        properties["VERSION"] = CreatorProperty(buildSystemProps.versionProperty, StringPropertyType())
 
-        properties["PROJECT_NAME"] = CreatorProperty(baseData.nameProperty, StringPropertyType())
-
-        // TODO remove
-        properties["GROUP_ID"] = CreatorProperty(propertyGraph.property("io.github.rednesto"), StringPropertyType())
+        properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
 
         val task = object : Task.WithResult<List<Consumer<Panel>>, Exception>(
             context.project,
@@ -183,93 +173,37 @@ class CustomPlatformStep(
 
         val templateDescriptor = Gson().fromJson<TemplateDescriptor>(templateDescriptorPath.readText())
         descriptor = templateDescriptor
-        return templateDescriptor.properties.mapNotNull { makeField(it) }
+        return templateDescriptor.properties.mapNotNull { setupProperty(it) }
     }
 
-    private fun makeField(prop: TemplateProperty): Consumer<Panel>? {
-        if (prop.name in properties.keys) {
-            thisLogger().error("Duplicate property name ${prop.name}")
+    private fun setupProperty(descriptor: TemplatePropertyDescriptor): Consumer<Panel>? {
+        if (descriptor.name in properties.keys) {
+            thisLogger().error("Duplicate property name ${descriptor.name}")
             return null
         }
 
-        @Suppress("UNCHECKED_CAST")
-        val type = when (prop.type) {
-            "string" -> StringPropertyType()
-            "integer" -> IntegerPropertyType()
-            "boolean" -> BooleanPropertyType()
-            "class_fqn" -> ClassFqnPropertyType()
-            "semantic_version" -> SemanticVersionPropertyType()
-            "jdk" -> JdkPropertyType()
+        // TODO make this an EP
+        val propFactory: (PropertyGraph, TemplatePropertyDescriptor, Map<String, CreatorProperty<*>>) -> CreatorProperty<*> = when (descriptor.type) {
+            "string" -> ::StringCreatorProperty
+            "integer" -> ::IntegerCreatorProperty
+            "boolean" -> ::BooleanCreatorProperty
+            "class_fqn" -> ::ClassFqnCreatorProperty
+            "semantic_version" -> ::SemanticVersionCreatorProperty
+            "jdk" -> ::JdkCreatorProperty
+            "build_system_coordinates" -> ::BuildSystemCoordinatesCreatorProperty
             else -> {
-                thisLogger().error("Unknown template property type ${prop.type}")
+                thisLogger().error("Unknown template property type ${descriptor.type}")
                 return null
             }
-        } as PropertyType<Any?>
-
-        val isDropdown = !prop.options.isNullOrEmpty()
-        val options = prop.options?.filterIsInstance<String>()?.map(type::deserialize) ?: emptyList()
-        val defaultOptionIndex = if (isDropdown) prop.default as? Int ?: 0 else null
-        val defaultValue =
-            type.createDefaultValue(if (isDropdown) prop.options!![defaultOptionIndex!!] else prop.default)
-        val graphProp = propertyGraph.property(defaultValue)
-
-        if (prop.remember != false && prop.derives == null) {
-            type.toStringProperty(graphProp).bindStorage(makeStorageKey(prop))
         }
 
-        if (prop.derives != null) {
-            val parents = prop.derives.parents
-                ?: run {
-                    thisLogger().error("No parents specified in derivation of property '${prop.name}'")
-                    return null
-                }
-            for (parent in parents) {
-                if (!properties.containsKey(parent)) {
-                    thisLogger().error("Unknown parent property '${parent}' in derivation of property '${prop.name}'")
-                    return null
-                }
-            }
+        val prop = propFactory(propertyGraph, descriptor, properties)
+        prop.setupProperty()
 
-            fun collectParentValues(): List<Any?> = parents.map { properties[it]!!.graphProperty.get() }
+        properties[descriptor.name] = prop
 
-            graphProp.set(type.derive(graphProp, collectParentValues(), properties, prop.derives))
-            for (parent in parents) {
-                val parentProperty = properties[parent]!!
-                graphProp.dependsOn(parentProperty.graphProperty, prop.derives.whenModified != false) {
-                    type.derive(graphProp, collectParentValues(), properties, prop.derives)
-                }
-            }
-        }
-
-        if (prop.inheritFrom != null) {
-            val parentProperty = properties[prop.inheritFrom]
-                ?: run {
-                    thisLogger().error("Unknown parent property '${prop.inheritFrom}' in derivation of property '${prop.name}'")
-                    return null
-                }
-
-            graphProp.set(parentProperty.graphProperty.get())
-            graphProp.dependsOn(parentProperty.graphProperty, true) { parentProperty.graphProperty.get() }
-        }
-
-        properties[prop.name] = CreatorProperty(graphProp, type)
-
-        return Consumer { panel ->
-            if (isDropdown) {
-                panel.row(prop.label) {
-                    comboBox(options)
-                        .bindItem(graphProp)
-                        .enabled(prop.editable != false)
-                        .also { ComboboxSpeedSearch.installOn(it.component) }
-                }.visible(prop.hidden != false)
-            } else {
-                with(panel) { with(type) { buildUi(context, graphProp, prop) } }
-            }
-        }
+        return Consumer { panel -> prop.buildUi(panel, context) }
     }
-
-    private fun makeStorageKey(prop: TemplateProperty) =
-        "${CustomPlatformStep::class.java.name}.property.${prop.name}.${prop.type}"
 
     override fun setupAssets(project: Project) {
         val descriptor = descriptor!!

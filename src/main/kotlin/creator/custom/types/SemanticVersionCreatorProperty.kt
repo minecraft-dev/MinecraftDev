@@ -1,16 +1,21 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
-import com.demonwav.mcdev.creator.custom.TemplateProperty
+import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 
-class SemanticVersionPropertyType : PropertyType<SemanticVersion> {
+class SemanticVersionCreatorProperty(
+    graph: PropertyGraph,
+    descriptor: TemplatePropertyDescriptor,
+    properties: Map<String, CreatorProperty<*>>
+) : SimpleCreatorProperty<SemanticVersion>(graph, descriptor, properties) {
 
     override fun createDefaultValue(raw: Any?): SemanticVersion =
         SemanticVersion.tryParse(raw as? String ?: "") ?: SemanticVersion(emptyList())
@@ -20,24 +25,15 @@ class SemanticVersionPropertyType : PropertyType<SemanticVersion> {
     override fun deserialize(string: String): SemanticVersion =
         SemanticVersion.tryParse(string) ?: SemanticVersion(emptyList())
 
-    override fun Panel.buildUi(
-        context: WizardContext,
-        graphProperty: GraphProperty<SemanticVersion>,
-        property: TemplateProperty
-    ) {
-        row(property.label) {
-            textField().bindText(toStringProperty(graphProperty))
+    override fun buildSimpleUi(panel: Panel, context: WizardContext) {
+        panel.row(descriptor.label) {
+            this.textField().bindText(this@SemanticVersionCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_SHORT)
-                .enabled(property.editable != false)
-        }.visible(property.hidden != false)
+                .enabled(descriptor.editable != false)
+        }.visible(descriptor.hidden != true)
     }
 
-    override fun derive(
-        property: GraphProperty<SemanticVersion>,
-        parentValues: List<Any?>,
-        properties: Map<String, Any?>,
-        derivation: PropertyDerivation
-    ): SemanticVersion {
+    override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any {
         return when (derivation.method) {
             "extractVersionMajorMinor" -> extractVersionMajorMinor(parentValues[0])
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")

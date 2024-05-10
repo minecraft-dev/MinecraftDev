@@ -52,7 +52,7 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
     val groupIdProperty = propertyGraph.property("org.example")
         .bindStorage("${javaClass.name}.groupId")
     val artifactIdProperty = propertyGraph.lazyProperty(::suggestArtifactId)
-    private val versionProperty = propertyGraph.property("1.0-SNAPSHOT")
+    val versionProperty = propertyGraph.property("1.0-SNAPSHOT")
         .bindStorage("${javaClass.name}.version")
 
     var groupId by groupIdProperty
