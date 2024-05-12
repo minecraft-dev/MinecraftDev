@@ -174,10 +174,13 @@ class CustomPlatformStep(
 
         val templateDescriptor = Gson().fromJson<TemplateDescriptor>(templateDescriptorPath.readText())
         descriptor = templateDescriptor
-        return templateDescriptor.properties.mapNotNull { setupProperty(it) }
+        return templateDescriptor.properties
+            .mapNotNull { setupProperty(it) }
+            .sortedBy { (_, order) -> order }
+            .map { it.first }
     }
 
-    private fun setupProperty(descriptor: TemplatePropertyDescriptor): Consumer<Panel>? {
+    private fun setupProperty(descriptor: TemplatePropertyDescriptor): Pair<Consumer<Panel>, Int>? {
         if (descriptor.name in properties.keys) {
             thisLogger().error("Duplicate property name ${descriptor.name}")
             return null
@@ -193,7 +196,9 @@ class CustomPlatformStep(
 
         properties[descriptor.name] = prop
 
-        return Consumer { panel -> prop.buildUi(panel, context) }
+        val factory = Consumer<Panel> { panel -> prop.buildUi(panel, context) }
+        val order = descriptor.order ?: 0
+        return factory to order
     }
 
     override fun setupAssets(project: Project) {

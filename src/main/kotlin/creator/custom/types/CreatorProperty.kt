@@ -79,7 +79,10 @@ abstract class CreatorProperty<T>(
 
             @Suppress("UNCHECKED_CAST")
             graphProperty.set(parentProperty.graphProperty.get() as T)
-            graphProperty.dependsOn(parentProperty.graphProperty, true) { parentProperty.graphProperty.get() as T }
+            graphProperty.dependsOn(parentProperty.graphProperty, true) {
+                @Suppress("UNCHECKED_CAST")
+                parentProperty.graphProperty.get() as T
+            }
         }
     }
 

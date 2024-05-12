@@ -9,6 +9,7 @@ data class TemplatePropertyDescriptor(
     val name: String,
     val type: String,
     val label: String,
+    val order: Int?,
     val options: List<Any>?,
     val remember: Boolean?,
     val hidden: Boolean?,

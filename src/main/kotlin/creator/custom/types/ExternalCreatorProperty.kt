@@ -10,7 +10,7 @@ class ExternalCreatorProperty<T>(
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>,
     override val graphProperty: GraphProperty<T>,
-    descriptor: TemplatePropertyDescriptor = TemplatePropertyDescriptor("", "", "", null, null, null, null, "", null, null),
+    descriptor: TemplatePropertyDescriptor = TemplatePropertyDescriptor("", "", "", null, null, null, null, null, "", null, null),
 ) : CreatorProperty<T>(descriptor, graph, properties) {
 
     override fun setupProperty() = Unit
