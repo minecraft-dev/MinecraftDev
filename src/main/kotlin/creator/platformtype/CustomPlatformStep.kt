@@ -166,6 +166,34 @@ class CustomPlatformStep(
     }
 
     private fun setupProperty(descriptor: TemplatePropertyDescriptor): Pair<Consumer<Panel>, Int>? {
+        if (!descriptor.groupProperties.isNullOrEmpty()) {
+            val childrenUiFactories = descriptor.groupProperties
+                .mapNotNull(::setupProperty)
+                .sortedBy { (_, order) -> order }
+                .map { it.first }
+
+            val factory = Consumer<Panel> { panel ->
+                if (descriptor.collapsible == false) {
+                    panel.group(descriptor.label) {
+                        for (childFactory in childrenUiFactories) {
+                            childFactory.accept(this@group)
+                        }
+                    }
+                } else {
+                    val group = panel.collapsibleGroup(descriptor.label) {
+                        for (childFactory in childrenUiFactories) {
+                            childFactory.accept(this@collapsibleGroup)
+                        }
+                    }
+
+                    group.expanded = descriptor.default as? Boolean ?: false
+                }
+            }
+
+            val order = descriptor.order ?: 0
+            return factory to order
+        }
+
         if (descriptor.name in properties.keys) {
             thisLogger().error("Duplicate property name ${descriptor.name}")
             return null
