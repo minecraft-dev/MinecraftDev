@@ -29,6 +29,18 @@ abstract class CreatorProperty<T>(
     open fun toStringProperty(graphProperty: GraphProperty<T>): ObservableMutableProperty<String> =
         graphProperty.transform(::serialize, ::deserialize)
 
+    open fun get(): T? {
+        val value = graphProperty.get()
+        if (descriptor.nullIfDefault == true) {
+            val default = createDefaultValue(descriptor.default)
+            if (value == default) {
+                return null
+            }
+        }
+
+        return value
+    }
+
     /**
      * Produces a new value based on the provided [parentValues] and the template-defined [derivation] configuration.
      *
@@ -60,7 +72,7 @@ abstract class CreatorProperty<T>(
                 }
             }
 
-            fun collectParentValues(): List<Any?> = parents.map { properties[it]!!.graphProperty.get() }
+            fun collectParentValues(): List<Any?> = parents.map { properties[it]!!.get() }
 
             @Suppress("UNCHECKED_CAST")
             graphProperty.set(derive(collectParentValues(), descriptor.derives) as T)

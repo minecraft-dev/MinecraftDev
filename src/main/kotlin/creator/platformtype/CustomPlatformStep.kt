@@ -227,6 +227,6 @@ class CustomPlatformStep(
     }
 
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
-        return properties.mapValuesTo(into) { (_, prop) -> prop.graphProperty.get() }
+        return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
     }
 }
