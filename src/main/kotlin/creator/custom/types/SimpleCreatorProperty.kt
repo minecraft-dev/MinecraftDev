@@ -55,10 +55,17 @@ abstract class SimpleCreatorProperty<T>(
     override fun buildUi(panel: Panel, context: WizardContext) {
         if (isDropdown) {
             panel.row(descriptor.label) {
-                comboBox(options!!.keys, DropdownAutoRenderer())
-                    .bindItem(graphProperty)
-                    .enabled(descriptor.editable != false)
-                    .also { ComboboxSpeedSearch.installOn(it.component) }
+                if (descriptor.forceDropdown == true) {
+                    comboBox(options!!.keys, DropdownAutoRenderer())
+                        .bindItem(graphProperty)
+                        .enabled(descriptor.editable != false)
+                        .also { ComboboxSpeedSearch.installOn(it.component) }
+                } else {
+                    segmentedButton(options!!.keys) { options[it] ?: it.toString() }
+                        .bind(graphProperty)
+                        .enabled(descriptor.editable != false)
+                        .maxButtonsCount(4)
+                }
             }.visible(descriptor.hidden != true)
         } else {
             buildSimpleUi(panel, context)
