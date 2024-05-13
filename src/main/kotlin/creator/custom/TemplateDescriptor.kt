@@ -10,7 +10,7 @@ data class TemplatePropertyDescriptor(
     val type: String,
     val label: String,
     val order: Int? = null,
-    val options: List<Any>? = null,
+    val options: Any? = null,
     val groupProperties: List<TemplatePropertyDescriptor>? = null,
     val remember: Boolean? = null,
     val hidden: Boolean? = null,

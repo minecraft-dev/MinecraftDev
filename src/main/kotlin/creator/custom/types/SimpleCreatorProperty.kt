@@ -7,6 +7,9 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
+import java.awt.Component
+import javax.swing.DefaultListCellRenderer
+import javax.swing.JList
 
 abstract class SimpleCreatorProperty<T>(
     graph: PropertyGraph,
@@ -14,17 +17,45 @@ abstract class SimpleCreatorProperty<T>(
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<T>(descriptor, graph, properties) {
 
-    private val isDropdown = !descriptor.options.isNullOrEmpty()
-    private val options = descriptor.options?.filterIsInstance<String>()?.map(::deserialize) ?: emptyList()
-    private val defaultOptionIndex = if (isDropdown) descriptor.default as? Int ?: 0 else null
-    private val defaultValue by lazy { createDefaultValue(if (isDropdown) descriptor.options!![defaultOptionIndex!!] else descriptor.default) }
+    private val options: Map<T, String>? = makeOptionsList()
+
+    private fun makeOptionsList(): Map<T, String>? {
+        val map = when (val options = descriptor.options) {
+            is Map<*, *> -> options.mapValues { it.value.toString() }
+            is Iterable<*> -> options.associateWithTo(linkedMapOf()) { it.toString() }
+            else -> null
+        }
+
+        return map?.mapKeys {
+            @Suppress("UNCHECKED_CAST")
+            when (val key = it.key) {
+                is String -> deserialize(key)
+                else -> key
+            } as T
+        }
+    }
+
+    private val isDropdown = !options.isNullOrEmpty()
+    private val defaultValue by lazy {
+        val raw = if (isDropdown) {
+            if (descriptor.default is Number && descriptor.options is List<*>) {
+                descriptor.options[descriptor.default.toInt()]
+            } else {
+                options!![createDefaultValue(descriptor.default)]
+            }
+        } else {
+            descriptor.default
+        }
+
+        createDefaultValue(raw)
+    }
 
     override val graphProperty: GraphProperty<T> by lazy { graph.property(defaultValue) }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
         if (isDropdown) {
             panel.row(descriptor.label) {
-                comboBox(options)
+                comboBox(options!!.keys, DropdownAutoRenderer())
                     .bindItem(graphProperty)
                     .enabled(descriptor.editable != false)
                     .also { ComboboxSpeedSearch.installOn(it.component) }
@@ -35,4 +66,18 @@ abstract class SimpleCreatorProperty<T>(
     }
 
     abstract fun buildSimpleUi(panel: Panel, context: WizardContext)
+
+    private inner class DropdownAutoRenderer : DefaultListCellRenderer() {
+
+        override fun getListCellRendererComponent(
+            list: JList<out Any?>?,
+            value: Any?,
+            index: Int,
+            isSelected: Boolean,
+            cellHasFocus: Boolean
+        ): Component {
+            val label = options!![value] ?: value.toString()
+            return super.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus)
+        }
+    }
 }
