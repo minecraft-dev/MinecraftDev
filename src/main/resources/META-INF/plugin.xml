@@ -89,7 +89,6 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
-        <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.CustomPlatformStep$TypeFactory" />
         <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.ModPlatformStep$TypeFactory" />
         <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$TypeFactory" />
 
@@ -196,6 +195,7 @@
         <!---->
 
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
+        <moduleBuilder id="CUSTOM_MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.custom.CustomMinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>

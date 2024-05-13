@@ -26,16 +26,9 @@ import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
-import com.demonwav.mcdev.creator.custom.types.BooleanCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.StringCreatorProperty
-import com.demonwav.mcdev.creator.custom.types.IntegerCreatorProperty
 import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.demonwav.mcdev.util.fromJson
@@ -43,9 +36,9 @@ import com.google.gson.Gson
 import com.intellij.ide.fileTemplates.impl.CustomFileTemplate
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
+import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -66,16 +59,8 @@ import com.intellij.util.io.readText
 import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
-import kotlin.collections.List
-import kotlin.collections.MutableMap
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.emptyList
-import kotlin.collections.mapNotNull
-import kotlin.collections.mapOf
-import kotlin.collections.mapValuesTo
-import kotlin.collections.mutableMapOf
-import kotlin.collections.plusAssign
 import kotlin.collections.set
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
@@ -84,7 +69,7 @@ import kotlin.io.path.exists
  * The step to select a custom template repo.
  */
 class CustomPlatformStep(
-    parent: PlatformTypeStep,
+    parent: NewProjectWizardStep,
 ) : AbstractLongRunningAssetsStep(parent) {
 
     override val description: String = MCDevBundle("creator.ui.custom.step.description")
@@ -242,26 +227,6 @@ class CustomPlatformStep(
     }
 
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
-        val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
-            ?: return into.also { thisLogger().error("Could not find wizard base data") }
-        val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
-
-        into += mapOf(
-            "PROJECT_NAME" to baseData.name,
-            "JAVA_VERSION" to javaVersion,
-            "GROUP_ID" to buildSystemProps.groupId,
-            "ARTIFACT_ID" to buildSystemProps.artifactId,
-            "VERSION" to buildSystemProps.version,
-        )
-
         return properties.mapValuesTo(into) { (_, prop) -> prop.graphProperty.get() }
-    }
-
-    class TypeFactory : PlatformTypeStep.Factory {
-        override val name
-            get() = MCDevBundle("creator.ui.platform.custom.name")
-
-        override fun createStep(parent: PlatformTypeStep) = CustomPlatformStep(parent)
     }
 }
