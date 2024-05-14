@@ -20,7 +20,7 @@ class BooleanCreatorProperty(
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.label) {
-            this.checkBox(descriptor.label)
+            this.checkBox(descriptor.label.removeSuffix(":"))
                 .bindSelected(graphProperty)
                 .enabled(descriptor.editable != false)
         }.visible(descriptor.hidden != true)

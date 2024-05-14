@@ -21,49 +21,34 @@
 package com.demonwav.mcdev.creator.platformtype
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.creator.JdkProjectSetupFinalizer
-import com.demonwav.mcdev.creator.buildsystem.BuildSystemPropertiesStep
-import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
+import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
-import com.demonwav.mcdev.creator.findStep
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
-import com.demonwav.mcdev.util.fromJson
-import com.google.gson.Gson
 import com.intellij.ide.fileTemplates.impl.CustomFileTemplate
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.io.FileUtilRt
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.textValidation
-import com.intellij.util.io.readText
 import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
-import kotlin.io.path.absolute
-import kotlin.io.path.exists
 
 /**
  * The step to select a custom template repo.
@@ -74,54 +59,54 @@ class CustomPlatformStep(
 
     override val description: String = MCDevBundle("creator.ui.custom.step.description")
 
-    val pathProperty = propertyGraph.property("").apply {
-        bindStorage("${javaClass.name}.path")
-    }
-    var path by pathProperty
+    val templateProviders = TemplateProvider.getAll()
 
-    val descriptorProperty = propertyGraph.property<TemplateDescriptor?>(null)
-    var descriptor by descriptorProperty
+    val templateProviderProperty = propertyGraph.property<TemplateProvider>(templateProviders.first())
+    var templateProvider by templateProviderProperty
+
+    val templateProperty = propertyGraph.property<LoadedTemplate?>(null)
+    var template by templateProperty
 
     private var properties = mutableMapOf<String, CreatorProperty<*>>()
 
     override fun setupUI(builder: Panel) {
         var taskParentComponent: JComponent? = null
-        builder.row(MCDevBundle("creator.ui.custom.path.label")) {
-            val pathChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor().apply {
-                description = MCDevBundle("creator.ui.custom.path.dialog.description")
-            }
-            textFieldWithBrowseButton(
-                MCDevBundle("creator.ui.custom.path.dialog.title"),
-                context.project,
-                pathChooserDescriptor
-            ).align(AlignX.FILL)
-                .columns(COLUMNS_LARGE)
-                .bindText(pathProperty)
-                .textValidation(validationErrorIf(MCDevBundle("creator.validation.custom.path_not_a_directory")) { value ->
-                    val file = kotlin.runCatching {
-                        VirtualFileManager.getInstance().findFileByNioPath(Path.of(value))
-                    }.getOrNull()
-                    file == null || !file.isDirectory
-                })
-                .also { taskParentComponent = it.component }
+
+        lateinit var templateProviderPlaceholder: Placeholder
+        lateinit var templatePropertyPlaceholder: Placeholder
+
+        builder.row(MCDevBundle("creator.ui.custom.provider.label")) {
+            segmentedButton(templateProviders, TemplateProvider::getLabel, TemplateProvider::getTooltip)
+                .bind(templateProviderProperty)
         }
 
         builder.row {
-            val placeholder = placeholder().align(AlignX.FILL)
-            createOptionsPanelInBackground(path, placeholder, taskParentComponent)
-            pathProperty.afterChange { path ->
-                createOptionsPanelInBackground(path, placeholder, taskParentComponent)
-            }
+            templateProviderPlaceholder = placeholder()
         }
+
+        val provideTemplate = Consumer<() -> LoadedTemplate> { provider ->
+            createOptionsPanelInBackground(provider, templatePropertyPlaceholder, taskParentComponent)
+        }
+
+        templateProviderProperty.afterChange { templateProvider ->
+            templatePropertyPlaceholder.component = null
+            templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
+        }
+
+        builder.row {
+            templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
+        }
+
+        templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
     }
 
     private fun createOptionsPanelInBackground(
-        path: String,
+        provider: () -> LoadedTemplate,
         placeholder: Placeholder,
         taskParentComponent: JComponent?
     ) {
         properties = mutableMapOf()
-        descriptor = null
+        template = null
 
         val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
             ?: return thisLogger().error("Could not find wizard base data")
@@ -140,7 +125,7 @@ class CustomPlatformStep(
                     return emptyList()
                 }
 
-                return setupTemplate(path)
+                return setupTemplate(provider)
             }
         }
 
@@ -151,18 +136,18 @@ class CustomPlatformStep(
         }
     }
 
-    private fun setupTemplate(path: String): List<Consumer<Panel>> {
-        val templateDescriptorPath = Path.of(path, ".mcdev.template.json")
-        if (!templateDescriptorPath.exists()) {
-            return emptyList()
+    private fun setupTemplate(provider: () -> LoadedTemplate): List<Consumer<Panel>> {
+        return try {
+            val loadedTemplate = provider()
+            template = loadedTemplate
+            loadedTemplate.descriptor.properties
+                .mapNotNull { setupProperty(it) }
+                .sortedBy { (_, order) -> order }
+                .map { it.first }
+        } catch (e: Throwable) {
+            template = null
+            emptyList()
         }
-
-        val templateDescriptor = Gson().fromJson<TemplateDescriptor>(templateDescriptorPath.readText())
-        descriptor = templateDescriptor
-        return templateDescriptor.properties
-            .mapNotNull { setupProperty(it) }
-            .sortedBy { (_, order) -> order }
-            .map { it.first }
     }
 
     private fun setupProperty(descriptor: TemplatePropertyDescriptor): Pair<Consumer<Panel>, Int>? {
@@ -215,13 +200,16 @@ class CustomPlatformStep(
     }
 
     override fun setupAssets(project: Project) {
-        val descriptor = descriptor!!
-
-        val rootPath = Path.of(path).absolute()
+        val template = template!!
+        val descriptor = template.descriptor
 
         collectTemplateProperties(assets.templateProperties)
 
         thisLogger().debug("Template properties: ${assets.templateProperties}")
+
+        val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
+            ?: return thisLogger().error("Could not find wizard base data")
+        val projectPath = Path.of(baseData.path)
 
         for (file in descriptor.files) {
             if (file.condition != null &&
@@ -232,15 +220,14 @@ class CustomPlatformStep(
 
             val relativeTemplate = TemplateEvaluator.template(assets.templateProperties, file.template).getOrNull()
                 ?: continue
-            val templatePath = rootPath.resolve(relativeTemplate).toAbsolutePath()
-            if (!templatePath.startsWith(rootPath)) {
-                continue
-            }
-
             val relativeDest = TemplateEvaluator.template(assets.templateProperties, file.destination).getOrNull()
                 ?: continue
-            val destPath = rootPath.resolve(relativeDest).toAbsolutePath()
-            if (!destPath.startsWith(rootPath)) {
+
+            val templateContents = template.loadTemplateContents(relativeTemplate)
+                ?: continue
+
+            val destPath = projectPath.resolve(relativeDest).toAbsolutePath()
+            if (!destPath.startsWith(projectPath)) {
                 // We want to make sure template files aren't 'escaping' the project directory
                 continue
             }
@@ -248,9 +235,9 @@ class CustomPlatformStep(
             val fileName = destPath.fileName.toString().removeSuffix(".ft")
             val baseFileName = FileUtilRt.getNameWithoutExtension(fileName)
             val extension = FileUtilRt.getExtension(fileName)
-            val template = CustomFileTemplate(baseFileName, extension)
-            template.text = templatePath.readText()
-            assets.addAssets(GeneratorTemplateFile(rootPath.relativize(destPath).toString(), template))
+            val fileTemplate = CustomFileTemplate(baseFileName, extension)
+            fileTemplate.text = templateContents
+            assets.addAssets(GeneratorTemplateFile(projectPath.relativize(destPath).toString(), fileTemplate))
         }
     }
 
