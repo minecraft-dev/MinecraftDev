@@ -146,6 +146,7 @@ class CustomPlatformStep(
                 .map { it.first }
         } catch (e: Throwable) {
             template = null
+            thisLogger().error(e)
             emptyList()
         }
     }
