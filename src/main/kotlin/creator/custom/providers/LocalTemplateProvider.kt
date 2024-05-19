@@ -59,4 +59,6 @@ class LocalTemplateProvider : TemplateProvider {
             }
         }
     }
+
+    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
 }

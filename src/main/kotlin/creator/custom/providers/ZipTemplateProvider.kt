@@ -39,9 +39,9 @@ class ZipTemplateProvider : TemplateProvider {
 
         return panel {
             row(MCDevBundle("creator.ui.custom.path.label")) {
-                val pathChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor(ArchiveFileType.INSTANCE).apply {
-                    description = MCDevBundle("creator.ui.custom.archive.dialog.description")
-                }
+                val pathChooserDescriptor = FileChooserDescriptorFactory.createSingleLocalFileDescriptor()
+                    .withFileFilter { it.extension == "zip" }
+                    .apply { description = MCDevBundle("creator.ui.custom.archive.dialog.description") }
                 textFieldWithBrowseButton(
                     MCDevBundle("creator.ui.custom.archive.dialog.title"),
                     context.project,
@@ -55,6 +55,8 @@ class ZipTemplateProvider : TemplateProvider {
             }
         }
     }
+
+    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
 
     companion object {
 

@@ -26,9 +26,15 @@ interface TemplateProvider {
         provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
     ): JComponent?
 
+    fun deserializeAndLoad(element: String): LoadedTemplate?
+
     companion object {
 
         private val EP_NAME = ExtensionPointName<TemplateProvider>("com.demonwav.minecraft-dev.creatorTemplateProvider")
+
+        fun get(name: String): TemplateProvider? {
+            return getAll().find { it.javaClass.name == name }
+        }
 
         fun getAll(): Collection<TemplateProvider> = EP_NAME.extensionList
 
@@ -40,14 +46,27 @@ interface TemplateProvider {
                 if (child.isDirectory) {
                     findTemplates(child, templates)
                 } else if (child.name.endsWith(".mcdev.template.json")) {
-                    val descriptor = Gson().fromJson<TemplateDescriptor>(child.readText())
-                    val label = child.name.removeSuffix(".mcdev.template.json").takeIf(String::isNotBlank)
-                        ?: directory.presentableName
-                    templates.add(VfsLoadedTemplate(directory, label, null, descriptor, true))
+                    templates.add(createVfsLoadedTemplate(directory, child))
                 }
             }
 
             return templates
+        }
+
+        fun createVfsLoadedTemplate(
+            root: VirtualFile,
+            descriptorFile: VirtualFile,
+            tooltip: String? = null
+        ): VfsLoadedTemplate {
+            val descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
+            val label = descriptorFile.name.removeSuffix(".mcdev.template.json").takeIf(String::isNotBlank)
+                ?: root.presentableName
+            return VfsLoadedTemplate(root, descriptorFile, label, tooltip, descriptor, true)
+        }
+
+        fun deserializeAndLoadVfs(element: String): LoadedTemplate? {
+            val serialized = Gson().fromJson<VfsLoadedTemplate.Serialized>(element)
+            return serialized.load()
         }
     }
 }

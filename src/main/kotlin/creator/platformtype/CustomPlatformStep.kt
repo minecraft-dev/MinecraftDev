@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.platformtype
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
@@ -236,6 +237,12 @@ class CustomPlatformStep(
 
     override fun setupAssets(project: Project) {
         val template = selectedTemplate
+        if (template is EmptyLoadedTemplate) {
+            return
+        }
+
+        RecentProjectTemplates.instance.addNewTemplate(templateProvider.javaClass.name, template)
+
         val descriptor = template.descriptor
 
         collectTemplateProperties(assets.templateProperties)

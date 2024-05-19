@@ -23,4 +23,6 @@ class BuiltInTemplateProvider : TemplateProvider {
 
         return null
     }
+
+    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
 }

@@ -10,4 +10,6 @@ interface LoadedTemplate {
     val isValid: Boolean
 
     fun loadTemplateContents(path: String): String?
+
+    fun serialize(): String?
 }

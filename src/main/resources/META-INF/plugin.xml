@@ -138,6 +138,7 @@
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
 
+        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.BuiltInTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
@@ -206,6 +207,7 @@
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
