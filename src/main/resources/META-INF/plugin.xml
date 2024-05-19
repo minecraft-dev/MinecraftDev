@@ -138,6 +138,7 @@
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
 
+        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.BuiltInTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
 

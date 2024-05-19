@@ -21,7 +21,7 @@ import java.io.FileNotFoundException
 import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
-import kotlin.io.path.absolute
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.isRegularFile
 
 class ZipTemplateProvider : TemplateProvider {
@@ -36,10 +36,7 @@ class ZipTemplateProvider : TemplateProvider {
         val pathProperty = propertyGraph.property("").apply {
             afterChange { path ->
                 provideTemplate.accept {
-                    val root = Path.of(path.trim()).absolute()
-                    val descriptorText = readFromArchive(root.toString(), ".mcdev.template.json")
-                    val descriptor = Gson().fromJson<TemplateDescriptor>(descriptorText)
-                    ArchiveFileLoadedTemplate(root.toString(), descriptor)
+                    loadTemplateFrom(path)
                 }
             }
             bindStorage("${this@ZipTemplateProvider.javaClass.name}.path")
@@ -66,6 +63,13 @@ class ZipTemplateProvider : TemplateProvider {
 
     companion object {
 
+        fun loadTemplateFrom(archivePath: String): ArchiveFileLoadedTemplate {
+            val absolutePath = Path.of(archivePath.trim()).absolutePathString()
+            val descriptorText = readFromArchive(absolutePath, ".mcdev.template.json")
+            val descriptor = Gson().fromJson<TemplateDescriptor>(descriptorText)
+            return ArchiveFileLoadedTemplate(absolutePath, descriptor)
+        }
+
         private fun readFromArchive(archivePath: String, innerPath: String): String {
             val fs = JarFileSystem.getInstance()
             val inArchivePath = "$archivePath!/$innerPath"
@@ -75,7 +79,7 @@ class ZipTemplateProvider : TemplateProvider {
         }
     }
 
-    private class ArchiveFileLoadedTemplate(
+    class ArchiveFileLoadedTemplate(
         val archivePath: String,
         override val descriptor: TemplateDescriptor,
     ) : LoadedTemplate {
