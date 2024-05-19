@@ -4,7 +4,10 @@ import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 
 interface LoadedTemplate {
 
+    val label: String
+    val tooltip: String?
     val descriptor: TemplateDescriptor
+    val isValid: Boolean
 
     fun loadTemplateContents(path: String): String?
 }

@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.platformtype
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
@@ -34,6 +35,7 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -42,6 +44,8 @@ import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
+import com.intellij.ui.dsl.builder.SegmentedButton
+import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import java.nio.file.Path
 import java.util.function.Consumer
@@ -64,8 +68,12 @@ class CustomPlatformStep(
     val templateProviderProperty = propertyGraph.property<TemplateProvider>(templateProviders.first())
     var templateProvider by templateProviderProperty
 
-    val templateProperty = propertyGraph.property<LoadedTemplate?>(null)
-    var template by templateProperty
+    val availableTemplatesProperty = propertyGraph.property<Collection<LoadedTemplate>>(emptyList())
+    var availableTemplates by availableTemplatesProperty
+    lateinit var availableTemplatesSegmentedButton: SegmentedButton<LoadedTemplate>
+
+    val selectedTemplateProperty = propertyGraph.property<LoadedTemplate>(EmptyLoadedTemplate)
+    var selectedTemplate by selectedTemplateProperty
 
     private var properties = mutableMapOf<String, CreatorProperty<*>>()
 
@@ -84,68 +92,117 @@ class CustomPlatformStep(
             templateProviderPlaceholder = placeholder()
         }
 
-        val provideTemplate = Consumer<() -> LoadedTemplate> { provider ->
-            createOptionsPanelInBackground(provider, templatePropertyPlaceholder, taskParentComponent)
+        val provideTemplate = Consumer<() -> Collection<LoadedTemplate>> { provider ->
+            loadTemplatesInBackground(provider, taskParentComponent)
         }
 
         templateProviderProperty.afterChange { templateProvider ->
             templatePropertyPlaceholder.component = null
+            availableTemplates = emptyList()
+            availableTemplatesSegmentedButton.items(availableTemplates)
             templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
+        }
+
+        builder.row(MCDevBundle("creator.ui.custom.templates.label")) {
+            availableTemplatesSegmentedButton =
+                segmentedButton(emptyList(), LoadedTemplate::label, LoadedTemplate::tooltip)
+                    .bind(selectedTemplateProperty)
+        }.visibleIf(availableTemplatesProperty.transform { it.size > 1 })
+
+        availableTemplatesProperty.afterChange { newTemplates ->
+            availableTemplatesSegmentedButton.items(newTemplates)
+            templatePropertyPlaceholder.component = null
+            selectedTemplate = EmptyLoadedTemplate
+        }
+
+        selectedTemplateProperty.afterChange { template ->
+            createOptionsPanelInBackground(template, templatePropertyPlaceholder, templateProviderPlaceholder.component)
         }
 
         builder.row {
             templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
-        }
+        }.topGap(TopGap.SMALL)
 
         templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
     }
 
-    private fun createOptionsPanelInBackground(
-        provider: () -> LoadedTemplate,
-        placeholder: Placeholder,
+    private fun loadTemplatesInBackground(
+        provider: () -> Collection<LoadedTemplate>,
         taskParentComponent: JComponent?
     ) {
-        properties = mutableMapOf()
-        template = null
+        selectedTemplate = EmptyLoadedTemplate
 
-        val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
-            ?: return thisLogger().error("Could not find wizard base data")
-
-        properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
-
-        val task = object : Task.WithResult<List<Consumer<Panel>>, Exception>(
+        val task = object : Task.WithResult<Collection<LoadedTemplate>, Exception>(
             context.project,
             taskParentComponent,
             MCDevBundle("creator.step.generic.project_created.message"),
             false
         ) {
 
-            override fun compute(indicator: ProgressIndicator): List<Consumer<Panel>> {
+            override fun compute(indicator: ProgressIndicator): Collection<LoadedTemplate> {
                 if (project?.isDisposed == true) {
                     return emptyList()
                 }
 
-                return setupTemplate(provider)
+                return provider()
             }
         }
 
+        val newTemplates = ProgressManager.getInstance().run(task)
+        availableTemplates = newTemplates
+        availableTemplatesSegmentedButton.items(newTemplates)
+        availableTemplatesSegmentedButton.selectedItem = newTemplates.firstOrNull()
+    }
+
+    private fun createOptionsPanelInBackground(
+        template: LoadedTemplate,
+        placeholder: Placeholder,
+        taskParentComponent: JComponent?
+    ) {
+        properties = mutableMapOf()
+
+        if (!template.isValid) {
+            return
+        }
+
+        val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
+            ?: return thisLogger().error("Could not find wizard base data")
+
+        properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
+
+        // val task = object : Task.WithResult<List<Consumer<Panel>>, Exception>(
+        //     context.project,
+        //     taskParentComponent,
+        //     MCDevBundle("creator.step.generic.project_created.message"),
+        //     false
+        // ) {
+        //
+        //     override fun compute(indicator: ProgressIndicator): List<Consumer<Panel>> {
+        //         if (project?.isDisposed == true) {
+        //             return emptyList()
+        //         }
+        //
+        //         return setupTemplate(template)
+        //     }
+        // }
+
         placeholder.component = panel {
-            for (uiFactory in ProgressManager.getInstance().run(task)) {
+            for (uiFactory in setupTemplate(template)) {
                 uiFactory.accept(this)
             }
+            // for (uiFactory in ProgressManager.getInstance().run(task)) {
+            //     uiFactory.accept(this)
+            // }
         }
     }
 
-    private fun setupTemplate(provider: () -> LoadedTemplate): List<Consumer<Panel>> {
+    private fun setupTemplate(template: LoadedTemplate): List<Consumer<Panel>> {
         return try {
-            val loadedTemplate = provider()
-            template = loadedTemplate
-            loadedTemplate.descriptor.properties
+            template.descriptor.properties
                 .mapNotNull { setupProperty(it) }
                 .sortedBy { (_, order) -> order }
                 .map { it.first }
         } catch (e: Throwable) {
-            template = null
             thisLogger().error(e)
             emptyList()
         }
@@ -201,7 +258,7 @@ class CustomPlatformStep(
     }
 
     override fun setupAssets(project: Project) {
-        val template = template!!
+        val template = selectedTemplate
         val descriptor = template.descriptor
 
         collectTemplateProperties(assets.templateProperties)

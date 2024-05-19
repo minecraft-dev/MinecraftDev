@@ -1,9 +1,7 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.creator.custom.TemplateDescriptor
-import com.demonwav.mcdev.util.fromJson
-import com.google.gson.Gson
+import com.demonwav.mcdev.util.virtualFile
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -16,14 +14,10 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
-import com.intellij.util.io.readText
-import java.io.FileNotFoundException
 import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.io.path.absolute
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.exists
 
 class LocalTemplateProvider : TemplateProvider {
 
@@ -32,19 +26,13 @@ class LocalTemplateProvider : TemplateProvider {
     override fun setupUi(
         context: WizardContext,
         propertyGraph: PropertyGraph,
-        provideTemplate: Consumer<() -> LoadedTemplate>
+        provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
     ): JComponent {
         val pathProperty = propertyGraph.property("").apply {
             afterChange { path ->
                 provideTemplate.accept {
                     val root = Path.of(path.trim()).absolute()
-                    val templateDescriptorPath = root.resolve(".mcdev.template.json")
-                    if (!templateDescriptorPath.exists()) {
-                        throw FileNotFoundException("Could not find template descriptor at ${templateDescriptorPath.absolutePathString()}")
-                    }
-
-                    val descriptor = Gson().fromJson<TemplateDescriptor>(templateDescriptorPath.readText())
-                    FileLoadedTemplate(root, descriptor)
+                    root.virtualFile?.let(TemplateProvider::findTemplates) ?: emptyList()
                 }
             }
             bindStorage("${this@LocalTemplateProvider.javaClass.name}.path")
@@ -69,21 +57,6 @@ class LocalTemplateProvider : TemplateProvider {
                         file == null || !file.isDirectory
                     })
             }
-        }
-    }
-
-    private class FileLoadedTemplate(
-        val root: Path,
-        override val descriptor: TemplateDescriptor,
-    ) : LoadedTemplate {
-
-        override fun loadTemplateContents(path: String): String {
-            val templatePath = root.resolve(path).toAbsolutePath()
-            if (!templatePath.startsWith(root)) {
-                throw Exception("Template file path is outside of template root directory")
-            }
-
-            return templatePath.readText()
         }
     }
 }

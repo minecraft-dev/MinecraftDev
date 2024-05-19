@@ -14,11 +14,11 @@ class BuiltInTemplateProvider : TemplateProvider {
     override fun setupUi(
         context: WizardContext,
         propertyGraph: PropertyGraph,
-        provideTemplate: Consumer<() -> LoadedTemplate>
+        provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
     ): JComponent? {
         provideTemplate.accept {
             val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/templates.zip")
-            ZipTemplateProvider.loadTemplateFrom(builtinTemplatesPath.absolutePathString())
+            ZipTemplateProvider.loadTemplatesFrom(builtinTemplatesPath.absolutePathString())
         }
 
         return null
