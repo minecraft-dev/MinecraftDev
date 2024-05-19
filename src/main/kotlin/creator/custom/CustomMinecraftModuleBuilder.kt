@@ -22,7 +22,6 @@ package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.creator.platformtype.CustomPlatformStep
 import com.demonwav.mcdev.creator.step.NewProjectWizardChainStep.Companion.nextStep
 import com.intellij.ide.projectWizard.ProjectSettingsStep
 import com.intellij.ide.util.projectWizard.WizardContext
