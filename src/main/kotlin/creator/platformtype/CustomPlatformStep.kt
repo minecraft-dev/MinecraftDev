@@ -116,7 +116,7 @@ class CustomPlatformStep(
         }
 
         selectedTemplateProperty.afterChange { template ->
-            createOptionsPanelInBackground(template, templatePropertyPlaceholder, templateProviderPlaceholder.component)
+            createOptionsPanelInBackground(template, templatePropertyPlaceholder)
         }
 
         builder.row {
@@ -154,11 +154,7 @@ class CustomPlatformStep(
         availableTemplatesSegmentedButton.selectedItem = newTemplates.firstOrNull()
     }
 
-    private fun createOptionsPanelInBackground(
-        template: LoadedTemplate,
-        placeholder: Placeholder,
-        taskParentComponent: JComponent?
-    ) {
+    private fun createOptionsPanelInBackground(template: LoadedTemplate, placeholder: Placeholder) {
         properties = mutableMapOf()
 
         if (!template.isValid) {
@@ -170,29 +166,10 @@ class CustomPlatformStep(
 
         properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
 
-        // val task = object : Task.WithResult<List<Consumer<Panel>>, Exception>(
-        //     context.project,
-        //     taskParentComponent,
-        //     MCDevBundle("creator.step.generic.project_created.message"),
-        //     false
-        // ) {
-        //
-        //     override fun compute(indicator: ProgressIndicator): List<Consumer<Panel>> {
-        //         if (project?.isDisposed == true) {
-        //             return emptyList()
-        //         }
-        //
-        //         return setupTemplate(template)
-        //     }
-        // }
-
         placeholder.component = panel {
             for (uiFactory in setupTemplate(template)) {
                 uiFactory.accept(this)
             }
-            // for (uiFactory in ProgressManager.getInstance().run(task)) {
-            //     uiFactory.accept(this)
-            // }
         }
     }
 
