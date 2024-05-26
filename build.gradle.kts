@@ -78,12 +78,6 @@ val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
     archiveFileName.set("externalAnnotations.jar")
 }
 
-val templatesZip = tasks.register<Zip>("templatesZip") {
-    from("mcdev-templates")
-    destinationDirectory.set(layout.buildDirectory.dir("mcdev-templates"))
-    archiveFileName.set("templates.zip")
-}
-
 repositories {
     maven("https://repo.denwav.dev/repository/maven-public/")
     maven("https://maven.fabricmc.net/") {
@@ -387,8 +381,8 @@ tasks.withType<PrepareSandboxTask> {
     from(externalAnnotationsJar) {
         into("Minecraft Development/lib/resources")
     }
-    from(templatesZip) {
-        into("Minecraft Development/lib/resources")
+    from("mcdev-templates") {
+        into("Minecraft Development/lib/resources/builtin-templates")
     }
 }
 
