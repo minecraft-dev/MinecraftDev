@@ -24,6 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
+import com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider
 import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
@@ -34,6 +35,7 @@ import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.observable.util.or
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -106,7 +108,10 @@ class CustomPlatformStep(
             availableTemplatesSegmentedButton =
                 segmentedButton(emptyList(), LoadedTemplate::label, LoadedTemplate::tooltip)
                     .bind(selectedTemplateProperty)
-        }.visibleIf(availableTemplatesProperty.transform { it.size > 1 })
+        }.visibleIf(
+            availableTemplatesProperty.transform { it.size > 1 } or
+                templateProviderProperty.transform { it is RecentTemplatesProvider }
+        )
 
         availableTemplatesProperty.afterChange { newTemplates ->
             availableTemplatesSegmentedButton.items(newTemplates)
@@ -239,7 +244,9 @@ class CustomPlatformStep(
             return
         }
 
-        RecentProjectTemplates.instance.addNewTemplate(templateProvider.javaClass.name, template)
+        if (templateProvider !is RecentTemplatesProvider) {
+            RecentProjectTemplates.instance.addNewTemplate(templateProvider.javaClass.name, template)
+        }
 
         val descriptor = template.descriptor
 
