@@ -210,19 +210,6 @@ class ParchmentProperty(
     }
 
     private fun getPlatformMinecraftVersion(): SemanticVersion? {
-        // val mcVersionExtractor = descriptor.parameters?.get("minecraftVersionExtractor") as? String
-        //     ?: return null
-        //
-        // val propValues = properties.mapValues { (_, value) -> value.get() }
-        // val (success, result) = TemplateEvaluator.evaluate(propValues, mcVersionExtractor).getOrNull()
-        //     ?: return null
-        //
-        // if (!success) {
-        //     return null
-        // }
-        //
-        // return SemanticVersion.tryParse(result)
-
         val platformMcVersionPropertyName = descriptor.parameters?.get("minecraftVersionProperty") as? String
         val platformMcVersionProperty = properties[platformMcVersionPropertyName]
 
