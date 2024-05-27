@@ -1,4 +1,4 @@
-package com.demonwav.mcdev.creator.custom.model
+package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.intellij.openapi.components.BaseState

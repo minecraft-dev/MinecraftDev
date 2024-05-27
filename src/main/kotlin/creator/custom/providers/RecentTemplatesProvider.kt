@@ -1,6 +1,6 @@
 package com.demonwav.mcdev.creator.custom.providers
 
-import com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates
+import com.demonwav.mcdev.creator.custom.RecentProjectTemplates
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
 import java.util.function.Consumer

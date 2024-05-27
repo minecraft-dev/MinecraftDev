@@ -210,7 +210,7 @@
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
-        <applicationService serviceImplementation="com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates"/>
+        <applicationService serviceImplementation="com.demonwav.mcdev.creator.custom.RecentProjectTemplates"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>

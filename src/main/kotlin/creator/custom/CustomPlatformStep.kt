@@ -21,7 +21,6 @@
 package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.creator.custom.model.RecentProjectTemplates
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider
