@@ -2,6 +2,7 @@ package com.demonwav.mcdev.creator.custom.model
 
 import com.demonwav.mcdev.util.SemanticVersion
 
+@TemplateApi
 data class NeoForgeVersions(
     val minecraft: SemanticVersion,
     val neoforge: SemanticVersion,

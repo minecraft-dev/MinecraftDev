@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator.custom.model
 
+@TemplateApi
 data class ClassFqn(val fqn: String) {
 
     val className by lazy { fqn.substringAfterLast('.') }

@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator.custom.model
 
+@TemplateApi
 data class StringList(val values: List<String>) : List<String> by values {
 
     override fun toString(): String = values.joinToString()
