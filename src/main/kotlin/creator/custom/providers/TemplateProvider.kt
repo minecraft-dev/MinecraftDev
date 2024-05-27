@@ -58,6 +58,9 @@ interface TemplateProvider {
             descriptorFile: VirtualFile,
             tooltip: String? = null
         ): VfsLoadedTemplate {
+            root.refresh(false, true)
+            descriptorFile.refresh(false, false)
+
             val descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
             val label = descriptorFile.name.removeSuffix(".mcdev.template.json").takeIf(String::isNotBlank)
                 ?: root.presentableName

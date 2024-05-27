@@ -11,6 +11,8 @@ data class TemplatePropertyDescriptor(
     val label: String,
     val order: Int? = null,
     val options: Any? = null,
+    val sourceUrl: String? = null,
+    val limit: Int? = null,
     val maxSegmentedButtonsCount: Int? = null,
     val forceDropdown: Boolean? = null,
     val groupProperties: List<TemplatePropertyDescriptor>? = null,
@@ -21,7 +23,8 @@ data class TemplatePropertyDescriptor(
     val default: Any,
     val nullIfDefault: Boolean? = null,
     val derives: PropertyDerivation? = null,
-    val inheritFrom: String? = null
+    val inheritFrom: String? = null,
+    val parameters: Map<String, Any>? = null
 )
 
 data class PropertyDerivation(

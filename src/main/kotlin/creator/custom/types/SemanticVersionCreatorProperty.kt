@@ -2,7 +2,6 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
-import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -11,7 +10,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 
-class SemanticVersionCreatorProperty(
+open class SemanticVersionCreatorProperty(
     graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
     properties: Map<String, CreatorProperty<*>>

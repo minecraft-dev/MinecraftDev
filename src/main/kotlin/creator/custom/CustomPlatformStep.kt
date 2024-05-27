@@ -34,6 +34,8 @@ import com.intellij.ide.fileTemplates.impl.CustomFileTemplate
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.diagnostic.getOrLogException
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.util.or
 import com.intellij.openapi.observable.util.transform
@@ -148,7 +150,9 @@ class CustomPlatformStep(
                     return emptyList()
                 }
 
-                return provider()
+                return runCatching { provider() }
+                    .getOrLogException(logger<CustomPlatformStep>())
+                    ?: emptyList()
             }
         }
 

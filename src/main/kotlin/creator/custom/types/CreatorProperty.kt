@@ -98,7 +98,7 @@ abstract class CreatorProperty<T>(
         }
     }
 
-    private fun makeStorageKey(discriminator: String? = null): String {
+    protected fun makeStorageKey(discriminator: String? = null): String {
         val base = "${javaClass.name}.property.${descriptor.name}.${descriptor.type}"
         if (discriminator == null) {
             return base

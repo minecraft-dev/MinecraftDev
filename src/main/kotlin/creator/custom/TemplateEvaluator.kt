@@ -1,5 +1,7 @@
 package com.demonwav.mcdev.creator.custom
 
+import com.demonwav.mcdev.util.MinecraftVersions
+import com.demonwav.mcdev.util.SemanticVersion
 import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.util.StringBuilderWriter
@@ -7,7 +9,12 @@ import org.apache.velocity.util.StringBuilderWriter
 object TemplateEvaluator {
 
     fun evaluate(properties: Map<String, Any?>, template: String): Result<Pair<Boolean, String>> {
-        val context = VelocityContext(properties)
+        val baseProperties = mapOf(
+            "SemanticVersion" to SemanticVersion,
+            "MinecraftVersions" to MinecraftVersions
+        )
+
+        val context = VelocityContext(baseProperties + properties)
         val stringWriter = StringBuilderWriter()
         return runCatching {
             Velocity.evaluate(context, stringWriter, "McDevTplExpr", template) to stringWriter.toString()

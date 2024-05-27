@@ -2,7 +2,8 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
-import com.demonwav.mcdev.platform.sponge.SpongeVersion
+import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
+import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
 import com.demonwav.mcdev.platform.sponge.util.SpongeVersions
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
@@ -42,11 +43,15 @@ class IntegerCreatorProperty(
     }
 
     private fun recommendJavaVersionForMcVersion(from: Any?): Int {
-        if (from !is SemanticVersion) {
-            return 17
+        if (from is SemanticVersion) {
+            return MinecraftVersions.requiredJavaVersion(from).ordinal
         }
 
-        return MinecraftVersions.requiredJavaVersion(from).ordinal
+        if (from is HasMinecraftVersion) {
+            return recommendJavaVersionForMcVersion(from.minecraftVersion)
+        }
+
+        return 17
     }
 
     private fun recommendJavaVersionForSpongeApiVersion(from: Any?): Int {
