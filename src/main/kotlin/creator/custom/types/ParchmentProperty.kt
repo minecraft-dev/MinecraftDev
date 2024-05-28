@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.jetbrains.kotlin.cli.common.toBooleanLenient
 
 class ParchmentProperty(
     descriptor: TemplatePropertyDescriptor,
@@ -63,11 +62,11 @@ class ParchmentProperty(
     override fun deserialize(string: String): ParchmentVersions {
         val segments = string.split(' ')
         return ParchmentVersions(
-            segments.getOrNull(0)?.toBooleanLenient() ?: true,
+            segments.getOrNull(0)?.toBoolean() ?: true,
             segments.getOrNull(1)?.let(SemanticVersion::tryParse) ?: emptyVersion,
             segments.getOrNull(2)?.let(SemanticVersion::tryParse) ?: emptyVersion,
-            segments.getOrNull(3).toBooleanLenient() ?: false,
-            segments.getOrNull(4).toBooleanLenient() ?: false,
+            segments.getOrNull(3).toBoolean(),
+            segments.getOrNull(4).toBoolean(),
         )
     }
 
