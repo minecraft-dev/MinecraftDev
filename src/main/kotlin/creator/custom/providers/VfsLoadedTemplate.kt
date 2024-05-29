@@ -25,6 +25,7 @@ class VfsLoadedTemplate(
     override fun loadTemplateContents(path: String): String? {
         val virtualFile = root.fileSystem.findFileByPath(root.path + "/" + path)
             ?: throw FileNotFoundException("Could not find file $path in template root ${root.path}")
+        virtualFile.refresh(false, false)
         return virtualFile.readText()
     }
 
