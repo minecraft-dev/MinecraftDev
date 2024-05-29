@@ -11,7 +11,6 @@ data class TemplatePropertyDescriptor(
     val label: String,
     val order: Int? = null,
     val options: Any? = null,
-    val sourceUrl: String? = null,
     val limit: Int? = null,
     val maxSegmentedButtonsCount: Int? = null,
     val forceDropdown: Boolean? = null,

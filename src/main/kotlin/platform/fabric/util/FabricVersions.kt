@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.util
 
+import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.SemanticVersion
@@ -36,6 +37,7 @@ class FabricVersions(val game: List<Game>, val mappings: List<Mappings>, val loa
     class Game(val version: String, val stable: Boolean)
     class Mappings(val gameVersion: String, val version: YarnVersion)
 
+    @TemplateApi
     class YarnVersion(val name: String, val build: Int) : Comparable<YarnVersion> {
         override fun toString() = name
         override fun compareTo(other: YarnVersion) = build.compareTo(other.build)

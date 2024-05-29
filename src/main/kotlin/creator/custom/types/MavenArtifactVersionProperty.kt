@@ -22,6 +22,9 @@ class MavenArtifactVersionProperty(
     properties: Map<String, CreatorProperty<*>>
 ) : SemanticVersionCreatorProperty(graph, descriptor, properties) {
 
+    val sourceUrl: String
+        get() = descriptor.parameters!!["sourceUrl"] as String
+
     override val graphProperty: GraphProperty<SemanticVersion> = graph.property(SemanticVersion(emptyList()))
     private val versionsProperty = graph.property<Collection<SemanticVersion>>(emptyList())
     private val loadingVersionsProperty = graph.property(true)
@@ -29,7 +32,7 @@ class MavenArtifactVersionProperty(
     init {
         application.executeOnPooledThread {
             runBlocking {
-                val versions = collectMavenVersions(descriptor.sourceUrl!!)
+                val versions = collectMavenVersions(sourceUrl)
                     .asSequence()
                     .mapNotNull(SemanticVersion::tryParse)
                     .sortedDescending()
