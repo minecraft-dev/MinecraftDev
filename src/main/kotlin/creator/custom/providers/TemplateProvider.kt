@@ -4,6 +4,8 @@ import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.vfs.VirtualFile
@@ -46,7 +48,16 @@ interface TemplateProvider {
                 if (child.isDirectory) {
                     findTemplates(child, templates)
                 } else if (child.name.endsWith(".mcdev.template.json")) {
-                    templates.add(createVfsLoadedTemplate(directory, child))
+                    try {
+                        templates.add(createVfsLoadedTemplate(directory, child))
+                    } catch (e: Throwable) {
+                        val attachment = runCatching { Attachment(child.name, child.readText()) }.getOrNull()
+                        if (attachment != null) {
+                            thisLogger().error("Failed to load template ${child.path}", e, attachment)
+                        } else {
+                            thisLogger().error("Failed to load template ${child.path}", e)
+                        }
+                    }
                 }
             }
 
