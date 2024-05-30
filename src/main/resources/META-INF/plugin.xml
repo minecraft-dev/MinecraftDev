@@ -138,6 +138,7 @@
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty$Factory" type="jdk" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.MavenArtifactVersionProperty$Factory" type="maven_artifact_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.NeoForgeVersionsProperty$Factory" type="neoforge_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.LicenseProperty$Factory" type="license" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ParchmentProperty$Factory" type="parchment" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
