@@ -1,6 +1,9 @@
 package com.demonwav.mcdev.creator.custom
 
 data class TemplateDescriptor(
+    val label: String? = null,
+    val inherit: String? = null,
+    val hidden: Boolean? = null,
     val properties: List<TemplatePropertyDescriptor>,
     val files: List<TemplateFile>,
 )

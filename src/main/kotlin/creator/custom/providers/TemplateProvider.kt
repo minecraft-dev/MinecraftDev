@@ -44,12 +44,13 @@ interface TemplateProvider {
             directory: VirtualFile,
             templates: MutableList<VfsLoadedTemplate> = mutableListOf(),
         ): List<VfsLoadedTemplate> {
+            directory.refresh(false, true)
             for (child in directory.children) {
                 if (child.isDirectory) {
                     findTemplates(child, templates)
                 } else if (child.name.endsWith(".mcdev.template.json")) {
                     try {
-                        templates.add(createVfsLoadedTemplate(directory, child))
+                        createVfsLoadedTemplate(directory, child)?.let(templates::add)
                     } catch (e: Throwable) {
                         val attachment = runCatching { Attachment(child.name, child.readText()) }.getOrNull()
                         if (attachment != null) {
@@ -68,13 +69,32 @@ interface TemplateProvider {
             root: VirtualFile,
             descriptorFile: VirtualFile,
             tooltip: String? = null
-        ): VfsLoadedTemplate {
+        ): VfsLoadedTemplate? {
             root.refresh(false, true)
             descriptorFile.refresh(false, false)
 
-            val descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
-            val label = descriptorFile.name.removeSuffix(".mcdev.template.json").takeIf(String::isNotBlank)
+            var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
+            if (descriptor.hidden == true) {
+                return null
+            }
+
+            val label = descriptor.label
+                ?: descriptorFile.name.removeSuffix(".mcdev.template.json").takeIf(String::isNotBlank)
                 ?: root.presentableName
+
+            if (descriptor.inherit != null) {
+                val parent = root.findFileByRelativePath(descriptor.inherit!!)
+                if (parent != null) {
+                    parent.refresh(false, false)
+                    val parentDescriptor = Gson().fromJson<TemplateDescriptor>(parent.readText())
+                    val mergedProperties = parentDescriptor.properties + descriptor.properties
+                    val mergedFiles = parentDescriptor.files + descriptor.files
+                    descriptor = descriptor.copy(properties = mergedProperties, files = mergedFiles)
+                } else {
+                    thisLogger().error("Could not find inherited template descriptor ${descriptor.inherit} from ${descriptorFile.path}")
+                }
+            }
+
             return VfsLoadedTemplate(root, descriptorFile, label, tooltip, descriptor, true)
         }
 
