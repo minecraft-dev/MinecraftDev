@@ -74,6 +74,10 @@ interface TemplateProvider {
             descriptorFile.refresh(false, false)
 
             var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
+            if (descriptor.version != 1) {
+                return null
+            }
+
             if (descriptor.hidden == true) {
                 return null
             }
