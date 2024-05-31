@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.BuildSystemCoordinates
@@ -12,6 +13,7 @@ import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.textValidation
 
 class ClassFqnCreatorProperty(
     graph: PropertyGraph,
@@ -29,6 +31,7 @@ class ClassFqnCreatorProperty(
         panel.row(descriptor.label) {
             this.textField().bindText(this@ClassFqnCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
+                .textValidation(BuiltinValidations.validClassFqn)
                 .enabled(descriptor.editable != false)
         }.visible(descriptor.hidden != true)
     }

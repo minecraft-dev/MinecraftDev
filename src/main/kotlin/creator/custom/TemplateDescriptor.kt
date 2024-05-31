@@ -27,7 +27,8 @@ data class TemplatePropertyDescriptor(
     val nullIfDefault: Boolean? = null,
     val derives: PropertyDerivation? = null,
     val inheritFrom: String? = null,
-    val parameters: Map<String, Any>? = null
+    val parameters: Map<String, Any>? = null,
+    val validator: Any? = null
 )
 
 data class PropertyDerivation(

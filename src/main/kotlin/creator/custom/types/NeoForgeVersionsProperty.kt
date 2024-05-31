@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
@@ -71,14 +72,20 @@ class NeoForgeVersionsProperty(
         panel.row(descriptor.label) {
             comboBox(mcVersionsModel)
                 .bindItem(mcVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             comboBox(nfVersionsModel)
                 .bindItem(nfVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             comboBox(ngVersionsModel)
                 .bindItem(ngVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 

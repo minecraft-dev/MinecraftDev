@@ -1,16 +1,27 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.BuildSystemCoordinates
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.transform
+import com.intellij.openapi.ui.validation.CHECK_ARTIFACT_ID
+import com.intellij.openapi.ui.validation.CHECK_GROUP_ID
+import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
+import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.ui.dsl.builder.COLUMNS_MEDIUM
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.textValidation
+
+private val nonExampleValidation = validationErrorIf<String>(MCDevBundle("creator.validation.group_id_non_example")) {
+    it == "org.example"
+}
 
 class BuildSystemCoordinatesCreatorProperty(
     graph: PropertyGraph,
@@ -73,22 +84,22 @@ class BuildSystemCoordinatesCreatorProperty(
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.groupIdProperty)
                     .columns(COLUMNS_MEDIUM)
-//                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-//                    .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
+                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                   .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
             }
             this.row(MCDevBundle("creator.ui.group.artifact_id")) {
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.artifactIdProperty)
                     .columns(COLUMNS_MEDIUM)
-//                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-//                    .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
+                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                   .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
             }
             this.row(MCDevBundle("creator.ui.group.version")) {
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.versionProperty)
                     .columns(COLUMNS_MEDIUM)
-//                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-//                    .textValidation(versionValidation)
+                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                   .textValidation(BuiltinValidations.validVersion)
             }
         }.expanded = true
 

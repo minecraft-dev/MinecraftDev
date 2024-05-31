@@ -1,6 +1,7 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.collectMavenVersions
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.FabricVersionsModel
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
@@ -13,6 +14,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
+import com.intellij.openapi.ui.validation.WHEN_GRAPH_PROPAGATION_FINISHED
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
@@ -115,6 +117,9 @@ class FabricVersionsProperty(
         panel.row("Minecraft Version:") {
             comboBox(mcVersionModel)
                 .bindItem(mcVersionProperty)
+                .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             checkBox("Show snapshots")
@@ -124,12 +129,16 @@ class FabricVersionsProperty(
         panel.row("Loom Version:") {
             comboBox(loomVersionModel)
                 .bindItem(loomVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 
         panel.row("Loader Version:") {
             comboBox(loaderVersionModel)
                 .bindItem(loaderVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 
@@ -137,6 +146,8 @@ class FabricVersionsProperty(
             comboBox(yarnVersionModel)
                 .bindItem(yarnVersionProperty)
                 .enabledIf(useOfficialMappingsProperty.not())
+                .validationOnInput(BuiltinValidations.nonEmptyYarnVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyYarnVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             checkBox("Use official mappings")
@@ -151,6 +162,8 @@ class FabricVersionsProperty(
             comboBox(fabricApiVersionModel)
                 .bindItem(fabricApiVersionProperty)
                 .enabledIf(useFabricApiVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             checkBox("Use FabricApi")
