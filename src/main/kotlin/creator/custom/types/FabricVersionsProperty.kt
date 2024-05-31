@@ -14,6 +14,7 @@ import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
@@ -62,10 +63,22 @@ class FabricVersionsProperty(
 
     val yarnVersionProperty = graphProperty.transform({ it.yarn }, { model.copy(yarn = it) })
     val yarnVersionModel = DefaultComboBoxModel<FabricVersions.YarnVersion>()
+    val yarnHasMatchingGameVersion = mcVersionProperty.transform { mcVersion ->
+        val versions = fabricVersions
+            ?: return@transform true
+        val mcVersionString = mcVersion.toString()
+        versions.mappings.any { it.gameVersion == mcVersionString }
+    }
 
     val fabricApiVersionProperty = graphProperty.transform({ it.fabricApi }, { model.copy(fabricApi = it) })
     val fabricApiVersionModel = DefaultComboBoxModel<SemanticVersion>()
     val useFabricApiVersionProperty = graphProperty.transform({ it.useFabricApi }, { model.copy(useFabricApi = it) })
+    val fabricApiHasMatchingGameVersion = mcVersionProperty.transform { mcVersion ->
+        val apiVersions = fabricApiVersions
+            ?: return@transform true
+        val mcVersionString = mcVersion.toString()
+        apiVersions.versions.any { mcVersionString in it.gameVersions }
+    }
 
     val useOfficialMappingsProperty =
         graphProperty.transform({ it.useOfficialMappings }, { model.copy(useOfficialMappings = it) })
@@ -128,6 +141,10 @@ class FabricVersionsProperty(
 
             checkBox("Use official mappings")
                 .bindSelected(useOfficialMappingsProperty)
+
+            label("Unable to match Yarn versions to Minecraft version")
+                .visibleIf(yarnHasMatchingGameVersion.not())
+                .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
 
         panel.row("FabricApi Version:") {
@@ -138,6 +155,9 @@ class FabricVersionsProperty(
 
             checkBox("Use FabricApi")
                 .bindSelected(useFabricApiVersionProperty)
+            label("Unable to match API versions to Minecraft version")
+                .visibleIf(fabricApiHasMatchingGameVersion.not())
+                .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
     }
 
@@ -216,10 +236,14 @@ class FabricVersionsProperty(
         val mcVersion = mcVersionProperty.get()
         val mcVersionString = mcVersion.toString()
 
-        val yarnVersions = fabricVersions.mappings.asSequence()
-            .filter { it.gameVersion == mcVersionString }
-            .map { it.version }
-            .toList()
+        val yarnVersions = if (yarnHasMatchingGameVersion.get()) {
+            fabricVersions.mappings.asSequence()
+                .filter { it.gameVersion == mcVersionString }
+                .map { it.version }
+                .toList()
+        } else {
+            fabricVersions.mappings.map { it.version }
+        }
         yarnVersionModel.removeAllElements()
         yarnVersionModel.addAll(yarnVersions)
         yarnVersionProperty.set(yarnVersions.firstOrNull() ?: emptyValue.yarn)
@@ -232,10 +256,14 @@ class FabricVersionsProperty(
         val mcVersion = mcVersionProperty.get()
         val mcVersionString = mcVersion.toString()
 
-        val apiVersions = fabricApiVersions.versions.asSequence()
-            .filter { mcVersionString in it.gameVersions }
-            .map(FabricApiVersions.Version::version)
-            .toList()
+        val apiVersions = if (fabricApiHasMatchingGameVersion.get()) {
+            fabricApiVersions.versions.asSequence()
+                .filter { mcVersionString in it.gameVersions }
+                .map(FabricApiVersions.Version::version)
+                .toList()
+        } else {
+            fabricApiVersions.versions.map(FabricApiVersions.Version::version)
+        }
         fabricApiVersionModel.removeAllElements()
         fabricApiVersionModel.addAll(apiVersions)
         fabricApiVersionProperty.set(apiVersions.firstOrNull() ?: emptyVersion)
