@@ -33,10 +33,16 @@ data class TemplatePropertyDescriptor(
 
 data class PropertyDerivation(
     val parents: List<String>? = null,
-    val method: String,
-    val default: Any,
+    val method: String? = null,
+    val select: List<PropertyDerivationSelect>? = null,
+    val default: Any? = null,
     val whenModified: Boolean? = null,
     val parameters: Map<String, Any?>? = null,
+)
+
+data class PropertyDerivationSelect(
+    val condition: String,
+    val value: Any
 )
 
 data class TemplateFile(

@@ -35,6 +35,7 @@ open class SemanticVersionCreatorProperty(
     override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any {
         return when (derivation.method) {
             "extractVersionMajorMinor" -> extractVersionMajorMinor(parentValues[0])
+            null -> SemanticVersion.parse(deriveSelectFirst(parentValues, derivation).toString())
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
     }

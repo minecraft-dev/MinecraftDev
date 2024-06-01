@@ -30,6 +30,7 @@ class StringCreatorProperty(
     override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
         return when (derivation.method) {
             "suggestSpongePluginId" -> suggestSpongePluginId(parentValues.first())
+            null -> deriveSelectFirst(parentValues, derivation).toString()
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
     }

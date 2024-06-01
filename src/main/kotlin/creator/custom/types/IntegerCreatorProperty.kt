@@ -38,6 +38,7 @@ class IntegerCreatorProperty(
         return when (derivation.method) {
             "recommendJavaVersionForMcVersion" -> recommendJavaVersionForMcVersion(parentValues[0])
             "recommendJavaVersionForSpongeApiVersion" -> recommendJavaVersionForSpongeApiVersion(parentValues[0])
+            null -> (deriveSelectFirst(parentValues, derivation) as Number).toInt()
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
     }

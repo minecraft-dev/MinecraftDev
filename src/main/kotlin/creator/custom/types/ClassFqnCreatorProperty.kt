@@ -39,6 +39,7 @@ class ClassFqnCreatorProperty(
     override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): ClassFqn {
         return when (derivation.method) {
             "suggestClassName" -> suggestClassName(parentValues)
+            null -> ClassFqn(deriveSelectFirst(parentValues, derivation).toString())
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
     }

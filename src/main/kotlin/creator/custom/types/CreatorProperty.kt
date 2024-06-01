@@ -1,8 +1,10 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
+import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
@@ -52,8 +54,23 @@ abstract class CreatorProperty<T>(
      * @see GraphProperty.dependsOn
      */
     open fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
+        if (derivation.select != null) {
+            return deriveSelectFirst(parentValues, derivation)
+        }
+
         thisLogger().error("This type doesn't support derivation")
         return graphProperty.get()
+    }
+
+    fun deriveSelectFirst(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
+        val properties = parentValues.mapIndexed { i, value -> derivation.parents!![i] to value }.toMap()
+        for (select in derivation.select ?: emptyList()) {
+            if (TemplateEvaluator.condition(properties, select.condition).getOrLogException(thisLogger()) == true) {
+                return select.value
+            }
+        }
+
+        return derivation.default
     }
 
     abstract fun buildUi(panel: Panel, context: WizardContext)
