@@ -88,6 +88,23 @@ class NeoForgeVersionsProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+    }
+
+    override fun setupProperty() {
+        super.setupProperty()
+
+        mcVersionProperty.afterChange { mcVersion ->
+            if (mcVersion == previousMcVersion) {
+                return@afterChange
+            }
+
+            previousMcVersion = mcVersion
+            val availableNfVersions = nfVersion!!.getNeoForgeVersions(mcVersion)
+                .take(descriptor.limit ?: 50)
+            nfVersionsModel.removeAllElements()
+            nfVersionsModel.addAll(availableNfVersions)
+            nfVersionProperty.set(availableNfVersions.firstOrNull() ?: emptyVersion)
+        }
 
         application.executeOnPooledThread {
             runBlocking {
@@ -126,23 +143,6 @@ class NeoForgeVersionsProperty(
                     }
                 }
             }
-        }
-    }
-
-    override fun setupProperty() {
-        super.setupProperty()
-
-        mcVersionProperty.afterChange { mcVersion ->
-            if (mcVersion == previousMcVersion) {
-                return@afterChange
-            }
-
-            previousMcVersion = mcVersion
-            val availableNfVersions = nfVersion!!.getNeoForgeVersions(mcVersion)
-                .take(descriptor.limit ?: 50)
-            nfVersionsModel.removeAllElements()
-            nfVersionsModel.addAll(availableNfVersions)
-            nfVersionProperty.set(availableNfVersions.firstOrNull() ?: emptyVersion)
         }
     }
 

@@ -236,6 +236,10 @@ class CustomPlatformStep(
 
         properties[descriptor.name] = prop
 
+        if (descriptor.hidden == true) {
+            return null
+        }
+
         val factory = Consumer<Panel> { panel -> prop.buildUi(panel, context) }
         val order = descriptor.order ?: 0
         return factory to order
