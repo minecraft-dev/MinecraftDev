@@ -277,25 +277,30 @@ class CustomPlatformStep(
             val relativeDest = TemplateEvaluator.template(assets.templateProperties, file.destination).getOrNull()
                 ?: continue
 
-            val templateContents = template.loadTemplateContents(relativeTemplate)
-                ?: continue
+            try {
+                val templateContents = template.loadTemplateContents(relativeTemplate)
+                    ?: continue
 
-            val destPath = projectPath.resolve(relativeDest).toAbsolutePath()
-            if (!destPath.startsWith(projectPath)) {
-                // We want to make sure template files aren't 'escaping' the project directory
-                continue
+                val destPath = projectPath.resolve(relativeDest).toAbsolutePath()
+                if (!destPath.startsWith(projectPath)) {
+                    // We want to make sure template files aren't 'escaping' the project directory
+                    continue
+                }
+
+                val fileName = destPath.fileName.toString().removeSuffix(".ft")
+                val baseFileName = FileUtilRt.getNameWithoutExtension(fileName)
+                val extension = FileUtilRt.getExtension(fileName)
+                val fileTemplate = CustomFileTemplate(baseFileName, extension)
+                fileTemplate.text = templateContents
+                assets.addAssets(GeneratorTemplateFile(projectPath.relativize(destPath).toString(), fileTemplate))
+            } catch (e: Exception) {
+                thisLogger().error("Failed to process template file $file", e)
             }
-
-            val fileName = destPath.fileName.toString().removeSuffix(".ft")
-            val baseFileName = FileUtilRt.getNameWithoutExtension(fileName)
-            val extension = FileUtilRt.getExtension(fileName)
-            val fileTemplate = CustomFileTemplate(baseFileName, extension)
-            fileTemplate.text = templateContents
-            assets.addAssets(GeneratorTemplateFile(projectPath.relativize(destPath).toString(), fileTemplate))
         }
     }
 
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
+        into.putAll(TemplateEvaluator.baseProperties)
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
     }
 }

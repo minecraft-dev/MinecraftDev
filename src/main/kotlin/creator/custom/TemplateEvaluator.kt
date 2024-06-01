@@ -8,12 +8,12 @@ import org.apache.velocity.util.StringBuilderWriter
 
 object TemplateEvaluator {
 
-    fun evaluate(properties: Map<String, Any?>, template: String): Result<Pair<Boolean, String>> {
-        val baseProperties = mapOf(
-            "SemanticVersion" to SemanticVersion,
-            "MinecraftVersions" to MinecraftVersions
-        )
+    val baseProperties = mapOf(
+        "semver" to SemanticVersion.Companion,
+        "mcver" to MinecraftVersions
+    )
 
+    fun evaluate(properties: Map<String, Any?>, template: String): Result<Pair<Boolean, String>> {
         val context = VelocityContext(baseProperties + properties)
         val stringWriter = StringBuilderWriter()
         return runCatching {
