@@ -28,7 +28,7 @@ class LicenseProperty(
     override fun serialize(value: LicenseData): String = value.id
 
     override fun deserialize(string: String): LicenseData =
-        LicenseData(string, ZonedDateTime.now().year.toString())
+        LicenseData(string, License.byId(string)?.toString() ?: string, ZonedDateTime.now().year.toString())
 
     override fun buildUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.label) {
