@@ -1,0 +1,141 @@
+package com.demonwav.mcdev.creator.custom.types
+
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
+import com.demonwav.mcdev.creator.custom.TemplateEvaluator
+import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.model.ForgeVersions
+import com.demonwav.mcdev.platform.forge.version.ForgeVersion
+import com.demonwav.mcdev.util.SemanticVersion
+import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.openapi.observable.util.transform
+import com.intellij.ui.ComboboxSpeedSearch
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.util.application
+import javax.swing.DefaultComboBoxModel
+import kotlin.collections.Map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+
+class ForgeVersionsProperty(
+    descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
+    properties: Map<String, CreatorProperty<*>>
+) : CreatorProperty<ForgeVersions>(descriptor, graph, properties) {
+
+    private val emptyVersion = SemanticVersion.release()
+
+    private val defaultValue = createDefaultValue(descriptor.default)
+
+    override val graphProperty: GraphProperty<ForgeVersions> = graph.property(defaultValue)
+    var versions: ForgeVersions by graphProperty
+
+    private var forgeVersion: ForgeVersion? = null
+    private var previousMcVersion: SemanticVersion? = null
+
+    private val mcVersionProperty = graphProperty.transform({ it.minecraft }, { versions.copy(minecraft = it) })
+    private val mcVersionsModel = DefaultComboBoxModel<SemanticVersion>()
+    private val forgeVersionProperty = graphProperty.transform({ it.forge }, { versions.copy(forge = it) })
+    private val forgeVersionsModel = DefaultComboBoxModel<SemanticVersion>()
+
+    override fun createDefaultValue(raw: Any?): ForgeVersions {
+        if (raw is String) {
+            return deserialize(raw)
+        }
+
+        return ForgeVersions(emptyVersion, emptyVersion)
+    }
+
+    override fun serialize(value: ForgeVersions): String {
+        return "${value.minecraft} ${value.forge}"
+    }
+
+    override fun deserialize(string: String): ForgeVersions {
+        val versions = string.split(' ')
+            .take(2)
+            .map { SemanticVersion.tryParse(it) ?: emptyVersion }
+
+        return ForgeVersions(
+            versions.getOrNull(0) ?: emptyVersion,
+            versions.getOrNull(1) ?: emptyVersion,
+        )
+    }
+
+    override fun buildUi(panel: Panel, context: WizardContext) {
+        panel.row(descriptor.label) {
+            comboBox(mcVersionsModel)
+                .bindItem(mcVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
+                .also { ComboboxSpeedSearch.installOn(it.component) }
+
+            comboBox(forgeVersionsModel)
+                .bindItem(forgeVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
+                .also { ComboboxSpeedSearch.installOn(it.component) }
+        }.enabled(descriptor.editable != false)
+    }
+
+    override fun setupProperty() {
+        super.setupProperty()
+
+        mcVersionProperty.afterChange { mcVersion ->
+            if (mcVersion == previousMcVersion) {
+                return@afterChange
+            }
+
+            previousMcVersion = mcVersion
+            val availableForgeVersions = forgeVersion!!.getForgeVersions(mcVersion)
+                .take(descriptor.limit ?: 50)
+            forgeVersionsModel.removeAllElements()
+            forgeVersionsModel.addAll(availableForgeVersions)
+            forgeVersionProperty.set(availableForgeVersions.firstOrNull() ?: emptyVersion)
+        }
+
+        application.executeOnPooledThread {
+            runBlocking {
+                val forgeVersions = ForgeVersion.downloadData()
+                val mcVersions = forgeVersions?.sortedMcVersions?.let { mcVersion ->
+                    val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
+                    if (filterExpr != null) {
+                        mcVersion.filter { version ->
+                            val conditionProps = mapOf("MC_VERSION" to version)
+                            TemplateEvaluator.condition(conditionProps, filterExpr).getOrDefault(true)
+                        }
+                    } else {
+                        mcVersion
+                    }
+                }
+
+                if (forgeVersions != null && !mcVersions.isNullOrEmpty()) {
+                    withContext(Dispatchers.Swing) {
+                        forgeVersion = forgeVersions
+
+                        mcVersionsModel.removeAllElements()
+                        mcVersionsModel.addAll(mcVersions)
+
+                        val selectedMcVersion = when {
+                            mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
+                            defaultValue.minecraft in mcVersions -> defaultValue.minecraft
+                            else -> mcVersions.first()
+                        }
+                        mcVersionProperty.set(selectedMcVersion)
+                    }
+                }
+            }
+        }
+    }
+
+    class Factory : CreatorPropertyFactory {
+        override fun create(
+            graph: PropertyGraph,
+            descriptor: TemplatePropertyDescriptor,
+            properties: Map<String, CreatorProperty<*>>
+        ): CreatorProperty<*> = ForgeVersionsProperty(descriptor, graph, properties)
+    }
+}

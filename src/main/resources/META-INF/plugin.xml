@@ -133,12 +133,13 @@
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty$Factory" type="build_system_coordinates" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty$Factory" type="class_fqn" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.FabricVersionsProperty$Factory" type="fabric_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ForgeVersionsProperty$Factory" type="forge_versions" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.InlineStringListCreatorProperty$Factory" type="inline_string_list" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.IntegerCreatorProperty$Factory" type="integer" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty$Factory" type="jdk" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.LicenseProperty$Factory" type="license" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.MavenArtifactVersionProperty$Factory" type="maven_artifact_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.NeoForgeVersionsProperty$Factory" type="neoforge_versions" />
-        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.LicenseProperty$Factory" type="license" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ParchmentProperty$Factory" type="parchment" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
