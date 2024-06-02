@@ -72,6 +72,26 @@ val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSource
     archiveClassifier.set("gradle-tooling-extension")
 }
 
+val templatesSourceSet: SourceSet = sourceSets.create("templates") {
+    resources {
+        srcDir("templates")
+        compileClasspath += sourceSets.main.get().output
+    }
+}
+
+val templateSourceSets: List<SourceSet> = (file("templates").listFiles() ?: emptyArray()).mapNotNull { file ->
+    if (file.isDirectory() && (file.listFiles() ?: emptyArray()).any { it.name.endsWith(".mcdev.template.json") }) {
+        sourceSets.create("templates-${file.name}") {
+            resources {
+                srcDir(file)
+                compileClasspath += sourceSets.main.get().output
+            }
+        }
+    } else {
+        null
+    }
+}
+
 val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
     from("externalAnnotations")
     destinationDirectory.set(layout.buildDirectory.dir("externalAnnotations"))
@@ -381,7 +401,7 @@ tasks.withType<PrepareSandboxTask> {
     from(externalAnnotationsJar) {
         into("Minecraft Development/lib/resources")
     }
-    from("mcdev-templates") {
+    from("templates") {
         into("Minecraft Development/lib/resources/builtin-templates")
     }
 }
