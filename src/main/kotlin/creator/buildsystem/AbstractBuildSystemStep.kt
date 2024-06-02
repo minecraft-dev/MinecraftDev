@@ -37,7 +37,7 @@ abstract class AbstractBuildSystemStep(
     parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardMultiStep<AbstractBuildSystemStep, AbstractBuildSystemStep.Factory>(parent, EP_NAME) {
     companion object {
-        val PLATFORM_NAME_KEY = Key.create<String>("mcdev.platformName")
+        private val PLATFORM_NAME_KEY = Key.create<String>("mcdev.platformName")
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.buildSystemWizard")
     }
 
