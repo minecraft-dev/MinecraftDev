@@ -37,6 +37,8 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         var underlineType: UnderlineType = UnderlineType.DOTTED,
 
         var isShadowAnnotationsSameLine: Boolean = true,
+
+        var autoUpdateBuiltinTemplate: Boolean = true,
     )
 
     private var state = State()
@@ -84,6 +86,12 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
         get() = state.isShadowAnnotationsSameLine
         set(shadowAnnotationsSameLine) {
             state.isShadowAnnotationsSameLine = shadowAnnotationsSameLine
+        }
+
+    var isAutoUpdateBuiltinTemplate: Boolean
+        get() = state.autoUpdateBuiltinTemplate
+        set(autoUpdateBuiltinTemplate) {
+            state.autoUpdateBuiltinTemplate = autoUpdateBuiltinTemplate
         }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {

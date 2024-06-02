@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
 import java.util.function.Consumer
@@ -21,6 +22,8 @@ interface TemplateProvider {
     fun getLabel(): String
 
     fun getTooltip(): String? = null
+
+    fun init(indicator: ProgressIndicator) = Unit
 
     fun setupUi(
         context: WizardContext,

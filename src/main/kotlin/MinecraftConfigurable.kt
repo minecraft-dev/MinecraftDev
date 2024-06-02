@@ -91,6 +91,14 @@ class MinecraftConfigurable : Configurable {
             }
         }
 
+        group(MCDevBundle("minecraft.settings.creator")) {
+            row {
+                checkBox(MCDevBundle("minecraft.settings.creator.auto_update_builtin_templates"))
+                    .comment(MCDevBundle("minecraft.settings.creator.auto_update_builtin_templates.comment"))
+                    .bindSelected(settings::isAutoUpdateBuiltinTemplate)
+            }
+        }
+
         onApply {
             for (project in ProjectManager.getInstance().openProjects) {
                 ProjectView.getInstance(project).refresh()

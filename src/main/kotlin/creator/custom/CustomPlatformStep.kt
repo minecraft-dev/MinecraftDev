@@ -128,7 +128,37 @@ class CustomPlatformStep(
             templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
         }.topGap(TopGap.SMALL)
 
+        initTemplates(null)
+
         templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
+    }
+
+    private fun initTemplates(
+        taskParentComponent: JComponent?
+    ) {
+        selectedTemplate = EmptyLoadedTemplate
+
+        val task = object : Task.Modal(
+            context.project,
+            taskParentComponent,
+            MCDevBundle("creator.step.generic.init_template_providers.message"),
+            false
+        ) {
+
+            override fun run(indicator: ProgressIndicator) {
+                if (project?.isDisposed == true) {
+                    return
+                }
+
+                for (provider in templateProviders) {
+                    indicator.text = provider.getLabel()
+                    runCatching { provider.init(indicator) }
+                        .getOrLogException(logger<CustomPlatformStep>())
+                }
+            }
+        }
+
+        ProgressManager.getInstance().run(task)
     }
 
     private fun loadTemplatesInBackground(
@@ -140,7 +170,7 @@ class CustomPlatformStep(
         val task = object : Task.WithResult<Collection<LoadedTemplate>, Exception>(
             context.project,
             taskParentComponent,
-            MCDevBundle("creator.step.generic.project_created.message"),
+            MCDevBundle("creator.step.generic.init_template_providers.message"),
             false
         ) {
 
