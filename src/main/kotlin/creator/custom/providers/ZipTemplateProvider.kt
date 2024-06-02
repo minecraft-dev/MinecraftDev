@@ -1,7 +1,6 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.intellij.ide.highlighter.ArchiveFileType
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -49,9 +48,11 @@ class ZipTemplateProvider : TemplateProvider {
                 ).align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(pathProperty)
-                    .textValidation(validationErrorIf(MCDevBundle("creator.validation.custom.path_not_a_file")) { value ->
-                        runCatching { !Path.of(value).isRegularFile() }.getOrDefault(true)
-                    })
+                    .textValidation(
+                        validationErrorIf(MCDevBundle("creator.validation.custom.path_not_a_file")) { value ->
+                            runCatching { !Path.of(value).isRegularFile() }.getOrDefault(true)
+                        }
+                    )
             }
         }
     }

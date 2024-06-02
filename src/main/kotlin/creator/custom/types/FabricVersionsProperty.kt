@@ -91,7 +91,8 @@ class FabricVersionsProperty(
     }
 
     override fun serialize(value: FabricVersionsModel): String {
-        return "${value.minecraftVersion} ${value.loom} ${value.loader} ${value.yarn} ${value.useFabricApi} ${value.fabricApi} ${value.useOfficialMappings}"
+        return "${value.minecraftVersion} ${value.loom} ${value.loader} ${value.yarn}" +
+            " ${value.useFabricApi} ${value.fabricApi} ${value.useOfficialMappings}"
     }
 
     override fun deserialize(string: String): FabricVersionsModel {
@@ -193,7 +194,9 @@ class FabricVersionsProperty(
         application.executeOnPooledThread {
             runBlocking {
                 val fabricVersionsJob = asyncIO { FabricVersions.downloadData() }
-                val loomVersionsJob = asyncIO { collectMavenVersions("https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml") }
+                val loomVersionsJob = asyncIO {
+                    collectMavenVersions("https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml")
+                }
                 val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
 
                 this@FabricVersionsProperty.fabricVersions = fabricVersionsJob.await()

@@ -13,8 +13,9 @@ interface CreatorPropertyFactory {
 
     companion object {
 
-        private val EP_NAME =
-            ExtensionPointName<KeyedLazyInstance<CreatorPropertyFactory>>("com.demonwav.minecraft-dev.creatorPropertyType")
+        private val EP_NAME = ExtensionPointName<KeyedLazyInstance<CreatorPropertyFactory>>(
+            "com.demonwav.minecraft-dev.creatorPropertyType"
+        )
 
         private val COLLECTOR = KeyedExtensionCollector<CreatorPropertyFactory, String>(EP_NAME)
 
@@ -35,8 +36,8 @@ interface CreatorPropertyFactory {
     ): CreatorProperty<*>
 }
 
-class CreatorPropertyFactoryBean : BaseKeyedLazyInstance<CreatorPropertyFactory>(),
-    KeyedLazyInstance<CreatorPropertyFactory> {
+class CreatorPropertyFactoryBean :
+    BaseKeyedLazyInstance<CreatorPropertyFactory>(), KeyedLazyInstance<CreatorPropertyFactory> {
 
     @Attribute("type")
     @RequiredElement

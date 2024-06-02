@@ -34,7 +34,10 @@ class JdkCreatorProperty(
             val minVersionPropName = descriptor.default as? String
             if (minVersionPropName != null) {
                 val minVersionProperty = properties[minVersionPropName]
-                    ?: throw RuntimeException("Could not find property $minVersionPropName referenced by default value of property ${descriptor.name}")
+                    ?: throw RuntimeException(
+                        "Could not find property $minVersionPropName referenced" +
+                            " by default value of property ${descriptor.name}"
+                    )
 
                 jdkComboBox.setPreferredJdk(JavaSdkVersion.entries[minVersionProperty.graphProperty.get() as Int])
                 minVersionProperty.graphProperty.afterPropagation {

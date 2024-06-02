@@ -98,7 +98,9 @@ interface TemplateProvider {
                     val mergedFiles = parentDescriptor.files + descriptor.files
                     descriptor = descriptor.copy(properties = mergedProperties, files = mergedFiles)
                 } else {
-                    thisLogger().error("Could not find inherited template descriptor ${descriptor.inherit} from ${descriptorFile.path}")
+                    thisLogger().error(
+                        "Could not find inherited template descriptor ${descriptor.inherit} from ${descriptorFile.path}"
+                    )
                 }
             }
 

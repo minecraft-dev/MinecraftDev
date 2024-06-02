@@ -56,7 +56,8 @@ class ParchmentProperty(
     }
 
     override fun serialize(value: ParchmentVersions): String {
-        return "${value.use} ${value.version} ${value.minecraftVersion} ${value.includeOlderMcVersions} ${value.includeSnapshots}"
+        return "${value.use} ${value.version} ${value.minecraftVersion}" +
+            " ${value.includeOlderMcVersions} ${value.includeSnapshots}"
     }
 
     override fun deserialize(string: String): ParchmentVersions {

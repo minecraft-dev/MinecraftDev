@@ -50,12 +50,14 @@ class LocalTemplateProvider : TemplateProvider {
                 ).align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(pathProperty)
-                    .textValidation(validationErrorIf(MCDevBundle("creator.validation.custom.path_not_a_directory")) { value ->
-                        val file = kotlin.runCatching {
-                            VirtualFileManager.getInstance().findFileByNioPath(Path.of(value))
-                        }.getOrNull()
-                        file == null || !file.isDirectory
-                    })
+                    .textValidation(
+                        validationErrorIf(MCDevBundle("creator.validation.custom.path_not_a_directory")) { value ->
+                            val file = kotlin.runCatching {
+                                VirtualFileManager.getInstance().findFileByNioPath(Path.of(value))
+                            }.getOrNull()
+                            file == null || !file.isDirectory
+                        }
+                    )
             }
         }
     }

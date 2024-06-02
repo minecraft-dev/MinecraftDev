@@ -84,25 +84,24 @@ class BuildSystemCoordinatesCreatorProperty(
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.groupIdProperty)
                     .columns(COLUMNS_MEDIUM)
-                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-                   .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                    .textValidation(CHECK_NON_EMPTY, CHECK_GROUP_ID, nonExampleValidation)
             }
             this.row(MCDevBundle("creator.ui.group.artifact_id")) {
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.artifactIdProperty)
                     .columns(COLUMNS_MEDIUM)
-                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-                   .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                    .textValidation(CHECK_NON_EMPTY, CHECK_ARTIFACT_ID)
             }
             this.row(MCDevBundle("creator.ui.group.version")) {
                 this.textField()
                     .bindText(this@BuildSystemCoordinatesCreatorProperty.versionProperty)
                     .columns(COLUMNS_MEDIUM)
-                   .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
-                   .textValidation(BuiltinValidations.validVersion)
+                    .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
+                    .textValidation(BuiltinValidations.validVersion)
             }
         }.expanded = true
-
     }
 
     class Factory : CreatorPropertyFactory {

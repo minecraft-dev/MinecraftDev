@@ -38,7 +38,6 @@ object BuiltinValidations {
         it.isBlank() || it.split('.').any { part -> !StringUtil.isJavaIdentifier(part) }
     }
 
-
     fun byRegex(regex: Regex): DialogValidation.WithParameter<() -> String> =
         validationErrorIf<String>("Must match regex $regex") { !it.matches(regex) }
 }

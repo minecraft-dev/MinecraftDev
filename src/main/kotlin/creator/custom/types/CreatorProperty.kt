@@ -85,7 +85,9 @@ abstract class CreatorProperty<T>(
                 ?: throw RuntimeException("No parents specified in derivation of property '${descriptor.name}'")
             for (parent in parents) {
                 if (!properties.containsKey(parent)) {
-                    throw RuntimeException("Unknown parent property '${parent}' in derivation of property '${descriptor.name}'")
+                    throw RuntimeException(
+                        "Unknown parent property '$parent' in derivation of property '${descriptor.name}'"
+                    )
                 }
             }
 
@@ -104,7 +106,9 @@ abstract class CreatorProperty<T>(
 
         if (descriptor.inheritFrom != null) {
             val parentProperty = properties[descriptor.inheritFrom]
-                ?: throw RuntimeException("Unknown parent property '${descriptor.inheritFrom}' in derivation of property '${descriptor.name}'")
+                ?: throw RuntimeException(
+                    "Unknown parent property '${descriptor.inheritFrom}' in derivation of property '${descriptor.name}'"
+                )
 
             @Suppress("UNCHECKED_CAST")
             graphProperty.set(parentProperty.graphProperty.get() as T)

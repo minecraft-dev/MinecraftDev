@@ -3,7 +3,6 @@ package com.demonwav.mcdev.creator.custom.types
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
-import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
 import com.demonwav.mcdev.platform.sponge.util.SpongeVersions
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion

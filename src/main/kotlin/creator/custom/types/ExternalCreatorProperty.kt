@@ -15,11 +15,14 @@ class ExternalCreatorProperty<T>(
 
     override fun setupProperty() = Unit
 
-    override fun createDefaultValue(raw: Any?): T = throw UnsupportedOperationException("Unsupported for external properties")
+    override fun createDefaultValue(raw: Any?): T =
+        throw UnsupportedOperationException("Unsupported for external properties")
 
-    override fun serialize(value: T): String = throw UnsupportedOperationException("Unsupported for external properties")
+    override fun serialize(value: T): String =
+        throw UnsupportedOperationException("Unsupported for external properties")
 
-    override fun deserialize(string: String): T = throw UnsupportedOperationException("Unsupported for external properties")
+    override fun deserialize(string: String): T =
+        throw UnsupportedOperationException("Unsupported for external properties")
 
     override fun buildUi(panel: Panel, context: WizardContext) = Unit
 }

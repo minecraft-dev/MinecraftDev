@@ -1,6 +1,5 @@
 package com.demonwav.mcdev.creator.custom.model
 
-import com.demonwav.mcdev.platform.fabric.creator.FabricMcVersion
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
 import com.demonwav.mcdev.util.SemanticVersion
 
