@@ -5,8 +5,10 @@ import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.virtualFile
 import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.map
 import com.github.kittinunf.result.onError
+import com.github.kittinunf.result.success
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -41,22 +43,23 @@ class BuiltInTemplateProvider : TemplateProvider {
                 .timeout(10000)
                 .response()
 
-            result.onError {
+            val data = result.onError {
                 thisLogger().warn("Could not fetch builtin templates update", it)
-            }.map { data ->
-                try {
-                    val builtinTemplatesZipPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates.zip")
-                    builtinTemplatesZipPath.writeBytes(data)
-                    FileUtil.deleteRecursively(builtinTemplatesPath)
-                    ZipUtil.extract(builtinTemplatesZipPath, builtinTemplatesPath, null)
-                    for (child in builtinTemplatesPath.resolve("mcdev-templates-main").listDirectoryEntries()) {
-                        child.moveTo(builtinTemplatesPath.resolve(child.fileName))
-                    }
-                    updatedBuiltinTemplates = true
-                    thisLogger().info("Builtin template update applied successfully")
-                } catch (e: Exception) {
-                    thisLogger().error("Failed to apply builtin templates update", e)
+            }.getOrNull() ?: return
+
+            try {
+                val builtinTemplatesZipPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates.zip")
+                builtinTemplatesZipPath.writeBytes(data)
+                FileUtil.deleteRecursively(builtinTemplatesPath)
+                ZipUtil.extract(builtinTemplatesZipPath, builtinTemplatesPath, null)
+                for (child in builtinTemplatesPath.resolve("mcdev-templates-main").listDirectoryEntries()) {
+                    child.moveTo(builtinTemplatesPath.resolve(child.fileName))
                 }
+
+                updatedBuiltinTemplates = true
+                thisLogger().info("Builtin template update applied successfully")
+            } catch (e: Exception) {
+                thisLogger().error("Failed to apply builtin templates update", e)
             }
         }
     }
