@@ -153,6 +153,7 @@
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
 
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.RunGradleTasksFinalizer" type="run_gradle_tasks" />
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.GitAddAllFinalizer" type="git_add_all" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />

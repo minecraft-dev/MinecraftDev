@@ -32,6 +32,7 @@ import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
 import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
 import com.intellij.ide.fileTemplates.impl.CustomFileTemplate
 import com.intellij.ide.starters.local.GeneratorTemplateFile
+import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.getOrLogException
@@ -337,6 +338,10 @@ class CustomPlatformStep(
 
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
         into.putAll(TemplateEvaluator.baseProperties)
+
+        val gitData = data.getUserData(GitNewProjectWizardData.KEY)
+        into["USE_GIT"] = gitData?.git == true
+
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
     }
 
