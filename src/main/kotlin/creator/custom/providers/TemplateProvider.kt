@@ -111,7 +111,7 @@ interface TemplateProvider {
                 ?: root.presentableName
 
             if (descriptor.inherit != null) {
-                val parent = root.findFileByRelativePath(descriptor.inherit)
+                val parent = root.findFileByRelativePath(descriptor.inherit!!)
                 if (parent != null) {
                     parent.refresh(false, false)
                     val parentDescriptor = Gson().fromJson<TemplateDescriptor>(parent.readText())
