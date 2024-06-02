@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizer
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider
@@ -36,6 +37,10 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskId
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskNotificationListenerAdapter
+import com.intellij.openapi.externalSystem.model.task.ExternalSystemTaskType
+import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
 import com.intellij.openapi.observable.util.or
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.progress.ProgressIndicator
@@ -49,6 +54,7 @@ import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.SegmentedButton
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.util.application
 import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
@@ -332,5 +338,28 @@ class CustomPlatformStep(
     private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
         into.putAll(TemplateEvaluator.baseProperties)
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
+    }
+
+    override fun perform(project: Project) {
+        super.perform(project)
+
+        val finalizers = selectedTemplate.descriptor.finalizers
+        if (finalizers.isNullOrEmpty()) {
+            return
+        }
+
+        val projectId = ExternalSystemTaskId.getProjectId(project)
+        val listener = object : ExternalSystemTaskNotificationListenerAdapter() {
+            override fun onSuccess(id: ExternalSystemTaskId) {
+                if (id.type == ExternalSystemTaskType.RESOLVE_PROJECT && projectId == id.ideProjectId) {
+                    application.executeOnPooledThread {
+                        // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
+                        CreatorFinalizer.executeAll(project, finalizers, assets.templateProperties)
+                    }
+                    ExternalSystemProgressNotificationManager.getInstance().removeNotificationListener(this)
+                }
+            }
+        }
+        ExternalSystemProgressNotificationManager.getInstance().addNotificationListener(listener)
     }
 }

@@ -78,6 +78,9 @@
             <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory"/>
         </extensionPoint>
         <extensionPoint name="creatorTemplateProvider" interface="com.demonwav.mcdev.creator.custom.providers.TemplateProvider" dynamic="true"/>
+        <extensionPoint name="creatorFinalizer" beanClass="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizerBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizer"/>
+        </extensionPoint>
 
         <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" dynamic="true" />
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
@@ -148,6 +151,8 @@
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.BuiltInTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
+
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.RunGradleTasksFinalizer" type="run_gradle_tasks" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
