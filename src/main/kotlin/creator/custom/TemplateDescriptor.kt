@@ -25,8 +25,8 @@ data class TemplateDescriptor(
     val label: String? = null,
     val inherit: String? = null,
     val hidden: Boolean? = null,
-    val properties: List<TemplatePropertyDescriptor>,
-    val files: List<TemplateFile>,
+    val properties: List<TemplatePropertyDescriptor>? = null,
+    val files: List<TemplateFile>? = null,
 )
 
 data class TemplatePropertyDescriptor(

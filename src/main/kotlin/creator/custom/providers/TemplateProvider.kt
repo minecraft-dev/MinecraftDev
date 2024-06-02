@@ -98,6 +98,7 @@ interface TemplateProvider {
 
             var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
             if (descriptor.version != 1) {
+                thisLogger().warn("Cannot handle template ${descriptorFile.path} of version ${descriptor.version}")
                 return null
             }
 
@@ -110,12 +111,12 @@ interface TemplateProvider {
                 ?: root.presentableName
 
             if (descriptor.inherit != null) {
-                val parent = root.findFileByRelativePath(descriptor.inherit!!)
+                val parent = root.findFileByRelativePath(descriptor.inherit)
                 if (parent != null) {
                     parent.refresh(false, false)
                     val parentDescriptor = Gson().fromJson<TemplateDescriptor>(parent.readText())
-                    val mergedProperties = parentDescriptor.properties + descriptor.properties
-                    val mergedFiles = parentDescriptor.files + descriptor.files
+                    val mergedProperties = parentDescriptor.properties.orEmpty() + descriptor.properties.orEmpty()
+                    val mergedFiles = parentDescriptor.files.orEmpty() + descriptor.files.orEmpty()
                     descriptor = descriptor.copy(properties = mergedProperties, files = mergedFiles)
                 } else {
                     thisLogger().error(

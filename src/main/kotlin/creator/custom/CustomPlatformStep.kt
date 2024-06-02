@@ -212,7 +212,7 @@ class CustomPlatformStep(
 
     private fun setupTemplate(template: LoadedTemplate): List<Consumer<Panel>> {
         return try {
-            template.descriptor.properties
+            template.descriptor.properties.orEmpty()
                 .mapNotNull { setupProperty(it) }
                 .sortedBy { (_, order) -> order }
                 .map { it.first }
@@ -295,7 +295,7 @@ class CustomPlatformStep(
             ?: return thisLogger().error("Could not find wizard base data")
         val projectPath = Path.of(baseData.path)
 
-        for (file in descriptor.files) {
+        for (file in descriptor.files.orEmpty()) {
             if (file.condition != null &&
                 !TemplateEvaluator.condition(assets.templateProperties, file.condition).getOrElse { false }
             ) {
