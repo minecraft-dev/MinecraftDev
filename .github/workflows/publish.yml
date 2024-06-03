@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Fetch latest submodule updates
+        run: git submodule update --remote
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
