@@ -70,7 +70,7 @@ class BuiltInTemplateProvider : TemplateProvider {
                 zipPath.writeBytes(data)
                 FileUtil.deleteRecursively(builtinTemplatesPath)
                 ZipUtil.extract(zipPath, builtinTemplatesPath, null)
-                for (child in builtinTemplatesPath.resolve("mcdev-templates-main").listDirectoryEntries()) {
+                for (child in builtinTemplatesPath.resolve("templates-main").listDirectoryEntries()) {
                     child.moveTo(builtinTemplatesPath.resolve(child.fileName))
                 }
 
