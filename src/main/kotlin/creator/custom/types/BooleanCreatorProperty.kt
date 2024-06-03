@@ -21,8 +21,10 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.intellij.icons.AllIcons
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.ui.content.AlertIcon
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindSelected
 
@@ -40,6 +42,10 @@ class BooleanCreatorProperty(
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.label) {
+            if (descriptor.warning != null) {
+                icon(AlertIcon(AllIcons.General.Warning)).comment(descriptor.warning)
+            }
+
             this.checkBox(descriptor.label.removeSuffix(":"))
                 .bindSelected(graphProperty)
                 .enabled(descriptor.editable != false)

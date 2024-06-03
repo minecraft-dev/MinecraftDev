@@ -44,6 +44,7 @@ data class TemplatePropertyDescriptor(
     val hidden: Boolean? = null,
     val editable: Boolean? = null,
     val collapsible: Boolean? = null,
+    val warning: String? = null,
     val default: Any,
     val nullIfDefault: Boolean? = null,
     val derives: PropertyDerivation? = null,
