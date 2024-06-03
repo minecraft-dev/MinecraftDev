@@ -30,13 +30,11 @@ import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
-import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
-import com.intellij.openapi.observable.util.and
 import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
@@ -46,7 +44,6 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
-import javax.swing.JComboBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
@@ -89,11 +86,11 @@ class ArchitecturyVersionsProperty(
 
     val forgeVersionProperty = graphProperty.transform({ it.forge }, { model.copy(forge = it) })
     val forgeVersionsModel = DefaultComboBoxModel<SemanticVersion>()
-    val isForgeAvailableProperty = forgeVersionProperty.transform { !it?.parts.isNullOrEmpty() } // graph.property(false)
+    val isForgeAvailableProperty = forgeVersionProperty.transform { !it?.parts.isNullOrEmpty() }
 
     val nfVersionProperty = graphProperty.transform({ it.neoforge }, { model.copy(neoforge = it) })
     val nfVersionsModel = DefaultComboBoxModel<SemanticVersion>()
-    val isNfAvailableProperty = nfVersionProperty.transform { !it?.parts.isNullOrEmpty() } // graph.property(false)
+    val isNfAvailableProperty = nfVersionProperty.transform { !it?.parts.isNullOrEmpty() }
 
     val loomVersionProperty = graphProperty.transform({ it.loom }, { model.copy(loom = it) })
     val loomVersionModel = DefaultComboBoxModel<SemanticVersion>()
@@ -282,7 +279,9 @@ class ArchitecturyVersionsProperty(
                 val neoForgeVersionsJob = asyncIO { NeoForgeVersion.downloadData() }
                 val fabricVersionsJob = asyncIO { FabricVersions.downloadData() }
                 val loomVersionsJob = asyncIO {
-                    collectMavenVersions("https://maven.architectury.dev/dev/architectury/architectury-loom//maven-metadata.xml")
+                    collectMavenVersions(
+                        "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
+                    )
                 }
                 val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
                 val architecturyVersionsJob = asyncIO { ArchitecturyVersion.downloadData() }
