@@ -51,7 +51,7 @@ class BuiltInTemplateProvider : TemplateProvider {
             indicator.text2 = "Updating builtin templates"
 
             val manager = FuelManager()
-            val url = "https://github.com/RedNesto/mcdev-templates/archive/refs/heads/main.zip"
+            val url = "https://github.com/minecraft-dev/templates/archive/refs/heads/main.zip"
 
             manager.proxy = selectProxy(url)
 
