@@ -132,6 +132,7 @@
 
         <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type" />
         
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ArchitecturyVersionsProperty$Factory" type="architectury_versions" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BooleanCreatorProperty$Factory" type="boolean" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty$Factory" type="build_system_coordinates" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty$Factory" type="class_fqn" />

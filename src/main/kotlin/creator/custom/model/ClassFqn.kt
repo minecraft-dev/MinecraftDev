@@ -45,5 +45,7 @@ data class ClassFqn(val fqn: String) {
 
     fun withClassName(className: String) = copy("$packageName.$className")
 
+    fun withSubPackage(name: String) = copy("$packageName.$name.$className")
+
     override fun toString(): String = fqn
 }
