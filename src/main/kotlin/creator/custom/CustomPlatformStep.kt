@@ -353,18 +353,9 @@ class CustomPlatformStep(
             return
         }
 
-        val projectId = ExternalSystemTaskId.getProjectId(project)
-        val listener = object : ExternalSystemTaskNotificationListenerAdapter() {
-            override fun onSuccess(id: ExternalSystemTaskId) {
-                if (id.type == ExternalSystemTaskType.RESOLVE_PROJECT && projectId == id.ideProjectId) {
-                    application.executeOnPooledThread {
-                        // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
-                        CreatorFinalizer.executeAll(project, finalizers, assets.templateProperties)
-                    }
-                    ExternalSystemProgressNotificationManager.getInstance().removeNotificationListener(this)
-                }
-            }
+        application.executeOnPooledThread {
+            // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
+            CreatorFinalizer.executeAll(project, finalizers, assets.templateProperties)
         }
-        ExternalSystemProgressNotificationManager.getInstance().addNotificationListener(listener)
     }
 }

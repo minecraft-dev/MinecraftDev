@@ -20,25 +20,23 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
-import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
+import kotlin.io.path.absolutePathString
+import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
+import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 
-class RunGradleTasksFinalizer : CreatorFinalizer {
+class ImportGradleProjectFinalizer : CreatorFinalizer {
 
     override fun execute(project: Project, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
-        @Suppress("UNCHECKED_CAST")
-        val tasks = properties["tasks"] as? List<String>
+        val projectDir = project.guessProjectDir()?.toNioPath()?.absolutePathString()
             ?: return
-        val projectDir = project.guessProjectDir()?.toNioPath()
-            ?: return
-
-        thisLogger().info("tasks = $tasks projectDir = $projectDir")
-        runGradleTaskAndWait(project, projectDir) { settings ->
-            settings.taskNames = tasks
+        val canLink = canLinkAndRefreshGradleProject(projectDir, project, showValidationDialog = false)
+        thisLogger().info("canLink = $canLink projectDir = $projectDir")
+        if (canLink) {
+            linkAndRefreshGradleProject(projectDir, project)
+            thisLogger().info("Linking done")
         }
-
-        thisLogger().info("Done running tasks")
     }
 }

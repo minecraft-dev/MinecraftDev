@@ -153,6 +153,8 @@
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
         <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
 
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportGradleProjectFinalizer" type="import_gradle_project" />
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportMavenProjectFinalizer" type="import_maven_project" />
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.RunGradleTasksFinalizer" type="run_gradle_tasks" />
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.GitAddAllFinalizer" type="git_add_all" />
 
