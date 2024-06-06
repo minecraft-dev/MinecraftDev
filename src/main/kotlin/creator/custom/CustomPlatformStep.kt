@@ -29,6 +29,10 @@ import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
+import com.demonwav.mcdev.util.toTypedArray
+import com.demonwav.mcdev.util.virtualFileOrError
+import com.intellij.codeInsight.actions.ReformatCodeProcessor
+import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
@@ -37,12 +41,21 @@ import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.module.ModuleTypeId
 import com.intellij.openapi.observable.util.or
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.startup.StartupManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.refreshAndFindVirtualFile
+import com.intellij.psi.PsiManager
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
@@ -50,6 +63,7 @@ import com.intellij.ui.dsl.builder.SegmentedButton
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.application
+import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.collections.component1
@@ -292,6 +306,7 @@ class CustomPlatformStep(
         val templateProperties = collectTemplateProperties()
         thisLogger().debug("Template properties: $templateProperties")
 
+        val generatedFiles = mutableListOf<Pair<TemplateFile, VirtualFile>>()
         for (file in template.descriptor.files.orEmpty()) {
             if (file.condition != null &&
                 !TemplateEvaluator.condition(templateProperties, file.condition).getOrElse { false }
@@ -320,6 +335,13 @@ class CustomPlatformStep(
 
                 destPath.parent.createDirectories()
                 destPath.writeText(processedContent)
+
+                val virtualFile = destPath.refreshAndFindVirtualFile()
+                if (virtualFile != null) {
+                    generatedFiles.add(file to virtualFile)
+                } else {
+                    thisLogger().warn("Could not find VirtualFile for file generated at $destPath (descriptor: $file)")
+                }
             } catch (t: Throwable) {
                 if (t is ControlFlowException) {
                     throw t
@@ -329,13 +351,31 @@ class CustomPlatformStep(
             }
         }
 
-        val finalizers = selectedTemplate.descriptor.finalizers
-        if (!finalizers.isNullOrEmpty()) {
-            application.executeOnPooledThread {
-                // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
+        application.executeOnPooledThread {
+            application.invokeLater({
+                application.runWriteAction {
+                    LocalFileSystem.getInstance().refresh(false)
+                    // Apparently a module root is required for the reformat to work
+                    setupTempRootModule(project, projectPath)
+                }
+                reformatFiles(project, generatedFiles)
+                openFilesInEditor(project, generatedFiles)
+            }, project.disposed)
+
+            val finalizers = selectedTemplate.descriptor.finalizers
+            if (!finalizers.isNullOrEmpty()) {
                 CreatorFinalizer.executeAll(project, finalizers, templateProperties)
             }
         }
+    }
+
+    private fun setupTempRootModule(project: Project, projectPath: Path) {
+        val modifiableModel = ModuleManager.getInstance(project).getModifiableModel()
+        val module = modifiableModel.newNonPersistentModule("mcdev-temp-root", ModuleTypeId.JAVA_MODULE)
+        val rootsModel = ModuleRootManager.getInstance(module).modifiableModel
+        rootsModel.addContentEntry(projectPath.virtualFileOrError)
+        rootsModel.commit()
+        modifiableModel.commit()
     }
 
     private fun collectTemplateProperties(): MutableMap<String, Any?> {
@@ -347,5 +387,30 @@ class CustomPlatformStep(
         into["USE_GIT"] = gitData?.git == true
 
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
+    }
+
+    private fun reformatFiles(
+        project: Project,
+        files: MutableList<Pair<TemplateFile, VirtualFile>>
+    ) {
+        val psiManager = PsiManager.getInstance(project)
+        val psiFiles = files.asSequence()
+            .filter { (desc, _) -> desc.reformat != false }
+            .mapNotNull { (_, file) -> psiManager.findFile(file) }
+        ReformatCodeProcessor(project, psiFiles.toTypedArray(), null, false).run()
+    }
+
+    private fun openFilesInEditor(
+        project: Project,
+        files: MutableList<Pair<TemplateFile, VirtualFile>>
+    ) {
+        val fileEditorManager = FileEditorManager.getInstance(project)
+        val projectView = ProjectView.getInstance(project)
+        for ((desc, file) in files) {
+            if (desc.openInEditor == true) {
+                fileEditorManager.openFile(file, true)
+                projectView.select(null, file, false)
+            }
+        }
     }
 }

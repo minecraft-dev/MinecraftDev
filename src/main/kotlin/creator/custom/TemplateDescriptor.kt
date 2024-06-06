@@ -71,5 +71,6 @@ data class TemplateFile(
     val template: String,
     val destination: String,
     val condition: String? = null,
-    var contents: String = "",
+    val reformat: Boolean? = null,
+    val openInEditor: Boolean? = null,
 )
