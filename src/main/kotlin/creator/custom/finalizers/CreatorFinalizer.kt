@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom.finalizers
 
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
+import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
@@ -62,8 +63,11 @@ interface CreatorFinalizer {
 
                 try {
                     finalizer.execute(project, properties, templateProperties)
-                } catch (e: Exception) {
-                    thisLogger().error("Unhandled exception in finalizer $type", e)
+                } catch (t: Throwable) {
+                    if (t is ControlFlowException) {
+                        throw t
+                    }
+                    thisLogger().error("Unhandled exception in finalizer $type", t)
                 }
             }
         }

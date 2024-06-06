@@ -24,6 +24,7 @@ import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -80,9 +81,12 @@ class StringCreatorProperty(
                     val regex = regexString.toRegex()
                     textField.textValidation(BuiltinValidations.byRegex(regex))
                 }
-            } catch (e: Exception) {
+            } catch (t: Throwable) {
+                if (t is ControlFlowException) {
+                    throw t
+                }
                 logger<StringCreatorProperty>()
-                    .error("Failed to create validator for property ${descriptor.name}", e)
+                    .error("Failed to create validator for property ${descriptor.name}", t)
             }
         }.visible(descriptor.hidden != true)
     }

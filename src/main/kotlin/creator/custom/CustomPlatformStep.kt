@@ -29,12 +29,11 @@ import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
-import com.demonwav.mcdev.creator.step.AbstractLongRunningAssetsStep
-import com.intellij.ide.fileTemplates.impl.CustomFileTemplate
-import com.intellij.ide.starters.local.GeneratorTemplateFile
+import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
@@ -44,7 +43,6 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.io.FileUtilRt
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
@@ -52,21 +50,20 @@ import com.intellij.ui.dsl.builder.SegmentedButton
 import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.application
-import java.nio.file.Path
 import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 /**
  * The step to select a custom template repo.
  */
 class CustomPlatformStep(
     parent: NewProjectWizardStep,
-) : AbstractLongRunningAssetsStep(parent) {
-
-    override val description: String = MCDevBundle("creator.ui.custom.step.description")
+) : AbstractNewProjectWizardStep(parent) {
 
     val templateProviders = TemplateProvider.getAll()
 
@@ -219,8 +216,11 @@ class CustomPlatformStep(
                 .mapNotNull { setupProperty(it) }
                 .sortedBy { (_, order) -> order }
                 .map { it.first }
-        } catch (e: Throwable) {
-            thisLogger().error(e)
+        } catch (t: Throwable) {
+            if (t is ControlFlowException) {
+                throw t
+            }
+            thisLogger().error(t)
             emptyList()
         }
     }
@@ -278,7 +278,7 @@ class CustomPlatformStep(
         return factory to order
     }
 
-    override fun setupAssets(project: Project) {
+    override fun setupProject(project: Project) {
         val template = selectedTemplate
         if (template is EmptyLoadedTemplate) {
             return
@@ -288,26 +288,20 @@ class CustomPlatformStep(
             RecentProjectTemplates.instance.addNewTemplate(templateProvider.javaClass.name, template)
         }
 
-        val descriptor = template.descriptor
+        val projectPath = context.projectDirectory
+        val templateProperties = collectTemplateProperties()
+        thisLogger().debug("Template properties: $templateProperties")
 
-        collectTemplateProperties(assets.templateProperties)
-
-        thisLogger().debug("Template properties: ${assets.templateProperties}")
-
-        val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
-            ?: return thisLogger().error("Could not find wizard base data")
-        val projectPath = Path.of(baseData.path)
-
-        for (file in descriptor.files.orEmpty()) {
+        for (file in template.descriptor.files.orEmpty()) {
             if (file.condition != null &&
-                !TemplateEvaluator.condition(assets.templateProperties, file.condition).getOrElse { false }
+                !TemplateEvaluator.condition(templateProperties, file.condition).getOrElse { false }
             ) {
                 continue
             }
 
-            val relativeTemplate = TemplateEvaluator.template(assets.templateProperties, file.template).getOrNull()
+            val relativeTemplate = TemplateEvaluator.template(templateProperties, file.template).getOrNull()
                 ?: continue
-            val relativeDest = TemplateEvaluator.template(assets.templateProperties, file.destination).getOrNull()
+            val relativeDest = TemplateEvaluator.template(templateProperties, file.destination).getOrNull()
                 ?: continue
 
             try {
@@ -320,38 +314,38 @@ class CustomPlatformStep(
                     continue
                 }
 
-                val fileName = destPath.fileName.toString().removeSuffix(".ft")
-                val baseFileName = FileUtilRt.getNameWithoutExtension(fileName)
-                val extension = FileUtilRt.getExtension(fileName)
-                val fileTemplate = CustomFileTemplate(baseFileName, extension)
-                fileTemplate.text = templateContents
-                assets.addAssets(GeneratorTemplateFile(projectPath.relativize(destPath).toString(), fileTemplate))
-            } catch (e: Exception) {
-                thisLogger().error("Failed to process template file $file", e)
+                val processedContent = TemplateEvaluator.template(templateProperties, templateContents)
+                    .getOrLogException(thisLogger())
+                    ?: continue
+
+                destPath.parent.createDirectories()
+                destPath.writeText(processedContent)
+            } catch (t: Throwable) {
+                if (t is ControlFlowException) {
+                    throw t
+                }
+
+                thisLogger().error("Failed to process template file $file", t)
+            }
+        }
+
+        val finalizers = selectedTemplate.descriptor.finalizers
+        if (!finalizers.isNullOrEmpty()) {
+            application.executeOnPooledThread {
+                // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
+                CreatorFinalizer.executeAll(project, finalizers, templateProperties)
             }
         }
     }
 
-    private fun collectTemplateProperties(into: MutableMap<String, Any?> = mutableMapOf()): MutableMap<String, Any?> {
+    private fun collectTemplateProperties(): MutableMap<String, Any?> {
+        val into = mutableMapOf<String, Any?>()
+
         into.putAll(TemplateEvaluator.baseProperties)
 
         val gitData = data.getUserData(GitNewProjectWizardData.KEY)
         into["USE_GIT"] = gitData?.git == true
 
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
-    }
-
-    override fun perform(project: Project) {
-        super.perform(project)
-
-        val finalizers = selectedTemplate.descriptor.finalizers
-        if (finalizers.isNullOrEmpty()) {
-            return
-        }
-
-        application.executeOnPooledThread {
-            // Has to be executed with a delay or else it deadlocks, the pooled thread is an easy way to achieve that
-            CreatorFinalizer.executeAll(project, finalizers, assets.templateProperties)
-        }
     }
 }

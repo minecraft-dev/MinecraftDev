@@ -25,6 +25,7 @@ import com.demonwav.mcdev.util.fromJson
 import com.google.gson.Gson
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.Attachment
+import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -74,12 +75,16 @@ interface TemplateProvider {
                 } else if (child.name.endsWith(".mcdev.template.json")) {
                     try {
                         createVfsLoadedTemplate(directory, child)?.let(templates::add)
-                    } catch (e: Throwable) {
+                    } catch (t: Throwable) {
+                        if (t is ControlFlowException) {
+                            throw t
+                        }
+
                         val attachment = runCatching { Attachment(child.name, child.readText()) }.getOrNull()
                         if (attachment != null) {
-                            thisLogger().error("Failed to load template ${child.path}", e, attachment)
+                            thisLogger().error("Failed to load template ${child.path}", t, attachment)
                         } else {
-                            thisLogger().error("Failed to load template ${child.path}", e)
+                            thisLogger().error("Failed to load template ${child.path}", t)
                         }
                     }
                 }

@@ -28,6 +28,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onError
 import com.intellij.ide.util.projectWizard.WizardContext
+ import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.progress.ProgressIndicator
@@ -76,8 +77,11 @@ class BuiltInTemplateProvider : TemplateProvider {
 
                 updatedBuiltinTemplates = true
                 thisLogger().info("Builtin template update applied successfully")
-            } catch (e: Exception) {
-                thisLogger().error("Failed to apply builtin templates update", e)
+            } catch (t: Throwable) {
+                if (t is ControlFlowException) {
+                    throw t
+                }
+                thisLogger().error("Failed to apply builtin templates update", t)
             }
         }
     }
