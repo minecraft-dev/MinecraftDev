@@ -33,7 +33,7 @@ import com.intellij.openapi.roots.ModifiableRootModel
 
 class CustomMinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
 
-    override fun getPresentableName() = "Minecraft Custom Template"
+    override fun getPresentableName() = "Minecraft"
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getGroupName() = "Minecraft"
     override fun getBuilderId() = "CUSTOM_MINECRAFT_MODULE"
