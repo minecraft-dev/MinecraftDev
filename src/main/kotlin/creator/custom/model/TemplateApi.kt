@@ -25,4 +25,6 @@ package com.demonwav.mcdev.creator.custom.model
  *
  * Be careful of not breaking source or binary compatibility of those APIs without a good reason.
  */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
 annotation class TemplateApi
