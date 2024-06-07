@@ -34,9 +34,11 @@ import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
@@ -44,7 +46,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleTypeId
-import com.intellij.openapi.observable.util.or
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -53,18 +54,23 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.refreshAndFindVirtualFile
 import com.intellij.psi.PsiManager
+import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Placeholder
 import com.intellij.ui.dsl.builder.SegmentedButton
 import com.intellij.ui.dsl.builder.TopGap
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.application
+import com.intellij.util.ui.AsyncProcessIcon
 import java.nio.file.Path
 import java.util.function.Consumer
-import javax.swing.JComponent
+import javax.swing.JLabel
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -90,12 +96,22 @@ class CustomPlatformStep(
     val selectedTemplateProperty = propertyGraph.property<LoadedTemplate>(EmptyLoadedTemplate)
     var selectedTemplate by selectedTemplateProperty
 
+    val templateProvidersLoadingProperty = propertyGraph.property<Boolean>(true)
+    val templateProvidersTextProperty = propertyGraph.property("")
+    val templateProvidersText2Property = propertyGraph.property("")
+    lateinit var templateProvidersProcessIcon: Cell<AsyncProcessIcon>
+    lateinit var templateProviderPlaceholder: Placeholder
+
+    val templateLoadingProperty = propertyGraph.property<Boolean>(true)
+    val templateLoadingTextProperty = propertyGraph.property<String>("")
+    val templateLoadingText2Property = propertyGraph.property<String>("")
+    lateinit var templatePropertiesProcessIcon: Cell<AsyncProcessIcon>
+    lateinit var noTemplatesAvailable: Cell<JLabel>
+    var templateLoadingIndicator: ProgressIndicator? = null
+
     private var properties = mutableMapOf<String, CreatorProperty<*>>()
 
     override fun setupUI(builder: Panel) {
-        var taskParentComponent: JComponent? = null
-
-        lateinit var templateProviderPlaceholder: Placeholder
         lateinit var templatePropertyPlaceholder: Placeholder
 
         builder.row(MCDevBundle("creator.ui.custom.provider.label")) {
@@ -104,18 +120,26 @@ class CustomPlatformStep(
         }
 
         builder.row {
-            templateProviderPlaceholder = placeholder()
-        }
+            templateProvidersProcessIcon =
+                cell(AsyncProcessIcon("TemplateProviders init"))
+                    .visibleIf(templateProvidersLoadingProperty)
+            label(MCDevBundle("creator.step.generic.init_template_providers.message"))
+                .visibleIf(templateProvidersLoadingProperty)
+            label("")
+                .bindText(templateProvidersTextProperty)
+                .visibleIf(templateProvidersLoadingProperty)
+            label("")
+                .bindText(templateProvidersText2Property)
+                .visibleIf(templateProvidersLoadingProperty)
 
-        val provideTemplate = Consumer<() -> Collection<LoadedTemplate>> { provider ->
-            loadTemplatesInBackground(provider, taskParentComponent)
+            templateProviderPlaceholder = placeholder()
         }
 
         templateProviderProperty.afterChange { templateProvider ->
             templatePropertyPlaceholder.component = null
             availableTemplates = emptyList()
-            availableTemplatesSegmentedButton.items(availableTemplates)
-            templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
+            templateProviderPlaceholder.component =
+                templateProvider.setupUi(context, propertyGraph, ::loadTemplatesInBackground)
         }
 
         builder.row(MCDevBundle("creator.ui.custom.templates.label")) {
@@ -123,14 +147,16 @@ class CustomPlatformStep(
                 segmentedButton(emptyList(), LoadedTemplate::label, LoadedTemplate::tooltip)
                     .bind(selectedTemplateProperty)
         }.visibleIf(
-            availableTemplatesProperty.transform { it.size > 1 } or
-                templateProviderProperty.transform { it is RecentTemplatesProvider }
+            availableTemplatesProperty.transform { it.size > 1 }
         )
 
         availableTemplatesProperty.afterChange { newTemplates ->
             availableTemplatesSegmentedButton.items(newTemplates)
+            // Force visiblity because the component might become hidden and not show up again
+            //  when the segmented button switches between dropdown and buttons
+            availableTemplatesSegmentedButton.visible(true)
             templatePropertyPlaceholder.component = null
-            selectedTemplate = EmptyLoadedTemplate
+            selectedTemplate = newTemplates.firstOrNull() ?: EmptyLoadedTemplate
         }
 
         selectedTemplateProperty.afterChange { template ->
@@ -138,24 +164,34 @@ class CustomPlatformStep(
         }
 
         builder.row {
+            templatePropertiesProcessIcon =
+                cell(AsyncProcessIcon("Templates loading"))
+                    .visibleIf(templateLoadingProperty)
+            label(MCDevBundle("creator.step.generic.load_template.message"))
+                .visibleIf(templateLoadingProperty)
+            label("")
+                .bindText(templateLoadingTextProperty)
+                .visibleIf(templateLoadingProperty)
+            label("")
+                .bindText(templateLoadingText2Property)
+                .visibleIf(templateLoadingProperty)
+            noTemplatesAvailable = label(MCDevBundle("creator.step.generic.no_templates_available.message"))
+                .visible(false)
+                .apply { component.foreground = JBColor.RED }
             templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
         }.topGap(TopGap.SMALL)
 
-        initTemplates(null)
-
-        templateProviderPlaceholder.component = templateProvider.setupUi(context, propertyGraph, provideTemplate)
+        initTemplates()
     }
 
-    private fun initTemplates(
-        taskParentComponent: JComponent?
-    ) {
+    private fun initTemplates() {
         selectedTemplate = EmptyLoadedTemplate
 
-        val task = object : Task.Modal(
+        val task = object : Task.Backgroundable(
             context.project,
-            taskParentComponent,
             MCDevBundle("creator.step.generic.init_template_providers.message"),
-            false
+            true,
+            ALWAYS_BACKGROUND,
         ) {
 
             override fun run(indicator: ProgressIndicator) {
@@ -163,45 +199,82 @@ class CustomPlatformStep(
                     return
                 }
 
+                application.invokeAndWait({
+                    ProgressManager.checkCanceled()
+                    templateProvidersLoadingProperty.set(true)
+                    VirtualFileManager.getInstance().syncRefresh()
+                }, getWizardModalityState())
+
                 for (provider in templateProviders) {
+                    ProgressManager.checkCanceled()
                     indicator.text = provider.getLabel()
                     runCatching { provider.init(indicator) }
                         .getOrLogException(logger<CustomPlatformStep>())
                 }
+
+                ProgressManager.checkCanceled()
+                application.invokeAndWait({
+                    ProgressManager.checkCanceled()
+                    templateProvidersLoadingProperty.set(false)
+                    // Force refresh to trigger template loading
+                    templateProviderProperty.set(templateProvider)
+                }, getWizardModalityState())
             }
         }
 
-        ProgressManager.getInstance().run(task)
+        val indicator = CreatorProgressIndicator(
+            templateProvidersLoadingProperty,
+            templateProvidersTextProperty,
+            templateProvidersText2Property
+        )
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, indicator)
     }
 
-    private fun loadTemplatesInBackground(
-        provider: () -> Collection<LoadedTemplate>,
-        taskParentComponent: JComponent?
-    ) {
+    private fun loadTemplatesInBackground(provider: () -> Collection<LoadedTemplate>) {
         selectedTemplate = EmptyLoadedTemplate
 
-        val task = object : Task.WithResult<Collection<LoadedTemplate>, Exception>(
+        val task = object : Task.Backgroundable(
             context.project,
-            taskParentComponent,
-            MCDevBundle("creator.step.generic.init_template_providers.message"),
-            false
+            MCDevBundle("creator.step.generic.load_template.message"),
+            true,
+            ALWAYS_BACKGROUND,
         ) {
 
-            override fun compute(indicator: ProgressIndicator): Collection<LoadedTemplate> {
+            override fun run(indicator: ProgressIndicator) {
                 if (project?.isDisposed == true) {
-                    return emptyList()
+                    return
                 }
 
-                return runCatching { provider() }
+                application.invokeAndWait({
+                    ProgressManager.checkCanceled()
+                    templateLoadingProperty.set(true)
+                    VirtualFileManager.getInstance().syncRefresh()
+                }, getWizardModalityState())
+
+                ProgressManager.checkCanceled()
+                val newTemplates = runCatching { provider() }
                     .getOrLogException(logger<CustomPlatformStep>())
                     ?: emptyList()
+
+                ProgressManager.checkCanceled()
+                application.invokeAndWait({
+                    ProgressManager.checkCanceled()
+                    templateLoadingProperty.set(false)
+                    noTemplatesAvailable.visible(newTemplates.isEmpty())
+                    availableTemplates = newTemplates
+                }, getWizardModalityState())
             }
         }
 
-        val newTemplates = ProgressManager.getInstance().run(task)
-        availableTemplates = newTemplates
-        availableTemplatesSegmentedButton.items(newTemplates)
-        availableTemplatesSegmentedButton.selectedItem = newTemplates.firstOrNull()
+        templateLoadingIndicator?.cancel()
+
+        val indicator = CreatorProgressIndicator(
+            templateLoadingProperty,
+            templateLoadingTextProperty,
+            templateLoadingText2Property
+        )
+        templateLoadingIndicator = indicator
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, indicator)
     }
 
     private fun createOptionsPanelInBackground(template: LoadedTemplate, placeholder: Placeholder) {
@@ -411,5 +484,16 @@ class CustomPlatformStep(
                 projectView.select(null, file, false)
             }
         }
+    }
+
+    private fun getWizardModalityState(): ModalityState {
+        val contentPanel = context.getUserData(AbstractWizard.KEY)?.contentPanel
+
+        if (contentPanel == null) {
+            thisLogger().error("Wizard content panel is null, using default modality state")
+            return ModalityState.defaultModalityState()
+        }
+
+        return ModalityState.stateForComponent(contentPanel)
     }
 }

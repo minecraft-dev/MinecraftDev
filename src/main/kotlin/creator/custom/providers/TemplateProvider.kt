@@ -30,6 +30,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
 import java.util.function.Consumer
@@ -68,8 +69,8 @@ interface TemplateProvider {
             directory: VirtualFile,
             templates: MutableList<VfsLoadedTemplate> = mutableListOf(),
         ): List<VfsLoadedTemplate> {
-            directory.refresh(false, true)
-            for (child in directory.children) {
+            for (child in directory.children) { // TODO use visitor instead of loop
+                ProgressManager.checkCanceled()
                 if (child.isDirectory) {
                     findTemplates(child, templates)
                 } else if (child.name.endsWith(".mcdev.template.json")) {
@@ -98,9 +99,6 @@ interface TemplateProvider {
             descriptorFile: VirtualFile,
             tooltip: String? = null
         ): VfsLoadedTemplate? {
-            root.refresh(false, true)
-            descriptorFile.refresh(false, false)
-
             var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
             if (descriptor.version != 1) {
                 thisLogger().warn("Cannot handle template ${descriptorFile.path} of version ${descriptor.version}")
@@ -118,7 +116,6 @@ interface TemplateProvider {
             if (descriptor.inherit != null) {
                 val parent = root.findFileByRelativePath(descriptor.inherit!!)
                 if (parent != null) {
-                    parent.refresh(false, false)
                     val parentDescriptor = Gson().fromJson<TemplateDescriptor>(parent.readText())
                     val mergedProperties = parentDescriptor.properties.orEmpty() + descriptor.properties.orEmpty()
                     val mergedFiles = parentDescriptor.files.orEmpty() + descriptor.files.orEmpty()
