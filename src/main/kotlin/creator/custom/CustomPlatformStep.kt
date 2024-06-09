@@ -29,16 +29,15 @@ import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
+import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.util.toTypedArray
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.codeInsight.actions.ReformatCodeProcessor
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
-import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
@@ -203,7 +202,7 @@ class CustomPlatformStep(
                     ProgressManager.checkCanceled()
                     templateProvidersLoadingProperty.set(true)
                     VirtualFileManager.getInstance().syncRefresh()
-                }, getWizardModalityState())
+                }, context.modalityState)
 
                 for (provider in templateProviders) {
                     ProgressManager.checkCanceled()
@@ -218,7 +217,7 @@ class CustomPlatformStep(
                     templateProvidersLoadingProperty.set(false)
                     // Force refresh to trigger template loading
                     templateProviderProperty.set(templateProvider)
-                }, getWizardModalityState())
+                }, context.modalityState)
             }
         }
 
@@ -249,7 +248,7 @@ class CustomPlatformStep(
                     ProgressManager.checkCanceled()
                     templateLoadingProperty.set(true)
                     VirtualFileManager.getInstance().syncRefresh()
-                }, getWizardModalityState())
+                }, context.modalityState)
 
                 ProgressManager.checkCanceled()
                 val newTemplates = runCatching { provider() }
@@ -262,7 +261,7 @@ class CustomPlatformStep(
                     templateLoadingProperty.set(false)
                     noTemplatesAvailable.visible(newTemplates.isEmpty())
                     availableTemplates = newTemplates
-                }, getWizardModalityState())
+                }, context.modalityState)
             }
         }
 
@@ -319,14 +318,15 @@ class CustomPlatformStep(
                 .map { it.first }
 
             val factory = Consumer<Panel> { panel ->
+                val label = descriptor.translatedLabel
                 if (descriptor.collapsible == false) {
-                    panel.group(descriptor.label) {
+                    panel.group(label) {
                         for (childFactory in childrenUiFactories) {
                             childFactory.accept(this@group)
                         }
                     }
                 } else {
-                    val group = panel.collapsibleGroup(descriptor.label) {
+                    val group = panel.collapsibleGroup(label) {
                         for (childFactory in childrenUiFactories) {
                             childFactory.accept(this@collapsibleGroup)
                         }
@@ -484,16 +484,5 @@ class CustomPlatformStep(
                 projectView.select(null, file, false)
             }
         }
-    }
-
-    private fun getWizardModalityState(): ModalityState {
-        val contentPanel = context.getUserData(AbstractWizard.KEY)?.contentPanel
-
-        if (contentPanel == null) {
-            thisLogger().error("Wizard content panel is null, using default modality state")
-            return ModalityState.defaultModalityState()
-        }
-
-        return ModalityState.stateForComponent(contentPanel)
     }
 }

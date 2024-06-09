@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
@@ -135,7 +136,7 @@ class FabricVersionsProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
-        panel.row("Minecraft Version:") {
+        panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionModel)
                 .bindItem(mcVersionProperty)
                 .validationRequestor(WHEN_GRAPH_PROPAGATION_FINISHED(graph))
@@ -143,11 +144,11 @@ class FabricVersionsProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Show snapshots")
+            checkBox(MCDevBundle("creator.ui.show_snapshots.label"))
                 .bindSelected(showMcSnapshotsProperty)
         }.enabled(descriptor.editable != false)
 
-        panel.row("Loom Version:") {
+        panel.row(MCDevBundle("creator.ui.loom_version.label")) {
             comboBox(loomVersionModel)
                 .bindItem(loomVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
@@ -155,7 +156,7 @@ class FabricVersionsProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 
-        panel.row("Loader Version:") {
+        panel.row(MCDevBundle("creator.ui.loader_version.label")) {
             comboBox(loaderVersionModel)
                 .bindItem(loaderVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
@@ -163,7 +164,7 @@ class FabricVersionsProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 
-        panel.row("Yarn Version:") {
+        panel.row(MCDevBundle("creator.ui.yarn_version.label")) {
             comboBox(yarnVersionModel)
                 .bindItem(yarnVersionProperty)
                 .enabledIf(useOfficialMappingsProperty.not())
@@ -171,15 +172,15 @@ class FabricVersionsProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyYarnVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use official mappings")
+            checkBox(MCDevBundle("creator.ui.use_official_mappings.label"))
                 .bindSelected(useOfficialMappingsProperty)
 
-            label("Unable to match Yarn versions to Minecraft version")
+            label(MCDevBundle("creator.ui.warn.no_yarn_to_mc_match"))
                 .visibleIf(yarnHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
 
-        panel.row("FabricApi Version:") {
+        panel.row(MCDevBundle("creator.ui.fabricapi_version.label")) {
             comboBox(fabricApiVersionModel)
                 .bindItem(fabricApiVersionProperty)
                 .enabledIf(useFabricApiVersionProperty)
@@ -187,9 +188,9 @@ class FabricVersionsProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use FabricApi")
+            checkBox(MCDevBundle("creator.ui.use_fabricapi.label"))
                 .bindSelected(useFabricApiVersionProperty)
-            label("Unable to match API versions to Minecraft version")
+            label(MCDevBundle("creator.ui.warn.no_fabricapi_to_mc_match"))
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)

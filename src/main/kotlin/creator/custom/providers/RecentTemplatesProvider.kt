@@ -21,7 +21,9 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.creator.custom.RecentProjectTemplates
+import com.demonwav.mcdev.creator.modalityState
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.observable.properties.PropertyGraph
 import java.util.function.Consumer
 import javax.swing.JComponent
@@ -37,12 +39,12 @@ class RecentTemplatesProvider : TemplateProvider {
     ): JComponent? {
         provideTemplate.accept {
             RecentProjectTemplates.instance.state.templates.mapNotNull { (provider, element) ->
-                TemplateProvider.get(provider)?.deserializeAndLoad(element)
+                TemplateProvider.get(provider)?.deserializeAndLoad(element, context.modalityState)
             }
         }
         return null
     }
 
-    override fun deserializeAndLoad(element: String): LoadedTemplate =
+    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate =
         throw UnsupportedOperationException("The recent templates provider is not supposed to deserialize nor load")
 }

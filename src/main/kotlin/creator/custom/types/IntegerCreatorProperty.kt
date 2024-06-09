@@ -46,7 +46,7 @@ class IntegerCreatorProperty(
     override fun deserialize(string: String): Int = string.toIntOrNull() ?: 0
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             this.intTextField().bindIntText(graphProperty)
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)

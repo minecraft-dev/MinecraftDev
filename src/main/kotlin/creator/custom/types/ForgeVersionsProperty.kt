@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
@@ -32,6 +33,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
@@ -86,13 +88,14 @@ class ForgeVersionsProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionsModel)
                 .bindItem(mcVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
+            label(MCDevBundle("creator.ui.forge_version.label")).gap(RightGap.SMALL)
             comboBox(forgeVersionsModel)
                 .bindItem(forgeVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)

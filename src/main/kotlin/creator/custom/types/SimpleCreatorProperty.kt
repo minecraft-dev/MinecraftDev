@@ -41,8 +41,13 @@ abstract class SimpleCreatorProperty<T>(
 
     private fun makeOptionsList(): Map<T, String>? {
         val map = when (val options = descriptor.options) {
-            is Map<*, *> -> options.mapValues { it.value.toString() }
-            is Iterable<*> -> options.associateWithTo(linkedMapOf()) { it.toString() }
+            is Map<*, *> -> options.mapValues { descriptor.translate(it.value.toString()) }
+            is Iterable<*> -> options.associateWithTo(linkedMapOf()) {
+                val optionKey = it.toString()
+                descriptor.translateOrNull("creator.ui.${descriptor.name.lowercase()}.option.${optionKey.lowercase()}")
+                    ?: optionKey
+            }
+
             else -> null
         }
 
@@ -74,7 +79,7 @@ abstract class SimpleCreatorProperty<T>(
 
     override fun buildUi(panel: Panel, context: WizardContext) {
         if (isDropdown) {
-            panel.row(descriptor.label) {
+            panel.row(descriptor.translatedLabel) {
                 if (descriptor.forceDropdown == true) {
                     comboBox(options!!.keys, DropdownAutoRenderer())
                         .bindItem(graphProperty)

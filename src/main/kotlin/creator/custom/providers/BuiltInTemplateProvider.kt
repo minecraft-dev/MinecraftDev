@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.virtualFile
@@ -28,6 +29,7 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onError
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -92,11 +94,13 @@ class BuiltInTemplateProvider : TemplateProvider {
         provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
     ): JComponent? {
         provideTemplate.accept {
-            builtinTemplatesPath.virtualFile?.let(TemplateProvider::findTemplates) ?: emptyList()
+            builtinTemplatesPath.virtualFile?.let { TemplateProvider.findTemplates(context.modalityState, it) }
+                ?: emptyList()
         }
 
         return null
     }
 
-    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
+    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
+        TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 }

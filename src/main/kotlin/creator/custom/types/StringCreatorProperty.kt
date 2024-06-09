@@ -71,7 +71,7 @@ class StringCreatorProperty(
     }
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             val textField = textField().bindText(this@StringCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)

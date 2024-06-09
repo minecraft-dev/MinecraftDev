@@ -92,7 +92,7 @@ class ParchmentProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             checkBox("Use Parchment")
                 .bindSelected(useParchmentProperty)
 

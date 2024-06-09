@@ -21,8 +21,10 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.util.virtualFile
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindStorage
@@ -51,8 +53,9 @@ class LocalTemplateProvider : TemplateProvider {
         val pathProperty = propertyGraph.property("").apply {
             afterChange { path ->
                 provideTemplate.accept {
-                    val root = Path.of(path.trim()).absolute()
-                    root.virtualFile?.let(TemplateProvider::findTemplates) ?: emptyList()
+                    val rootPath = Path.of(path.trim()).absolute()
+                    rootPath.virtualFile?.let { TemplateProvider.findTemplates(context.modalityState, it) }
+                        ?: emptyList()
                 }
             }
             bindStorage("${this@LocalTemplateProvider.javaClass.name}.path")
@@ -82,5 +85,6 @@ class LocalTemplateProvider : TemplateProvider {
         }
     }
 
-    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
+    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
+        TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 }

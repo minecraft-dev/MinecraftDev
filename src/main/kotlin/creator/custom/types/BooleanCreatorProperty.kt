@@ -26,6 +26,7 @@ import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.content.AlertIcon
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindSelected
 
 class BooleanCreatorProperty(
@@ -41,12 +42,16 @@ class BooleanCreatorProperty(
     override fun deserialize(string: String): Boolean = string.toBoolean()
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
-            if (descriptor.warning != null) {
-                icon(AlertIcon(AllIcons.General.Warning)).comment(descriptor.warning)
+        val label = descriptor.translatedLabel
+        panel.row(label) {
+            val warning = descriptor.translatedWarning
+            if (warning != null) {
+                icon(AlertIcon(AllIcons.General.Warning))
+                    .gap(RightGap.SMALL)
+                    .comment(descriptor.translate(warning))
             }
 
-            this.checkBox(descriptor.label.removeSuffix(":"))
+            this.checkBox(label.removeSuffix(":").trim())
                 .bindSelected(graphProperty)
                 .enabled(descriptor.editable != false)
         }.visible(descriptor.hidden != true)

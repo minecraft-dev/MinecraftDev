@@ -49,7 +49,7 @@ abstract class AbstractBuildSystemStep(
 
     override val self get() = this
     override val label
-        get() = MCDevBundle("creator.ui.build_system.label.generic")
+        get() = MCDevBundle("creator.ui.build_system.label")
 
     override fun initSteps(): LinkedHashMap<String, NewProjectWizardStep> {
         context.putUserData(PLATFORM_NAME_KEY, platformName)

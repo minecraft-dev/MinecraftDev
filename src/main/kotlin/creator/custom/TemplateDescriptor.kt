@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.creator.custom
 
+import java.util.ResourceBundle
+
 data class TemplateDescriptor(
     val version: Int,
     val label: String? = null,
@@ -28,12 +30,15 @@ data class TemplateDescriptor(
     val properties: List<TemplatePropertyDescriptor>? = null,
     val files: List<TemplateFile>? = null,
     val finalizers: List<Map<String, Any>>? = null,
-)
+) : ResourceBundleTranslator() {
+    @Transient
+    override var bundle: ResourceBundle? = null
+}
 
 data class TemplatePropertyDescriptor(
     val name: String,
     val type: String,
-    val label: String,
+    val label: String? = null,
     val order: Int? = null,
     val options: Any? = null,
     val limit: Int? = null,
@@ -51,7 +56,15 @@ data class TemplatePropertyDescriptor(
     val inheritFrom: String? = null,
     val parameters: Map<String, Any>? = null,
     val validator: Any? = null
-)
+) : ResourceBundleTranslator() {
+    @Transient
+    override var bundle: ResourceBundle? = null
+
+    val translatedLabel: String
+        get() = translate(label ?: "creator.ui.${name.lowercase()}.label")
+    val translatedWarning: String?
+        get() = translateOrNull(label ?: "creator.ui.${name.lowercase()}.warning") ?: warning
+}
 
 data class PropertyDerivation(
     val parents: List<String>? = null,

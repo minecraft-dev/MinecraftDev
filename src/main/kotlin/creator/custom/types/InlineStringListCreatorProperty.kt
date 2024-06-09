@@ -45,7 +45,7 @@ class InlineStringListCreatorProperty(
         .run(::StringList)
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             this.textField().bindText(this@InlineStringListCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)

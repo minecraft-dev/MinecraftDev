@@ -48,7 +48,7 @@ class ClassFqnCreatorProperty(
     override fun deserialize(string: String): ClassFqn = ClassFqn(string)
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             this.textField().bindText(this@ClassFqnCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .textValidation(BuiltinValidations.validClassFqn)

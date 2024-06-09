@@ -26,11 +26,15 @@ import com.demonwav.mcdev.creator.step.LicenseStep
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.intellij.ide.fileTemplates.FileTemplateManager
 import com.intellij.ide.starters.local.GeneratorTemplateFile
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
+import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.ObservableProperty
 import com.intellij.openapi.project.Project
@@ -160,3 +164,15 @@ fun notifyCreatedProjectNotOpened() {
         NotificationType.ERROR,
     ).notify(null)
 }
+
+val WizardContext.modalityState: ModalityState
+    get() {
+        val contentPanel = this.getUserData(AbstractWizard.KEY)?.contentPanel
+
+        if (contentPanel == null) {
+            thisLogger().error("Wizard content panel is null, using default modality state")
+            return ModalityState.defaultModalityState()
+        }
+
+        return ModalityState.stateForComponent(contentPanel)
+    }

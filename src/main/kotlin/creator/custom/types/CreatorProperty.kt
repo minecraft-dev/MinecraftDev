@@ -149,7 +149,7 @@ abstract class CreatorProperty<T>(
     }
 
     protected fun <E> Panel.buildDropdownUi(options: List<E>, graphProp: GraphProperty<E>) {
-        row(descriptor.label) {
+        row(descriptor.translatedLabel) {
             comboBox(options)
                 .bindItem(graphProp)
                 .enabled(descriptor.editable != false)

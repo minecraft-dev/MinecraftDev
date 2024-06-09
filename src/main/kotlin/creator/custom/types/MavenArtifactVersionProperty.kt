@@ -67,7 +67,7 @@ class MavenArtifactVersionProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             val combobox = comboBox(versionsProperty.get())
                 .bindItem(graphProperty)
                 .enabled(descriptor.editable != false)

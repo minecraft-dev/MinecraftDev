@@ -51,7 +51,7 @@ class LicenseProperty(
         LicenseData(string, License.byId(string)?.toString() ?: string, ZonedDateTime.now().year.toString())
 
     override fun buildUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             val model = EnumComboBoxModel(License::class.java)
             val licenseEnumProperty = graphProperty.transform(
                 { License.byId(it.id) ?: License.entries.first() },

@@ -47,7 +47,7 @@ class JdkCreatorProperty(
         CreatorJdk(ProjectJdkTable.getInstance().allJdks.find { it.homePath == string })
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             val sdkProperty = graphProperty.transform(CreatorJdk::sdk, ::CreatorJdk)
             jdkComboBox = this.jdkComboBoxWithPreference(context, sdkProperty, descriptor.name).component
 

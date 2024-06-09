@@ -21,7 +21,9 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.modalityState
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindStorage
@@ -50,7 +52,7 @@ class ZipTemplateProvider : TemplateProvider {
         val pathProperty = propertyGraph.property("").apply {
             afterChange { path ->
                 provideTemplate.accept {
-                    loadTemplatesFrom(path)
+                    loadTemplatesFrom(path, context.modalityState)
                 }
             }
             bindStorage("${this@ZipTemplateProvider.javaClass.name}.path")
@@ -77,16 +79,17 @@ class ZipTemplateProvider : TemplateProvider {
         }
     }
 
-    override fun deserializeAndLoad(element: String): LoadedTemplate? = TemplateProvider.deserializeAndLoadVfs(element)
+    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
+        TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 
     companion object {
 
-        fun loadTemplatesFrom(archivePath: String): List<LoadedTemplate> {
+        fun loadTemplatesFrom(archivePath: String, modalityState: ModalityState): List<LoadedTemplate> {
             val archiveRoot = archivePath + JarFileSystem.JAR_SEPARATOR
             val fs = JarFileSystem.getInstance()
             val rootFile = fs.refreshAndFindFileByPath(archiveRoot)
                 ?: return emptyList()
-            return TemplateProvider.findTemplates(rootFile)
+            return TemplateProvider.findTemplates(modalityState, rootFile)
         }
     }
 }

@@ -414,8 +414,8 @@ tasks.runIde {
         systemProperty("idea.debug.mode", "true")
     }
     // Set these properties to test different languages
-    // systemProperty("user.language", "en")
-    // systemProperty("user.country", "US")
+    systemProperty("user.language", "fr")
+    systemProperty("user.country", "FR")
 }
 
 tasks.buildSearchableOptions {

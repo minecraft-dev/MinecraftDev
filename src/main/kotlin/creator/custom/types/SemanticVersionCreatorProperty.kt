@@ -45,7 +45,7 @@ open class SemanticVersionCreatorProperty(
         SemanticVersion.tryParse(string) ?: SemanticVersion(emptyList())
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
-        panel.row(descriptor.label) {
+        panel.row(descriptor.translatedLabel) {
             this.textField().bindText(this@SemanticVersionCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_SHORT)
                 .enabled(descriptor.editable != false)
