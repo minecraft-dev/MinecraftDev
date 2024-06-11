@@ -25,6 +25,7 @@ import java.util.ResourceBundle
 data class TemplateDescriptor(
     val version: Int,
     val label: String? = null,
+    val group: String? = null,
     val inherit: String? = null,
     val hidden: Boolean? = null,
     val properties: List<TemplatePropertyDescriptor>? = null,
@@ -33,6 +34,9 @@ data class TemplateDescriptor(
 ) : ResourceBundleTranslator() {
     @Transient
     override var bundle: ResourceBundle? = null
+
+    val translatedGroup: String
+        get() = translate("creator.ui.group.${(group ?: "default").lowercase()}.label")
 }
 
 data class TemplatePropertyDescriptor(

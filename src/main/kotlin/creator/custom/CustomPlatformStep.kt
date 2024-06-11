@@ -88,10 +88,15 @@ class CustomPlatformStep(
     val templateProviderProperty = propertyGraph.property<TemplateProvider>(templateProviders.first())
     var templateProvider by templateProviderProperty
 
+    val availableGroupsProperty = propertyGraph.property<Collection<String>>(emptyList())
+    var availableGroups by availableGroupsProperty
     val availableTemplatesProperty = propertyGraph.property<Collection<LoadedTemplate>>(emptyList())
     var availableTemplates by availableTemplatesProperty
+    lateinit var availableGroupsSegmentedButton: SegmentedButton<String>
     lateinit var availableTemplatesSegmentedButton: SegmentedButton<LoadedTemplate>
 
+    val selectedGroupProperty = propertyGraph.property<String>("")
+    var selectedGroup by selectedGroupProperty
     val selectedTemplateProperty = propertyGraph.property<LoadedTemplate>(EmptyLoadedTemplate)
     var selectedTemplate by selectedTemplateProperty
 
@@ -143,6 +148,14 @@ class CustomPlatformStep(
                 templateProvider.setupUi(context, propertyGraph, ::loadTemplatesInBackground)
         }
 
+        builder.row(MCDevBundle("creator.ui.custom.groups.label")) {
+            availableGroupsSegmentedButton =
+                segmentedButton(emptyList<String>(), String::toString)
+                    .bind(selectedGroupProperty)
+        }.visibleIf(
+            availableGroupsProperty.transform { it.size > 1 }
+        )
+
         builder.row(MCDevBundle("creator.ui.custom.templates.label")) {
             availableTemplatesSegmentedButton =
                 segmentedButton(emptyList(), LoadedTemplate::label, LoadedTemplate::tooltip)
@@ -155,12 +168,21 @@ class CustomPlatformStep(
         )
 
         availableTemplatesProperty.afterChange { newTemplates ->
-            availableTemplatesSegmentedButton.items(newTemplates)
+            val groups = newTemplates.mapTo(linkedSetOf()) { it.descriptor.translatedGroup }
+            availableGroupsSegmentedButton.items(groups)
+            // availableGroupsSegmentedButton.visible(groups.size > 1)
+            availableGroups = groups
+            selectedGroup = groups.firstOrNull() ?: "empty"
+        }
+
+        selectedGroupProperty.afterChange { group ->
+            val templates = availableTemplates.filter { it.descriptor.translatedGroup == group }
+            availableTemplatesSegmentedButton.items(templates)
             // Force visiblity because the component might become hidden and not show up again
             //  when the segmented button switches between dropdown and buttons
             availableTemplatesSegmentedButton.visible(true)
             templatePropertyPlaceholder.component = null
-            selectedTemplate = newTemplates.firstOrNull() ?: EmptyLoadedTemplate
+            selectedTemplate = templates.firstOrNull() ?: EmptyLoadedTemplate
         }
 
         selectedTemplateProperty.afterChange { template ->
