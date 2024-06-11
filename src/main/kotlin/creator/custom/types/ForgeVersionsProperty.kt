@@ -24,6 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.ForgeVersions
 import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.util.SemanticVersion
@@ -104,8 +105,8 @@ class ForgeVersionsProperty(
         }.enabled(descriptor.editable != false)
     }
 
-    override fun setupProperty() {
-        super.setupProperty()
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
 
         mcVersionProperty.afterChange { mcVersion ->
             if (mcVersion == previousMcVersion) {

@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom.types
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.BuildSystemCoordinates
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -77,8 +78,8 @@ class BuildSystemCoordinatesCreatorProperty(
         return BuildSystemCoordinates(groupId, artifactId, version)
     }
 
-    override fun setupProperty() {
-        super.setupProperty()
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
 
         val projectNameProperty = properties["PROJECT_NAME"]?.graphProperty
         if (projectNameProperty != null) {

@@ -23,9 +23,8 @@ package com.demonwav.mcdev.creator.custom.types
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.diagnostic.ControlFlowException
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
@@ -39,6 +38,8 @@ class StringCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     properties: Map<String, CreatorProperty<*>>
 ) : SimpleCreatorProperty<String>(graph, descriptor, properties) {
+
+    private var validationRegex: Regex? = null
 
     override fun createDefaultValue(raw: Any?): String = raw as? String ?: ""
 
@@ -70,23 +71,26 @@ class StringCreatorProperty(
         return sanitized
     }
 
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
+
+        val regexString = descriptor.validator as? String
+        if (regexString != null) {
+            try {
+                validationRegex = regexString.toRegex()
+            } catch (t: Throwable) {
+                reporter.error("Invalid validator regex: '$regexString': ${t.message}")
+            }
+        }
+    }
+
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.translatedLabel) {
             val textField = textField().bindText(this@StringCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)
-            try {
-                val regexString = descriptor.validator as? String
-                if (regexString != null) {
-                    val regex = regexString.toRegex()
-                    textField.textValidation(BuiltinValidations.byRegex(regex))
-                }
-            } catch (t: Throwable) {
-                if (t is ControlFlowException) {
-                    throw t
-                }
-                logger<StringCreatorProperty>()
-                    .error("Failed to create validator for property ${descriptor.name}", t)
+            if (validationRegex != null) {
+                textField.textValidation(BuiltinValidations.byRegex(validationRegex!!))
             }
         }.visible(descriptor.hidden != true)
     }

@@ -21,6 +21,8 @@
 package com.demonwav.mcdev.creator.custom.finalizers
 
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporterImpl
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
@@ -33,6 +35,8 @@ import com.intellij.util.xmlb.annotations.Attribute
 
 interface CreatorFinalizer {
 
+    fun validate(reporter: TemplateValidationReporter, properties: Map<String, Any>) = Unit
+
     fun execute(project: Project, properties: Map<String, Any>, templateProperties: Map<String, Any?>)
 
     companion object {
@@ -40,14 +44,42 @@ interface CreatorFinalizer {
             ExtensionPointName.create<CreatorFinalizerBean>("com.demonwav.minecraft-dev.creatorFinalizer")
         private val COLLECTOR = KeyedExtensionCollector<CreatorFinalizer, String>(EP_NAME)
 
-        fun executeAll(project: Project, finalizers: List<Map<String, Any>>, templateProperties: Map<String, Any?>) {
-            for (properties in finalizers) {
+        fun validateAll(
+            reporter: TemplateValidationReporterImpl,
+            finalizers: List<Map<String, Any>>,
+        ) {
+            for ((index, properties) in finalizers.withIndex()) {
+                reporter.subject = "Finalizer #$index"
+
                 val type = properties["type"] as? String
                 if (type == null) {
-                    thisLogger().warn("Missing finalizer 'type' value")
-                    continue
+                    reporter.error("Missing required 'type' value")
                 }
 
+                val condition = properties["condition"]
+                if (condition != null && condition !is String) {
+                    reporter.error("'condition' must be a string")
+                }
+
+                if (type != null) {
+                    val finalizer = COLLECTOR.findSingle(type)
+                    if (finalizer == null) {
+                        reporter.error("Unknown finalizer of type $type")
+                    } else {
+                        try {
+                            finalizer.validate(reporter, properties)
+                        } catch (t: Throwable) {
+                            reporter.error("Unexpected error during finalizer validation: ${t.message}")
+                            thisLogger().error("Unexpected error during finalizer validation", t)
+                        }
+                    }
+                }
+            }
+        }
+
+        fun executeAll(project: Project, finalizers: List<Map<String, Any>>, templateProperties: Map<String, Any?>) {
+            for ((index, properties) in finalizers.withIndex()) {
+                val type = properties["type"] as String
                 val condition = properties["condition"] as? String
                 if (condition != null &&
                     !TemplateEvaluator.condition(templateProperties, condition).getOrElse { false }
@@ -55,19 +87,14 @@ interface CreatorFinalizer {
                     continue
                 }
 
-                val finalizer = COLLECTOR.findSingle(type)
-                if (finalizer == null) {
-                    thisLogger().warn("Unknown finalizer $type")
-                    continue
-                }
-
+                val finalizer = COLLECTOR.findSingle(type)!!
                 try {
                     finalizer.execute(project, properties, templateProperties)
                 } catch (t: Throwable) {
                     if (t is ControlFlowException) {
                         throw t
                     }
-                    thisLogger().error("Unhandled exception in finalizer $type", t)
+                    thisLogger().error("Unhandled exception in finalizer #$index ($type)", t)
                 }
             }
         }

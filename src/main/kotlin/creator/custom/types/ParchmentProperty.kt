@@ -22,6 +22,7 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.ParchmentVersion
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
 import com.demonwav.mcdev.creator.custom.model.ParchmentVersions
 import com.demonwav.mcdev.util.SemanticVersion
@@ -118,8 +119,8 @@ class ParchmentProperty(
         }.enabled(descriptor.editable != false)
     }
 
-    override fun setupProperty() {
-        super.setupProperty()
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
 
         val platformMcVersionPropertyName = descriptor.parameters?.get("minecraftVersionProperty") as? String
         val platformMcVersionProperty = properties[platformMcVersionPropertyName]

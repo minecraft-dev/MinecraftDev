@@ -24,6 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.FabricVersionsModel
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
@@ -196,8 +197,8 @@ class FabricVersionsProperty(
         }.enabled(descriptor.editable != false)
     }
 
-    override fun setupProperty() {
-        super.setupProperty()
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
 
         showMcSnapshotsProperty.afterChange { updateMcVersionsList() }
 

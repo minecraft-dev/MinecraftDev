@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom.types
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.thisLogger
@@ -95,19 +96,28 @@ abstract class CreatorProperty<T>(
 
     abstract fun buildUi(panel: Panel, context: WizardContext)
 
-    open fun setupProperty() {
+    /**
+     * Prepares everything this property needs, like calling [GraphProperty]'s [GraphProperty.afterChange] and
+     * [GraphProperty.dependsOn] on this property or other properties declared before this one.
+     *
+     * [properties] contains all the properties declared in the descriptor
+     * up to this one, forward references are not permitted.
+     *
+     * This is also where you should validate the [descriptor] values you want to use, and report all validation errors
+     * or warnings through the [reporter], use [TemplateValidationReporter.fatal] if the error is a show-stopper and
+     * the validation cannot even proceed further.
+     */
+    open fun setupProperty(reporter: TemplateValidationReporter) {
         if (descriptor.remember != false && descriptor.derives == null) {
             toStringProperty(graphProperty).bindStorage(makeStorageKey())
         }
 
         if (descriptor.derives != null) {
             val parents = descriptor.derives.parents
-                ?: throw RuntimeException("No parents specified in derivation of property '${descriptor.name}'")
+                ?: return reporter.error("No parents specified in derivation")
             for (parent in parents) {
                 if (!properties.containsKey(parent)) {
-                    throw RuntimeException(
-                        "Unknown parent property '$parent' in derivation of property '${descriptor.name}'"
-                    )
+                    return reporter.error("Unknown parent property '$parent' in derivation")
                 }
             }
 
@@ -126,9 +136,7 @@ abstract class CreatorProperty<T>(
 
         if (descriptor.inheritFrom != null) {
             val parentProperty = properties[descriptor.inheritFrom]
-                ?: throw RuntimeException(
-                    "Unknown parent property '${descriptor.inheritFrom}' in derivation of property '${descriptor.name}'"
-                )
+                ?: return reporter.error("Unknown parent property '${descriptor.inheritFrom}' in derivation")
 
             @Suppress("UNCHECKED_CAST")
             graphProperty.set(parentProperty.graphProperty.get() as T)

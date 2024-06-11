@@ -24,6 +24,7 @@ import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.ArchitecturyVersionsModel
 import com.demonwav.mcdev.platform.architectury.ArchitecturyVersion
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
@@ -255,8 +256,8 @@ class ArchitecturyVersionsProperty(
         }.enabled(descriptor.editable != false)
     }
 
-    override fun setupProperty() {
-        super.setupProperty()
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
 
         var previousMcVersion: SemanticVersion? = null
         mcVersionProperty.afterChange { mcVersion ->

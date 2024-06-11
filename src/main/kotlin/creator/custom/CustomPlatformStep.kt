@@ -108,6 +108,8 @@ class CustomPlatformStep(
     lateinit var noTemplatesAvailable: Cell<JLabel>
     var templateLoadingIndicator: ProgressIndicator? = null
 
+    private var hasTemplateErrors: Boolean = true
+
     private var properties = mutableMapOf<String, CreatorProperty<*>>()
 
     override fun setupUI(builder: Panel) {
@@ -145,6 +147,9 @@ class CustomPlatformStep(
             availableTemplatesSegmentedButton =
                 segmentedButton(emptyList(), LoadedTemplate::label, LoadedTemplate::tooltip)
                     .bind(selectedTemplateProperty)
+                    .validation {
+                        addApplyRule("", condition = ::hasTemplateErrors)
+                    }
         }.visibleIf(
             availableTemplatesProperty.transform { it.size > 1 }
         )
@@ -289,31 +294,69 @@ class CustomPlatformStep(
         properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
 
         placeholder.component = panel {
-            for (uiFactory in setupTemplate(template)) {
-                uiFactory.accept(this)
+            val reporter = TemplateValidationReporterImpl()
+            val uiFactories = setupTemplate(template, reporter)
+            if (uiFactories.isEmpty() && !reporter.hasErrors) {
+                row {
+                    label(MCDevBundle("creator.ui.warn.no_properties"))
+                        .component.foreground = JBColor.YELLOW
+                }
+            } else {
+                reporter.display(this)
+
+                if (!reporter.hasErrors) {
+                    for (uiFactory in uiFactories) {
+                        uiFactory.accept(this)
+                    }
+                }
             }
         }
     }
 
-    private fun setupTemplate(template: LoadedTemplate): List<Consumer<Panel>> {
+    private fun setupTemplate(
+        template: LoadedTemplate,
+        reporter: TemplateValidationReporterImpl
+    ): List<Consumer<Panel>> {
         return try {
-            template.descriptor.properties.orEmpty()
-                .mapNotNull { setupProperty(it) }
+            val properties = template.descriptor.properties.orEmpty()
+                .mapNotNull {
+                    reporter.subject = it.name
+                    setupProperty(it, reporter)
+                }
                 .sortedBy { (_, order) -> order }
                 .map { it.first }
+
+            val finalizers = template.descriptor.finalizers
+            if (finalizers != null) {
+                CreatorFinalizer.validateAll(reporter, finalizers)
+            }
+
+            properties
         } catch (t: Throwable) {
             if (t is ControlFlowException) {
                 throw t
             }
-            thisLogger().error(t)
+
+            thisLogger().error(
+                "Unexpected error during template setup",
+                t,
+                template.label,
+                template.descriptor.toString()
+            )
+
             emptyList()
+        } finally {
+            reporter.subject = null
         }
     }
 
-    private fun setupProperty(descriptor: TemplatePropertyDescriptor): Pair<Consumer<Panel>, Int>? {
+    private fun setupProperty(
+        descriptor: TemplatePropertyDescriptor,
+        reporter: TemplateValidationReporter
+    ): Pair<Consumer<Panel>, Int>? {
         if (!descriptor.groupProperties.isNullOrEmpty()) {
             val childrenUiFactories = descriptor.groupProperties
-                .mapNotNull(::setupProperty)
+                .mapNotNull { setupProperty(it, reporter) }
                 .sortedBy { (_, order) -> order }
                 .map { it.first }
 
@@ -341,17 +384,15 @@ class CustomPlatformStep(
         }
 
         if (descriptor.name in properties.keys) {
-            thisLogger().error("Duplicate property name ${descriptor.name}")
-            return null
+            reporter.fatal("Duplicate property name ${descriptor.name}")
         }
 
         val prop = CreatorPropertyFactory.createFromType(descriptor.type, descriptor, propertyGraph, properties)
         if (prop == null) {
-            thisLogger().error("Unknown template property type ${descriptor.type}")
-            return null
+            reporter.fatal("Unknown template property type ${descriptor.type}")
         }
 
-        prop.setupProperty()
+        prop.setupProperty(reporter)
 
         properties[descriptor.name] = prop
 

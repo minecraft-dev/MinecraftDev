@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -33,7 +34,7 @@ class ExternalCreatorProperty<T>(
     descriptor: TemplatePropertyDescriptor = TemplatePropertyDescriptor("", "", "", default = ""),
 ) : CreatorProperty<T>(descriptor, graph, properties) {
 
-    override fun setupProperty() = Unit
+    override fun setupProperty(reporter: TemplateValidationReporter) = Unit
 
     override fun createDefaultValue(raw: Any?): T =
         throw UnsupportedOperationException("Unsupported for external properties")
