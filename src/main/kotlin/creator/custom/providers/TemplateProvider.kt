@@ -71,7 +71,7 @@ interface TemplateProvider {
 
         fun get(key: String): TemplateProvider? = COLLECTOR.findSingle(key)
 
-        fun getAllKeys() = EP_NAME.extensionList.map { it.key }
+        fun getAllKeys() = EP_NAME.extensionList.mapNotNull { it.key }
 
         fun findTemplates(
             modalityState: ModalityState,
