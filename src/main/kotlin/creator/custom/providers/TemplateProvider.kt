@@ -35,9 +35,11 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.KeyedExtensionCollector
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileVisitor
+import com.intellij.openapi.vfs.isFile
 import com.intellij.openapi.vfs.readText
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.KeyedLazyInstance
@@ -74,34 +76,35 @@ interface TemplateProvider {
         fun findTemplates(
             modalityState: ModalityState,
             repoRoot: VirtualFile,
-            directory: VirtualFile = repoRoot,
             templates: MutableList<VfsLoadedTemplate> = mutableListOf(),
             bundle: ResourceBundle? = loadMessagesBundle(modalityState, repoRoot)
         ): List<VfsLoadedTemplate> {
-            for (child in directory.children) { // TODO use visitor instead of loop
-                ProgressManager.checkCanceled()
-                if (child.isDirectory) {
-                    findTemplates(modalityState, repoRoot, child, templates, bundle)
-                } else if (child.name.endsWith(".mcdev.template.json")) {
+            val visitor = object : VirtualFileVisitor<Unit>() {
+                override fun visitFile(file: VirtualFile): Boolean {
+                    if (!file.isFile || !file.name.endsWith(".mcdev.template.json")) {
+                        return true
+                    }
+
                     try {
-                        createVfsLoadedTemplate(modalityState, directory, child, bundle = bundle)?.let(
-                            templates::add
-                        )
+                        createVfsLoadedTemplate(modalityState, file.parent, file, bundle = bundle)
+                            ?.let(templates::add)
                     } catch (t: Throwable) {
                         if (t is ControlFlowException) {
                             throw t
                         }
 
-                        val attachment = runCatching { Attachment(child.name, child.readText()) }.getOrNull()
+                        val attachment = runCatching { Attachment(file.name, file.readText()) }.getOrNull()
                         if (attachment != null) {
-                            thisLogger().error("Failed to load template ${child.path}", t, attachment)
+                            thisLogger().error("Failed to load template ${file.path}", t, attachment)
                         } else {
-                            thisLogger().error("Failed to load template ${child.path}", t)
+                            thisLogger().error("Failed to load template ${file.path}", t)
                         }
                     }
+
+                    return true
                 }
             }
-
+            VfsUtilCore.visitChildrenRecursively(repoRoot, visitor)
             return templates
         }
 
