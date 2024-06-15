@@ -182,7 +182,7 @@ class MinecraftConfigurable : Configurable {
                         val configPanel = provider.setupConfigUi(selectedRepo.data, dataConsumer)
                             ?: return@setEditAction
 
-                        val dialog = object : DialogWrapper(null) {
+                        val dialog = object : DialogWrapper(table, true) {
                             init {
                                 init()
                             }

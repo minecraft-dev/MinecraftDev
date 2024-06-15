@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom.providers
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.modalityState
+import com.demonwav.mcdev.util.refreshSync
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
@@ -46,7 +47,13 @@ class ZipTemplateProvider : TemplateProvider {
     override val hasConfig: Boolean = true
 
     override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
-        return loadTemplatesFrom(repo.data, context.modalityState)
+        val archiveRoot = repo.data + JarFileSystem.JAR_SEPARATOR
+        val fs = JarFileSystem.getInstance()
+        val rootFile = fs.refreshAndFindFileByPath(archiveRoot)
+            ?: return emptyList()
+        val modalityState = context.modalityState
+        rootFile.refreshSync(modalityState)
+        return TemplateProvider.findTemplates(modalityState, rootFile)
     }
 
     override fun setupConfigUi(
@@ -83,15 +90,4 @@ class ZipTemplateProvider : TemplateProvider {
 
     override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
         TemplateProvider.deserializeAndLoadVfs(element, modalityState)
-
-    companion object {
-
-        fun loadTemplatesFrom(archivePath: String, modalityState: ModalityState): List<LoadedTemplate> {
-            val archiveRoot = archivePath + JarFileSystem.JAR_SEPARATOR
-            val fs = JarFileSystem.getInstance()
-            val rootFile = fs.refreshAndFindFileByPath(archiveRoot)
-                ?: return emptyList()
-            return TemplateProvider.findTemplates(modalityState, rootFile)
-        }
-    }
 }

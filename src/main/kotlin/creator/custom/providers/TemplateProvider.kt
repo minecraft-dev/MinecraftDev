@@ -73,9 +73,6 @@ interface TemplateProvider {
 
         fun getAllKeys() = EP_NAME.extensionList.map { it.key }
 
-        fun getAll(): Collection<TemplateProvider> =
-            EP_NAME.extensionList.mapNotNull { KeyedExtensionCollector.instantiate(it) }
-
         fun findTemplates(
             modalityState: ModalityState,
             repoRoot: VirtualFile,

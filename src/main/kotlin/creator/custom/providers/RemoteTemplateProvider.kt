@@ -26,6 +26,7 @@ import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.refreshSync
 import com.demonwav.mcdev.util.virtualFile
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.result.getOrNull
@@ -40,8 +41,11 @@ import com.intellij.openapi.observable.util.trim
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
 import com.intellij.util.io.ZipUtil
@@ -52,7 +56,7 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.moveTo
 import kotlin.io.path.writeBytes
 
-class RemoteTemplateProvider : TemplateProvider {
+open class RemoteTemplateProvider : TemplateProvider {
 
     private var updatedTemplates = mutableSetOf<String>()
 
@@ -69,60 +73,76 @@ class RemoteTemplateProvider : TemplateProvider {
                 continue
             }
 
-            indicator.text2 = "Updating remote repository ${repo.name}"
-
-            val manager = FuelManager()
-            manager.proxy = selectProxy(remote.url)
-            val (_, _, result) = manager.get(remote.url)
-                .header("User-Agent", "github_org/minecraft-dev/${PluginUtil.pluginVersion}")
-                .header("Accepts", "application/json")
-                .timeout(10000)
-                .response()
-
-            val data = result.onError {
-                thisLogger().warn("Could not fetch remote templates repository update at ${remote.url}", it)
-            }.getOrNull() ?: return
-
-            try {
-                val remoteTemplatesDir = remote.getDestination(repo.name)
-                remoteTemplatesDir.createDirectories()
-                val zipPath = remoteTemplatesDir.resolveSibling("${repo.name}.zip")
-                zipPath.writeBytes(data)
-                FileUtil.deleteRecursively(remoteTemplatesDir)
-                ZipUtil.extract(zipPath, remoteTemplatesDir, null)
-
-                // Loose way to find out if the url is a github repo archive
-                // In such cases there is a single directory in the root directory of the zip
-                // We simply move all its children to the base directory so the rest of the system uses the correct
-                // root directory for this repository
-                val githubRepoArchiveRegex = "https://github\\.com/(.*?)/(.*?)/archive/refs/heads/(.*?).zip".toRegex()
-                val githubRepoArchiveMatcher = githubRepoArchiveRegex.matchEntire(remote.url)
-                if (githubRepoArchiveMatcher != null) {
-                    val repoName = githubRepoArchiveMatcher.groupValues[2]
-                    val branchName = githubRepoArchiveMatcher.groupValues[3]
-                    for (child in remoteTemplatesDir.resolve("$repoName-$branchName").listDirectoryEntries()) {
-                        child.moveTo(remoteTemplatesDir.resolve(child.fileName))
-                    }
-                }
-
+            if (doUpdateRepo(indicator, repo.name, remote.url, remote.getDestination(repo.name))) {
                 updatedTemplates.add(remote.url)
-
-                thisLogger().info("Remote templates repository update applied successfully")
-            } catch (t: Throwable) {
-                if (t is ControlFlowException) {
-                    throw t
-                }
-                thisLogger().error("Failed to apply remote templates repository update", t, repo.toString())
             }
         }
     }
 
-    override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
+    protected fun doUpdateRepo(
+        indicator: ProgressIndicator,
+        repoName: String,
+        repoUrl: String,
+        destination: Path
+    ): Boolean {
+        indicator.text2 = "Updating remote repository $repoName"
+
+        val manager = FuelManager()
+        manager.proxy = selectProxy(repoUrl)
+        val (_, _, result) = manager.get(repoUrl)
+            .header("User-Agent", "github_org/minecraft-dev/${PluginUtil.pluginVersion}")
+            .header("Accepts", "application/json")
+            .timeout(10000)
+            .response()
+
+        val data = result.onError {
+            thisLogger().warn("Could not fetch remote templates repository update at ${repoUrl}", it)
+        }.getOrNull() ?: return false
+
+        try {
+            val remoteTemplatesDir = destination
+            remoteTemplatesDir.createDirectories()
+            val zipPath = remoteTemplatesDir.resolveSibling("$repoName.zip")
+            zipPath.writeBytes(data)
+            FileUtil.deleteRecursively(remoteTemplatesDir)
+            ZipUtil.extract(zipPath, remoteTemplatesDir, null)
+
+            // Loose way to find out if the url is a github repo archive
+            // In such cases there is a single directory in the root directory of the zip
+            // We simply move all its children to the base directory so the rest of the system uses the correct
+            // root directory for this repository
+            val githubRepoArchiveRegex = "https://github\\.com/(.*?)/(.*?)/archive/refs/heads/(.*?).zip".toRegex()
+            val githubRepoArchiveMatcher = githubRepoArchiveRegex.matchEntire(repoUrl)
+            if (githubRepoArchiveMatcher != null) {
+                val githubRepoName = githubRepoArchiveMatcher.groupValues[2]
+                val branchName = githubRepoArchiveMatcher.groupValues[3]
+                for (child in remoteTemplatesDir.resolve("$githubRepoName-$branchName").listDirectoryEntries()) {
+                    child.moveTo(remoteTemplatesDir.resolve(child.fileName))
+                }
+            }
+
+            thisLogger().info("Remote templates repository update applied successfully")
+            return true
+        } catch (t: Throwable) {
+            if (t is ControlFlowException) {
+                throw t
+            }
+            thisLogger().error("Failed to apply remote templates repository update of $repoName", t)
+        }
+        return false
+    }
+
+    override fun loadTemplates(
+        context: WizardContext,
+        repo: MinecraftSettings.TemplateRepo
+    ): Collection<LoadedTemplate> {
         val remote = RemoteTemplateRepo.deserialize(repo.data)
             ?: return emptyList()
-        return remote.getDestination(repo.name).virtualFile
-            ?.let { TemplateProvider.findTemplates(context.modalityState, it) }
-            ?: emptyList()
+        val repoRoot = remote.getDestination(repo.name).virtualFile
+            ?: return emptyList()
+        val modalityState = context.modalityState
+        repoRoot.refreshSync(modalityState)
+        return TemplateProvider.findTemplates(modalityState, repoRoot)
     }
 
     override fun setupConfigUi(
@@ -137,6 +157,8 @@ class RemoteTemplateProvider : TemplateProvider {
         return panel {
             row(MCDevBundle("creator.ui.custom.remote.url.label")) {
                 textField()
+                    .align(AlignX.FILL)
+                    .columns(COLUMNS_LARGE)
                     .bindText(urlProperty)
                     .textValidation(BuiltinValidations.nonBlank)
             }
@@ -156,7 +178,7 @@ class RemoteTemplateProvider : TemplateProvider {
     override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
         TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 
-    private data class RemoteTemplateRepo(val url: String, val autoUpdate: Boolean) {
+    data class RemoteTemplateRepo(val url: String, val autoUpdate: Boolean) {
 
         fun getDestination(repoName: String): Path {
             return PathManager.getSystemDir().resolve("mcdev-templates").resolve(repoName)
@@ -167,12 +189,14 @@ class RemoteTemplateProvider : TemplateProvider {
         companion object {
             fun deserialize(data: String): RemoteTemplateRepo? {
                 val lines = data.lines()
-                if (lines.size < 2) {
-                    return null
+                return when (lines.size) {
+                    0 -> null
+                    1 -> RemoteTemplateRepo(lines[0], true)
+                    else -> {
+                        val (url, autoUpdate) = lines
+                        RemoteTemplateRepo(url, autoUpdate.toBoolean())
+                    }
                 }
-
-                val (url, autoUpdate) = lines
-                return RemoteTemplateRepo(url, autoUpdate.toBoolean())
             }
         }
     }

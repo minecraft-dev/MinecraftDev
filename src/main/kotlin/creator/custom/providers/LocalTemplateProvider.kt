@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom.providers
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.modalityState
+import com.demonwav.mcdev.util.refreshSync
 import com.demonwav.mcdev.util.virtualFile
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.ModalityState
@@ -48,8 +49,11 @@ class LocalTemplateProvider : TemplateProvider {
 
     override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
         val rootPath = Path.of(repo.data.trim()).absolute()
-        return rootPath.virtualFile?.let { TemplateProvider.findTemplates(context.modalityState, it) }
-            ?: emptyList()
+        val repoRoot = rootPath.virtualFile
+            ?: return emptyList()
+        val modalityState = context.modalityState
+        repoRoot.refreshSync(modalityState)
+        return TemplateProvider.findTemplates(modalityState, repoRoot)
     }
 
     override fun setupConfigUi(
