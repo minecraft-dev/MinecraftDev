@@ -61,8 +61,6 @@ interface TemplateProvider {
 
     fun setupConfigUi(data: String, dataSetter: (String) -> Unit): JComponent?
 
-    fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate?
-
     companion object {
 
         private val EP_NAME =
@@ -86,7 +84,7 @@ interface TemplateProvider {
                     findTemplates(modalityState, repoRoot, child, templates, bundle)
                 } else if (child.name.endsWith(".mcdev.template.json")) {
                     try {
-                        createVfsLoadedTemplate(modalityState, repoRoot, directory, child, bundle = bundle)?.let(
+                        createVfsLoadedTemplate(modalityState, directory, child, bundle = bundle)?.let(
                             templates::add
                         )
                     } catch (t: Throwable) {
@@ -159,7 +157,6 @@ interface TemplateProvider {
 
         fun createVfsLoadedTemplate(
             modalityState: ModalityState,
-            repoRoot: VirtualFile,
             templateRoot: VirtualFile,
             descriptorFile: VirtualFile,
             tooltip: String? = null,
@@ -205,12 +202,7 @@ interface TemplateProvider {
                 }
             }
 
-            return VfsLoadedTemplate(repoRoot, templateRoot, descriptorFile, label, tooltip, descriptor, true)
-        }
-
-        fun deserializeAndLoadVfs(element: String, modalityState: ModalityState): LoadedTemplate? {
-            val serialized = Gson().fromJson<VfsLoadedTemplate.Serialized>(element)
-            return serialized.load(modalityState)
+            return VfsLoadedTemplate(templateRoot, label, tooltip, descriptor, true)
         }
     }
 }

@@ -32,7 +32,6 @@ import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onError
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
@@ -174,9 +173,6 @@ open class RemoteTemplateProvider : TemplateProvider {
             }
         }
     }
-
-    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
-        TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 
     data class RemoteTemplateRepo(val url: String, val autoUpdate: Boolean) {
 

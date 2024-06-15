@@ -26,7 +26,6 @@ import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.util.refreshSync
 import com.demonwav.mcdev.util.virtualFile
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.ui.validation.validationErrorIf
@@ -89,7 +88,4 @@ class LocalTemplateProvider : TemplateProvider {
             }
         }
     }
-
-    override fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate? =
-        TemplateProvider.deserializeAndLoadVfs(element, modalityState)
 }

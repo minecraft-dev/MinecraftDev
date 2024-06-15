@@ -37,7 +37,4 @@ object EmptyLoadedTemplate : LoadedTemplate {
 
     override fun loadTemplateContents(path: String): String? =
         throw UnsupportedOperationException("The empty template can't have contents")
-
-    override fun serialize(): String? =
-        throw UnsupportedOperationException("The empty template can't have contents")
 }
