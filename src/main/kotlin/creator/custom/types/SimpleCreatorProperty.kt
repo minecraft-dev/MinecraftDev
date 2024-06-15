@@ -32,8 +32,8 @@ import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
 
 abstract class SimpleCreatorProperty<T>(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<T>(descriptor, graph, properties) {
 

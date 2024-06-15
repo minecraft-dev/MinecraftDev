@@ -25,8 +25,9 @@ import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
-import com.demonwav.mcdev.creator.custom.model.ForgeVersions
-import com.demonwav.mcdev.platform.forge.version.ForgeVersion
+import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
+import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
+import com.demonwav.mcdev.platform.neoforge.version.NeoGradleVersion
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -38,53 +39,55 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
-import kotlin.collections.Map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 
-class ForgeVersionsProperty(
+class NeoForgeVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<ForgeVersions>(descriptor, graph, properties) {
+) : CreatorProperty<NeoForgeVersions>(descriptor, graph, properties) {
 
     private val emptyVersion = SemanticVersion.release()
 
     private val defaultValue = createDefaultValue(descriptor.default)
 
-    override val graphProperty: GraphProperty<ForgeVersions> = graph.property(defaultValue)
-    var versions: ForgeVersions by graphProperty
+    override val graphProperty: GraphProperty<NeoForgeVersions> = graph.property(defaultValue)
+    var versions: NeoForgeVersions by graphProperty
 
-    private var forgeVersion: ForgeVersion? = null
+    private var nfVersion: NeoForgeVersion? = null
     private var previousMcVersion: SemanticVersion? = null
 
     private val mcVersionProperty = graphProperty.transform({ it.minecraft }, { versions.copy(minecraft = it) })
     private val mcVersionsModel = DefaultComboBoxModel<SemanticVersion>()
-    private val forgeVersionProperty = graphProperty.transform({ it.forge }, { versions.copy(forge = it) })
-    private val forgeVersionsModel = DefaultComboBoxModel<SemanticVersion>()
+    private val nfVersionProperty = graphProperty.transform({ it.neoforge }, { versions.copy(neoforge = it) })
+    private val nfVersionsModel = DefaultComboBoxModel<SemanticVersion>()
+    private val ngVersionProperty = graphProperty.transform({ it.neogradle }, { versions.copy(neogradle = it) })
+    private val ngVersionsModel = DefaultComboBoxModel<SemanticVersion>()
 
-    override fun createDefaultValue(raw: Any?): ForgeVersions {
+    override fun createDefaultValue(raw: Any?): NeoForgeVersions {
         if (raw is String) {
             return deserialize(raw)
         }
 
-        return ForgeVersions(emptyVersion, emptyVersion)
+        return NeoForgeVersions(emptyVersion, emptyVersion, emptyVersion)
     }
 
-    override fun serialize(value: ForgeVersions): String {
-        return "${value.minecraft} ${value.forge}"
+    override fun serialize(value: NeoForgeVersions): String {
+        return "${value.minecraft} ${value.neoforge} ${value.neogradle}"
     }
 
-    override fun deserialize(string: String): ForgeVersions {
+    override fun deserialize(string: String): NeoForgeVersions {
         val versions = string.split(' ')
-            .take(2)
+            .take(3)
             .map { SemanticVersion.tryParse(it) ?: emptyVersion }
 
-        return ForgeVersions(
+        return NeoForgeVersions(
             versions.getOrNull(0) ?: emptyVersion,
             versions.getOrNull(1) ?: emptyVersion,
+            versions.getOrNull(2) ?: emptyVersion,
         )
     }
 
@@ -96,9 +99,16 @@ class ForgeVersionsProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            label(MCDevBundle("creator.ui.forge_version.label")).gap(RightGap.SMALL)
-            comboBox(forgeVersionsModel)
-                .bindItem(forgeVersionProperty)
+            label(MCDevBundle("creator.ui.neoforge_version.label")).gap(RightGap.SMALL)
+            comboBox(nfVersionsModel)
+                .bindItem(nfVersionProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
+                .also { ComboboxSpeedSearch.installOn(it.component) }
+
+            label(MCDevBundle("creator.ui.neogradle_version.label")).gap(RightGap.SMALL)
+            comboBox(ngVersionsModel)
+                .bindItem(ngVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
@@ -114,17 +124,18 @@ class ForgeVersionsProperty(
             }
 
             previousMcVersion = mcVersion
-            val availableForgeVersions = forgeVersion!!.getForgeVersions(mcVersion)
+            val availableNfVersions = nfVersion!!.getNeoForgeVersions(mcVersion)
                 .take(descriptor.limit ?: 50)
-            forgeVersionsModel.removeAllElements()
-            forgeVersionsModel.addAll(availableForgeVersions)
-            forgeVersionProperty.set(availableForgeVersions.firstOrNull() ?: emptyVersion)
+            nfVersionsModel.removeAllElements()
+            nfVersionsModel.addAll(availableNfVersions)
+            nfVersionProperty.set(availableNfVersions.firstOrNull() ?: emptyVersion)
         }
 
         application.executeOnPooledThread {
             runBlocking {
-                val forgeVersions = ForgeVersion.downloadData()
-                val mcVersions = forgeVersions?.sortedMcVersions?.let { mcVersion ->
+                val neoforgeVersions = NeoForgeVersion.downloadData()
+                val neogradleVersions = NeoGradleVersion.downloadData()
+                val mcVersions = neoforgeVersions?.sortedMcVersions?.let { mcVersion ->
                     val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
                     if (filterExpr != null) {
                         mcVersion.filter { version ->
@@ -136,9 +147,9 @@ class ForgeVersionsProperty(
                     }
                 }
 
-                if (forgeVersions != null && !mcVersions.isNullOrEmpty()) {
+                if (neoforgeVersions != null && neogradleVersions != null && !mcVersions.isNullOrEmpty()) {
                     withContext(Dispatchers.Swing) {
-                        forgeVersion = forgeVersions
+                        nfVersion = neoforgeVersions
 
                         mcVersionsModel.removeAllElements()
                         mcVersionsModel.addAll(mcVersions)
@@ -149,6 +160,11 @@ class ForgeVersionsProperty(
                             else -> mcVersions.first()
                         }
                         mcVersionProperty.set(selectedMcVersion)
+
+                        val availableNgVersions = neogradleVersions.versions.take(descriptor.limit ?: 50)
+                        ngVersionsModel.removeAllElements()
+                        ngVersionsModel.addAll(availableNgVersions)
+                        ngVersionProperty.set(availableNgVersions.firstOrNull() ?: emptyVersion)
                     }
                 }
             }
@@ -157,9 +173,9 @@ class ForgeVersionsProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = ForgeVersionsProperty(descriptor, graph, properties)
+        ): CreatorProperty<*> = NeoForgeVersionsCreatorProperty(descriptor, graph, properties)
     }
 }

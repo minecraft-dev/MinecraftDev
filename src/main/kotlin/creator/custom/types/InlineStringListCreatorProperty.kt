@@ -30,10 +30,10 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 
 class InlineStringListCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<StringList>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<StringList>(descriptor, graph, properties) {
 
     override fun createDefaultValue(raw: Any?): StringList = deserialize(raw as? String ?: "")
 
@@ -54,9 +54,9 @@ class InlineStringListCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = InlineStringListCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = InlineStringListCreatorProperty(descriptor, graph, properties)
     }
 }

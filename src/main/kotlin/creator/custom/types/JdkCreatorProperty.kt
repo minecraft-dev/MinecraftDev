@@ -32,10 +32,10 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.ui.dsl.builder.Panel
 
 class JdkCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<CreatorJdk>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<CreatorJdk>(descriptor, graph, properties) {
 
     private lateinit var jdkComboBox: JdkComboBoxWithPreference
 
@@ -69,9 +69,9 @@ class JdkCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = JdkCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = JdkCreatorProperty(descriptor, graph, properties)
     }
 }

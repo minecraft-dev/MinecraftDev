@@ -34,10 +34,10 @@ import com.intellij.ui.dsl.builder.bindIntText
 import com.intellij.ui.dsl.builder.columns
 
 class IntegerCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<Int>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<Int>(descriptor, graph, properties) {
 
     override fun createDefaultValue(raw: Any?): Int = raw as? Int ?: 0
 
@@ -84,9 +84,9 @@ class IntegerCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = IntegerCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = IntegerCreatorProperty(descriptor, graph, properties)
     }
 }

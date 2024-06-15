@@ -28,10 +28,10 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.dsl.builder.Panel
 
 class ExternalCreatorProperty<T>(
+    descriptor: TemplatePropertyDescriptor = TemplatePropertyDescriptor("", "", "", default = ""),
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>,
     override val graphProperty: GraphProperty<T>,
-    descriptor: TemplatePropertyDescriptor = TemplatePropertyDescriptor("", "", "", default = ""),
 ) : CreatorProperty<T>(descriptor, graph, properties) {
 
     override fun setupProperty(reporter: TemplateValidationReporter) = Unit

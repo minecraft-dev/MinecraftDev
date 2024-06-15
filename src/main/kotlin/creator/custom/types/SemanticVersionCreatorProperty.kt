@@ -31,10 +31,10 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 
 open class SemanticVersionCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<SemanticVersion>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<SemanticVersion>(descriptor, graph, properties) {
 
     override fun createDefaultValue(raw: Any?): SemanticVersion =
         SemanticVersion.tryParse(raw as? String ?: "") ?: SemanticVersion(emptyList())
@@ -81,9 +81,9 @@ open class SemanticVersionCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = SemanticVersionCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = SemanticVersionCreatorProperty(descriptor, graph, properties)
     }
 }

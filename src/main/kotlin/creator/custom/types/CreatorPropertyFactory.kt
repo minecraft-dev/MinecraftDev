@@ -45,13 +45,13 @@ interface CreatorPropertyFactory {
             graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
         ): CreatorProperty<*>? {
-            return COLLECTOR.findSingle(type)?.create(graph, descriptor, properties)
+            return COLLECTOR.findSingle(type)?.create(descriptor, graph, properties)
         }
     }
 
     fun create(
-        graph: PropertyGraph,
         descriptor: TemplatePropertyDescriptor,
+        graph: PropertyGraph,
         properties: Map<String, CreatorProperty<*>>
     ): CreatorProperty<*>
 }

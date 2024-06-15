@@ -45,8 +45,8 @@ private val nonExampleValidation = validationErrorIf<String>(MCDevBundle("creato
 }
 
 class BuildSystemCoordinatesCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<BuildSystemCoordinates>(descriptor, graph, properties) {
 
@@ -127,9 +127,9 @@ class BuildSystemCoordinatesCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = BuildSystemCoordinatesCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = BuildSystemCoordinatesCreatorProperty(descriptor, graph, properties)
     }
 }

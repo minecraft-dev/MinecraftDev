@@ -50,9 +50,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 
-class ArchitecturyVersionsProperty(
-    graph: PropertyGraph,
+class ArchitecturyVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<ArchitecturyVersionsModel>(descriptor, graph, properties) {
 
@@ -287,14 +287,14 @@ class ArchitecturyVersionsProperty(
                 val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
                 val architecturyVersionsJob = asyncIO { ArchitecturyVersion.downloadData() }
 
-                this@ArchitecturyVersionsProperty.forgeVersions = forgeVersionsJob.await()
-                this@ArchitecturyVersionsProperty.neoForgeVersions = neoForgeVersionsJob.await()
-                this@ArchitecturyVersionsProperty.fabricVersions = fabricVersionsJob.await()
-                this@ArchitecturyVersionsProperty.loomVersions = loomVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.forgeVersions = forgeVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.neoForgeVersions = neoForgeVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.fabricVersions = fabricVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.loomVersions = loomVersionsJob.await()
                     .mapNotNull(SemanticVersion::tryParse)
                     .sortedDescending()
-                this@ArchitecturyVersionsProperty.fabricApiVersions = fabricApiVersionsJob.await()
-                this@ArchitecturyVersionsProperty.architecturyVersions = architecturyVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.fabricApiVersions = fabricApiVersionsJob.await()
+                this@ArchitecturyVersionsCreatorProperty.architecturyVersions = architecturyVersionsJob.await()
 
                 withContext(Dispatchers.Swing) {
                     val fabricVersions = fabricVersions
@@ -442,9 +442,9 @@ class ArchitecturyVersionsProperty(
     class Factory : CreatorPropertyFactory {
 
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = ArchitecturyVersionsProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = ArchitecturyVersionsCreatorProperty(descriptor, graph, properties)
     }
 }

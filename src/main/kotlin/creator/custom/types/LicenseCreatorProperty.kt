@@ -33,9 +33,9 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import java.time.ZonedDateTime
 
-class LicenseProperty(
-    graph: PropertyGraph,
+class LicenseCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<LicenseData>(descriptor, graph, properties) {
 
@@ -66,9 +66,9 @@ class LicenseProperty(
     class Factory : CreatorPropertyFactory {
 
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = LicenseProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = LicenseCreatorProperty(descriptor, graph, properties)
     }
 }

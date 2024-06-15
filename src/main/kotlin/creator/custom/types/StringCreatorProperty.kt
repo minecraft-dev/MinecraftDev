@@ -34,10 +34,10 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.textValidation
 
 class StringCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<String>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<String>(descriptor, graph, properties) {
 
     private var validationRegex: Regex? = null
 
@@ -97,9 +97,9 @@ class StringCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = StringCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = StringCreatorProperty(descriptor, graph, properties)
     }
 }

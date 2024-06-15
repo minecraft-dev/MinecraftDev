@@ -36,10 +36,10 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.textValidation
 
 class ClassFqnCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<ClassFqn>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<ClassFqn>(descriptor, graph, properties) {
 
     override fun createDefaultValue(raw: Any?): ClassFqn = ClassFqn(raw as? String ?: "")
 
@@ -74,9 +74,9 @@ class ClassFqnCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = ClassFqnCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = ClassFqnCreatorProperty(descriptor, graph, properties)
     }
 }

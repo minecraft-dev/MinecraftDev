@@ -41,7 +41,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 
-class ParchmentProperty(
+class ParchmentCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
@@ -243,9 +243,9 @@ class ParchmentProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = ParchmentProperty(descriptor, graph, properties)
+        ): CreatorProperty<*> = ParchmentCreatorProperty(descriptor, graph, properties)
     }
 }

@@ -49,9 +49,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 
-class FabricVersionsProperty(
-    graph: PropertyGraph,
+class FabricVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
 ) : CreatorProperty<FabricVersionsModel>(descriptor, graph, properties) {
 
@@ -221,11 +221,11 @@ class FabricVersionsProperty(
                 }
                 val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
 
-                this@FabricVersionsProperty.fabricVersions = fabricVersionsJob.await()
-                this@FabricVersionsProperty.loomVersions = loomVersionsJob.await()
+                this@FabricVersionsCreatorProperty.fabricVersions = fabricVersionsJob.await()
+                this@FabricVersionsCreatorProperty.loomVersions = loomVersionsJob.await()
                     .mapNotNull(SemanticVersion::tryParse)
                     .sortedDescending()
-                this@FabricVersionsProperty.fabricApiVersions = fabricApiVersionsJob.await()
+                this@FabricVersionsCreatorProperty.fabricApiVersions = fabricApiVersionsJob.await()
 
                 withContext(Dispatchers.Swing) {
                     val fabricVersions = fabricVersions
@@ -310,9 +310,9 @@ class FabricVersionsProperty(
     class Factory : CreatorPropertyFactory {
 
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = FabricVersionsProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = FabricVersionsCreatorProperty(descriptor, graph, properties)
     }
 }

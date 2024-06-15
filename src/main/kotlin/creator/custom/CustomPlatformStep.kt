@@ -316,7 +316,11 @@ class CustomPlatformStep(
         val baseData = data.getUserData(NewProjectWizardBaseData.KEY)
             ?: return thisLogger().error("Could not find wizard base data")
 
-        properties["PROJECT_NAME"] = ExternalCreatorProperty(propertyGraph, properties, baseData.nameProperty)
+        properties["PROJECT_NAME"] = ExternalCreatorProperty(
+            graph = propertyGraph,
+            properties = properties,
+            graphProperty = baseData.nameProperty
+        )
 
         placeholder.component = panel {
             val reporter = TemplateValidationReporterImpl()

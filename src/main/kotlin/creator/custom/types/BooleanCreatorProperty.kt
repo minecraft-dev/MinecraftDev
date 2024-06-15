@@ -30,10 +30,10 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindSelected
 
 class BooleanCreatorProperty(
-    graph: PropertyGraph,
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<Boolean>(graph, descriptor, properties) {
+) : SimpleCreatorProperty<Boolean>(descriptor, graph, properties) {
 
     override fun createDefaultValue(raw: Any?): Boolean = raw as? Boolean ?: false
 
@@ -59,9 +59,9 @@ class BooleanCreatorProperty(
 
     class Factory : CreatorPropertyFactory {
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = BooleanCreatorProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = BooleanCreatorProperty(descriptor, graph, properties)
     }
 }

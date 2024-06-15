@@ -36,11 +36,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 
-class MavenArtifactVersionProperty(
-    graph: PropertyGraph,
+class MavenArtifactVersionCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
+    graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SemanticVersionCreatorProperty(graph, descriptor, properties) {
+) : SemanticVersionCreatorProperty(descriptor, graph, properties) {
 
     val sourceUrl: String
         get() = descriptor.parameters!!["sourceUrl"] as String
@@ -88,9 +88,9 @@ class MavenArtifactVersionProperty(
     class Factory : CreatorPropertyFactory {
 
         override fun create(
-            graph: PropertyGraph,
             descriptor: TemplatePropertyDescriptor,
+            graph: PropertyGraph,
             properties: Map<String, CreatorProperty<*>>
-        ): CreatorProperty<*> = MavenArtifactVersionProperty(graph, descriptor, properties)
+        ): CreatorProperty<*> = MavenArtifactVersionCreatorProperty(descriptor, graph, properties)
     }
 }
