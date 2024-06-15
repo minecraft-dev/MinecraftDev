@@ -22,20 +22,36 @@ package com.demonwav.mcdev
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.util.NlsContexts
+import com.intellij.psi.impl.cache.impl.id.IdDataConsumer
+import com.intellij.ui.ComboBoxTableCellRenderer
 import com.intellij.ui.EnumComboBoxModel
+import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.Label
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.MutableProperty
+import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.table.TableView
 import com.intellij.util.IconUtil
+import com.intellij.util.ListWithSelection
+import com.intellij.util.ui.ColumnInfo
+import com.intellij.util.ui.ListTableModel
+import com.intellij.util.ui.table.ComboBoxTableCellEditor
 import javax.swing.JComponent
+import javax.swing.table.TableCellEditor
+import javax.swing.table.TableCellRenderer
 import org.jetbrains.annotations.Nls
 
 class MinecraftConfigurable : Configurable {
@@ -91,12 +107,103 @@ class MinecraftConfigurable : Configurable {
             }
         }
 
-        group(MCDevBundle("minecraft.settings.creator")) {
-            row {
-                checkBox(MCDevBundle("minecraft.settings.creator.auto_update_builtin_templates"))
-                    .comment(MCDevBundle("minecraft.settings.creator.auto_update_builtin_templates.comment"))
-                    .bindSelected(settings::isAutoUpdateBuiltinTemplate)
+        val nameColumn = object :
+            ColumnInfo<MinecraftSettings.TemplateRepo, String>(
+                MCDevBundle("minecraft.settings.creator.repos.column.name")
+            ) {
+
+            override fun valueOf(item: MinecraftSettings.TemplateRepo?): String? {
+                return item?.name
             }
+
+            override fun setValue(item: MinecraftSettings.TemplateRepo?, value: String?) {
+                item?.name = value ?: MCDevBundle("minecraft.settings.creator.repo.default_name")
+            }
+
+            override fun isCellEditable(item: MinecraftSettings.TemplateRepo?): Boolean = true
+        }
+
+        val providerColumn = object : ColumnInfo<MinecraftSettings.TemplateRepo, Any>(
+            MCDevBundle("minecraft.settings.creator.repos.column.provider")
+        ) {
+
+            override fun valueOf(item: MinecraftSettings.TemplateRepo?): ListWithSelection<String>? {
+                val providers = TemplateProvider.getAllKeys()
+                val list = ListWithSelection<String>(providers)
+                list.select(item?.provider?.takeUnless { it.isBlank() })
+
+                return list
+            }
+
+            override fun setValue(item: MinecraftSettings.TemplateRepo?, value: Any?) {
+                item?.provider = value as? String ?: "local"
+            }
+
+            override fun isCellEditable(item: MinecraftSettings.TemplateRepo?): Boolean = true
+
+            override fun getRenderer(item: MinecraftSettings.TemplateRepo?): TableCellRenderer? {
+                return ComboBoxTableCellRenderer.INSTANCE
+            }
+
+            override fun getEditor(item: MinecraftSettings.TemplateRepo?): TableCellEditor? {
+                return ComboBoxTableCellEditor.INSTANCE
+            }
+        }
+
+        val model = object : ListTableModel<MinecraftSettings.TemplateRepo>(nameColumn, providerColumn) {
+            override fun addRow() {
+                val defaultName = MCDevBundle("minecraft.settings.creator.repo.default_name")
+                addRow(MinecraftSettings.TemplateRepo(defaultName, "local", ""))
+            }
+        }
+        group(MCDevBundle("minecraft.settings.creator")) {
+            row(MCDevBundle("minecraft.settings.creator.repos")) {}
+
+            row {
+                val table = TableView<MinecraftSettings.TemplateRepo>()
+                table.setShowGrid(true)
+                table.model = model
+                table.tableHeader.reorderingAllowed = false
+
+                val decoratedTable = ToolbarDecorator.createDecorator(table)
+                    .setEditActionUpdater {
+                        val selectedRepo = table.selection.firstOrNull()
+                            ?: return@setEditActionUpdater false
+                        val provider = TemplateProvider.get(selectedRepo.provider)
+                            ?: return@setEditActionUpdater false
+                        return@setEditActionUpdater provider.hasConfig
+                    }
+                    .setEditAction {
+                        val selectedRepo = table.selection.firstOrNull()
+                            ?: return@setEditAction
+                        val provider = TemplateProvider.get(selectedRepo.provider)
+                            ?: return@setEditAction
+                        val dataConsumer = { data: String -> selectedRepo.data = data }
+                        val configPanel = provider.setupConfigUi(selectedRepo.data, dataConsumer)
+                            ?: return@setEditAction
+
+                        val dialog = object : DialogWrapper(null) {
+                            init {
+                                init()
+                            }
+
+                            override fun createCenterPanel(): JComponent = configPanel
+                        }
+                        dialog.title = MCDevBundle("minecraft.settings.creator.repo_config.title", selectedRepo.name)
+                        dialog.show()
+                    }
+                    .createPanel()
+                cell(decoratedTable)
+                    .align(Align.FILL)
+                    .bind(
+                        { _ -> model.items },
+                        { _, repos -> model.items = repos; },
+                        MutableProperty(
+                            { settings.creatorTemplateRepos.toMutableList() },
+                            { settings.creatorTemplateRepos = it }
+                        )
+                    )
+            }.resizableRow()
         }
 
         onApply {

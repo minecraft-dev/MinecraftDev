@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.providers
 
+import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.util.virtualFile
@@ -27,7 +28,6 @@ import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
-import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.dsl.builder.AlignX
@@ -37,7 +37,6 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
 import java.nio.file.Path
-import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.io.path.absolute
 
@@ -45,22 +44,20 @@ class LocalTemplateProvider : TemplateProvider {
 
     override fun getLabel(): String = "Local"
 
-    override fun setupUi(
-        context: WizardContext,
-        propertyGraph: PropertyGraph,
-        provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
-    ): JComponent {
-        val pathProperty = propertyGraph.property("").apply {
-            afterChange { path ->
-                provideTemplate.accept {
-                    val rootPath = Path.of(path.trim()).absolute()
-                    rootPath.virtualFile?.let { TemplateProvider.findTemplates(context.modalityState, it) }
-                        ?: emptyList()
-                }
-            }
-            bindStorage("${this@LocalTemplateProvider.javaClass.name}.path")
-        }
+    override val hasConfig: Boolean = true
 
+    override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
+        val rootPath = Path.of(repo.data.trim()).absolute()
+        return rootPath.virtualFile?.let { TemplateProvider.findTemplates(context.modalityState, it) }
+            ?: emptyList()
+    }
+
+    override fun setupConfigUi(
+        data: String,
+        dataSetter: (String) -> Unit
+    ): JComponent? {
+        val propertyGraph = PropertyGraph("LocalTemplateProvider config")
+        val pathProperty = propertyGraph.property(data)
         return panel {
             row(MCDevBundle("creator.ui.custom.path.label")) {
                 val pathChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor().apply {
@@ -68,7 +65,7 @@ class LocalTemplateProvider : TemplateProvider {
                 }
                 textFieldWithBrowseButton(
                     MCDevBundle("creator.ui.custom.path.dialog.title"),
-                    context.project,
+                    null,
                     pathChooserDescriptor
                 ).align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
@@ -81,6 +78,10 @@ class LocalTemplateProvider : TemplateProvider {
                             file == null || !file.isDirectory
                         }
                     )
+            }
+
+            onApply {
+                dataSetter(pathProperty.get())
             }
         }
     }

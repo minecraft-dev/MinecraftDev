@@ -20,13 +20,13 @@
 
 package com.demonwav.mcdev.creator.custom.providers
 
+import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.modalityState
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.observable.properties.PropertyGraph
-import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.ui.dsl.builder.AlignX
@@ -36,7 +36,6 @@ import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
 import java.nio.file.Path
-import java.util.function.Consumer
 import javax.swing.JComponent
 import kotlin.io.path.isRegularFile
 
@@ -44,19 +43,18 @@ class ZipTemplateProvider : TemplateProvider {
 
     override fun getLabel(): String = "Archive"
 
-    override fun setupUi(
-        context: WizardContext,
-        propertyGraph: PropertyGraph,
-        provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
+    override val hasConfig: Boolean = true
+
+    override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
+        return loadTemplatesFrom(repo.data, context.modalityState)
+    }
+
+    override fun setupConfigUi(
+        data: String,
+        dataSetter: (String) -> Unit
     ): JComponent {
-        val pathProperty = propertyGraph.property("").apply {
-            afterChange { path ->
-                provideTemplate.accept {
-                    loadTemplatesFrom(path, context.modalityState)
-                }
-            }
-            bindStorage("${this@ZipTemplateProvider.javaClass.name}.path")
-        }
+        val propertyGraph = PropertyGraph("ZipTemplateProvider config")
+        val pathProperty = propertyGraph.property(data)
 
         return panel {
             row(MCDevBundle("creator.ui.custom.path.label")) {
@@ -65,7 +63,7 @@ class ZipTemplateProvider : TemplateProvider {
                     .apply { description = MCDevBundle("creator.ui.custom.archive.dialog.description") }
                 textFieldWithBrowseButton(
                     MCDevBundle("creator.ui.custom.archive.dialog.title"),
-                    context.project,
+                    null,
                     pathChooserDescriptor
                 ).align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
@@ -75,6 +73,10 @@ class ZipTemplateProvider : TemplateProvider {
                             runCatching { !Path.of(value).isRegularFile() }.getOrDefault(true)
                         }
                     )
+            }
+
+            onApply {
+                dataSetter(pathProperty.get())
             }
         }
     }

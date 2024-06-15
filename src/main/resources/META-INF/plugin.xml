@@ -77,7 +77,9 @@
         <extensionPoint name="creatorPropertyType" beanClass="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactoryBean" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory"/>
         </extensionPoint>
-        <extensionPoint name="creatorTemplateProvider" interface="com.demonwav.mcdev.creator.custom.providers.TemplateProvider" dynamic="true"/>
+        <extensionPoint name="creatorTemplateProvider" beanClass="com.demonwav.mcdev.creator.custom.providers.TemplateProviderBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.providers.TemplateProvider"/>
+        </extensionPoint>
         <extensionPoint name="creatorFinalizer" beanClass="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizerBean" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizer"/>
         </extensionPoint>
@@ -148,10 +150,9 @@
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
         <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
 
-        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider" />
-        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.BuiltInTemplateProvider" />
-        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
-        <creatorTemplateProvider implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
+        <creatorTemplateProvider key="remote" implementation="com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider" />
+        <creatorTemplateProvider key="local" implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
+        <creatorTemplateProvider key="archive" implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
 
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportGradleProjectFinalizer" type="import_gradle_project" />
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportMavenProjectFinalizer" type="import_maven_project" />
@@ -222,7 +223,6 @@
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
-        <applicationService serviceImplementation="com.demonwav.mcdev.creator.custom.RecentProjectTemplates"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>

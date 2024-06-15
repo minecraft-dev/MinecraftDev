@@ -59,7 +59,7 @@ val VirtualFile.mcPath: String?
 operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(attribute)
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)
 
-fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile {
+fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile? {
     RefreshQueue.getInstance().refresh(false, this.isDirectory, null, modalityState, this)
-    return this.parent.findOrCreateChildData(this, this.name)
+    return this.parent?.findOrCreateChildData(this, this.name)
 }

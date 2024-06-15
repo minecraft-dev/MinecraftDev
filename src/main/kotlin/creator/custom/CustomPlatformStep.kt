@@ -20,11 +20,11 @@
 
 package com.demonwav.mcdev.creator.custom
 
+import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizer
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
-import com.demonwav.mcdev.creator.custom.providers.RecentTemplatesProvider
 import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
@@ -83,10 +83,12 @@ class CustomPlatformStep(
     parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardStep(parent) {
 
-    val templateProviders = TemplateProvider.getAll()
+    val templateRepos = MinecraftSettings.instance.creatorTemplateRepos
 
-    val templateProviderProperty = propertyGraph.property<TemplateProvider>(templateProviders.first())
-    var templateProvider by templateProviderProperty
+    val templateRepoProperty = propertyGraph.property<MinecraftSettings.TemplateRepo>(
+        templateRepos.firstOrNull() ?: MinecraftSettings.TemplateRepo.makeBuiltinRepo()
+    )
+    var templateRepo by templateRepoProperty
 
     val availableGroupsProperty = propertyGraph.property<Collection<String>>(emptyList())
     var availableGroups by availableGroupsProperty
@@ -104,7 +106,6 @@ class CustomPlatformStep(
     val templateProvidersTextProperty = propertyGraph.property("")
     val templateProvidersText2Property = propertyGraph.property("")
     lateinit var templateProvidersProcessIcon: Cell<AsyncProcessIcon>
-    lateinit var templateProviderPlaceholder: Placeholder
 
     val templateLoadingProperty = propertyGraph.property<Boolean>(true)
     val templateLoadingTextProperty = propertyGraph.property<String>("")
@@ -120,9 +121,9 @@ class CustomPlatformStep(
     override fun setupUI(builder: Panel) {
         lateinit var templatePropertyPlaceholder: Placeholder
 
-        builder.row(MCDevBundle("creator.ui.custom.provider.label")) {
-            segmentedButton(templateProviders, TemplateProvider::getLabel, TemplateProvider::getTooltip)
-                .bind(templateProviderProperty)
+        builder.row(MCDevBundle("creator.ui.custom.repos.label")) {
+            segmentedButton(templateRepos, { it.name })
+                .bind(templateRepoProperty)
         }
 
         builder.row {
@@ -137,15 +138,15 @@ class CustomPlatformStep(
             label("")
                 .bindText(templateProvidersText2Property)
                 .visibleIf(templateProvidersLoadingProperty)
-
-            templateProviderPlaceholder = placeholder()
         }
 
-        templateProviderProperty.afterChange { templateProvider ->
+        templateRepoProperty.afterChange { templateRepo ->
             templatePropertyPlaceholder.component = null
             availableTemplates = emptyList()
-            templateProviderPlaceholder.component =
-                templateProvider.setupUi(context, propertyGraph, ::loadTemplatesInBackground)
+            loadTemplatesInBackground {
+                val provider = TemplateProvider.get(templateRepo.provider)
+                provider?.loadTemplates(context, templateRepo).orEmpty()
+            }
         }
 
         builder.row(MCDevBundle("creator.ui.custom.groups.label")) {
@@ -231,10 +232,12 @@ class CustomPlatformStep(
                     VirtualFileManager.getInstance().syncRefresh()
                 }, context.modalityState)
 
-                for (provider in templateProviders) {
+                for ((providerKey, repos) in templateRepos.groupBy { it.provider }) {
                     ProgressManager.checkCanceled()
+                    val provider = TemplateProvider.get(providerKey)
+                        ?: continue
                     indicator.text = provider.getLabel()
-                    runCatching { provider.init(indicator) }
+                    runCatching { provider.init(indicator, repos) }
                         .getOrLogException(logger<CustomPlatformStep>())
                 }
 
@@ -243,7 +246,7 @@ class CustomPlatformStep(
                     ProgressManager.checkCanceled()
                     templateProvidersLoadingProperty.set(false)
                     // Force refresh to trigger template loading
-                    templateProviderProperty.set(templateProvider)
+                    templateRepoProperty.set(templateRepo)
                 }, context.modalityState)
             }
         }
@@ -324,6 +327,7 @@ class CustomPlatformStep(
                         .component.foreground = JBColor.YELLOW
                 }
             } else {
+                hasTemplateErrors = reporter.hasErrors
                 reporter.display(this)
 
                 if (!reporter.hasErrors) {
@@ -431,10 +435,6 @@ class CustomPlatformStep(
         val template = selectedTemplate
         if (template is EmptyLoadedTemplate) {
             return
-        }
-
-        if (templateProvider !is RecentTemplatesProvider) {
-            RecentProjectTemplates.instance.addNewTemplate(templateProvider.javaClass.name, template)
         }
 
         val projectPath = context.projectDirectory

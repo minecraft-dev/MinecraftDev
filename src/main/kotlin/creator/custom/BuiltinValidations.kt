@@ -30,6 +30,8 @@ import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.text.StringUtil
 
 object BuiltinValidations {
+    val nonBlank = validationErrorIf<String>(MCDevBundle("creator.validation.blank")) { it.isBlank() }
+
     val validVersion = validationErrorIf<String>(MCDevBundle("creator.validation.semantic_version")) {
         SemanticVersion.tryParse(it) == null
     }

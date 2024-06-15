@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.providers
 
+import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateResourceBundle
 import com.demonwav.mcdev.util.fromJson
@@ -32,43 +33,48 @@ import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
-import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.util.KeyedExtensionCollector
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
+import com.intellij.serviceContainer.BaseKeyedLazyInstance
+import com.intellij.util.KeyedLazyInstance
+import com.intellij.util.xmlb.annotations.Attribute
 import java.util.ResourceBundle
-import java.util.function.Consumer
 import javax.swing.JComponent
 
 /**
- * Extensions responsible for creating a [TemplateDescriptor] based on whatever data it is provided in its [UI][setupUi].
+ * Extensions responsible for creating a [TemplateDescriptor] based on whatever data it is provided in its configuration
+ * [UI][setupConfigUi].
  */
 interface TemplateProvider {
 
     fun getLabel(): String
 
-    fun getTooltip(): String? = null
+    val hasConfig: Boolean
 
-    fun init(indicator: ProgressIndicator) = Unit
+    fun init(indicator: ProgressIndicator, repos: List<MinecraftSettings.TemplateRepo>) = Unit
 
-    fun setupUi(
-        context: WizardContext,
-        propertyGraph: PropertyGraph,
-        provideTemplate: Consumer<() -> Collection<LoadedTemplate>>
-    ): JComponent?
+    fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate>
+
+    fun setupConfigUi(data: String, dataSetter: (String) -> Unit): JComponent?
 
     fun deserializeAndLoad(element: String, modalityState: ModalityState): LoadedTemplate?
 
     companion object {
 
-        private val EP_NAME = ExtensionPointName<TemplateProvider>("com.demonwav.minecraft-dev.creatorTemplateProvider")
+        private val EP_NAME =
+            ExtensionPointName<TemplateProviderBean>("com.demonwav.minecraft-dev.creatorTemplateProvider")
+        private val COLLECTOR = KeyedExtensionCollector<TemplateProvider, String>(EP_NAME)
 
-        fun get(name: String): TemplateProvider? {
-            return getAll().find { it.javaClass.name == name }
-        }
+        fun get(key: String): TemplateProvider? = COLLECTOR.findSingle(key)
 
-        fun getAll(): Collection<TemplateProvider> = EP_NAME.extensionList
+        fun getAllKeys() = EP_NAME.extensionList.map { it.key }
+
+        fun getAll(): Collection<TemplateProvider> =
+            EP_NAME.extensionList.mapNotNull { KeyedExtensionCollector.instantiate(it) }
 
         fun findTemplates(
             modalityState: ModalityState,
@@ -77,7 +83,6 @@ interface TemplateProvider {
             templates: MutableList<VfsLoadedTemplate> = mutableListOf(),
             bundle: ResourceBundle? = loadMessagesBundle(modalityState, repoRoot)
         ): List<VfsLoadedTemplate> {
-            directory.refreshSync(modalityState)
             for (child in directory.children) { // TODO use visitor instead of loop
                 ProgressManager.checkCanceled()
                 if (child.isDirectory) {
@@ -142,8 +147,8 @@ interface TemplateProvider {
             }
 
             try {
-                file.refreshSync(modalityState)
-                return file.inputStream.reader().use { TemplateResourceBundle(it, parent) }
+                return file.refreshSync(modalityState)
+                    ?.inputStream?.reader()?.use { TemplateResourceBundle(it, parent) }
             } catch (t: Throwable) {
                 if (t is ControlFlowException) {
                     return parent
@@ -211,4 +216,19 @@ interface TemplateProvider {
             return serialized.load(modalityState)
         }
     }
+}
+
+class TemplateProviderBean : BaseKeyedLazyInstance<TemplateProvider>(), KeyedLazyInstance<TemplateProvider> {
+
+    @Attribute("key")
+    @RequiredElement
+    lateinit var name: String
+
+    @Attribute("implementation")
+    @RequiredElement
+    lateinit var implementation: String
+
+    override fun getKey(): String? = name
+
+    override fun getImplementationClassName(): String? = implementation
 }
