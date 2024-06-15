@@ -29,8 +29,6 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.util.NlsContexts
-import com.intellij.psi.impl.cache.impl.id.IdDataConsumer
 import com.intellij.ui.ComboBoxTableCellRenderer
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.ToolbarDecorator
@@ -39,7 +37,6 @@ import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.MutableProperty
-import com.intellij.ui.dsl.builder.TopGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel

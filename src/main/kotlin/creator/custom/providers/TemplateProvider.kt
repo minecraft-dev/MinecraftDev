@@ -53,7 +53,7 @@ import javax.swing.JComponent
  */
 interface TemplateProvider {
 
-    fun getLabel(): String
+    val label: String
 
     val hasConfig: Boolean
 

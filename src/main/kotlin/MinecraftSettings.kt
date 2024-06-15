@@ -21,7 +21,6 @@
 package com.demonwav.mcdev
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State

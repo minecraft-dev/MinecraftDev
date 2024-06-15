@@ -42,11 +42,14 @@ import kotlin.io.path.absolute
 
 class LocalTemplateProvider : TemplateProvider {
 
-    override fun getLabel(): String = "Local"
+    override val label: String = MCDevBundle("template.provider.local.label")
 
     override val hasConfig: Boolean = true
 
-    override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
+    override fun loadTemplates(
+        context: WizardContext,
+        repo: MinecraftSettings.TemplateRepo
+    ): Collection<LoadedTemplate> {
         val rootPath = Path.of(repo.data.trim()).absolute()
         val repoRoot = rootPath.virtualFile
             ?: return emptyList()

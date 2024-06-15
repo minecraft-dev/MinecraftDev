@@ -59,7 +59,7 @@ open class RemoteTemplateProvider : TemplateProvider {
 
     private var updatedTemplates = mutableSetOf<String>()
 
-    override fun getLabel(): String = "Remote"
+    override val label: String = MCDevBundle("template.provider.remote.label")
 
     override val hasConfig: Boolean = true
 
@@ -95,7 +95,7 @@ open class RemoteTemplateProvider : TemplateProvider {
             .response()
 
         val data = result.onError {
-            thisLogger().warn("Could not fetch remote templates repository update at ${repoUrl}", it)
+            thisLogger().warn("Could not fetch remote templates repository update at $repoUrl", it)
         }.getOrNull() ?: return false
 
         try {

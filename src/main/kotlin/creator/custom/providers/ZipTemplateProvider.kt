@@ -41,11 +41,14 @@ import kotlin.io.path.isRegularFile
 
 class ZipTemplateProvider : TemplateProvider {
 
-    override fun getLabel(): String = "Archive"
+    override val label: String = MCDevBundle("template.provider.zip.label")
 
     override val hasConfig: Boolean = true
 
-    override fun loadTemplates(context: WizardContext, repo: MinecraftSettings.TemplateRepo): Collection<LoadedTemplate> {
+    override fun loadTemplates(
+        context: WizardContext,
+        repo: MinecraftSettings.TemplateRepo
+    ): Collection<LoadedTemplate> {
         val archiveRoot = repo.data + JarFileSystem.JAR_SEPARATOR
         val fs = JarFileSystem.getInstance()
         val rootFile = fs.refreshAndFindFileByPath(archiveRoot)

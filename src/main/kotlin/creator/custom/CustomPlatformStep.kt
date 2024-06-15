@@ -236,7 +236,7 @@ class CustomPlatformStep(
                     ProgressManager.checkCanceled()
                     val provider = TemplateProvider.get(providerKey)
                         ?: continue
-                    indicator.text = provider.getLabel()
+                    indicator.text = provider.label
                     runCatching { provider.init(indicator, repos) }
                         .getOrLogException(logger<CustomPlatformStep>())
                 }

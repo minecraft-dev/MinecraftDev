@@ -39,7 +39,7 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
     private val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates")
     private var repoUpdated: Boolean = false
 
-    override fun getLabel(): String = MCDevBundle("minecraft.settings.creator.repo.builtin_name")
+    override val label: String = MCDevBundle("template.provider.builtin.label")
 
     override val hasConfig: Boolean = true
 
@@ -49,7 +49,7 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
             return
         }
 
-        if (doUpdateRepo(indicator, getLabel(), builtinRepoUrl, builtinTemplatesPath)) {
+        if (doUpdateRepo(indicator, label, builtinRepoUrl, builtinTemplatesPath)) {
             repoUpdated = true
         }
     }
