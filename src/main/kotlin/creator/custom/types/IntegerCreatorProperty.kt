@@ -23,7 +23,6 @@ package com.demonwav.mcdev.creator.custom.types
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
-import com.demonwav.mcdev.platform.sponge.util.SpongeVersions
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -56,7 +55,6 @@ class IntegerCreatorProperty(
     override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
         return when (derivation.method) {
             "recommendJavaVersionForMcVersion" -> recommendJavaVersionForMcVersion(parentValues[0])
-            "recommendJavaVersionForSpongeApiVersion" -> recommendJavaVersionForSpongeApiVersion(parentValues[0])
             null -> (deriveSelectFirst(parentValues, derivation) as Number).toInt()
             else -> throw IllegalArgumentException("Unknown method derivation $derivation")
         }
@@ -72,14 +70,6 @@ class IntegerCreatorProperty(
         }
 
         return 17
-    }
-
-    private fun recommendJavaVersionForSpongeApiVersion(from: Any?): Int {
-        if (from !is SemanticVersion) {
-            return 17
-        }
-
-        return SpongeVersions.requiredJavaVersion(from).ordinal
     }
 
     class Factory : CreatorPropertyFactory {
