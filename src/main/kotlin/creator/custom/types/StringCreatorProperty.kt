@@ -21,12 +21,12 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
-import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
-import com.demonwav.mcdev.creator.custom.derivation.ReplacePropertyDerivation
-import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
+import com.demonwav.mcdev.creator.custom.derivation.ReplacePropertyDerivation
+import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
