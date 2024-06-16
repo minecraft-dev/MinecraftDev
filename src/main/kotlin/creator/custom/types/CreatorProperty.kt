@@ -121,6 +121,8 @@ abstract class CreatorProperty<T>(
                 }
             }
 
+            setupDerivation(reporter, descriptor.derives)
+
             fun collectParentValues(): List<Any?> = parents.map { properties[it]!!.get() }
 
             @Suppress("UNCHECKED_CAST")
@@ -147,6 +149,8 @@ abstract class CreatorProperty<T>(
         }
     }
 
+    protected open fun setupDerivation(reporter: TemplateValidationReporter, derives: PropertyDerivation) {}
+
     protected fun makeStorageKey(discriminator: String? = null): String {
         val base = "${javaClass.name}.property.${descriptor.name}.${descriptor.type}"
         if (discriminator == null) {
@@ -154,6 +158,17 @@ abstract class CreatorProperty<T>(
         }
 
         return "$base.$discriminator"
+    }
+
+    protected fun collectDerivationParents(
+        derives: PropertyDerivation,
+        reporter: TemplateValidationReporter
+    ): List<CreatorProperty<*>?>? = derives.parents?.map { parentName ->
+        val property = properties[parentName]
+        if (property == null) {
+            reporter.error("Unknown parent property: $parentName")
+        }
+        return@map property
     }
 
     protected fun <E> Panel.buildDropdownUi(options: List<E>, graphProp: GraphProperty<E>) {

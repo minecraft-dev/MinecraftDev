@@ -21,7 +21,10 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
+import com.demonwav.mcdev.creator.custom.PreparedDerivation
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
+import com.demonwav.mcdev.creator.custom.ReplacePropertyDerivation
+import com.demonwav.mcdev.creator.custom.SelectPropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -41,6 +44,8 @@ class StringCreatorProperty(
 
     private var validationRegex: Regex? = null
 
+    private var derivation: PreparedDerivation? = null
+
     override fun createDefaultValue(raw: Any?): String = raw as? String ?: ""
 
     override fun serialize(value: String): String = value
@@ -50,25 +55,10 @@ class StringCreatorProperty(
     override fun toStringProperty(graphProperty: GraphProperty<String>) = graphProperty
 
     override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
-        return when (derivation.method) {
-            "suggestSpongePluginId" -> suggestSpongePluginId(parentValues.first())
-            null -> deriveSelectFirst(parentValues, derivation).toString()
-            else -> throw IllegalArgumentException("Unknown method derivation $derivation")
+        if (this.derivation == null) {
+            throw IllegalStateException("This property has not been configured with a derivation")
         }
-    }
-
-    private fun suggestSpongePluginId(projectName: Any?): String? {
-        if (projectName !is String) {
-            return null
-        }
-
-        val invalidModIdRegex = "[^a-z0-9-_]+".toRegex()
-        val sanitized = projectName.lowercase().replace(invalidModIdRegex, "_")
-        if (sanitized.length > 64) {
-            return sanitized.substring(0, 64)
-        }
-
-        return sanitized
+        return this.derivation!!.derive(parentValues)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -81,6 +71,22 @@ class StringCreatorProperty(
             } catch (t: Throwable) {
                 reporter.error("Invalid validator regex: '$regexString': ${t.message}")
             }
+        }
+    }
+
+    override fun setupDerivation(reporter: TemplateValidationReporter, derives: PropertyDerivation) {
+        when (derives.method) {
+            "replace" -> {
+                val parents = collectDerivationParents(derives, reporter)
+                derivation = ReplacePropertyDerivation.create(reporter, parents, derives)
+            }
+
+            null -> {
+                // No need to collect parent values for this one because it is not used
+                derivation = SelectPropertyDerivation.create(reporter, emptyList(), derives)
+            }
+
+            else -> reporter.fatal("Unknown method derivation: $derivation")
         }
     }
 
