@@ -22,34 +22,22 @@ package com.demonwav.mcdev
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.custom.templateRepoTable
 import com.demonwav.mcdev.update.ConfigurePluginUpdatesDialog
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.ComboBoxTableCellRenderer
 import com.intellij.ui.EnumComboBoxModel
-import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.Label
-import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.MutableProperty
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.table.TableView
 import com.intellij.util.IconUtil
-import com.intellij.util.ListWithSelection
-import com.intellij.util.ui.ColumnInfo
-import com.intellij.util.ui.ListTableModel
-import com.intellij.util.ui.table.ComboBoxTableCellEditor
 import javax.swing.JComponent
-import javax.swing.table.TableCellEditor
-import javax.swing.table.TableCellRenderer
 import org.jetbrains.annotations.Nls
 
 class MinecraftConfigurable : Configurable {
