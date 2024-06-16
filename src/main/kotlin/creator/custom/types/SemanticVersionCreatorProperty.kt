@@ -22,6 +22,9 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.derivation.ExtractVersionMajorMinorPropertyDerivation
+import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -34,7 +37,7 @@ open class SemanticVersionCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<SemanticVersion>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<SemanticVersion>(descriptor, graph, properties, SemanticVersion::class.java) {
 
     override fun createDefaultValue(raw: Any?): SemanticVersion =
         SemanticVersion.tryParse(raw as? String ?: "") ?: SemanticVersion(emptyList())
@@ -52,31 +55,16 @@ open class SemanticVersionCreatorProperty(
         }.visible(descriptor.hidden != true)
     }
 
-    override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any {
-        return when (derivation.method) {
-            "extractVersionMajorMinor" -> extractVersionMajorMinor(parentValues[0])
-            null -> SemanticVersion.parse(deriveSelectFirst(parentValues, derivation).toString())
-            else -> throw IllegalArgumentException("Unknown method derivation $derivation")
-        }
-    }
-
-    private fun extractVersionMajorMinor(from: Any?): SemanticVersion {
-        if (from !is SemanticVersion) {
-            return SemanticVersion(emptyList())
+    override fun setupDerivation(
+        reporter: TemplateValidationReporter,
+        derives: PropertyDerivation
+    ): PreparedDerivation? = when (derives.method) {
+        "extractVersionMajorMinor" -> {
+            val parents = collectDerivationParents(reporter)
+            ExtractVersionMajorMinorPropertyDerivation.create(reporter, parents, derives)
         }
 
-        if (from.parts.size < 2) {
-            return SemanticVersion(emptyList())
-        }
-
-        val (part1, part2) = from.parts
-        if (part1 is SemanticVersion.Companion.VersionPart.ReleasePart &&
-            part2 is SemanticVersion.Companion.VersionPart.ReleasePart
-        ) {
-            return SemanticVersion(listOf(part1, part2))
-        }
-
-        return SemanticVersion(emptyList())
+        else -> null
     }
 
     class Factory : CreatorPropertyFactory {

@@ -34,8 +34,9 @@ import javax.swing.JList
 abstract class SimpleCreatorProperty<T>(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
-    properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<T>(descriptor, graph, properties) {
+    properties: Map<String, CreatorProperty<*>>,
+    valueType: Class<T>
+) : CreatorProperty<T>(descriptor, graph, properties, valueType) {
 
     private val options: Map<T, String>? = makeOptionsList()
 

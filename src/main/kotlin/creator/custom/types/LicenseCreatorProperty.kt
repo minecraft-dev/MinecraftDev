@@ -37,7 +37,7 @@ class LicenseCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<LicenseData>(descriptor, graph, properties) {
+) : CreatorProperty<LicenseData>(descriptor, graph, properties, LicenseData::class.java) {
 
     override val graphProperty: GraphProperty<LicenseData> =
         graph.property(createDefaultValue(descriptor.default))

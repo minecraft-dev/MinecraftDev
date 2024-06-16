@@ -18,8 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.creator.custom
+package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.creator.custom.PropertyDerivation
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 
 class ReplacePropertyDerivation(
@@ -61,7 +63,7 @@ class ReplacePropertyDerivation(
                 reporter.warn("More than one parent defined")
             }
 
-            if (parents.first()?.get() !is String) {
+            if (!parents[0]!!.acceptsType(String::class.java)) {
                 reporter.error("Parent property must produce a string value")
                 return null
             }

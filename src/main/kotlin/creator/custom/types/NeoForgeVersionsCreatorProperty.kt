@@ -48,7 +48,7 @@ class NeoForgeVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<NeoForgeVersions>(descriptor, graph, properties) {
+) : CreatorProperty<NeoForgeVersions>(descriptor, graph, properties, NeoForgeVersions::class.java) {
 
     private val emptyVersion = SemanticVersion.release()
 

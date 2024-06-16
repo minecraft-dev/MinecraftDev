@@ -35,7 +35,7 @@ class JdkCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<CreatorJdk>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<CreatorJdk>(descriptor, graph, properties, CreatorJdk::class.java) {
 
     private lateinit var jdkComboBox: JdkComboBoxWithPreference
 

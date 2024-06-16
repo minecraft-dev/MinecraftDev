@@ -18,31 +18,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.creator.custom
+package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.creator.custom.PropertyDerivation
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
-import com.intellij.openapi.diagnostic.getOrLogException
-import com.intellij.openapi.diagnostic.thisLogger
+import com.demonwav.mcdev.util.SemanticVersion
 
-class SelectPropertyDerivation(
-    val parents: List<String>?,
-    val options: List<PropertyDerivationSelect>,
-    val default: Any?,
-) : PreparedDerivation {
+class ExtractVersionMajorMinorPropertyDerivation : PreparedDerivation {
 
     override fun derive(parentValues: List<Any?>): Any? {
-        val properties = if (!parents.isNullOrEmpty()) {
-            parentValues.mapIndexed { i, value -> parents[i] to value }.toMap()
-        } else {
-            emptyMap()
-        }
-        for (option in options) {
-            if (TemplateEvaluator.condition(properties, option.condition).getOrLogException(thisLogger()) == true) {
-                return option.value
-            }
+        val from = parentValues[0] as SemanticVersion
+        if (from.parts.size < 2) {
+            return SemanticVersion(emptyList())
         }
 
-        return default
+        val (part1, part2) = from.parts
+        if (part1 is SemanticVersion.Companion.VersionPart.ReleasePart &&
+            part2 is SemanticVersion.Companion.VersionPart.ReleasePart
+        ) {
+            return SemanticVersion(listOf(part1, part2))
+        }
+
+        return SemanticVersion(emptyList())
     }
 
     companion object : PropertyDerivationFactory {
@@ -52,12 +50,17 @@ class SelectPropertyDerivation(
             parents: List<CreatorProperty<*>?>?,
             derivation: PropertyDerivation
         ): PreparedDerivation? {
-            if (derivation.select == null) {
-                reporter.error("Missing select options")
+            if (parents.isNullOrEmpty()) {
+                reporter.error("Expected a parent")
                 return null
             }
 
-            return SelectPropertyDerivation(derivation.parents, derivation.select, derivation.default)
+            if (!parents[0]!!.acceptsType(SemanticVersion::class.java)) {
+                reporter.error("First parent must produce a semantic version")
+                return null
+            }
+
+            return ExtractVersionMajorMinorPropertyDerivation()
         }
     }
 }

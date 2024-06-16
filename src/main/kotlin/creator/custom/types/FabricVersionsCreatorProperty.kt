@@ -53,7 +53,7 @@ class FabricVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<FabricVersionsModel>(descriptor, graph, properties) {
+) : CreatorProperty<FabricVersionsModel>(descriptor, graph, properties, FabricVersionsModel::class.java) {
 
     private val emptyVersion = SemanticVersion.release()
     private val emptyValue = FabricVersionsModel(

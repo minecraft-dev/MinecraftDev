@@ -21,10 +21,10 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
-import com.demonwav.mcdev.creator.custom.PreparedDerivation
+import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
-import com.demonwav.mcdev.creator.custom.ReplacePropertyDerivation
-import com.demonwav.mcdev.creator.custom.SelectPropertyDerivation
+import com.demonwav.mcdev.creator.custom.derivation.ReplacePropertyDerivation
+import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -40,11 +40,9 @@ class StringCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<String>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<String>(descriptor, graph, properties, String::class.java) {
 
     private var validationRegex: Regex? = null
-
-    private var derivation: PreparedDerivation? = null
 
     override fun createDefaultValue(raw: Any?): String = raw as? String ?: ""
 
@@ -53,13 +51,6 @@ class StringCreatorProperty(
     override fun deserialize(string: String): String = string
 
     override fun toStringProperty(graphProperty: GraphProperty<String>) = graphProperty
-
-    override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
-        if (this.derivation == null) {
-            throw IllegalStateException("This property has not been configured with a derivation")
-        }
-        return this.derivation!!.derive(parentValues)
-    }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
         super.setupProperty(reporter)
@@ -74,20 +65,21 @@ class StringCreatorProperty(
         }
     }
 
-    override fun setupDerivation(reporter: TemplateValidationReporter, derives: PropertyDerivation) {
-        when (derives.method) {
-            "replace" -> {
-                val parents = collectDerivationParents(derives, reporter)
-                derivation = ReplacePropertyDerivation.create(reporter, parents, derives)
-            }
-
-            null -> {
-                // No need to collect parent values for this one because it is not used
-                derivation = SelectPropertyDerivation.create(reporter, emptyList(), derives)
-            }
-
-            else -> reporter.fatal("Unknown method derivation: $derivation")
+    override fun setupDerivation(
+        reporter: TemplateValidationReporter,
+        derives: PropertyDerivation
+    ): PreparedDerivation? = when (derives.method) {
+        "replace" -> {
+            val parents = collectDerivationParents(reporter)
+            ReplacePropertyDerivation.create(reporter, parents, derives)
         }
+
+        null -> {
+            // No need to collect parent values for this one because it is not used
+            SelectPropertyDerivation.create(reporter, emptyList(), derives)
+        }
+
+        else -> null
     }
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {

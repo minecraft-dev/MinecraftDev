@@ -22,9 +22,10 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
-import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
-import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
+import com.demonwav.mcdev.creator.custom.derivation.RecommendJavaVersionForMcVersionPropertyDerivation
+import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
@@ -36,13 +37,15 @@ class IntegerCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<Int>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<Int>(descriptor, graph, properties, Int::class.java) {
 
     override fun createDefaultValue(raw: Any?): Int = raw as? Int ?: 0
 
     override fun serialize(value: Int): String = value.toString()
 
     override fun deserialize(string: String): Int = string.toIntOrNull() ?: 0
+
+    override fun convertSelectDerivationResult(original: Any?): Any? = (original as? Number)?.toInt()
 
     override fun buildSimpleUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.translatedLabel) {
@@ -52,24 +55,21 @@ class IntegerCreatorProperty(
         }.visible(descriptor.hidden != true)
     }
 
-    override fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
-        return when (derivation.method) {
-            "recommendJavaVersionForMcVersion" -> recommendJavaVersionForMcVersion(parentValues[0])
-            null -> (deriveSelectFirst(parentValues, derivation) as Number).toInt()
-            else -> throw IllegalArgumentException("Unknown method derivation $derivation")
-        }
-    }
-
-    private fun recommendJavaVersionForMcVersion(from: Any?): Int {
-        if (from is SemanticVersion) {
-            return MinecraftVersions.requiredJavaVersion(from).ordinal
+    override fun setupDerivation(
+        reporter: TemplateValidationReporter,
+        derives: PropertyDerivation
+    ): PreparedDerivation? = when (derives.method) {
+        "recommendJavaVersionForMcVersion" -> {
+            val parents = collectDerivationParents(reporter)
+            RecommendJavaVersionForMcVersionPropertyDerivation.create(reporter, parents, derives)
         }
 
-        if (from is HasMinecraftVersion) {
-            return recommendJavaVersionForMcVersion(from.minecraftVersion)
+        null -> {
+            // No need to collect parent values for this one because it is not used
+            SelectPropertyDerivation.create(reporter, emptyList(), derives)
         }
 
-        return 17
+        else -> null
     }
 
     class Factory : CreatorPropertyFactory {

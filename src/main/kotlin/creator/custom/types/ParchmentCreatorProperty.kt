@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.ParchmentVersion
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
@@ -45,7 +46,7 @@ class ParchmentCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<ParchmentVersions>(descriptor, graph, properties) {
+) : CreatorProperty<ParchmentVersions>(descriptor, graph, properties, ParchmentVersions::class.java) {
 
     private val emptyVersion = SemanticVersion.release()
 
@@ -100,11 +101,15 @@ class ParchmentCreatorProperty(
             comboBox(mcVersionsModel)
                 .bindItem(mcVersionProperty)
                 .enabledIf(useParchmentProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             comboBox(versionsModel)
                 .bindItem(versionProperty)
                 .enabledIf(useParchmentProperty)
+                .validationOnInput(BuiltinValidations.nonEmptyVersion)
+                .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 

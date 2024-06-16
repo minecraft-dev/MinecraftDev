@@ -48,7 +48,7 @@ class ForgeVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<ForgeVersions>(descriptor, graph, properties) {
+) : CreatorProperty<ForgeVersions>(descriptor, graph, properties, ForgeVersions::class.java) {
 
     private val emptyVersion = SemanticVersion.release()
 

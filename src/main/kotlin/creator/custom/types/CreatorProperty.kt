@@ -24,6 +24,8 @@ import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
+import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.thisLogger
@@ -39,8 +41,11 @@ import com.intellij.ui.dsl.builder.bindItem
 abstract class CreatorProperty<T>(
     val descriptor: TemplatePropertyDescriptor,
     val graph: PropertyGraph,
-    protected val properties: Map<String, CreatorProperty<*>>
+    protected val properties: Map<String, CreatorProperty<*>>,
+    val valueType: Class<T>
 ) {
+    private var derivation: PreparedDerivation? = null
+
     abstract val graphProperty: GraphProperty<T>
 
     abstract fun createDefaultValue(raw: Any?): T
@@ -64,6 +69,8 @@ abstract class CreatorProperty<T>(
         return value
     }
 
+    fun acceptsType(type: Class<*>): Boolean = type.isAssignableFrom(valueType)
+
     /**
      * Produces a new value based on the provided [parentValues] and the template-defined [derivation] configuration.
      *
@@ -74,14 +81,20 @@ abstract class CreatorProperty<T>(
      *
      * @see GraphProperty.dependsOn
      */
-    open fun derive(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
-        if (derivation.select != null) {
-            return deriveSelectFirst(parentValues, derivation)
+    open fun derive(parentValues: List<Any?>?, derivation: PropertyDerivation): Any? {
+        if (this.derivation == null) {
+            throw IllegalStateException("This property has not been configured with a derivation")
         }
 
-        thisLogger().error("This type doesn't support derivation")
-        return graphProperty.get()
+        val result = this.derivation!!.derive(parentValues.orEmpty())
+        if (this.derivation is SelectPropertyDerivation) {
+            return convertSelectDerivationResult(result)
+        }
+
+        return result
     }
+
+    protected open fun convertSelectDerivationResult(original: Any?): Any? = original
 
     fun deriveSelectFirst(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
         val properties = parentValues.mapIndexed { i, value -> derivation.parents!![i] to value }.toMap()
@@ -121,17 +134,18 @@ abstract class CreatorProperty<T>(
                 }
             }
 
-            setupDerivation(reporter, descriptor.derives)
-
-            fun collectParentValues(): List<Any?> = parents.map { properties[it]!!.get() }
+            derivation = setupDerivation(reporter, descriptor.derives)
+            if (derivation == null) {
+                reporter.fatal("Unknown method derivation: ${descriptor.derives}")
+            }
 
             @Suppress("UNCHECKED_CAST")
-            graphProperty.set(derive(collectParentValues(), descriptor.derives) as T)
+            graphProperty.set(derive(collectDerivationParentValues(reporter), descriptor.derives) as T)
             for (parent in parents) {
                 val parentProperty = properties[parent]!!
                 graphProperty.dependsOn(parentProperty.graphProperty, descriptor.derives.whenModified != false) {
                     @Suppress("UNCHECKED_CAST")
-                    derive(collectParentValues(), descriptor.derives) as T
+                    derive(collectDerivationParentValues(), descriptor.derives) as T
                 }
             }
         }
@@ -149,7 +163,10 @@ abstract class CreatorProperty<T>(
         }
     }
 
-    protected open fun setupDerivation(reporter: TemplateValidationReporter, derives: PropertyDerivation) {}
+    protected open fun setupDerivation(
+        reporter: TemplateValidationReporter,
+        derives: PropertyDerivation
+    ): PreparedDerivation? = null
 
     protected fun makeStorageKey(discriminator: String? = null): String {
         val base = "${javaClass.name}.property.${descriptor.name}.${descriptor.type}"
@@ -160,16 +177,23 @@ abstract class CreatorProperty<T>(
         return "$base.$discriminator"
     }
 
-    protected fun collectDerivationParents(
-        derives: PropertyDerivation,
-        reporter: TemplateValidationReporter
-    ): List<CreatorProperty<*>?>? = derives.parents?.map { parentName ->
-        val property = properties[parentName]
-        if (property == null) {
-            reporter.error("Unknown parent property: $parentName")
+    protected fun collectDerivationParents(reporter: TemplateValidationReporter? = null): List<CreatorProperty<*>?>? =
+        descriptor.derives?.parents?.map { parentName ->
+            val property = properties[parentName]
+            if (property == null) {
+                reporter?.error("Unknown parent property: $parentName")
+            }
+            return@map property
         }
-        return@map property
-    }
+
+    protected fun collectDerivationParentValues(reporter: TemplateValidationReporter? = null): List<Any?>? =
+        descriptor.derives?.parents?.map { parentName ->
+            val property = properties[parentName]
+            if (property == null) {
+                reporter?.error("Unknown parent property: $parentName")
+            }
+            return@map property?.get()
+        }
 
     protected fun <E> Panel.buildDropdownUi(options: List<E>, graphProp: GraphProperty<E>) {
         row(descriptor.translatedLabel) {

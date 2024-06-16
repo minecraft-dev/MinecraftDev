@@ -32,7 +32,8 @@ class ExternalCreatorProperty<T>(
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>,
     override val graphProperty: GraphProperty<T>,
-) : CreatorProperty<T>(descriptor, graph, properties) {
+    valueType: Class<T>,
+) : CreatorProperty<T>(descriptor, graph, properties, valueType) {
 
     override fun setupProperty(reporter: TemplateValidationReporter) = Unit
 

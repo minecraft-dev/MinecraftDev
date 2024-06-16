@@ -48,7 +48,7 @@ class BuildSystemCoordinatesCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<BuildSystemCoordinates>(descriptor, graph, properties) {
+) : CreatorProperty<BuildSystemCoordinates>(descriptor, graph, properties, BuildSystemCoordinates::class.java) {
 
     private val default = createDefaultValue(descriptor.default)
 

@@ -319,7 +319,8 @@ class CustomPlatformStep(
         properties["PROJECT_NAME"] = ExternalCreatorProperty(
             graph = propertyGraph,
             properties = properties,
-            graphProperty = baseData.nameProperty
+            graphProperty = baseData.nameProperty,
+            valueType = String::class.java
         )
 
         placeholder.component = panel {

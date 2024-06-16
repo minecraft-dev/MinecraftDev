@@ -18,8 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.creator.custom
+package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.creator.custom.PropertyDerivation
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 
 fun interface PreparedDerivation {

@@ -33,7 +33,7 @@ class InlineStringListCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<StringList>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<StringList>(descriptor, graph, properties, StringList::class.java) {
 
     override fun createDefaultValue(raw: Any?): StringList = deserialize(raw as? String ?: "")
 

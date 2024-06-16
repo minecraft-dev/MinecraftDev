@@ -33,7 +33,7 @@ class BooleanCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : SimpleCreatorProperty<Boolean>(descriptor, graph, properties) {
+) : SimpleCreatorProperty<Boolean>(descriptor, graph, properties, Boolean::class.java) {
 
     override fun createDefaultValue(raw: Any?): Boolean = raw as? Boolean ?: false
 

@@ -54,7 +54,7 @@ class ArchitecturyVersionsCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     graph: PropertyGraph,
     properties: Map<String, CreatorProperty<*>>
-) : CreatorProperty<ArchitecturyVersionsModel>(descriptor, graph, properties) {
+) : CreatorProperty<ArchitecturyVersionsModel>(descriptor, graph, properties, ArchitecturyVersionsModel::class.java) {
 
     private val emptyVersion = SemanticVersion.release()
     private val emptyValue = ArchitecturyVersionsModel(
