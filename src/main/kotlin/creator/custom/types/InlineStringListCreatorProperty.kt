@@ -49,7 +49,7 @@ class InlineStringListCreatorProperty(
             this.textField().bindText(this@InlineStringListCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     class Factory : CreatorPropertyFactory {

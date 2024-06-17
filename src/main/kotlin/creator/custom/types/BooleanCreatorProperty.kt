@@ -54,7 +54,7 @@ class BooleanCreatorProperty(
             this.checkBox(label.removeSuffix(":").trim())
                 .bindSelected(graphProperty)
                 .enabled(descriptor.editable != false)
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     class Factory : CreatorPropertyFactory {

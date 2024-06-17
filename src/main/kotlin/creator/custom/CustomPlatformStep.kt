@@ -427,7 +427,7 @@ class CustomPlatformStep(
 
         properties[descriptor.name] = prop
 
-        if (descriptor.hidden == true) {
+        if (descriptor.visible == false) {
             return null
         }
 

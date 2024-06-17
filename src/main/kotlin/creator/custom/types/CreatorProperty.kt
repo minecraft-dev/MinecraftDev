@@ -36,6 +36,7 @@ import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
 
 abstract class CreatorProperty<T>(
@@ -45,6 +46,7 @@ abstract class CreatorProperty<T>(
     val valueType: Class<T>
 ) {
     private var derivation: PreparedDerivation? = null
+    private lateinit var visibleProperty: GraphProperty<Boolean>
 
     abstract val graphProperty: GraphProperty<T>
 
@@ -125,6 +127,8 @@ abstract class CreatorProperty<T>(
             toStringProperty(graphProperty).bindStorage(makeStorageKey())
         }
 
+        visibleProperty = setupVisibleProperty(reporter, descriptor.visible)
+
         if (descriptor.derives != null) {
             val parents = descriptor.derives.parents
                 ?: return reporter.error("No parents specified in derivation")
@@ -195,12 +199,86 @@ abstract class CreatorProperty<T>(
             return@map property?.get()
         }
 
+    protected fun Row.propertyVisibility(): Row = this.visibleIf(visibleProperty)
+
+    private fun setupVisibleProperty(
+        reporter: TemplateValidationReporter,
+        visibility: Any?
+    ): GraphProperty<Boolean> {
+        val prop = graph.property(true)
+        if (visibility == null || visibility is Boolean) {
+            prop.set(visibility != false)
+            return prop
+        }
+
+        if (visibility !is Map<*, *>) {
+            reporter.error("Visibility can only be a boolean or an object")
+            return prop
+        }
+
+        var dependsOn = visibility["dependsOn"]
+        if (dependsOn !is String && (dependsOn !is List<*> || dependsOn.any { it !is String })) {
+            reporter.error(
+                "Expected 'visible' to have a 'dependsOn' value that is either a string or a list of strings"
+            )
+            return prop
+        }
+
+        val dependenciesNames = when (dependsOn) {
+            is String -> setOf(dependsOn)
+            is Collection<*> -> dependsOn.filterIsInstance<String>().toSet()
+            else -> throw IllegalStateException("Should not be reached")
+        }
+        val dependencies = dependenciesNames.mapNotNull {
+            val dependency = this.properties[it]
+            if (dependency == null) {
+                reporter.error("Visibility dependency '$it' does not exist")
+            }
+            dependency
+        }
+        if (dependencies.size != dependenciesNames.size) {
+            // Errors have already been reported
+            return prop
+        }
+
+        val condition = visibility["condition"]
+        if (condition !is String) {
+            reporter.error("Expected 'visible' to have a 'condition' string")
+            return prop
+        }
+
+        var didInitialUpdate = false
+        val update: () -> Boolean = {
+            val conditionProperties = dependencies.associate { prop -> prop.descriptor.name to prop.get() }
+            val result = TemplateEvaluator.condition(conditionProperties, condition)
+            val exception = result.exceptionOrNull()
+            if (exception != null) {
+                if (!didInitialUpdate) {
+                    didInitialUpdate = true
+                    reporter.error("Failed to compute initial visibility: ${exception.message}")
+                    thisLogger().info("Failed to compute initial visibility: ${exception.message}", exception)
+                } else {
+                    thisLogger().error("Failed to compute initial visibility: ${exception.message}", exception)
+                }
+            }
+
+            result.getOrDefault(true)
+        }
+
+        prop.set(update())
+        for (dependency in dependencies) {
+            prop.dependsOn(dependency.graphProperty, deleteWhenModified = false, update)
+        }
+
+        return prop
+    }
+
     protected fun <E> Panel.buildDropdownUi(options: List<E>, graphProp: GraphProperty<E>) {
         row(descriptor.translatedLabel) {
             comboBox(options)
                 .bindItem(graphProp)
                 .enabled(descriptor.editable != false)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 }

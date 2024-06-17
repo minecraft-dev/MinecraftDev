@@ -90,7 +90,7 @@ class StringCreatorProperty(
             if (validationRegex != null) {
                 textField.textValidation(BuiltinValidations.byRegex(validationRegex!!))
             }
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     class Factory : CreatorPropertyFactory {

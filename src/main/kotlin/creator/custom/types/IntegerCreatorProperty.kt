@@ -52,7 +52,7 @@ class IntegerCreatorProperty(
             this.intTextField().bindIntText(graphProperty)
                 .columns(COLUMNS_LARGE)
                 .enabled(descriptor.editable != false)
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     override fun setupDerivation(

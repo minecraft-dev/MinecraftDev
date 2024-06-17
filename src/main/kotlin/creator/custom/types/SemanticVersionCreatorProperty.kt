@@ -52,7 +52,7 @@ open class SemanticVersionCreatorProperty(
             this.textField().bindText(this@SemanticVersionCreatorProperty.toStringProperty(graphProperty))
                 .columns(COLUMNS_SHORT)
                 .enabled(descriptor.editable != false)
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     override fun setupDerivation(

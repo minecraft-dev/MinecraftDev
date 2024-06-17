@@ -50,7 +50,7 @@ data class TemplatePropertyDescriptor(
     val forceDropdown: Boolean? = null,
     val groupProperties: List<TemplatePropertyDescriptor>? = null,
     val remember: Boolean? = null,
-    val hidden: Boolean? = null,
+    val visible: Any? = null,
     val editable: Boolean? = null,
     val collapsible: Boolean? = null,
     val warning: String? = null,

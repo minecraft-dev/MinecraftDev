@@ -92,7 +92,7 @@ abstract class SimpleCreatorProperty<T>(
                         .enabled(descriptor.editable != false)
                         .maxButtonsCount(4)
                 }
-            }.visible(descriptor.hidden != true)
+            }.propertyVisibility()
         } else {
             buildSimpleUi(panel, context)
         }

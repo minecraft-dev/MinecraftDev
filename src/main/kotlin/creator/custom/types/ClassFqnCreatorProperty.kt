@@ -53,7 +53,7 @@ class ClassFqnCreatorProperty(
                 .columns(COLUMNS_LARGE)
                 .textValidation(BuiltinValidations.validClassFqn)
                 .enabled(descriptor.editable != false)
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     override fun setupDerivation(

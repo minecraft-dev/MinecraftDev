@@ -65,7 +65,7 @@ class MavenArtifactVersionCreatorProperty(
                     combobox.component.addItem(version)
                 }
             }
-        }.visible(descriptor.hidden != true)
+        }.propertyVisibility()
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
