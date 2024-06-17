@@ -64,7 +64,7 @@ class BuildSystemCoordinatesCreatorProperty(
         return deserialize(str)
     }
 
-    private fun createDefaultValue() = BuildSystemCoordinates("", "", "")
+    private fun createDefaultValue() = BuildSystemCoordinates("org.example", "", "1.0-SNAPSHOT")
 
     override fun serialize(value: BuildSystemCoordinates): String =
         "${value.groupId}:${value.artifactId}:${value.version}"
