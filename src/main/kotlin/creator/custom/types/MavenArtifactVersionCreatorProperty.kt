@@ -22,6 +22,7 @@ package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
+import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -42,29 +43,11 @@ class MavenArtifactVersionCreatorProperty(
     properties: Map<String, CreatorProperty<*>>
 ) : SemanticVersionCreatorProperty(descriptor, graph, properties) {
 
-    val sourceUrl: String
-        get() = descriptor.parameters!!["sourceUrl"] as String
+    lateinit var sourceUrl: String
 
     override val graphProperty: GraphProperty<SemanticVersion> = graph.property(SemanticVersion(emptyList()))
     private val versionsProperty = graph.property<Collection<SemanticVersion>>(emptyList())
     private val loadingVersionsProperty = graph.property(true)
-
-    init {
-        application.executeOnPooledThread {
-            runBlocking {
-                val versions = collectMavenVersions(sourceUrl)
-                    .asSequence()
-                    .mapNotNull(SemanticVersion::tryParse)
-                    .sortedDescending()
-                    .take(descriptor.limit ?: 50)
-                    .toList()
-                withContext(Dispatchers.Swing) {
-                    versionsProperty.set(versions)
-                    loadingVersionsProperty.set(false)
-                }
-            }
-        }
-    }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
         panel.row(descriptor.translatedLabel) {
@@ -83,6 +66,33 @@ class MavenArtifactVersionCreatorProperty(
                 }
             }
         }.visible(descriptor.hidden != true)
+    }
+
+    override fun setupProperty(reporter: TemplateValidationReporter) {
+        super.setupProperty(reporter)
+
+        val url = descriptor.parameters?.get("sourceUrl") as? String
+        if (url == null) {
+            reporter.error("Expected string parameter 'sourceUrl'")
+            return
+        }
+
+        sourceUrl = url
+
+        application.executeOnPooledThread {
+            runBlocking {
+                val versions = collectMavenVersions(sourceUrl)
+                    .asSequence()
+                    .mapNotNull(SemanticVersion::tryParse)
+                    .sortedDescending()
+                    .take(descriptor.limit ?: 50)
+                    .toList()
+                withContext(Dispatchers.Swing) {
+                    versionsProperty.set(versions)
+                    loadingVersionsProperty.set(false)
+                }
+            }
+        }
     }
 
     class Factory : CreatorPropertyFactory {
