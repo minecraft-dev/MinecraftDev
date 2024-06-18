@@ -21,10 +21,13 @@
 package com.demonwav.mcdev.creator.custom.types
 
 import com.demonwav.mcdev.creator.collectMavenVersions
+import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.diagnostic.getOrLogException
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.ui.ComboboxSpeedSearch
@@ -44,6 +47,7 @@ class MavenArtifactVersionCreatorProperty(
 ) : SemanticVersionCreatorProperty(descriptor, graph, properties) {
 
     lateinit var sourceUrl: String
+    var rawVersionFilter: (String) -> Boolean = { true }
 
     override val graphProperty: GraphProperty<SemanticVersion> = graph.property(SemanticVersion(emptyList()))
     private val versionsProperty = graph.property<Collection<SemanticVersion>>(emptyList())
@@ -79,10 +83,24 @@ class MavenArtifactVersionCreatorProperty(
 
         sourceUrl = url
 
+        val rawVersionFilterCondition = descriptor.parameters?.get("rawVersionFilter")
+        if (rawVersionFilterCondition != null) {
+            if (rawVersionFilterCondition !is String) {
+                reporter.error("'rawVersionFilter' must be a string")
+            } else {
+                rawVersionFilter = { version ->
+                    val props = mapOf("version" to version)
+                    TemplateEvaluator.condition(props, rawVersionFilterCondition)
+                        .getOrLogException(thisLogger()) == true
+                }
+            }
+        }
+
         application.executeOnPooledThread {
             runBlocking {
                 val versions = collectMavenVersions(sourceUrl)
                     .asSequence()
+                    .filter(rawVersionFilter)
                     .mapNotNull(SemanticVersion::tryParse)
                     .sortedDescending()
                     .take(descriptor.limit ?: 50)
