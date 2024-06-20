@@ -48,6 +48,7 @@ class MavenArtifactVersionCreatorProperty(
 
     lateinit var sourceUrl: String
     var rawVersionFilter: (String) -> Boolean = { true }
+    var versionFilter: (SemanticVersion) -> Boolean = { true }
 
     override val graphProperty: GraphProperty<SemanticVersion> = graph.property(SemanticVersion(emptyList()))
     private val versionsProperty = graph.property<Collection<SemanticVersion>>(emptyList())
@@ -96,12 +97,26 @@ class MavenArtifactVersionCreatorProperty(
             }
         }
 
+        val versionFilterCondition = descriptor.parameters?.get("versionFilter")
+        if (versionFilterCondition != null) {
+            if (versionFilterCondition !is String) {
+                reporter.error("'versionFilter' must be a string")
+            } else {
+                versionFilter = { version ->
+                    val props = mapOf("version" to version)
+                    TemplateEvaluator.condition(props, versionFilterCondition)
+                        .getOrLogException(thisLogger()) == true
+                }
+            }
+        }
+
         application.executeOnPooledThread {
             runBlocking {
                 val versions = collectMavenVersions(sourceUrl)
                     .asSequence()
                     .filter(rawVersionFilter)
                     .mapNotNull(SemanticVersion::tryParse)
+                    .filter(versionFilter)
                     .sortedDescending()
                     .take(descriptor.limit ?: 50)
                     .toList()
