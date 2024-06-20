@@ -244,11 +244,13 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         )
                     }
                 }
-                "ninja.leaping.configurate.loader.ConfigurationLoader" -> {
+                "ninja.leaping.configurate.loader.ConfigurationLoader",
+                "org.spongepowered.configurate.reference.ConfigurationReference",
+                "org.spongepowered.configurate.loader.ConfigurationLoader" -> {
                     if (defaultConfig == null) {
                         holder.registerProblem(
                             variable.nameIdentifier ?: variable,
-                            "Injected ConfigurationLoader must be annotated with @DefaultConfig.",
+                            "Injected ${classType.name} must be annotated with @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
                             AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner),
                         )
@@ -257,7 +259,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     if (configDir != null) {
                         holder.registerProblem(
                             configDir,
-                            "Injected ConfigurationLoader cannot be annotated with @ConfigDir.",
+                            "Injected ${classType.name} cannot be annotated with @ConfigDir.",
                             ProblemHighlightType.GENERIC_ERROR,
                             QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir"),
                         )
@@ -267,7 +269,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         val ref = classType.reference
                         holder.registerProblem(
                             ref,
-                            "Injected ConfigurationLoader must have a generic parameter.",
+                            "Injected ${classType.name} must have a generic parameter.",
                             ProblemHighlightType.GENERIC_ERROR,
                             MissingConfLoaderTypeParamFix(ref),
                         )
@@ -275,14 +277,17 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         classType.parameters.firstOrNull()?.let { param ->
                             val paramType = param as? PsiClassReferenceType ?: return@let
                             val paramTypeFQName = paramType.fullQualifiedName ?: return@let
-                            if (paramTypeFQName != "ninja.leaping.configurate.commented.CommentedConfigurationNode") {
+                            if (
+                                paramTypeFQName != "ninja.leaping.configurate.commented.CommentedConfigurationNode" &&
+                                paramTypeFQName != "org.spongepowered.configurate.CommentedConfigurationNode"
+                            ) {
                                 val ref = param.reference
                                 holder.registerProblem(
                                     ref,
                                     "Injected ConfigurationLoader generic parameter must be " +
                                         "CommentedConfigurationNode.",
                                     ProblemHighlightType.GENERIC_ERROR,
-                                    WrongConfLoaderTypeParamFix(ref),
+                                    WrongConfLoaderTypeParamFix(classType.className, ref),
                                 )
                             }
                         }
@@ -371,7 +376,8 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         }
     }
 
-    class WrongConfLoaderTypeParamFix(ref: PsiJavaCodeReferenceElement) : LocalQuickFixOnPsiElement(ref) {
+    class WrongConfLoaderTypeParamFix(private val clazzName: String, param: PsiJavaCodeReferenceElement) :
+        LocalQuickFixOnPsiElement(param) {
 
         override fun getFamilyName(): String = name
 
@@ -379,7 +385,11 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val newRef = JavaPsiFacade.getElementFactory(project).createReferenceFromText(
-                "ninja.leaping.configurate.commented.CommentedConfigurationNode",
+                when (clazzName) {
+                    "ninja.leaping.configurate.loader.ConfigurationLoader" ->
+                        "ninja.leaping.configurate.commented.CommentedConfigurationNode"
+                    else -> { "org.spongepowered.configurate.CommentedConfigurationNode" }
+                },
                 startElement,
             )
             startElement.replace(newRef)
@@ -393,11 +403,23 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         override fun getText(): String = "Insert generic parameter"
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
-            val newRef = JavaPsiFacade.getElementFactory(project).createReferenceFromText(
-                "ninja.leaping.configurate.loader.ConfigurationLoader" +
-                    "<ninja.leaping.configurate.commented.CommentedConfigurationNode>",
-                startElement,
-            )
+            val newRef: PsiElement = if (
+                JavaPsiFacade.getInstance(project)
+                    .findPackage("ninja.leaping.configurate") != null
+            ) {
+                JavaPsiFacade.getElementFactory(project).createReferenceFromText(
+                    "ninja.leaping.configurate.loader.ConfigurationLoader" +
+                        "<ninja.leaping.configurate.commented.CommentedConfigurationNode>",
+                    startElement
+                )
+            } else {
+                JavaPsiFacade.getElementFactory(project).createReferenceFromText(
+                    "org.spongepowered.configurate.loader.ConfigurationLoader" +
+                        "<org.spongepowered.configurate.CommentedConfigurationNode>",
+                    startElement
+                )
+            }
+
             startElement.replace(newRef)
         }
     }
