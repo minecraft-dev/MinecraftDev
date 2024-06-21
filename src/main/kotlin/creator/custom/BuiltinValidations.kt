@@ -28,6 +28,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.DialogValidation
 import com.intellij.openapi.ui.validation.validationErrorIf
 import com.intellij.openapi.util.text.StringUtil
+import javax.swing.JComponent
 
 object BuiltinValidations {
     val nonBlank = validationErrorIf<String>(MCDevBundle("creator.validation.blank")) { it.isBlank() }
@@ -61,5 +62,17 @@ object BuiltinValidations {
     }
 
     fun byRegex(regex: Regex): DialogValidation.WithParameter<() -> String> =
-        validationErrorIf<String>("Must match regex $regex") { !it.matches(regex) }
+        validationErrorIf<String>(MCDevBundle("creator.validation.regex", regex)) { !it.matches(regex) }
+
+    fun <T> isAnyOf(
+        selectionGetter: () -> T,
+        options: Collection<T>,
+        component: JComponent? = null
+    ): DialogValidation = DialogValidation {
+        if (selectionGetter() !in options) {
+            return@DialogValidation ValidationInfo(MCDevBundle("creator.validation.invalid_option"), component)
+        }
+
+        return@DialogValidation null
+    }
 }

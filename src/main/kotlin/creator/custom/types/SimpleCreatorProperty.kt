@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -67,7 +69,7 @@ abstract class SimpleCreatorProperty<T>(
             if (descriptor.default is Number && descriptor.options is List<*>) {
                 descriptor.options[descriptor.default.toInt()]
             } else {
-                options!![createDefaultValue(descriptor.default)]
+                descriptor.default ?: options?.keys?.firstOrNull()
             }
         } else {
             descriptor.default
@@ -80,17 +82,33 @@ abstract class SimpleCreatorProperty<T>(
 
     override fun buildUi(panel: Panel, context: WizardContext) {
         if (isDropdown) {
+            if (graphProperty.get() !in options!!.keys) {
+                graphProperty.set(defaultValue)
+            }
+
             panel.row(descriptor.translatedLabel) {
                 if (descriptor.forceDropdown == true) {
-                    comboBox(options!!.keys, DropdownAutoRenderer())
+                    comboBox(options.keys, DropdownAutoRenderer())
                         .bindItem(graphProperty)
                         .enabled(descriptor.editable != false)
-                        .also { ComboboxSpeedSearch.installOn(it.component) }
+                        .also {
+                            val component = it.component
+                            ComboboxSpeedSearch.installOn(component)
+                            val validation =
+                                BuiltinValidations.isAnyOf(component::getSelectedItem, options.keys, component)
+                            it.validationOnInput(validation)
+                            it.validationOnApply(validation)
+                        }
                 } else {
-                    segmentedButton(options!!.keys) { options[it] ?: it.toString() }
+                    segmentedButton(options.keys) { options[it] ?: it.toString() }
                         .bind(graphProperty)
                         .enabled(descriptor.editable != false)
                         .maxButtonsCount(4)
+                        .validation {
+                            val message = MCDevBundle("creator.validation.invalid_option")
+                            addInputRule(message) { it.selectedItem !in options.keys }
+                            addApplyRule(message) { it.selectedItem !in options.keys }
+                        }
                 }
             }.propertyVisibility()
         } else {
