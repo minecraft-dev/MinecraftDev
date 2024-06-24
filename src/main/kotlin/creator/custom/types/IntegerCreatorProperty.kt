@@ -39,7 +39,7 @@ class IntegerCreatorProperty(
     properties: Map<String, CreatorProperty<*>>
 ) : SimpleCreatorProperty<Int>(descriptor, graph, properties, Int::class.java) {
 
-    override fun createDefaultValue(raw: Any?): Int = raw as? Int ?: 0
+    override fun createDefaultValue(raw: Any?): Int = (raw as? Number)?.toInt() ?: 0
 
     override fun serialize(value: Int): String = value.toString()
 
