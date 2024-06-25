@@ -239,13 +239,20 @@ class ParchmentCreatorProperty(
         val platformMcVersionPropertyName = descriptor.parameters?.get("minecraftVersionProperty") as? String
         val platformMcVersionProperty = properties[platformMcVersionPropertyName]
 
-        return when (val version = platformMcVersionProperty?.get()) {
+        val version = when (val version = platformMcVersionProperty?.get()) {
             is SemanticVersion -> version
             is HasMinecraftVersion -> version.minecraftVersion
-            else -> null
+            else -> return null
         }
-    }
 
+        // Ensures we get no trailing .0 for the first major version (1.21.0 -> 1.21)
+        // This is required because otherwise those versions won't be properly compared against Parchment's
+        val normalizedVersion = version.parts.dropLastWhile { part ->
+            part is SemanticVersion.Companion.VersionPart.ReleasePart && part.version == 0
+        }
+
+        return SemanticVersion(normalizedVersion)
+    }
     class Factory : CreatorPropertyFactory {
         override fun create(
             descriptor: TemplatePropertyDescriptor,
