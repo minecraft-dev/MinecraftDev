@@ -113,7 +113,7 @@ open class RemoteTemplateProvider : TemplateProvider {
             // In such cases there is a single directory in the root directory of the zip
             // We simply move all its children to the base directory so the rest of the system uses the correct
             // root directory for this repository
-            val githubRepoArchiveRegex = "https://github\\.com/(.*?)/(.*?)/archive/refs/heads/(.*?).zip".toRegex()
+            val githubRepoArchiveRegex = "https://github\\.com/(.*?)/(.*?)/archive/refs/heads/[vV]?(.*?).zip".toRegex()
             val githubRepoArchiveMatcher = githubRepoArchiveRegex.matchEntire(repoUrl)
             if (githubRepoArchiveMatcher != null) {
                 val githubRepoName = githubRepoArchiveMatcher.groupValues[2]

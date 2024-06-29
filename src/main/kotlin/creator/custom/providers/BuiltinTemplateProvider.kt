@@ -35,7 +35,7 @@ import javax.swing.JComponent
 
 class BuiltinTemplateProvider : RemoteTemplateProvider() {
 
-    private val builtinRepoUrl = "https://github.com/minecraft-dev/templates/archive/refs/heads/\$version.zip"
+    private val builtinRepoUrl = "https://github.com/minecraft-dev/templates/archive/refs/heads/v\$version.zip"
     private val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates")
     private var repoUpdated: Boolean = false
 
