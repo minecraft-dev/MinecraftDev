@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom.providers
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
+import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
@@ -81,10 +82,12 @@ open class RemoteTemplateProvider : TemplateProvider {
     protected fun doUpdateRepo(
         indicator: ProgressIndicator,
         repoName: String,
-        repoUrl: String,
+        originalRepoUrl: String,
         destination: Path
     ): Boolean {
         indicator.text2 = "Updating remote repository $repoName"
+
+        val repoUrl = originalRepoUrl.replace("\$version", TemplateDescriptor.FORMAT_VERSION.toString())
 
         val manager = FuelManager()
         manager.proxy = selectProxy(repoUrl)
@@ -156,6 +159,7 @@ open class RemoteTemplateProvider : TemplateProvider {
         return panel {
             row(MCDevBundle("creator.ui.custom.remote.url.label")) {
                 textField()
+                    .comment(MCDevBundle("creator.ui.custom.remote.url.comment"))
                     .align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(urlProperty)

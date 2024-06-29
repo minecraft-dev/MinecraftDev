@@ -37,6 +37,11 @@ data class TemplateDescriptor(
 
     val translatedGroup: String
         get() = translate("creator.ui.group.${(group ?: "default").lowercase()}.label")
+
+    companion object {
+
+        const val FORMAT_VERSION = 1
+    }
 }
 
 data class TemplatePropertyDescriptor(
