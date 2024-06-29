@@ -36,6 +36,7 @@ object MinecraftVersions {
     val MC1_19_3 = SemanticVersion.release(1, 19, 3)
     val MC1_19_4 = SemanticVersion.release(1, 19, 4)
     val MC1_20 = SemanticVersion.release(1, 20)
+    val MC1_20_1 = SemanticVersion.release(1, 20, 1)
     val MC1_20_2 = SemanticVersion.release(1, 20, 2)
     val MC1_20_3 = SemanticVersion.release(1, 20, 3)
     val MC1_20_4 = SemanticVersion.release(1, 20, 4)

@@ -65,6 +65,8 @@ class ForgeVersionsCreatorProperty(
     private val forgeVersionProperty = graphProperty.transform({ it.forge }, { versions.copy(forge = it) })
     private val forgeVersionsModel = DefaultComboBoxModel<SemanticVersion>()
 
+    private var mcVersionFilterParents: List<String>? = null
+
     override fun createDefaultValue(raw: Any?): ForgeVersions {
         if (raw is String) {
             return deserialize(raw)
@@ -121,38 +123,60 @@ class ForgeVersionsCreatorProperty(
             forgeVersionProperty.set(availableForgeVersions.firstOrNull() ?: emptyVersion)
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val forgeVersions = ForgeVersion.downloadData()
-                val mcVersions = forgeVersions?.sortedMcVersions?.let { mcVersion ->
-                    val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
-                    if (filterExpr != null) {
-                        mcVersion.filter { version ->
-                            val conditionProps = mapOf("MC_VERSION" to version)
-                            TemplateEvaluator.condition(conditionProps, filterExpr).getOrDefault(true)
-                        }
-                    } else {
-                        mcVersion
+        descriptor.parameters?.get("mcVersionFilterParents")?.let { parents ->
+            if (parents !is List<*> || parents.any { it !is String }) {
+                reporter.error("mcVersionFilterParents must be a list of strings")
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                this.mcVersionFilterParents = parents as List<String>
+                for (parent in parents) {
+                    val parentProp = properties[parent]
+                    if (parentProp == null) {
+                        reporter.error("Unknown mcVersionFilter parent $parent")
+                        continue
                     }
-                }
 
-                if (forgeVersions != null && !mcVersions.isNullOrEmpty()) {
-                    withContext(Dispatchers.Swing) {
-                        forgeVersion = forgeVersions
-
-                        mcVersionsModel.removeAllElements()
-                        mcVersionsModel.addAll(mcVersions)
-
-                        val selectedMcVersion = when {
-                            mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
-                            defaultValue.minecraft in mcVersions -> defaultValue.minecraft
-                            else -> mcVersions.first()
-                        }
-                        mcVersionProperty.set(selectedMcVersion)
+                    parentProp.graphProperty.afterChange {
+                        reloadMinecraftVersions()
                     }
                 }
             }
         }
+
+        application.executeOnPooledThread {
+            runBlocking {
+                forgeVersion = ForgeVersion.downloadData()
+                withContext(Dispatchers.Swing) {
+                    reloadMinecraftVersions()
+                }
+            }
+        }
+    }
+
+    private fun reloadMinecraftVersions() {
+        val forgeVersions = forgeVersion
+            ?: return
+
+        val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
+        val mcVersions = if (filterExpr != null) {
+            val conditionProps = collectPropertiesValues(mcVersionFilterParents)
+            forgeVersions.sortedMcVersions.filter { version ->
+                conditionProps["MC_VERSION"] = version
+                TemplateEvaluator.condition(conditionProps, filterExpr).getOrDefault(true)
+            }
+        } else {
+            forgeVersions.sortedMcVersions
+        }
+
+        mcVersionsModel.removeAllElements()
+        mcVersionsModel.addAll(mcVersions)
+
+        val selectedMcVersion = when {
+            mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
+            defaultValue.minecraft in mcVersions -> defaultValue.minecraft
+            else -> mcVersions.first()
+        }
+        mcVersionProperty.set(selectedMcVersion)
     }
 
     class Factory : CreatorPropertyFactory {

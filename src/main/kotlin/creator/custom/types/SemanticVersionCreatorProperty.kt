@@ -25,6 +25,7 @@ import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.derivation.ExtractVersionMajorMinorPropertyDerivation
 import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
+import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -64,7 +65,15 @@ open class SemanticVersionCreatorProperty(
             ExtractVersionMajorMinorPropertyDerivation.create(reporter, parents, derives)
         }
 
+        null -> {
+            SelectPropertyDerivation.create(reporter, emptyList(), derives)
+        }
+
         else -> null
+    }
+
+    override fun convertSelectDerivationResult(original: Any?): Any? {
+        return (original as? String)?.let(SemanticVersion::tryParse)
     }
 
     class Factory : CreatorPropertyFactory {

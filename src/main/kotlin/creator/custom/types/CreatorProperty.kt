@@ -181,6 +181,18 @@ abstract class CreatorProperty<T>(
         return "$base.$discriminator"
     }
 
+    protected fun collectPropertiesValues(names: List<String>? = null): MutableMap<String, Any?> {
+        val into = mutableMapOf<String, Any?>()
+
+        into.putAll(TemplateEvaluator.baseProperties)
+
+        return if (names == null) {
+            properties.mapValuesTo(into) { (_, prop) -> prop.get() }
+        } else {
+            names.associateWithTo(mutableMapOf()) { properties[it]?.get() }
+        }
+    }
+
     protected fun collectDerivationParents(reporter: TemplateValidationReporter? = null): List<CreatorProperty<*>?>? =
         descriptor.derives?.parents?.map { parentName ->
             val property = properties[parentName]
