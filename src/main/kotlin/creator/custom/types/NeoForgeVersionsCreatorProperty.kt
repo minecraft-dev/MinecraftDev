@@ -28,6 +28,7 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
 import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
 import com.demonwav.mcdev.platform.neoforge.version.NeoGradleVersion
+import com.demonwav.mcdev.platform.neoforge.version.platform.neoforge.version.NeoModDevVersion
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -65,29 +66,30 @@ class NeoForgeVersionsCreatorProperty(
     private val nfVersionProperty = graphProperty.transform({ it.neoforge }, { versions.copy(neoforge = it) })
     private val nfVersionsModel = DefaultComboBoxModel<SemanticVersion>()
     private val ngVersionProperty = graphProperty.transform({ it.neogradle }, { versions.copy(neogradle = it) })
-    private val ngVersionsModel = DefaultComboBoxModel<SemanticVersion>()
+    private val mdVersionProperty = graphProperty.transform({ it.moddev }, { versions.copy(moddev = it) })
 
     override fun createDefaultValue(raw: Any?): NeoForgeVersions {
         if (raw is String) {
             return deserialize(raw)
         }
 
-        return NeoForgeVersions(emptyVersion, emptyVersion, emptyVersion)
+        return NeoForgeVersions(emptyVersion, emptyVersion, emptyVersion, emptyVersion)
     }
 
     override fun serialize(value: NeoForgeVersions): String {
-        return "${value.minecraft} ${value.neoforge} ${value.neogradle}"
+        return "${value.minecraft} ${value.neoforge} ${value.neogradle} ${value.moddev}"
     }
 
     override fun deserialize(string: String): NeoForgeVersions {
         val versions = string.split(' ')
-            .take(3)
+            .take(4)
             .map { SemanticVersion.tryParse(it) ?: emptyVersion }
 
         return NeoForgeVersions(
             versions.getOrNull(0) ?: emptyVersion,
             versions.getOrNull(1) ?: emptyVersion,
             versions.getOrNull(2) ?: emptyVersion,
+            versions.getOrNull(3) ?: emptyVersion,
         )
     }
 
@@ -102,13 +104,6 @@ class NeoForgeVersionsCreatorProperty(
             label(MCDevBundle("creator.ui.neoforge_version.label")).gap(RightGap.SMALL)
             comboBox(nfVersionsModel)
                 .bindItem(nfVersionProperty)
-                .validationOnInput(BuiltinValidations.nonEmptyVersion)
-                .validationOnApply(BuiltinValidations.nonEmptyVersion)
-                .also { ComboboxSpeedSearch.installOn(it.component) }
-
-            label(MCDevBundle("creator.ui.neogradle_version.label")).gap(RightGap.SMALL)
-            comboBox(ngVersionsModel)
-                .bindItem(ngVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
@@ -135,6 +130,7 @@ class NeoForgeVersionsCreatorProperty(
             runBlocking {
                 val neoforgeVersions = NeoForgeVersion.downloadData()
                 val neogradleVersions = NeoGradleVersion.downloadData()
+                val moddevVersions = NeoModDevVersion.downloadData()
                 val mcVersions = neoforgeVersions?.sortedMcVersions?.let { mcVersion ->
                     val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
                     if (filterExpr != null) {
@@ -147,7 +143,9 @@ class NeoForgeVersionsCreatorProperty(
                     }
                 }
 
-                if (neoforgeVersions != null && neogradleVersions != null && !mcVersions.isNullOrEmpty()) {
+                if (neoforgeVersions != null && neogradleVersions != null &&
+                    moddevVersions != null && !mcVersions.isNullOrEmpty()
+                ) {
                     withContext(Dispatchers.Swing) {
                         nfVersion = neoforgeVersions
 
@@ -161,10 +159,8 @@ class NeoForgeVersionsCreatorProperty(
                         }
                         mcVersionProperty.set(selectedMcVersion)
 
-                        val availableNgVersions = neogradleVersions.versions.take(descriptor.limit ?: 50)
-                        ngVersionsModel.removeAllElements()
-                        ngVersionsModel.addAll(availableNgVersions)
-                        ngVersionProperty.set(availableNgVersions.firstOrNull() ?: emptyVersion)
+                        ngVersionProperty.set(neogradleVersions.versions.firstOrNull() ?: emptyVersion)
+                        mdVersionProperty.set(moddevVersions.versions.firstOrNull() ?: emptyVersion)
                     }
                 }
             }

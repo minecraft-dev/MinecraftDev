@@ -27,6 +27,7 @@ data class NeoForgeVersions(
     val minecraft: SemanticVersion,
     val neoforge: SemanticVersion,
     val neogradle: SemanticVersion,
+    val moddev: SemanticVersion,
 ) : HasMinecraftVersion {
     override val minecraftVersion = minecraft
 
