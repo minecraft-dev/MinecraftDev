@@ -38,6 +38,7 @@ import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.GitNewProjectWizardData
 import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.logger
@@ -476,7 +477,11 @@ class CustomPlatformStep(
                 }
 
                 val processedContent = TemplateEvaluator.template(fileTemplateProperties, templateContents)
-                    .getOrLogException(thisLogger())
+                    .onFailure { t ->
+                        val attachment = Attachment(relativeTemplate, templateContents)
+                        thisLogger().error("Failed evaluate template '$relativeTemplate'", t, attachment)
+                    }
+                    .getOrNull()
                     ?: continue
 
                 destPath.parent.createDirectories()
