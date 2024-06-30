@@ -469,7 +469,13 @@ class CustomPlatformStep(
                     continue
                 }
 
-                val processedContent = TemplateEvaluator.template(templateProperties, templateContents)
+                var fileTemplateProperties = templateProperties
+                if (file.properties != null) {
+                    fileTemplateProperties = templateProperties.toMutableMap()
+                    fileTemplateProperties.putAll(file.properties)
+                }
+
+                val processedContent = TemplateEvaluator.template(fileTemplateProperties, templateContents)
                     .getOrLogException(thisLogger())
                     ?: continue
 

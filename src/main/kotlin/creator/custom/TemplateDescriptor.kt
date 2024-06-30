@@ -93,6 +93,7 @@ data class TemplateFile(
     val template: String,
     val destination: String,
     val condition: String? = null,
+    val properties: Map<String, Any?>? = null,
     val reformat: Boolean? = null,
     val openInEditor: Boolean? = null,
 )
