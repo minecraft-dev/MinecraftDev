@@ -241,9 +241,9 @@ class FabricVersionsCreatorProperty(
                     if (loomVersions != null) {
                         loomVersionModel.removeAllElements()
                         loomVersionModel.addAll(loomVersions)
-                        val defaultValue = loomVersions.firstOrNull {
-                            it.parts.none { it is SemanticVersion.Companion.VersionPart.PreReleasePart }
-                        } ?: loomVersions.firstOrNull() ?: emptyVersion
+                        val defaultValue = loomVersions.firstOrNull { it.toString().endsWith("-SNAPSHOT") }
+                            ?: loomVersions.firstOrNull()
+                            ?: emptyVersion
 
                         loomVersionProperty.set(defaultValue)
                     }
