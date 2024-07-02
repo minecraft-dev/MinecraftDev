@@ -22,6 +22,7 @@ package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.refreshSync
@@ -37,6 +38,7 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
 
     private val builtinRepoUrl = "https://github.com/minecraft-dev/templates/archive/refs/heads/v\$version.zip"
     private val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates")
+    private val builtinTemplatesInnerPath = "templates-${TemplateDescriptor.FORMAT_VERSION}"
     private var repoUpdated: Boolean = false
 
     override val label: String = MCDevBundle("template.provider.builtin.label")
@@ -49,7 +51,7 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
             return
         }
 
-        if (doUpdateRepo(indicator, label, builtinRepoUrl, builtinTemplatesPath)) {
+        if (doUpdateRepo(indicator, label, builtinRepoUrl)) {
             repoUpdated = true
         }
     }
@@ -58,6 +60,11 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
         context: WizardContext,
         repo: MinecraftSettings.TemplateRepo
     ): Collection<LoadedTemplate> {
+        val remoteTemplates = doLoadTemplates(context, repo, builtinTemplatesInnerPath)
+        if (remoteTemplates.isNotEmpty()) {
+            return remoteTemplates
+        }
+
         val repoRoot = builtinTemplatesPath.virtualFile
             ?: return emptyList()
         repoRoot.refreshSync(context.modalityState)

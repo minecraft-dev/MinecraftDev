@@ -28,7 +28,6 @@ import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.creator.selectProxy
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.refreshSync
-import com.demonwav.mcdev.util.virtualFile
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.result.getOrNull
 import com.github.kittinunf.result.onError
@@ -40,7 +39,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.trim
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.bindSelected
@@ -48,12 +47,11 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.textValidation
-import com.intellij.util.io.ZipUtil
 import com.intellij.util.io.createDirectories
 import java.nio.file.Path
 import javax.swing.JComponent
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.moveTo
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.writeBytes
 
 open class RemoteTemplateProvider : TemplateProvider {
@@ -73,7 +71,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                 continue
             }
 
-            if (doUpdateRepo(indicator, repo.name, remote.url, remote.getDestination(repo.name))) {
+            if (doUpdateRepo(indicator, repo.name, remote.url)) {
                 updatedTemplates.add(remote.url)
             }
         }
@@ -82,12 +80,11 @@ open class RemoteTemplateProvider : TemplateProvider {
     protected fun doUpdateRepo(
         indicator: ProgressIndicator,
         repoName: String,
-        originalRepoUrl: String,
-        destination: Path
+        originalRepoUrl: String
     ): Boolean {
         indicator.text2 = "Updating remote repository $repoName"
 
-        val repoUrl = originalRepoUrl.replace("\$version", TemplateDescriptor.FORMAT_VERSION.toString())
+        val repoUrl = replaceVariables(originalRepoUrl)
 
         val manager = FuelManager()
         manager.proxy = selectProxy(repoUrl)
@@ -102,26 +99,9 @@ open class RemoteTemplateProvider : TemplateProvider {
         }.getOrNull() ?: return false
 
         try {
-            val remoteTemplatesDir = destination
-            remoteTemplatesDir.createDirectories()
-            val zipPath = remoteTemplatesDir.resolveSibling("$repoName.zip")
+            val zipPath = RemoteTemplateRepo.getDestinationZip(repoName)
+            zipPath.parent.createDirectories()
             zipPath.writeBytes(data)
-            FileUtil.deleteRecursively(remoteTemplatesDir)
-            ZipUtil.extract(zipPath, remoteTemplatesDir, null)
-
-            // Loose way to find out if the url is a github repo archive
-            // In such cases there is a single directory in the root directory of the zip
-            // We simply move all its children to the base directory so the rest of the system uses the correct
-            // root directory for this repository
-            val githubRepoArchiveRegex = "https://github\\.com/(.*?)/(.*?)/archive/refs/heads/[vV]?(.*?).zip".toRegex()
-            val githubRepoArchiveMatcher = githubRepoArchiveRegex.matchEntire(repoUrl)
-            if (githubRepoArchiveMatcher != null) {
-                val githubRepoName = githubRepoArchiveMatcher.groupValues[2]
-                val branchName = githubRepoArchiveMatcher.groupValues[3]
-                for (child in remoteTemplatesDir.resolve("$githubRepoName-$branchName").listDirectoryEntries()) {
-                    child.moveTo(remoteTemplatesDir.resolve(child.fileName))
-                }
-            }
 
             thisLogger().info("Remote templates repository update applied successfully")
             return true
@@ -138,14 +118,45 @@ open class RemoteTemplateProvider : TemplateProvider {
         context: WizardContext,
         repo: MinecraftSettings.TemplateRepo
     ): Collection<LoadedTemplate> {
-        val remote = RemoteTemplateRepo.deserialize(repo.data)
+        val remoteRepo = RemoteTemplateRepo.deserialize(repo.data)
             ?: return emptyList()
-        val repoRoot = remote.getDestination(repo.name).virtualFile
+        return doLoadTemplates(context, repo, remoteRepo.innerPath)
+    }
+
+    protected fun doLoadTemplates(
+        context: WizardContext,
+        repo: MinecraftSettings.TemplateRepo,
+        rawInnerPath: String
+    ): List<LoadedTemplate> {
+        val remoteRootPath = RemoteTemplateRepo.getDestinationZip(repo.name)
+        if (!remoteRootPath.exists()) {
+            return emptyList()
+        }
+
+        val archiveRoot = remoteRootPath.absolutePathString() + JarFileSystem.JAR_SEPARATOR
+
+        val fs = JarFileSystem.getInstance()
+        val rootFile = fs.refreshAndFindFileByPath(archiveRoot)
             ?: return emptyList()
         val modalityState = context.modalityState
-        repoRoot.refreshSync(modalityState)
+        rootFile.refreshSync(modalityState)
+
+        val innerPath = replaceVariables(rawInnerPath)
+        val repoRoot = if (innerPath.isNotBlank()) {
+            rootFile.findFileByRelativePath(innerPath)
+        } else {
+            rootFile
+        }
+
+        if (repoRoot == null) {
+            return emptyList()
+        }
+
         return TemplateProvider.findTemplates(modalityState, repoRoot)
     }
+
+    private fun replaceVariables(originalRepoUrl: String): String =
+        originalRepoUrl.replace("\$version", TemplateDescriptor.FORMAT_VERSION.toString())
 
     override fun setupConfigUi(
         data: String,
@@ -155,6 +166,7 @@ open class RemoteTemplateProvider : TemplateProvider {
         val defaultRepo = RemoteTemplateRepo.deserialize(data)
         val urlProperty = propertyGraph.property(defaultRepo?.url ?: "").trim()
         val autoUpdateProperty = propertyGraph.property(defaultRepo?.autoUpdate != false)
+        val innerPathProperty = propertyGraph.property(defaultRepo?.innerPath ?: "").trim()
 
         return panel {
             row(MCDevBundle("creator.ui.custom.remote.url.label")) {
@@ -166,37 +178,50 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .textValidation(BuiltinValidations.nonBlank)
             }
 
+            row(MCDevBundle("creator.ui.custom.remote.inner_path.label")) {
+                textField()
+                    .comment(MCDevBundle("creator.ui.custom.remote.inner_path.comment"))
+                    .align(AlignX.FILL)
+                    .columns(COLUMNS_LARGE)
+                    .bindText(innerPathProperty)
+            }
+
             row {
                 checkBox(MCDevBundle("creator.ui.custom.remote.auto_update.label"))
                     .bindSelected(autoUpdateProperty)
             }
 
             onApply {
-                val repo = RemoteTemplateRepo(urlProperty.get(), autoUpdateProperty.get())
+                val repo = RemoteTemplateRepo(urlProperty.get(), autoUpdateProperty.get(), innerPathProperty.get())
                 dataSetter(repo.serialize())
             }
         }
     }
 
-    data class RemoteTemplateRepo(val url: String, val autoUpdate: Boolean) {
+    data class RemoteTemplateRepo(val url: String, val autoUpdate: Boolean, val innerPath: String) {
 
-        fun getDestination(repoName: String): Path {
-            return PathManager.getSystemDir().resolve("mcdev-templates").resolve(repoName)
-        }
-
-        fun serialize(): String = "$url\n$autoUpdate"
+        fun serialize(): String = "$url\n$autoUpdate\n$innerPath"
 
         companion object {
+
+            val templatesBaseDir: Path
+                get() = PathManager.getSystemDir().resolve("mcdev-templates")
+
+            fun getDestinationZip(repoName: String): Path {
+                return templatesBaseDir.resolve("$repoName.zip")
+            }
+
             fun deserialize(data: String): RemoteTemplateRepo? {
-                val lines = data.lines()
-                return when (lines.size) {
-                    0 -> null
-                    1 -> RemoteTemplateRepo(lines[0], true)
-                    else -> {
-                        val (url, autoUpdate) = lines
-                        RemoteTemplateRepo(url, autoUpdate.toBoolean())
-                    }
+                if (data.isBlank()) {
+                    return null
                 }
+
+                val lines = data.lines()
+                return RemoteTemplateRepo(
+                    lines[0],
+                    lines.getOrNull(1).toBoolean(),
+                    lines.getOrNull(2) ?: "",
+                )
             }
         }
     }
