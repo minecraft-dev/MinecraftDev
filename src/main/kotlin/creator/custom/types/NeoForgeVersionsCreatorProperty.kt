@@ -143,7 +143,6 @@ class NeoForgeVersionsCreatorProperty(
 
             ngVersionProperty.set(ngVersion?.versions?.firstOrNull() ?: emptyVersion)
             mdVersionProperty.set(mdVersion?.versions?.firstOrNull() ?: emptyVersion)
-
         }
     }
 
