@@ -46,6 +46,7 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
@@ -71,13 +72,6 @@ class ArchitecturyVersionsCreatorProperty(
         emptyVersion,
     )
     private val defaultValue = createDefaultValue(descriptor.default)
-
-    private var forgeVersions: ForgeVersion? = null
-    private var neoForgeVersions: NeoForgeVersion? = null
-    private var fabricVersions: FabricVersions? = null
-    private var loomVersions: List<SemanticVersion>? = null
-    private var fabricApiVersions: FabricApiVersions? = null
-    private var architecturyVersions: ArchitecturyVersion? = null
 
     override val graphProperty: GraphProperty<ArchitecturyVersionsModel> = graph.property(defaultValue)
     var model: ArchitecturyVersionsModel by graphProperty
@@ -274,50 +268,26 @@ class ArchitecturyVersionsCreatorProperty(
             updateArchitecturyApiVersions()
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val forgeVersionsJob = asyncIO { ForgeVersion.downloadData() }
-                val neoForgeVersionsJob = asyncIO { NeoForgeVersion.downloadData() }
-                val fabricVersionsJob = asyncIO { FabricVersions.downloadData() }
-                val loomVersionsJob = asyncIO {
-                    collectMavenVersions(
-                        "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
-                    )
-                }
-                val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
-                val architecturyVersionsJob = asyncIO { ArchitecturyVersion.downloadData() }
-
-                this@ArchitecturyVersionsCreatorProperty.forgeVersions = forgeVersionsJob.await()
-                this@ArchitecturyVersionsCreatorProperty.neoForgeVersions = neoForgeVersionsJob.await()
-                this@ArchitecturyVersionsCreatorProperty.fabricVersions = fabricVersionsJob.await()
-                this@ArchitecturyVersionsCreatorProperty.loomVersions = loomVersionsJob.await()
-                    .mapNotNull(SemanticVersion::tryParse)
-                    .sortedDescending()
-                this@ArchitecturyVersionsCreatorProperty.fabricApiVersions = fabricApiVersionsJob.await()
-                this@ArchitecturyVersionsCreatorProperty.architecturyVersions = architecturyVersionsJob.await()
-
-                withContext(Dispatchers.Swing) {
-                    val fabricVersions = fabricVersions
-                    if (fabricVersions != null) {
-                        loaderVersionModel.removeAllElements()
-                        loaderVersionModel.addAll(fabricVersions.loader)
-                        loaderVersionProperty.set(fabricVersions.loader.firstOrNull() ?: emptyVersion)
-                    }
-
-                    val loomVersions = loomVersions
-                    if (loomVersions != null) {
-                        loomVersionModel.removeAllElements()
-                        loomVersionModel.addAll(loomVersions)
-                        val defaultValue = loomVersions.find {
-                            it.parts.any { it is SemanticVersion.Companion.VersionPart.PreReleasePart }
-                        } ?: loomVersions.firstOrNull() ?: emptyVersion
-
-                        loomVersionProperty.set(defaultValue)
-                    }
-
-                    updateMcVersionsList()
-                }
+        downloadVersions {
+            val fabricVersions = fabricVersions
+            if (fabricVersions != null) {
+                loaderVersionModel.removeAllElements()
+                loaderVersionModel.addAll(fabricVersions.loader)
+                loaderVersionProperty.set(fabricVersions.loader.firstOrNull() ?: emptyVersion)
             }
+
+            val loomVersions = loomVersions
+            if (loomVersions != null) {
+                loomVersionModel.removeAllElements()
+                loomVersionModel.addAll(loomVersions)
+                val defaultValue = loomVersions.find {
+                    it.parts.any { it is SemanticVersion.Companion.VersionPart.PreReleasePart }
+                } ?: loomVersions.firstOrNull() ?: emptyVersion
+
+                loomVersionProperty.set(defaultValue)
+            }
+
+            updateMcVersionsList()
         }
     }
 
@@ -437,6 +407,51 @@ class ArchitecturyVersionsCreatorProperty(
         architecturyApiVersionModel.addAll(availableArchitecturyApiVersions)
 
         architecturyApiVersionProperty.set(availableArchitecturyApiVersions.firstOrNull() ?: emptyVersion)
+    }
+
+    companion object {
+        private var hasDownloadedVersions = false
+
+        private var forgeVersions: ForgeVersion? = null
+        private var neoForgeVersions: NeoForgeVersion? = null
+        private var fabricVersions: FabricVersions? = null
+        private var loomVersions: List<SemanticVersion>? = null
+        private var fabricApiVersions: FabricApiVersions? = null
+        private var architecturyVersions: ArchitecturyVersion? = null
+
+        private fun downloadVersions(completeCallback: () -> Unit) {
+            if (hasDownloadedVersions) {
+                completeCallback()
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    awaitAll(
+                        asyncIO { ForgeVersion.downloadData().also { forgeVersions = it } },
+                        asyncIO { NeoForgeVersion.downloadData().also { neoForgeVersions = it } },
+                        asyncIO { FabricVersions.downloadData().also { fabricVersions = it } },
+                        asyncIO {
+                            collectMavenVersions(
+                                "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
+                            ).also {
+                                loomVersions = it
+                                    .mapNotNull(SemanticVersion::tryParse)
+                                    .sortedDescending()
+                            }
+                        },
+                        asyncIO { FabricApiVersions.downloadData().also { fabricApiVersions = it } },
+                        asyncIO { ArchitecturyVersion.downloadData().also { architecturyVersions = it } },
+                    )
+
+                    hasDownloadedVersions = true
+
+                    withContext(Dispatchers.Swing) {
+                        completeCallback()
+                    }
+                }
+            }
+        }
     }
 
     class Factory : CreatorPropertyFactory {

@@ -35,6 +35,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.util.application
 import com.intellij.util.ui.AsyncProcessIcon
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
@@ -110,19 +111,56 @@ class MavenArtifactVersionCreatorProperty(
             }
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val versions = collectMavenVersions(sourceUrl)
-                    .asSequence()
-                    .filter(rawVersionFilter)
-                    .mapNotNull(SemanticVersion::tryParse)
-                    .filter(versionFilter)
-                    .sortedDescending()
-                    .take(descriptor.limit ?: 50)
-                    .toList()
-                withContext(Dispatchers.Swing) {
-                    versionsProperty.set(versions)
-                    loadingVersionsProperty.set(false)
+        downloadVersions(
+            // The key might be a bit too unique, but that'll do the job
+            descriptor.name + "@" + descriptor.hashCode(),
+            sourceUrl,
+            rawVersionFilter,
+            versionFilter,
+            descriptor.limit ?: 50
+        ) { versions ->
+            versionsProperty.set(versions)
+            loadingVersionsProperty.set(false)
+        }
+    }
+
+    companion object {
+
+        private var versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
+
+        private fun downloadVersions(
+            key: String,
+            url: String,
+            rawVersionFilter: (String) -> Boolean,
+            versionFilter: (SemanticVersion) -> Boolean,
+            limit: Int,
+            uiCallback: (List<SemanticVersion>) -> Unit
+        ) {
+            // Let's not mix up cached versions if different properties
+            // point to the same URL, but have different filters or limits
+            val cacheKey = "$key-$url"
+            val cachedVersions = versionsCache[cacheKey]
+            if (cachedVersions != null) {
+                uiCallback(cachedVersions)
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    val versions = collectMavenVersions(url)
+                        .asSequence()
+                        .filter(rawVersionFilter)
+                        .mapNotNull(SemanticVersion::tryParse)
+                        .filter(versionFilter)
+                        .sortedDescending()
+                        .take(limit)
+                        .toList()
+
+                    versionsCache[cacheKey] = versions
+
+                    withContext(Dispatchers.Swing) {
+                        uiCallback(versions)
+                    }
                 }
             }
         }

@@ -45,6 +45,7 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
@@ -66,10 +67,6 @@ class FabricVersionsCreatorProperty(
         false,
     )
     private val defaultValue = createDefaultValue(descriptor.default)
-
-    private var fabricVersions: FabricVersions? = null
-    private var loomVersions: List<SemanticVersion>? = null
-    private var fabricApiVersions: FabricApiVersions? = null
 
     override val graphProperty: GraphProperty<FabricVersionsModel> = graph.property(defaultValue)
     var model: FabricVersionsModel by graphProperty
@@ -213,41 +210,25 @@ class FabricVersionsCreatorProperty(
             updateFabricApiVersions()
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val fabricVersionsJob = asyncIO { FabricVersions.downloadData() }
-                val loomVersionsJob = asyncIO {
-                    collectMavenVersions("https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml")
-                }
-                val fabricApiVersionsJob = asyncIO { FabricApiVersions.downloadData() }
+        downloadVersion {
+            val fabricVersions = fabricVersions
+            if (fabricVersions != null) {
+                loaderVersionModel.removeAllElements()
+                loaderVersionModel.addAll(fabricVersions.loader)
+                loaderVersionProperty.set(fabricVersions.loader.firstOrNull() ?: emptyVersion)
 
-                this@FabricVersionsCreatorProperty.fabricVersions = fabricVersionsJob.await()
-                this@FabricVersionsCreatorProperty.loomVersions = loomVersionsJob.await()
-                    .mapNotNull(SemanticVersion::tryParse)
-                    .sortedDescending()
-                this@FabricVersionsCreatorProperty.fabricApiVersions = fabricApiVersionsJob.await()
+                updateMcVersionsList()
+            }
 
-                withContext(Dispatchers.Swing) {
-                    val fabricVersions = fabricVersions
-                    if (fabricVersions != null) {
-                        loaderVersionModel.removeAllElements()
-                        loaderVersionModel.addAll(fabricVersions.loader)
-                        loaderVersionProperty.set(fabricVersions.loader.firstOrNull() ?: emptyVersion)
+            val loomVersions = loomVersions
+            if (loomVersions != null) {
+                loomVersionModel.removeAllElements()
+                loomVersionModel.addAll(loomVersions)
+                val defaultValue = loomVersions.firstOrNull { it.toString().endsWith("-SNAPSHOT") }
+                    ?: loomVersions.firstOrNull()
+                    ?: emptyVersion
 
-                        updateMcVersionsList()
-                    }
-
-                    val loomVersions = loomVersions
-                    if (loomVersions != null) {
-                        loomVersionModel.removeAllElements()
-                        loomVersionModel.addAll(loomVersions)
-                        val defaultValue = loomVersions.firstOrNull { it.toString().endsWith("-SNAPSHOT") }
-                            ?: loomVersions.firstOrNull()
-                            ?: emptyVersion
-
-                        loomVersionProperty.set(defaultValue)
-                    }
-                }
+                loomVersionProperty.set(defaultValue)
             }
         }
     }
@@ -305,6 +286,43 @@ class FabricVersionsCreatorProperty(
         fabricApiVersionModel.removeAllElements()
         fabricApiVersionModel.addAll(apiVersions)
         fabricApiVersionProperty.set(apiVersions.firstOrNull() ?: emptyVersion)
+    }
+
+    companion object {
+        private var hasDownloadedVersions = false
+
+        private var fabricVersions: FabricVersions? = null
+        private var loomVersions: List<SemanticVersion>? = null
+        private var fabricApiVersions: FabricApiVersions? = null
+
+        private fun downloadVersion(uiCallback: () -> Unit) {
+            if (hasDownloadedVersions) {
+                uiCallback()
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    awaitAll(
+                        asyncIO { FabricVersions.downloadData().also { fabricVersions = it } },
+                        asyncIO {
+                            collectMavenVersions(
+                                "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml"
+                            ).mapNotNull(SemanticVersion::tryParse)
+                                .sortedDescending()
+                                .also { loomVersions = it }
+                        },
+                        asyncIO { FabricApiVersions.downloadData().also { fabricApiVersions = it } },
+                    )
+
+                    hasDownloadedVersions = true
+
+                    withContext(Dispatchers.Swing) {
+                        uiCallback()
+                    }
+                }
+            }
+        }
     }
 
     class Factory : CreatorPropertyFactory {

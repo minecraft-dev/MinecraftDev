@@ -55,7 +55,6 @@ class ParchmentCreatorProperty(
     override val graphProperty: GraphProperty<ParchmentVersions> = graph.property(defaultValue)
     var versions: ParchmentVersions by graphProperty
 
-    private var allParchmentVersions: List<ParchmentVersion>? = null
     private var availableParchmentVersions: List<ParchmentVersion> = emptyList()
 
     private val useParchmentProperty = graphProperty.transform({ it.use }, { versions.copy(use = it) })
@@ -170,21 +169,12 @@ class ParchmentCreatorProperty(
             refreshVersionsLists()
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val downloadedVersions = ParchmentVersion.downloadData()
+        downloadVersions {
+            refreshVersionsLists()
 
-                if (downloadedVersions.isNotEmpty()) {
-                    withContext(Dispatchers.Swing) {
-                        allParchmentVersions = downloadedVersions.sortedByDescending(ParchmentVersion::parchmentVersion)
-                        refreshVersionsLists()
-
-                        val minecraftVersion = getPlatformMinecraftVersion()
-                        if (minecraftVersion != null) {
-                            mcVersionProperty.set(minecraftVersion)
-                        }
-                    }
-                }
+            val minecraftVersion = getPlatformMinecraftVersion()
+            if (minecraftVersion != null) {
+                mcVersionProperty.set(minecraftVersion)
             }
         }
     }
@@ -253,6 +243,34 @@ class ParchmentCreatorProperty(
 
         return SemanticVersion(normalizedVersion)
     }
+
+    companion object {
+
+        private var hasDownloadedVersions = false
+
+        private var allParchmentVersions: List<ParchmentVersion>? = null
+
+        private fun downloadVersions(uiCallback: () -> Unit) {
+            if (hasDownloadedVersions) {
+                uiCallback()
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    allParchmentVersions = ParchmentVersion.downloadData()
+                        .sortedByDescending(ParchmentVersion::parchmentVersion)
+
+                    hasDownloadedVersions = true
+
+                    withContext(Dispatchers.Swing) {
+                        uiCallback()
+                    }
+                }
+            }
+        }
+    }
+
     class Factory : CreatorPropertyFactory {
         override fun create(
             descriptor: TemplatePropertyDescriptor,

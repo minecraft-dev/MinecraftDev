@@ -30,6 +30,7 @@ import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
 import com.demonwav.mcdev.platform.neoforge.version.NeoGradleVersion
 import com.demonwav.mcdev.platform.neoforge.version.platform.neoforge.version.NeoModDevVersion
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -41,6 +42,7 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.util.application
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
@@ -58,7 +60,6 @@ class NeoForgeVersionsCreatorProperty(
     override val graphProperty: GraphProperty<NeoForgeVersions> = graph.property(defaultValue)
     var versions: NeoForgeVersions by graphProperty
 
-    private var nfVersion: NeoForgeVersion? = null
     private var previousMcVersion: SemanticVersion? = null
 
     private val mcVersionProperty = graphProperty.transform({ it.minecraft }, { versions.copy(minecraft = it) })
@@ -126,41 +127,64 @@ class NeoForgeVersionsCreatorProperty(
             nfVersionProperty.set(availableNfVersions.firstOrNull() ?: emptyVersion)
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                val neoforgeVersions = NeoForgeVersion.downloadData()
-                val neogradleVersions = NeoGradleVersion.downloadData()
-                val moddevVersions = NeoModDevVersion.downloadData()
-                val mcVersions = neoforgeVersions?.sortedMcVersions?.let { mcVersion ->
-                    val filterExpr = descriptor.parameters?.get("mcVersionFilter") as? String
-                    if (filterExpr != null) {
-                        mcVersion.filter { version ->
-                            val conditionProps = mapOf("MC_VERSION" to version)
-                            TemplateEvaluator.condition(conditionProps, filterExpr).getOrDefault(true)
+        val mcVersionFilter = descriptor.parameters?.get("mcVersionFilter") as? String
+        downloadVersion(mcVersionFilter) {
+            val mcVersions = mcVersions ?: return@downloadVersion
+
+            mcVersionsModel.removeAllElements()
+            mcVersionsModel.addAll(mcVersions)
+
+            val selectedMcVersion = when {
+                mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
+                defaultValue.minecraft in mcVersions -> defaultValue.minecraft
+                else -> mcVersions.first()
+            }
+            mcVersionProperty.set(selectedMcVersion)
+
+            ngVersionProperty.set(ngVersion?.versions?.firstOrNull() ?: emptyVersion)
+            mdVersionProperty.set(mdVersion?.versions?.firstOrNull() ?: emptyVersion)
+
+        }
+    }
+
+    companion object {
+
+        private var hasDownloadedVersions = false
+
+        private var nfVersion: NeoForgeVersion? = null
+        private var ngVersion: NeoGradleVersion? = null
+        private var mdVersion: NeoModDevVersion? = null
+        private var mcVersions: List<SemanticVersion>? = null
+
+        private fun downloadVersion(mcVersionFilter: String?, uiCallback: () -> Unit) {
+            if (hasDownloadedVersions) {
+                uiCallback()
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    awaitAll(
+                        asyncIO { NeoForgeVersion.downloadData().also { nfVersion = it } },
+                        asyncIO { NeoGradleVersion.downloadData().also { ngVersion = it } },
+                        asyncIO { NeoModDevVersion.downloadData().also { mdVersion = it } },
+                    )
+
+                    mcVersions = nfVersion?.sortedMcVersions?.let { mcVersion ->
+                        if (mcVersionFilter != null) {
+                            mcVersion.filter { version ->
+                                val conditionProps = mapOf("MC_VERSION" to version)
+                                TemplateEvaluator.condition(conditionProps, mcVersionFilter).getOrDefault(true)
+                            }
+                        } else {
+                            mcVersion
                         }
-                    } else {
-                        mcVersion
                     }
-                }
 
-                if (neoforgeVersions != null && neogradleVersions != null &&
-                    moddevVersions != null && !mcVersions.isNullOrEmpty()
-                ) {
+                    hasDownloadedVersions = true
+
                     withContext(Dispatchers.Swing) {
-                        nfVersion = neoforgeVersions
-
-                        mcVersionsModel.removeAllElements()
-                        mcVersionsModel.addAll(mcVersions)
-
-                        val selectedMcVersion = when {
-                            mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
-                            defaultValue.minecraft in mcVersions -> defaultValue.minecraft
-                            else -> mcVersions.first()
-                        }
-                        mcVersionProperty.set(selectedMcVersion)
-
-                        ngVersionProperty.set(neogradleVersions.versions.firstOrNull() ?: emptyVersion)
-                        mdVersionProperty.set(moddevVersions.versions.firstOrNull() ?: emptyVersion)
+                        uiCallback()
                     }
                 }
             }

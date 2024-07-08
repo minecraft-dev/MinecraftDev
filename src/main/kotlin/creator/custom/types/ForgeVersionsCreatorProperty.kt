@@ -57,7 +57,6 @@ class ForgeVersionsCreatorProperty(
     override val graphProperty: GraphProperty<ForgeVersions> = graph.property(defaultValue)
     var versions: ForgeVersions by graphProperty
 
-    private var forgeVersion: ForgeVersion? = null
     private var previousMcVersion: SemanticVersion? = null
 
     private val mcVersionProperty = graphProperty.transform({ it.minecraft }, { versions.copy(minecraft = it) })
@@ -143,13 +142,8 @@ class ForgeVersionsCreatorProperty(
             }
         }
 
-        application.executeOnPooledThread {
-            runBlocking {
-                forgeVersion = ForgeVersion.downloadData()
-                withContext(Dispatchers.Swing) {
-                    reloadMinecraftVersions()
-                }
-            }
+        downloadVersions {
+            reloadMinecraftVersions()
         }
     }
 
@@ -177,6 +171,31 @@ class ForgeVersionsCreatorProperty(
             else -> mcVersions.first()
         }
         mcVersionProperty.set(selectedMcVersion)
+    }
+
+    companion object {
+        private var hasDownloadedVersions = false
+
+        private var forgeVersion: ForgeVersion? = null
+
+        private fun downloadVersions(uiCallback: () -> Unit) {
+            if (hasDownloadedVersions) {
+                uiCallback()
+                return
+            }
+
+            application.executeOnPooledThread {
+                runBlocking {
+                    forgeVersion = ForgeVersion.downloadData()
+
+                    hasDownloadedVersions = true
+
+                    withContext(Dispatchers.Swing) {
+                        uiCallback()
+                    }
+                }
+            }
+        }
     }
 
     class Factory : CreatorPropertyFactory {
