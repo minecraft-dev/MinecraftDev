@@ -21,21 +21,24 @@
 package com.demonwav.mcdev.translations.intentions
 
 import com.demonwav.mcdev.translations.TranslationFiles
-import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
+import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.util.IncorrectOperationException
+import com.intellij.psi.PsiFile
 
-class RemoveUnmatchedEntryIntention : PsiElementBaseIntentionAction() {
+class RemoveUnmatchedEntryIntention(element: PsiElement) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
     override fun getText() = "Remove translation"
-
-    override fun isAvailable(project: Project, editor: Editor, element: PsiElement) = true
 
     override fun getFamilyName() = "Minecraft"
 
-    @Throws(IncorrectOperationException::class)
-    override fun invoke(project: Project, editor: Editor, element: PsiElement) {
-        TranslationFiles.remove(TranslationFiles.seekTranslation(element) ?: return)
+    override fun invoke(
+        project: Project,
+        file: PsiFile,
+        editor: Editor?,
+        startElement: PsiElement,
+        endElement: PsiElement
+    ) {
+        TranslationFiles.remove(TranslationFiles.seekTranslation(startElement) ?: return)
     }
 }

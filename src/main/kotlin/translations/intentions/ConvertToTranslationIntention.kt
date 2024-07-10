@@ -20,7 +20,10 @@
 
 package com.demonwav.mcdev.translations.intentions
 
+import com.demonwav.mcdev.TranslationSettings
+import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethodCall
 import com.demonwav.mcdev.translations.TranslationFiles
+import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.runWriteAction
 import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.lang.java.JavaLanguage
@@ -42,6 +45,9 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         if (element.parent is PsiLiteral) {
             val value = (element.parent as PsiLiteral).value as? String ?: return
+
+            val existingKey = TranslationFiles.findTranslationKeyForText(element, value)
+
             val result = Messages.showInputDialogWithCheckBox(
                 "Enter translation key:",
                 "Convert String Literal to Translation",
@@ -49,7 +55,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
                 true,
                 true,
                 Messages.getQuestionIcon(),
-                null,
+                existingKey,
                 object : InputValidatorEx {
                     override fun getErrorText(inputString: String): String? {
                         if (inputString.isEmpty()) {
@@ -73,12 +79,24 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
             val key = result.first ?: return
             val replaceLiteral = result.second
             try {
-                TranslationFiles.add(element, key, value)
+                if (existingKey != key) {
+                    TranslationFiles.add(element, key, value)
+                }
                 if (replaceLiteral) {
+                    val translationSettings = TranslationSettings.getInstance(project)
                     val psi = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
                     psi.runWriteAction {
                         val expression = JavaPsiFacade.getElementFactory(project).createExpressionFromText(
-                            "net.minecraft.client.resources.I18n.format(\"$key\")",
+                            if (translationSettings.isUseCustomConvertToTranslationTemplate) {
+                                translationSettings.convertToTranslationTemplate.replace("\$key", key)
+                            } else {
+                                element.findModule()?.getMappedMethodCall(
+                                    "net.minecraft.client.resource.language.I18n",
+                                    "translate",
+                                    "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+                                    "\"$key\""
+                                ) ?: "net.minecraft.client.resource.I18n.get(\"$key\")"
+                            },
                             element.context,
                         )
                         if (psi.language === JavaLanguage.INSTANCE) {

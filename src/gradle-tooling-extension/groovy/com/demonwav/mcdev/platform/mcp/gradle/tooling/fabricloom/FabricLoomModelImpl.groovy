@@ -24,6 +24,7 @@ import groovy.transform.Immutable
 
 @Immutable(knownImmutableClasses = [File])
 class FabricLoomModelImpl implements FabricLoomModel, Serializable {
+    String minecraftVersion
     File tinyMappings
     Map<String, List<DecompilerModel>> decompilers
     boolean splitMinecraftJar

@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.util
 
 import com.intellij.psi.PsiCall
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
@@ -32,6 +33,7 @@ val PsiCall.referencedMethod: PsiMethod?
     get() = when (this) {
         is PsiMethodCallExpression -> this.methodExpression.advancedResolve(false).element as PsiMethod?
         is PsiNewExpression -> this.resolveMethod()
+        is PsiEnumConstant -> this.resolveMethod()
         else -> null
     }
 

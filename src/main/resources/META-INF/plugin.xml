@@ -291,6 +291,7 @@
 
         <applicationService serviceImplementation="com.demonwav.mcdev.MinecraftSettings"/>
         <projectService serviceImplementation="com.demonwav.mcdev.MinecraftProjectSettings"/>
+        <projectService serviceImplementation="com.demonwav.mcdev.TranslationSettings"/>
 
         <errorHandler implementation="com.demonwav.mcdev.errorreporter.ErrorReporter"/>
         <!--endregion-->

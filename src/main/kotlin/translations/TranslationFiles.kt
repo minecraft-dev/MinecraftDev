@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations
 
+import com.demonwav.mcdev.TranslationSettings
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
 import com.demonwav.mcdev.translations.lang.LangFile
@@ -110,12 +111,43 @@ object TranslationFiles {
         element.delete()
     }
 
+    fun findTranslationKeyForText(context: PsiElement, text: String): String? {
+        val module = context.findModule()
+            ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
+        var jsonVersion = true
+        if (!TranslationSettings.getInstance(context.project).isForceJsonTranslationFile) {
+            val version =
+                context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
+            jsonVersion = version > MC_1_12_2
+        }
+
+        if (!jsonVersion) {
+            // This feature only supports JSON translation files
+            return null
+        }
+
+        val files = FileTypeIndex.getFiles(
+            JsonFileType.INSTANCE,
+            GlobalSearchScope.moduleScope(module),
+        ).filter { getLocale(it) == TranslationConstants.DEFAULT_LOCALE }
+
+        for (file in files) {
+            val psiFile = PsiManager.getInstance(context.project).findFile(file) ?: continue
+            psiFile.findKeyForTextAsJson(text)?.let { return it }
+        }
+
+        return null
+    }
+
     fun add(context: PsiElement, key: String, text: String) {
         val module = context.findModule()
             ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
-        val version =
-            context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
-        val jsonVersion = version > MC_1_12_2
+        var jsonVersion = true
+        if (!TranslationSettings.getInstance(context.project).isForceJsonTranslationFile) {
+            val version =
+                context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
+            jsonVersion = version > MC_1_12_2
+        }
 
         fun write(files: Iterable<VirtualFile>) {
             for (file in files) {
@@ -223,6 +255,13 @@ object TranslationFiles {
         doc.insertString(rootObject.lastChild.prevSibling.textOffset, content)
     }
 
+    private fun PsiFile.findKeyForTextAsJson(text: String): String? {
+        val rootObject = this.firstChild as? JsonObject ?: return null
+        return rootObject.propertyList.firstOrNull {
+            (it.value as? JsonStringLiteral)?.value == text
+        }?.name
+    }
+
     private fun generateJsonFile(
         leadingComma: Boolean,
         indent: CharSequence,
@@ -292,9 +331,12 @@ object TranslationFiles {
     fun buildSortingTemplateFromDefault(context: PsiElement, domain: String? = null): Template? {
         val module = context.findModule()
             ?: throw IllegalArgumentException("Cannot add translation for element outside of module")
-        val version =
-            context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
-        val jsonVersion = version > MC_1_12_2
+        var jsonVersion = true
+        if (!TranslationSettings.getInstance(context.project).isForceJsonTranslationFile) {
+            val version =
+                context.mcVersion ?: throw IllegalArgumentException("Cannot determine MC version for element $context")
+            jsonVersion = version > MC_1_12_2
+        }
 
         val defaultTranslationFile = FileBasedIndex.getInstance()
             .getContainingFiles(

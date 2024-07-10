@@ -119,6 +119,13 @@ fun Module.getMappedMethod(mojangClass: String, mojangMethod: String, mojangDesc
     return getMappedMethod(MemberReference(mojangMethod, mojangDescriptor, mojangClass))
 }
 
+fun Module.getMappedMethodCall(mojangClass: String, mojangMethod: String, mojangDescriptor: String, p: String): String {
+    val mappedMethodRef = namedToMojang?.tryGetMappedMethod(
+        MemberReference(mojangMethod, mojangDescriptor, mojangClass)
+    ) ?: return "$mojangClass.$mojangMethod($p)"
+    return "${mappedMethodRef.owner}.${mappedMethodRef.name}($p)"
+}
+
 fun Module.getMojangMethod(mappedMethod: MemberReference): String {
     return namedToMojang?.getIntermediaryMethod(mappedMethod)?.name ?: return mappedMethod.name
 }

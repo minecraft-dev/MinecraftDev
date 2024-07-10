@@ -26,6 +26,8 @@ import java.util.Map;
 
 public interface FabricLoomModel {
 
+    String getMinecraftVersion();
+
     File getTinyMappings();
 
     Map<String, List<DecompilerModel>> getDecompilers();

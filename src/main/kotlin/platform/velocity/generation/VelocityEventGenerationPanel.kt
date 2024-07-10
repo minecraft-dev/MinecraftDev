@@ -20,32 +20,31 @@
 
 package com.demonwav.mcdev.platform.velocity.generation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.psi.PsiClass
-import javax.swing.JComboBox
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
 import javax.swing.JPanel
 
 class VelocityEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(chosenClass) {
 
-    private lateinit var parentPanel: JPanel
-    private lateinit var eventOrderComboBox: JComboBox<String>
+    private val graph = PropertyGraph("VelocityEventGenerationPanel graph")
 
-    override val panel: JPanel
-        get() {
-            // Not static because the form builder is not reliable
-            eventOrderComboBox.addItem("FIRST")
-            eventOrderComboBox.addItem("EARLY")
-            eventOrderComboBox.addItem("NORMAL")
-            eventOrderComboBox.addItem("LATE")
-            eventOrderComboBox.addItem("LAST")
+    private val eventOrderProperty = graph.property("NORMAL")
 
-            eventOrderComboBox.selectedIndex = 2
-
-            return parentPanel
+    override val panel: JPanel by lazy {
+        panel {
+            row(MCDevBundle("generate.event_listener.event_order")) {
+                comboBox(listOf("FIRST", "EARLY", "NORMAL", "LATE", "LAST"))
+                    .bindItem(eventOrderProperty)
+            }
         }
+    }
 
     override fun gatherData(): GenerationData {
-        return VelocityGenerationData(eventOrderComboBox.selectedItem as String)
+        return VelocityGenerationData(eventOrderProperty.get())
     }
 }

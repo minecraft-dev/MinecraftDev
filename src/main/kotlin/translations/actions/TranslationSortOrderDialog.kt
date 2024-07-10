@@ -20,44 +20,58 @@
 
 package com.demonwav.mcdev.translations.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.sorting.Ordering
+import com.intellij.CommonBundle
+import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.bindIntValue
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
 import java.awt.Component
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.swing.DefaultComboBoxModel
 import javax.swing.DefaultListCellRenderer
-import javax.swing.JButton
-import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.JSpinner
 import javax.swing.KeyStroke
-import javax.swing.SpinnerNumberModel
 import javax.swing.WindowConstants
 
 class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection: Ordering) : JDialog() {
-    private lateinit var contentPane: JPanel
-    private lateinit var buttonOK: JButton
-    private lateinit var buttonCancel: JButton
-    private lateinit var comboSelection: JComboBox<Ordering>
-    private lateinit var spinnerComments: JSpinner
+
+    private val graph = PropertyGraph("TranslationSortOrderDialog graph")
+
+    private val orderProperty = graph.property(defaultSelection)
+    private val keepCommentsProperty = graph.property(0)
+
+    private var canceled = false
 
     init {
-        setContentPane(contentPane)
-        isModal = true
-        title = "Select Sort Order"
-        getRootPane().defaultButton = buttonOK
-
-        buttonOK.addActionListener { onOK() }
-        buttonCancel.addActionListener { onCancel() }
-        spinnerComments.model = SpinnerNumberModel(0, 0, Int.MAX_VALUE, 1)
         val availableOrderings = if (excludeDefaultOption) NON_DEFAULT_ORDERINGS else ALL_ORDERINGS
-        comboSelection.model = DefaultComboBoxModel(availableOrderings)
-        comboSelection.renderer = CellRenderer
-        comboSelection.selectedItem = defaultSelection
+        val panel = panel {
+            row(MCDevBundle("translation_sort.order")) {
+                comboBox(availableOrderings, CellRenderer)
+                    .bindItem(orderProperty)
+            }
+
+            row(MCDevBundle("translation_sort.keep_comment")) {
+                spinner(0..Int.MAX_VALUE)
+                    .bindIntValue(keepCommentsProperty::get, keepCommentsProperty::set)
+            }
+
+            row {
+                button(CommonBundle.message("button.ok")) { onOK() }.align(AlignX.RIGHT).also {
+                    getRootPane().defaultButton = it.component
+                }
+                button(CommonBundle.message("button.cancel")) { onCancel() }.align(AlignX.RIGHT)
+            }
+        }
+        contentPane = panel
+
+        isModal = true
+        title = MCDevBundle("translation_sort.title")
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
@@ -70,7 +84,7 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
         )
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
+        panel.registerKeyboardAction(
             { onCancel() },
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
@@ -82,7 +96,7 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
     }
 
     private fun onCancel() {
-        comboSelection.selectedIndex = -1
+        canceled = true
         dispose()
     }
 
@@ -100,17 +114,17 @@ class TranslationSortOrderDialog(excludeDefaultOption: Boolean, defaultSelection
     }
 
     companion object {
-        private val ALL_ORDERINGS = Ordering.values()
-        private val NON_DEFAULT_ORDERINGS = Ordering.values()
-            .filterNot { it == Ordering.LIKE_DEFAULT }.toTypedArray()
+        private val ALL_ORDERINGS = Ordering.entries
+        private val NON_DEFAULT_ORDERINGS = Ordering.entries
+            .filterNot { it == Ordering.LIKE_DEFAULT }
 
         fun show(excludeDefaultOption: Boolean, defaultSelection: Ordering): Pair<Ordering?, Int> {
             val dialog = TranslationSortOrderDialog(excludeDefaultOption, defaultSelection)
             dialog.pack()
             dialog.setLocationRelativeTo(dialog.owner)
             dialog.isVisible = true
-            val order = dialog.comboSelection.selectedItem as? Ordering
-            val comments = dialog.spinnerComments.value as Int
+            val order = if (dialog.canceled) null else dialog.orderProperty.get()
+            val comments = dialog.keepCommentsProperty.get()
             return (order to comments)
         }
     }

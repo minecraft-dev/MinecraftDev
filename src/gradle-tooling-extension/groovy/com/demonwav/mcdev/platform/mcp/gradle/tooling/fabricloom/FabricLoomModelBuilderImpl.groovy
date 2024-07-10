@@ -50,6 +50,7 @@ class FabricLoomModelBuilderImpl implements ModelBuilderService {
     }
 
     FabricLoomModel build(Project project, Object loomExtension) {
+        def minecraftVersion = loomExtension.minecraftProvider.minecraftVersion()
         def tinyMappings = loomExtension.mappingsFile
         def splitMinecraftJar = loomExtension.areEnvironmentSourceSetsSplit()
 
@@ -70,7 +71,7 @@ class FabricLoomModelBuilderImpl implements ModelBuilderService {
         }
 
         //noinspection GroovyAssignabilityCheck
-        return new FabricLoomModelImpl(tinyMappings, decompilers, splitMinecraftJar, modSourceSets)
+        return new FabricLoomModelImpl(minecraftVersion, tinyMappings, decompilers, splitMinecraftJar, modSourceSets)
     }
 
     List<FabricLoomModelImpl.DecompilerModelImpl> getDecompilers(Object loomExtension, boolean client) {

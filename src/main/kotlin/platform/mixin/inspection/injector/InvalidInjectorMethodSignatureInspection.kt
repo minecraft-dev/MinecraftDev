@@ -60,6 +60,7 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
@@ -183,12 +184,16 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
                         if (!isValid) {
                             val (expectedParameters, expectedReturnType, intLikeTypePositions) = possibleSignatures[0]
+                            val normalizedReturnType = when (expectedReturnType) {
+                                is PsiEllipsisType -> expectedReturnType.toArrayType()
+                                else -> expectedReturnType
+                            }
 
                             val paramsCheck = checkParameters(parameters, expectedParameters, handler.allowCoerce)
                             val isWarning = paramsCheck == CheckResult.WARNING
                             val methodReturnType = method.returnType
                             val returnTypeOk = methodReturnType != null &&
-                                checkReturnType(expectedReturnType, methodReturnType, method, handler.allowCoerce)
+                                checkReturnType(normalizedReturnType, methodReturnType, method, handler.allowCoerce)
                             val isError = paramsCheck == CheckResult.ERROR || !returnTypeOk
                             if (isWarning || isError) {
                                 reportedSignature = true
@@ -198,7 +203,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                 val quickFix = SignatureQuickFix(
                                     method,
                                     expectedParameters.takeUnless { paramsCheck == CheckResult.OK },
-                                    expectedReturnType.takeUnless { returnTypeOk },
+                                    normalizedReturnType.takeUnless { returnTypeOk },
                                     intLikeTypePositions
                                 )
                                 val highlightType =

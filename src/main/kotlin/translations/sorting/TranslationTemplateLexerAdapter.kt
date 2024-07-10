@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.translations.sorting
 
-import com.demonwav.mcdev.translations.lang.gen.TranslationTemplateLexer
+import com.demonwav.mcdev.translations.template.gen.TranslationTemplateLexer
 import com.intellij.lexer.FlexAdapter
 
 class TranslationTemplateLexerAdapter : FlexAdapter(TranslationTemplateLexer())

@@ -20,29 +20,28 @@
 
 package com.demonwav.mcdev.platform.bungeecord.generation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.psi.PsiClass
-import javax.swing.JComboBox
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
 import javax.swing.JPanel
 
 class BungeeCordEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(chosenClass) {
 
-    private lateinit var eventPriorityComboBox: JComboBox<String>
-    private lateinit var parentPanel: JPanel
+    private val graph = PropertyGraph("BungeeCordEventGenerationPanel graph")
 
-    override val panel: JPanel
-        get() {
-            // Not static because the form builder is not reliable
-            eventPriorityComboBox.addItem("HIGHEST")
-            eventPriorityComboBox.addItem("HIGH")
-            eventPriorityComboBox.addItem("NORMAL")
-            eventPriorityComboBox.addItem("LOW")
-            eventPriorityComboBox.addItem("LOWEST")
+    private val eventPriorityProperty = graph.property("NORMAL")
 
-            eventPriorityComboBox.selectedIndex = 2
-
-            return parentPanel
+    override val panel: JPanel by lazy {
+        panel {
+            row(MCDevBundle("generate.event_listener.event_priority")) {
+                comboBox(listOf("HIGHEST", "HIGH", "NORMAL", "LOW", "LOWEST"))
+                    .bindItem(eventPriorityProperty)
+            }
         }
+    }
 
-    override fun gatherData() = BungeeCordGenerationData(eventPriorityComboBox.selectedItem.toString())
+    override fun gatherData() = BungeeCordGenerationData(eventPriorityProperty.get())
 }

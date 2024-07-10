@@ -23,24 +23,32 @@ package com.demonwav.mcdev.translations.intentions
 import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
-import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
+import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 
-class RemoveDuplicatesIntention(private val translation: Translation) : PsiElementBaseIntentionAction() {
+class RemoveDuplicatesIntention(
+    private val translation: Translation,
+    element: PsiElement
+) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
     override fun getText() = "Remove duplicates (keep this translation)"
 
     override fun getFamilyName() = "Minecraft localization"
 
-    override fun isAvailable(project: Project, editor: Editor?, element: PsiElement) = true
-
-    override fun invoke(project: Project, editor: Editor?, element: PsiElement) {
-        val keep = TranslationFiles.seekTranslation(element) ?: return
+    override fun invoke(
+        project: Project,
+        file: PsiFile,
+        editor: Editor?,
+        startElement: PsiElement,
+        endElement: PsiElement
+    ) {
+        val keep = TranslationFiles.seekTranslation(startElement) ?: return
         val entries = TranslationInverseIndex.findElements(
             translation.key,
-            GlobalSearchScope.fileScope(element.containingFile),
+            GlobalSearchScope.fileScope(file),
         )
         for (other in entries) {
             if (other !== keep) {

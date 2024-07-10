@@ -20,40 +20,38 @@
 
 package com.demonwav.mcdev.platform.sponge.generation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.insight.generation.GenerationData
 import com.demonwav.mcdev.insight.generation.ui.EventGenerationPanel
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.psi.PsiClass
-import javax.swing.JCheckBox
-import javax.swing.JComboBox
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.panel
 import javax.swing.JPanel
 
 class SpongeEventGenerationPanel(chosenClass: PsiClass) : EventGenerationPanel(chosenClass) {
 
-    private lateinit var parentPanel: JPanel
-    private lateinit var eventOrderComboBox: JComboBox<String>
-    private lateinit var ignoreCanceledCheckBox: JCheckBox
+    private val graph = PropertyGraph("SpongeEventGenerationPanel graph")
 
-    override val panel: JPanel
-        get() {
-            ignoreCanceledCheckBox.isSelected = true
+    private val ignoreCanceledProperty = graph.property(true)
+    private val eventOrderProperty = graph.property("DEFAULT")
 
-            // Not static because the form builder is not reliable
-            eventOrderComboBox.addItem("PRE")
-            eventOrderComboBox.addItem("AFTER_PRE")
-            eventOrderComboBox.addItem("FIRST")
-            eventOrderComboBox.addItem("EARLY")
-            eventOrderComboBox.addItem("DEFAULT")
-            eventOrderComboBox.addItem("LATE")
-            eventOrderComboBox.addItem("LAST")
-            eventOrderComboBox.addItem("BEFORE_POST")
-            eventOrderComboBox.addItem("POST")
+    override val panel: JPanel by lazy {
+        panel {
+            row {
+                checkBox(MCDevBundle("generate.event_listener.ignore_if_canceled"))
+                    .bindSelected(ignoreCanceledProperty)
+            }
 
-            eventOrderComboBox.selectedIndex = 4
-
-            return parentPanel
+            row(MCDevBundle("generate.event_listener.event_order")) {
+                comboBox(listOf("PRE", "AFTER_PRE", "FIRST", "EARLY", "DEFAULT", "LATE", "LAST", "BEFORE_POST", "POST"))
+                    .bindItem(eventOrderProperty)
+            }
         }
+    }
 
     override fun gatherData(): GenerationData {
-        return SpongeGenerationData(ignoreCanceledCheckBox.isSelected, eventOrderComboBox.selectedItem as String)
+        return SpongeGenerationData(ignoreCanceledProperty.get(), eventOrderProperty.get())
     }
 }

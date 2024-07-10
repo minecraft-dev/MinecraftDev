@@ -22,60 +22,62 @@ package com.demonwav.mcdev.insight.generation.ui
 
 import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.openapi.editor.ex.util.EditorUtil
-import com.intellij.openapi.wm.ex.IdeFocusTraversalPolicy
-import com.intellij.uiDesigner.core.GridConstraints
+import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.builder.columns
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.text
 import com.intellij.util.ui.UIUtil
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JSeparator
-import javax.swing.JTextField
 
 class EventListenerWizard(panel: JPanel?, className: String, defaultListenerName: String) {
-    lateinit var panel: JPanel
-    private lateinit var classNameTextField: JTextField
-    private lateinit var listenerNameTextField: JTextField
-    private lateinit var publicVoidLabel: JLabel
-    private lateinit var contentPanel: JPanel
-    private lateinit var separator: JSeparator
 
-    init {
-        classNameTextField.font = EditorUtil.getEditorFont()
-        listenerNameTextField.font = EditorUtil.getEditorFont()
-        publicVoidLabel.font = EditorUtil.getEditorFont()
-        if (UIUtil.isUnderDarcula()) {
-            publicVoidLabel.foreground = JavaHighlightingColors.KEYWORD.defaultAttributes.foregroundColor
-        } else {
-            publicVoidLabel.foreground =
-                JavaHighlightingColors.KEYWORD.fallbackAttributeKey!!.defaultAttributes.foregroundColor
-        }
+    private val graph = PropertyGraph("EventListenerWizard graph")
 
-        if (panel != null) {
-            separator.isVisible = true
-            contentPanel.add(panel, innerContentPanelConstraints)
-        }
+    private val listenerNameProperty = graph.property(defaultListenerName)
+    val chosenClassName: String by listenerNameProperty
 
-        classNameTextField.text = className
-        listenerNameTextField.text = defaultListenerName
+    val panel: JPanel by lazy {
+        panel {
+            row {
+                textField()
+                    .text(className)
+                    .align(AlignX.FILL)
+                    .apply {
+                        component.font = EditorUtil.getEditorFont()
+                        component.isEditable = false
+                    }
+            }
 
-        IdeFocusTraversalPolicy.getPreferredFocusedComponent(listenerNameTextField).requestFocus()
-        listenerNameTextField.requestFocus()
-    }
+            row {
+                label("public void").apply {
+                    component.font = EditorUtil.getEditorFont()
+                    if (UIUtil.isUnderDarcula()) {
+                        component.foreground = JavaHighlightingColors.KEYWORD.defaultAttributes.foregroundColor
+                    } else {
+                        component.foreground =
+                            JavaHighlightingColors.KEYWORD.fallbackAttributeKey!!.defaultAttributes.foregroundColor
+                    }
+                }
 
-    val chosenClassName: String
-        get() = listenerNameTextField.text
+                textField()
+                    .bindText(listenerNameProperty)
+                    .columns(COLUMNS_LARGE)
+                    .focused()
+                    .apply {
+                        component.font = EditorUtil.getEditorFont()
+                    }
+            }
 
-    companion object {
-        private val innerContentPanelConstraints = GridConstraints()
+            if (panel != null) {
+                separator()
 
-        init {
-            innerContentPanelConstraints.row = 0
-            innerContentPanelConstraints.column = 0
-            innerContentPanelConstraints.rowSpan = 1
-            innerContentPanelConstraints.colSpan = 1
-            innerContentPanelConstraints.anchor = GridConstraints.ANCHOR_CENTER
-            innerContentPanelConstraints.fill = GridConstraints.FILL_BOTH
-            innerContentPanelConstraints.hSizePolicy = GridConstraints.SIZEPOLICY_FIXED
-            innerContentPanelConstraints.vSizePolicy = GridConstraints.SIZEPOLICY_FIXED
+                row {
+                    cell(panel)
+                }
+            }
         }
     }
 }

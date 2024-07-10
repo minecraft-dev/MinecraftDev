@@ -38,7 +38,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiCall
-import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiExpression
@@ -69,7 +68,7 @@ abstract class TranslationIdentifier<T : PsiElement> {
             if (container !is PsiExpressionList) {
                 return null
             }
-            val call = container.parent as? PsiCallExpression ?: return null
+            val call = container.parent as? PsiCall ?: return null
             val index = container.expressions.indexOf(element)
 
             val method = call.referencedMethod ?: return null

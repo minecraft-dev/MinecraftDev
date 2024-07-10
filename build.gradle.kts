@@ -362,7 +362,10 @@ val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/
 val generateMEExpressionLexer by lexer("MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
 val generateMEExpressionParser by parser("MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
 
-val generateTranslationTemplateLexer by lexer("TranslationTemplateLexer", "com/demonwav/mcdev/translations/lang/gen")
+val generateTranslationTemplateLexer by lexer(
+    "TranslationTemplateLexer",
+    "com/demonwav/mcdev/translations/template/gen"
+)
 
 val generate by tasks.registering {
     group = "minecraft"
@@ -395,6 +398,7 @@ tasks.register("cleanSandbox", Delete::class) {
 }
 
 tasks.withType<PrepareSandboxTask> {
+    pluginJar.set(tasks.jar.get().archiveFile)
     from(externalAnnotationsJar) {
         into("Minecraft Development/lib/resources")
     }
@@ -414,5 +418,13 @@ tasks.runIde {
 
 tasks.buildSearchableOptions {
     // not working atm
+    enabled = false
+}
+
+tasks.instrumentCode {
+    enabled = false
+}
+
+tasks.instrumentedJar {
     enabled = false
 }

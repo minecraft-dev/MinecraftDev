@@ -32,94 +32,42 @@ import org.gradle.kotlin.dsl.configure
 
 typealias TaskDelegate<T> = RegisteringDomainObjectDelegateProviderWithTypeAndAction<out TaskContainer, T>
 
-fun Project.lexer(flex: String, pack: String): TaskDelegate<JavaExec> {
+fun Project.lexer(flex: String, pack: String): TaskDelegate<JFlexExec> {
     configure<LicenseExtension> {
         exclude(pack.removeSuffix("/") + "/**")
     }
 
-    return tasks.registering(JavaExec::class) {
-        val src = layout.projectDirectory.file("src/main/grammars/$flex.flex")
-        val dst = layout.buildDirectory.dir("gen/$pack")
-        val output = layout.buildDirectory.file("gen/$pack/$flex.java")
-        val logOutout = layout.buildDirectory.file("logs/generate$flex.log")
+    return tasks.registering(JFlexExec::class) {
+        sourceFile.set(layout.projectDirectory.file("src/main/grammars/$flex.flex"))
+        destinationDirectory.set(layout.buildDirectory.dir("gen/$pack"))
+        destinationFile.set(layout.buildDirectory.file("gen/$pack/$flex.java"))
+        logFile.set(layout.buildDirectory.file("logs/generate$flex.log"))
 
         val jflex by project.configurations
+        this.jflex.setFrom(jflex)
+
         val jflexSkeleton by project.configurations
-
-        classpath = jflex
-        mainClass.set("jflex.Main")
-
-        val taskOutput = ByteArrayOutputStream()
-        standardOutput = taskOutput
-        errorOutput = taskOutput
-
-                        doFirst {
-            args(
-                "--skel", jflexSkeleton.singleFile.absolutePath,
-                "-d", dst.get().asFile.absolutePath,
-                src.asFile.absolutePath
-            )
-
-            // Delete current lexer
-            project.delete(output)
-            logOutout.get().asFile.parentFile.mkdirs()
-        }
-
-        doLast {
-            logOutout.get().asFile.writeBytes(taskOutput.toByteArray())
-        }
-
-        inputs.files(src, jflexSkeleton)
-        outputs.file(output)
+        skeletonFile.set(jflexSkeleton.singleFile)
     }
 }
 
-fun Project.parser(bnf: String, pack: String): TaskDelegate<JavaExec> {
+fun Project.parser(bnf: String, pack: String): TaskDelegate<ParserExec> {
     configure<LicenseExtension> {
         exclude(pack.removeSuffix("/") + "/**")
     }
 
-    return tasks.registering(JavaExec::class) {
-        val src = project.layout.projectDirectory.file("src/main/grammars/$bnf.bnf")
-        val dstRoot = project.layout.buildDirectory.dir("gen")
-        val dst = dstRoot.map { it.dir(pack) }
-        val psiDir = dst.map { it.dir("psi") }
-        val parserDir = dst.map { it.dir("parser") }
-        val logOutout = layout.buildDirectory.file("logs/generate$bnf.log")
+    return tasks.registering(ParserExec::class) {
+        val destRoot = project.layout.buildDirectory.dir("gen")
+        val dest = destRoot.map { it.dir(pack) }
+        sourceFile.set(project.layout.projectDirectory.file("src/main/grammars/$bnf.bnf"))
+        destinationRootDirectory.set(destRoot)
+        destinationDirectory.set(dest)
+        psiDirectory.set(dest.map { it.dir("psi") })
+        parserDirectory.set(dest.map { it.dir("parser") })
+        logFile.set(layout.buildDirectory.file("logs/generate$bnf.log"))
 
         val grammarKit by project.configurations
-
-        val taskOutput = ByteArrayOutputStream()
-        standardOutput = taskOutput
-        errorOutput = taskOutput
-
-        classpath = grammarKit
-        mainClass.set("org.intellij.grammar.Main")
-
-        if (JavaVersion.current().isJava9Compatible) {
-            jvmArgs(
-                "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-                "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
-                "--add-opens", "java.base/java.util=ALL-UNNAMED"
-            )
-        }
-
-        doFirst {
-            project.delete(psiDir, parserDir)
-            args(dstRoot.get().asFile, src.asFile)
-            logOutout.get().asFile.parentFile.mkdirs()
-        }
-        doLast {
-            logOutout.get().asFile.writeBytes(taskOutput.toByteArray())
-        }
-
-        inputs.file(src)
-        outputs.dirs(
-            mapOf(
-                "psi" to psiDir,
-                "parser" to parserDir
-            )
-        )
+        this.grammarKit.setFrom(grammarKit)
     }
 }
 

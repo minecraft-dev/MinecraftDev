@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.generation.actions.BaseGenerateAction
 import com.intellij.openapi.application.ApplicationManager
@@ -75,7 +76,7 @@ class GenerateAccessorAction : BaseGenerateAction(GenerateAccessorHandler()) {
     }
 
     override fun isValidForFile(project: Project, editor: Editor, file: PsiFile): Boolean {
-        if (file !is PsiJavaFile) {
+        if (file !is PsiJavaFile || !MixinModuleType.isInModule(file)) {
             return false
         }
 
