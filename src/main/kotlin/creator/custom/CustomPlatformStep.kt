@@ -123,9 +123,9 @@ class CustomPlatformStep(
         lateinit var templatePropertyPlaceholder: Placeholder
 
         builder.row(MCDevBundle("creator.ui.custom.repos.label")) {
-            segmentedButton(templateRepos, { it.name })
+            segmentedButton(templateRepos) { it.name }
                 .bind(templateRepoProperty)
-        }
+        }.visible(templateRepos.size > 1)
 
         builder.row {
             templateProvidersProcessIcon =
