@@ -42,7 +42,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
         var isShadowAnnotationsSameLine: Boolean = true,
 
-        var creatorTemplateRepos: List<TemplateRepo> = emptyList(),
+        var creatorTemplateRepos: List<TemplateRepo> = listOf(TemplateRepo.makeBuiltinRepo()),
     )
 
     @Tag("repo")
