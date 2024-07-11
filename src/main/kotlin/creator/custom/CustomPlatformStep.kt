@@ -515,7 +515,7 @@ class CustomPlatformStep(
 
             val finalizers = selectedTemplate.descriptor.finalizers
             if (!finalizers.isNullOrEmpty()) {
-                CreatorFinalizer.executeAll(project, finalizers, templateProperties)
+                CreatorFinalizer.executeAll(context, finalizers, templateProperties)
             }
         }
     }

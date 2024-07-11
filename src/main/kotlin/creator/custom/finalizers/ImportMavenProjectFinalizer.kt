@@ -21,20 +21,18 @@
 package com.demonwav.mcdev.creator.custom.finalizers
 
 import com.demonwav.mcdev.util.invokeAndWait
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.absolutePathString
 import org.jetbrains.idea.maven.project.importing.MavenImportingManager
 
 class ImportMavenProjectFinalizer : CreatorFinalizer {
 
-    override fun execute(project: Project, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
-        val projectDir = project.guessProjectDir()?.toNioPath()?.absolutePathString()
-            ?: return
+    override fun execute(context: WizardContext, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
+        val project = context.project!!
+        val projectDir = context.projectFileDirectory
 
         val pomFile = VfsUtil.findFile(Path.of(projectDir).resolve("pom.xml"), true)
             ?: return

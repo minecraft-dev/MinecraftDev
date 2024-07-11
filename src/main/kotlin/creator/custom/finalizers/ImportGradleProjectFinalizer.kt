@@ -20,18 +20,16 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
-import kotlin.io.path.absolutePathString
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
 import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
 
 class ImportGradleProjectFinalizer : CreatorFinalizer {
 
-    override fun execute(project: Project, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
-        val projectDir = project.guessProjectDir()?.toNioPath()?.absolutePathString()
-            ?: return
+    override fun execute(context: WizardContext, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
+        val project = context.project!!
+        val projectDir = context.projectFileDirectory
         val canLink = canLinkAndRefreshGradleProject(projectDir, project, showValidationDialog = false)
         thisLogger().info("canLink = $canLink projectDir = $projectDir")
         if (canLink) {

@@ -22,9 +22,8 @@ package com.demonwav.mcdev.creator.custom.finalizers
 
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.runGradleTaskAndWait
+import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.guessProjectDir
 
 class RunGradleTasksFinalizer : CreatorFinalizer {
 
@@ -39,11 +38,11 @@ class RunGradleTasksFinalizer : CreatorFinalizer {
         }
     }
 
-    override fun execute(project: Project, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
+    override fun execute(context: WizardContext, properties: Map<String, Any>, templateProperties: Map<String, Any?>) {
         @Suppress("UNCHECKED_CAST")
         val tasks = properties["tasks"] as List<String>
-        val projectDir = project.guessProjectDir()?.toNioPath()
-            ?: return thisLogger().error("Could not find project dir")
+        val project = context.project!!
+        val projectDir = context.projectDirectory
 
         thisLogger().info("tasks = $tasks projectDir = $projectDir")
         runGradleTaskAndWait(project, projectDir) { settings ->
