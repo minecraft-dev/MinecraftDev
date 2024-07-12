@@ -54,7 +54,7 @@ data class TemplatePropertyDescriptor(
     val maxSegmentedButtonsCount: Int? = null,
     val forceDropdown: Boolean? = null,
     val groupProperties: List<TemplatePropertyDescriptor>? = null,
-    val remember: Boolean? = null,
+    val remember: Any? = null,
     val visible: Any? = null,
     val editable: Boolean? = null,
     val collapsible: Boolean? = null,

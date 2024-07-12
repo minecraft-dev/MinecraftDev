@@ -124,7 +124,18 @@ abstract class CreatorProperty<T>(
      */
     open fun setupProperty(reporter: TemplateValidationReporter) {
         if (descriptor.remember != false && descriptor.derives == null) {
-            toStringProperty(graphProperty).bindStorage(makeStorageKey())
+            val storageKey = when (val remember = descriptor.remember) {
+                null, true -> makeStorageKey()
+                is String -> makeCustomStorageKey(remember)
+                else -> {
+                    reporter.error("Invalid 'remember' value. Must be a boolean or a string")
+                    null
+                }
+            }
+
+            if (storageKey != null) {
+                toStringProperty(graphProperty).bindStorage(storageKey)
+            }
         }
 
         visibleProperty = setupVisibleProperty(reporter, descriptor.visible)
@@ -179,6 +190,10 @@ abstract class CreatorProperty<T>(
         }
 
         return "$base.$discriminator"
+    }
+
+    protected fun makeCustomStorageKey(key: String): String {
+        return "${javaClass.name}.property.$key"
     }
 
     protected fun collectPropertiesValues(names: List<String>? = null): MutableMap<String, Any?> {
