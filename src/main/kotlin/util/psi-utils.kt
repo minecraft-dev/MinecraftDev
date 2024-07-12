@@ -75,8 +75,9 @@ import com.intellij.util.IncorrectOperationException
 import com.siyeh.ig.psiutils.ImportUtils
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 // Parent
 fun PsiElement.findModule(): Module? = ModuleUtilCore.findModuleForPsiElement(this)
@@ -254,7 +255,7 @@ inline fun <T> PsiElement.cached(vararg dependencies: Any, crossinline compute: 
 }
 
 @PublishedApi
-internal val CACHE_LOCKS_KEY = Key.create<ConcurrentMap<Key<*>, ReadWriteLock>>("mcdev.cacheLock")
+internal val CACHE_LOCKS_KEY = Key.create<ConcurrentMap<Key<*>, ReentrantReadWriteLock>>("mcdev.cacheLock")
 
 inline fun <T> PsiElement.lockedCached(
     key: Key<CachedValue<T>>,
@@ -264,18 +265,14 @@ inline fun <T> PsiElement.lockedCached(
     val cacheLocks = (this as UserDataHolderEx).putUserDataIfAbsent(CACHE_LOCKS_KEY, ConcurrentHashMap())
     val cacheLock = cacheLocks.computeIfAbsent(key) { ReentrantReadWriteLock() }
 
-    cacheLock.readLock().lock()
-    try {
+    cacheLock.read {
         val value = getUserData(key)?.upToDateOrNull
         if (value != null) {
             return value.get()
         }
-    } finally {
-        cacheLock.readLock().unlock()
     }
 
-    cacheLock.writeLock().lock()
-    try {
+    cacheLock.write {
         val value = getUserData(key)?.upToDateOrNull
         if (value != null) {
             return value.get()
@@ -284,8 +281,6 @@ inline fun <T> PsiElement.lockedCached(
         return CachedValuesManager.getCachedValue(this, key) {
             CachedValueProvider.Result.create(compute(), *(dependencies.toList() + this).toTypedArray())
         }
-    } finally {
-        cacheLock.writeLock().unlock()
     }
 }
 
