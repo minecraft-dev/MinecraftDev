@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.asset.MCDevBundle.invoke
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
@@ -44,6 +46,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
+import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -73,6 +76,7 @@ class ArchitecturyVersionsCreatorProperty(
     )
     private val defaultValue = createDefaultValue(descriptor.default)
 
+    private val loadingVersionsProperty = graph.property(true)
     override val graphProperty: GraphProperty<ArchitecturyVersionsModel> = graph.property(defaultValue)
     var model: ArchitecturyVersionsModel by graphProperty
 
@@ -161,6 +165,11 @@ class ArchitecturyVersionsCreatorProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
+        panel.row("") {
+            cell(AsyncProcessIcon("ArchitecturyVersions download"))
+            label(MCDevBundle("creator.ui.versions_download.label"))
+        }.visibleIf(loadingVersionsProperty)
+
         panel.row("Minecraft Version:") {
             comboBox(mcVersionModel)
                 .bindItem(mcVersionProperty)
@@ -168,6 +177,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row("Forge Version:") {
             comboBox(forgeVersionsModel)
@@ -176,6 +186,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
                 .component
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row("NeoForge Version:") {
             comboBox(nfVersionsModel)
@@ -184,6 +195,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
                 .component
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         //
         // panel.row("Loom Version:") {
@@ -201,6 +213,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         // Official mappings forced currently, yarn mappings are not handled yet
         // panel.row("Yarn Version:") {
@@ -232,7 +245,7 @@ class ArchitecturyVersionsCreatorProperty(
             label("Unable to match API versions to Minecraft version")
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
-        }
+        }.visibleIf(!loadingVersionsProperty)
 
         panel.row("Architectury API Version:") {
             comboBox(architecturyApiVersionModel)
@@ -248,6 +261,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .visibleIf(architecturyApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -288,6 +302,8 @@ class ArchitecturyVersionsCreatorProperty(
             }
 
             updateMcVersionsList()
+
+            loadingVersionsProperty.set(false)
         }
     }
 

@@ -34,12 +34,14 @@ import com.demonwav.mcdev.util.asyncIO
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
+import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.util.application
+import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -57,6 +59,7 @@ class NeoForgeVersionsCreatorProperty(
 
     private val defaultValue = createDefaultValue(descriptor.default)
 
+    private val loadingVersionsProperty = graph.property(true)
     override val graphProperty: GraphProperty<NeoForgeVersions> = graph.property(defaultValue)
     var versions: NeoForgeVersions by graphProperty
 
@@ -95,6 +98,11 @@ class NeoForgeVersionsCreatorProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
+        panel.row("") {
+            cell(AsyncProcessIcon("NeoForgeVersions download"))
+            label(MCDevBundle("creator.ui.versions_download.label"))
+        }.visibleIf(loadingVersionsProperty)
+
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionsModel)
                 .bindItem(mcVersionProperty)
@@ -109,6 +117,7 @@ class NeoForgeVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -143,6 +152,8 @@ class NeoForgeVersionsCreatorProperty(
 
             ngVersionProperty.set(ngVersion?.versions?.firstOrNull() ?: emptyVersion)
             mdVersionProperty.set(mdVersion?.versions?.firstOrNull() ?: emptyVersion)
+
+            loadingVersionsProperty.set(false)
         }
     }
 

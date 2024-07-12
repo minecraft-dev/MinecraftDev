@@ -43,6 +43,7 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
+import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -68,6 +69,7 @@ class FabricVersionsCreatorProperty(
     )
     private val defaultValue = createDefaultValue(descriptor.default)
 
+    private val loadingVersionsProperty = graph.property(true)
     override val graphProperty: GraphProperty<FabricVersionsModel> = graph.property(defaultValue)
     var model: FabricVersionsModel by graphProperty
 
@@ -134,6 +136,11 @@ class FabricVersionsCreatorProperty(
     }
 
     override fun buildUi(panel: Panel, context: WizardContext) {
+        panel.row("") {
+            cell(AsyncProcessIcon("FabricVersions download"))
+            label(MCDevBundle("creator.ui.versions_download.label"))
+        }.visibleIf(loadingVersionsProperty)
+
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionModel)
                 .bindItem(mcVersionProperty)
@@ -145,6 +152,7 @@ class FabricVersionsCreatorProperty(
             checkBox(MCDevBundle("creator.ui.show_snapshots.label"))
                 .bindSelected(showMcSnapshotsProperty)
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row(MCDevBundle("creator.ui.loom_version.label")) {
             comboBox(loomVersionModel)
@@ -153,6 +161,7 @@ class FabricVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row(MCDevBundle("creator.ui.loader_version.label")) {
             comboBox(loaderVersionModel)
@@ -161,6 +170,7 @@ class FabricVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row(MCDevBundle("creator.ui.yarn_version.label")) {
             comboBox(yarnVersionModel)
@@ -177,6 +187,7 @@ class FabricVersionsCreatorProperty(
                 .visibleIf(yarnHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
 
         panel.row(MCDevBundle("creator.ui.fabricapi_version.label")) {
             comboBox(fabricApiVersionModel)
@@ -192,6 +203,7 @@ class FabricVersionsCreatorProperty(
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
+            .visibleIf(!loadingVersionsProperty)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -230,6 +242,8 @@ class FabricVersionsCreatorProperty(
 
                 loomVersionProperty.set(defaultValue)
             }
+
+            loadingVersionsProperty.set(false)
         }
     }
 
