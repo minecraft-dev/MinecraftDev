@@ -219,7 +219,7 @@ class ArchitecturyVersionsCreatorProperty(
         //         .component.foreground = JBColor.YELLOW
         // }.enabled(descriptor.editable != false)
 
-        panel.row("FabricApi Version:") {
+        panel.row("Fabric API Version:") {
             comboBox(fabricApiVersionModel)
                 .bindItem(fabricApiVersionProperty)
                 .enabledIf(useFabricApiVersionProperty)
@@ -227,14 +227,14 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use FabricApi")
+            checkBox("Use Fabric API")
                 .bindSelected(useFabricApiVersionProperty)
             label("Unable to match API versions to Minecraft version")
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }
 
-        panel.row("ArchitecturyApi Version:") {
+        panel.row("Architectury API Version:") {
             comboBox(architecturyApiVersionModel)
                 .bindItem(architecturyApiVersionProperty)
                 .enabledIf(useArchitecturyApiVersionProperty)
@@ -242,7 +242,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use ArchitecturyApi")
+            checkBox("Use Architectury API")
                 .bindSelected(useArchitecturyApiVersionProperty)
             label("Unable to match API versions to Minecraft version")
                 .visibleIf(architecturyApiHasMatchingGameVersion.not())
