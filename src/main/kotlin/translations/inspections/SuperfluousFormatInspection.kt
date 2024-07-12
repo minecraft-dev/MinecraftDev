@@ -27,58 +27,68 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
-import com.intellij.psi.JavaElementVisitor
-import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiLiteralExpression
-import com.intellij.psi.PsiReferenceExpression
-import com.intellij.psi.SmartPointerManager
-import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.uast.UastHintedVisitorAdapter
+import com.intellij.uast.UastSmartPointer
+import com.intellij.uast.createUastSmartPointer
 import com.intellij.util.IncorrectOperationException
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.ULiteralExpression
+import org.jetbrains.uast.UReferenceExpression
+import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class SuperfluousFormatInspection : TranslationInspection() {
     override fun getStaticDescription() = "Detect superfluous format arguments for translations"
 
-    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+    private val typesHint: Array<Class<out UElement>> =
+        arrayOf(UReferenceExpression::class.java, ULiteralExpression::class.java)
 
-    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitReferenceExpression(expression: PsiReferenceExpression) {
-            val result = TranslationInstance.find(expression)
+    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor =
+        UastHintedVisitorAdapter.create(holder.file.language, Visitor(holder), typesHint)
+
+    private class Visitor(private val holder: ProblemsHolder) : AbstractUastNonRecursiveVisitor() {
+
+        override fun visitExpression(node: UExpression): Boolean {
+            val result = TranslationInstance.find(node)
             if (
-                result != null && result.foldingElement is PsiCall &&
+                result != null && result.foldingElement is UCallExpression &&
                 result.formattingError == FormattingError.SUPERFLUOUS
             ) {
-                registerProblem(expression, result)
+                registerProblem(node, result)
             }
+
+            return super.visitExpression(node)
         }
 
-        override fun visitLiteralExpression(expression: PsiLiteralExpression) {
-            val result = TranslationInstance.find(expression)
+        override fun visitLiteralExpression(node: ULiteralExpression): Boolean {
+            val result = TranslationInstance.find(node)
             if (
-                result != null && result.required && result.foldingElement is PsiCall &&
+                result != null && result.required && result.foldingElement is UCallExpression &&
                 result.formattingError == FormattingError.SUPERFLUOUS
             ) {
                 registerProblem(
-                    expression,
+                    node,
                     result,
                     RemoveArgumentsQuickFix(
-                        SmartPointerManager.getInstance(holder.project)
-                            .createSmartPsiElementPointer(result.foldingElement),
+                        result.foldingElement.createUastSmartPointer<UCallExpression>(),
                         result.superfluousVarargStart,
                     ),
                     ChangeTranslationQuickFix("Use a different translation"),
                 )
             }
+
+            return super.visitLiteralExpression(node)
         }
 
         private fun registerProblem(
-            expression: PsiExpression,
+            expression: UExpression,
             result: TranslationInstance,
             vararg quickFixes: LocalQuickFix,
         ) {
             holder.registerProblem(
-                expression,
+                expression.sourcePsi!!,
                 "There are missing formatting arguments to satisfy '${result.text}'",
                 *quickFixes,
             )
@@ -86,7 +96,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
     }
 
     private class RemoveArgumentsQuickFix(
-        private val call: SmartPsiElementPointer<PsiCall>,
+        private val call: UastSmartPointer<UCallExpression>,
         private val position: Int,
     ) : LocalQuickFix {
         override fun getName() = "Remove superfluous arguments"
@@ -94,7 +104,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             try {
                 descriptor.psiElement.containingFile.runWriteAction {
-                    call.element?.argumentList?.expressions?.drop(position)?.forEach { it.delete() }
+                    call.element?.valueArguments?.drop(position)?.forEach { it.sourcePsi?.delete() }
                 }
             } catch (ignored: IncorrectOperationException) {
             }

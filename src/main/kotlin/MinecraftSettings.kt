@@ -20,27 +20,97 @@
 
 package com.demonwav.mcdev
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.editor.markup.EffectType
-import com.intellij.util.xmlb.XmlSerializerUtil
+import com.intellij.util.xmlb.annotations.Attribute
+import com.intellij.util.xmlb.annotations.Tag
+import com.intellij.util.xmlb.annotations.Text
 
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
-class MinecraftSettings : PersistentStateComponent<MinecraftSettings> {
-    override fun getState() = this
+class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
 
-    override fun loadState(state: MinecraftSettings) {
-        XmlSerializerUtil.copyBean(state, this)
+    data class State(
+        var isShowProjectPlatformIcons: Boolean = true,
+        var isShowEventListenerGutterIcons: Boolean = true,
+        var isShowChatColorGutterIcons: Boolean = true,
+        var isShowChatColorUnderlines: Boolean = false,
+        var underlineType: UnderlineType = UnderlineType.DOTTED,
+
+        var creatorTemplateRepos: List<TemplateRepo> = listOf(TemplateRepo.makeBuiltinRepo()),
+    )
+
+    @Tag("repo")
+    data class TemplateRepo(
+        @get:Attribute("name")
+        var name: String,
+        @get:Attribute("provider")
+        var provider: String,
+        @get:Text
+        var data: String
+    ) {
+        constructor() : this("", "", "")
+
+        companion object {
+
+            fun makeBuiltinRepo(): TemplateRepo {
+                return TemplateRepo(MCDevBundle("minecraft.settings.creator.repo.builtin_name"), "builtin", "true")
+            }
+        }
     }
 
-    var isShowProjectPlatformIcons = true
-    var isShowEventListenerGutterIcons = true
-    var isShowChatColorGutterIcons = true
-    var isShowChatColorUnderlines = false
+    private var state = State()
 
-    var underlineType = UnderlineType.DOTTED
+    override fun getState(): State {
+        return state
+    }
+
+    override fun loadState(state: State) {
+        this.state = state
+        if (state.creatorTemplateRepos.isEmpty()) {
+            state.creatorTemplateRepos = listOf()
+        }
+    }
+
+    // State mappings
+    var isShowProjectPlatformIcons: Boolean
+        get() = state.isShowProjectPlatformIcons
+        set(showProjectPlatformIcons) {
+            state.isShowProjectPlatformIcons = showProjectPlatformIcons
+        }
+
+    var isShowEventListenerGutterIcons: Boolean
+        get() = state.isShowEventListenerGutterIcons
+        set(showEventListenerGutterIcons) {
+            state.isShowEventListenerGutterIcons = showEventListenerGutterIcons
+        }
+
+    var isShowChatColorGutterIcons: Boolean
+        get() = state.isShowChatColorGutterIcons
+        set(showChatColorGutterIcons) {
+            state.isShowChatColorGutterIcons = showChatColorGutterIcons
+        }
+
+    var isShowChatColorUnderlines: Boolean
+        get() = state.isShowChatColorUnderlines
+        set(showChatColorUnderlines) {
+            state.isShowChatColorUnderlines = showChatColorUnderlines
+        }
+
+    var underlineType: UnderlineType
+        get() = state.underlineType
+        set(underlineType) {
+            state.underlineType = underlineType
+        }
+
+    var creatorTemplateRepos: List<TemplateRepo>
+        get() = state.creatorTemplateRepos.map { it.copy() }
+        set(creatorTemplateRepos) {
+            state.creatorTemplateRepos = creatorTemplateRepos.map { it.copy() }
+        }
 
     enum class UnderlineType(private val regular: String, val effectType: EffectType) {
 

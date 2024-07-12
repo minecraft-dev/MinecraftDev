@@ -74,6 +74,16 @@
 
         <extensionPoint name="gradleFileType" interface="com.demonwav.mcdev.creator.buildsystem.GradleFile$Type" dynamic="true" />
 
+        <extensionPoint name="creatorPropertyType" beanClass="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactoryBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory"/>
+        </extensionPoint>
+        <extensionPoint name="creatorTemplateProvider" beanClass="com.demonwav.mcdev.creator.custom.providers.TemplateProviderBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.providers.TemplateProvider"/>
+        </extensionPoint>
+        <extensionPoint name="creatorFinalizer" beanClass="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizerBean" dynamic="true">
+            <with attribute="implementation" implements="com.demonwav.mcdev.creator.custom.finalizers.CreatorFinalizer"/>
+        </extensionPoint>
+
         <extensionPoint name="mixinSelectorParser" interface="com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser" dynamic="true" />
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler"/>
@@ -123,6 +133,32 @@
         <buildSystemSupport platform="BungeeCord" buildSystem="Maven" implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMavenSupport" />
 
         <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type" />
+        
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ArchitecturyVersionsCreatorProperty$Factory" type="architectury_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BooleanCreatorProperty$Factory" type="boolean" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.BuildSystemCoordinatesCreatorProperty$Factory" type="build_system_coordinates" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ClassFqnCreatorProperty$Factory" type="class_fqn" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.FabricVersionsCreatorProperty$Factory" type="fabric_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ForgeVersionsCreatorProperty$Factory" type="forge_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.InlineStringListCreatorProperty$Factory" type="inline_string_list" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.IntegerCreatorProperty$Factory" type="integer" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.JdkCreatorProperty$Factory" type="jdk" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.LicenseCreatorProperty$Factory" type="license" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.MavenArtifactVersionCreatorProperty$Factory" type="maven_artifact_version" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.NeoForgeVersionsCreatorProperty$Factory" type="neoforge_versions" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.ParchmentCreatorProperty$Factory" type="parchment" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.SemanticVersionCreatorProperty$Factory" type="semantic_version" />
+        <creatorPropertyType implementation="com.demonwav.mcdev.creator.custom.types.StringCreatorProperty$Factory" type="string" />
+
+        <creatorTemplateProvider key="builtin" implementation="com.demonwav.mcdev.creator.custom.providers.BuiltinTemplateProvider" />
+        <creatorTemplateProvider key="remote" implementation="com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider" />
+        <creatorTemplateProvider key="local" implementation="com.demonwav.mcdev.creator.custom.providers.LocalTemplateProvider" />
+        <creatorTemplateProvider key="archive" implementation="com.demonwav.mcdev.creator.custom.providers.ZipTemplateProvider" />
+
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportGradleProjectFinalizer" type="import_gradle_project" />
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ImportMavenProjectFinalizer" type="import_maven_project" />
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.RunGradleTasksFinalizer" type="run_gradle_tasks" />
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.GitAddAllFinalizer" type="git_add_all" />
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser" order="before memberReference" />
         <mixinSelectorParser id="memberReference" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinMemberParser" />
@@ -183,6 +219,7 @@
         <!--region NO PLATFORM-->
         <!---->
 
+        <moduleBuilder id="CUSTOM_MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.custom.CustomMinecraftModuleBuilder"/>
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType" />
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
@@ -254,11 +291,11 @@
         <lang.psiStructureViewFactory language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.structure.LangStructureViewFactory"/>
         <lang.findUsagesProvider language="MCLang" implementationClass="com.demonwav.mcdev.translations.reference.LangFindUsagesProvider"/>
         <lang.findUsagesProvider language="JSON" implementationClass="com.demonwav.mcdev.translations.reference.JsonFindUsagesProvider" order="first"/>
-        <lang.foldingBuilder language="JAVA" implementationClass="com.demonwav.mcdev.translations.TranslationFoldingBuilder"/>
+        <lang.foldingBuilder language="UAST" implementationClass="com.demonwav.mcdev.translations.TranslationFoldingBuilder"/>
         <lang.formatter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.formatting.LangFormattingModelBuilder"/>
         <lang.commenter language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.LangCommenter" />
         <spellchecker.support language="MCLang" implementationClass="com.demonwav.mcdev.translations.lang.spellcheck.LangSpellcheckingStrategy"/>
-        <psi.referenceContributor language="JAVA" implementation="com.demonwav.mcdev.translations.reference.JavaReferenceContributor"/>
+        <psi.referenceContributor language="UAST" implementation="com.demonwav.mcdev.translations.reference.UastReferenceContributor"/>
         <psi.referenceContributor language="MCLang" implementation="com.demonwav.mcdev.translations.reference.LangReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.demonwav.mcdev.translations.reference.JsonReferenceContributor"/>
         <gotoSymbolContributor implementation="com.demonwav.mcdev.translations.reference.TranslationGotoSymbolContributor"/>
@@ -272,7 +309,7 @@
         <annotator language="MCLang" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <annotator language="JSON" implementationClass="com.demonwav.mcdev.translations.intentions.TranslationFileAnnotator"/>
         <intentionAction>
-            <language>JAVA</language>
+            <language>UAST</language>
             <className>com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention</className>
             <category>Minecraft</category>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
@@ -554,28 +591,28 @@
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
         <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
         <localInspection displayName="Superfluous format arguments"
                          groupName="Minecraft"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
         <localInspection displayName="Wrong translation argument types"
                          groupName="Minecraft"
-                         language="JAVA"
+                         language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
@@ -1250,11 +1287,6 @@
                 description="Lookup MCP mapping info on a SRG field or method">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
-        <action class="com.demonwav.mcdev.translations.actions.ConvertToTranslationAction" id="ConvertToMcTranslationAction"
-                text="Convert String Literal to Translation"
-                description="Converts any string literal into a Minecraft localization translation">
-            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
-        </action>
         <action class="com.demonwav.mcdev.translations.actions.SortTranslationsAction" id="SortMcTranslationsAction"
                 text="Sort Translations by Specified Order"
                 description="Sorts translations by specified order">
@@ -1269,5 +1301,8 @@
                 description="Copy the reference to clipboard in Access Widener format">
             <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
+        <action id="com.demonwav.mcdev.creator.custom.expression.EvaluateTemplateConditionAction"
+                class="com.demonwav.mcdev.creator.custom.EvaluateTemplateExpressionAction"
+                text="Evaluate Template Expression"/>
     </actions>
 </idea-plugin>

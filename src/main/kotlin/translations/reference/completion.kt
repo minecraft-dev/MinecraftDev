@@ -38,35 +38,28 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.json.JsonElementTypes
 import com.intellij.json.JsonLanguage
 import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiUtilCore
 
 sealed class TranslationCompletionContributor : CompletionContributor() {
     protected fun handleKey(text: String, element: PsiElement, domain: String?, result: CompletionResultSet) {
-        if (text.isEmpty()) {
-            return
-        }
-
         val defaultEntries = TranslationIndex.getAllDefaultTranslations(element.project, domain)
-        val existingKeys = TranslationIndex.getTranslations(element.containingFile ?: return).map { it.key }.toSet()
+        val availableKeys = TranslationIndex.getTranslations(element.containingFile.originalFile).map { it.key }.toSet()
         val prefixResult = result.withPrefixMatcher(text)
 
-        var counter = 0
         for (entry in defaultEntries) {
             val key = entry.key
 
-            if (!key.contains(text) || existingKeys.contains(key)) {
+            if (!key.contains(text) || availableKeys.contains(key)) {
                 continue
             }
 
-            if (counter++ > 1000) {
-                break // Prevent insane CPU usage
-            }
-
+            val textHint = StringUtil.shortenTextWithEllipsis(entry.text, 30, 0)
             prefixResult.addElement(
                 PrioritizedLookupElement.withPriority(
-                    LookupElementBuilder.create(key).withIcon(PlatformAssets.MINECRAFT_ICON),
+                    LookupElementBuilder.create(key).withIcon(PlatformAssets.MINECRAFT_ICON).withTypeText(textHint),
                     1.0 + key.getSimilarity(text),
                 ),
             )

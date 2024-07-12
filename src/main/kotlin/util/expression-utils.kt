@@ -22,34 +22,44 @@ package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
-import com.intellij.psi.PsiAnnotationMemberValue
-import com.intellij.psi.PsiCall
-import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiReferenceExpression
-import com.intellij.psi.PsiTypeCastExpression
-import com.intellij.psi.PsiVariable
+import org.jetbrains.uast.UBinaryExpressionWithType
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UReferenceExpression
+import org.jetbrains.uast.UVariable
+import org.jetbrains.uast.evaluateString
+import org.jetbrains.uast.resolveToUElement
+import org.jetbrains.uast.util.isTypeCast
 
-fun PsiAnnotationMemberValue.evaluate(allowReferences: Boolean, allowTranslations: Boolean): String? {
-    val visited = mutableSetOf<PsiAnnotationMemberValue?>()
+fun UExpression.evaluate(allowReferences: Boolean, allowTranslations: Boolean): String? {
+    val visited = mutableSetOf<UExpression?>()
 
-    fun eval(expr: PsiAnnotationMemberValue?, defaultValue: String? = null): String? {
+    fun eval(expr: UExpression?, defaultValue: String? = null): String? {
         if (!visited.add(expr)) {
             return defaultValue
         }
 
         when {
-            expr is PsiTypeCastExpression && expr.operand != null ->
+            expr is UBinaryExpressionWithType && expr.isTypeCast() ->
                 return eval(expr.operand, defaultValue)
-            expr is PsiReferenceExpression -> {
-                val reference = expr.advancedResolve(false).element
-                if (reference is PsiVariable && reference.initializer != null) {
-                    return eval(reference.initializer, "\${${expr.text}}")
+
+            expr is UQualifiedReferenceExpression -> {
+                val selector = expr.selector
+                if (selector is UCallExpression) {
+                    return eval(selector, "\${${expr.asSourceString()}}")
                 }
             }
-            expr is PsiLiteral ->
-                return expr.value.toString()
-            expr is PsiCall && allowTranslations ->
-                for (argument in expr.argumentList?.expressions ?: emptyArray()) {
+
+            expr is UReferenceExpression -> {
+                val reference = expr.resolveToUElement()
+                if (reference is UVariable && reference.uastInitializer != null) {
+                    return eval(reference.uastInitializer, "\${${expr.asSourceString()}}")
+                }
+            }
+
+            expr is UCallExpression && allowTranslations ->
+                for (argument in expr.valueArguments) {
                     val translation = TranslationInstance.find(argument) ?: continue
                     if (translation.formattingError == FormattingError.MISSING) {
                         return "{ERROR: Missing formatting arguments for '${translation.text}'}"
@@ -57,10 +67,12 @@ fun PsiAnnotationMemberValue.evaluate(allowReferences: Boolean, allowTranslation
 
                     return translation.text
                 }
+
+            else -> expr?.evaluateString()?.let { return it }
         }
 
         return if (allowReferences && expr != null) {
-            "\${${expr.text}}"
+            "\${${expr.asSourceString()}}"
         } else {
             defaultValue
         }

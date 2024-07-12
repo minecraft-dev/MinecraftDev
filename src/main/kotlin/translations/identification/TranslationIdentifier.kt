@@ -37,18 +37,23 @@ import com.intellij.codeInspection.dataFlow.CommonDataflow
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.PsiCall
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiExpressionList
-import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiParameter
 import java.util.IllegalFormatException
 import java.util.MissingFormatArgumentException
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.evaluateString
+import org.jetbrains.uast.getContainingUClass
 
-abstract class TranslationIdentifier<T : PsiElement> {
+abstract class TranslationIdentifier<T : UElement> {
     @Suppress("UNCHECKED_CAST")
-    fun identifyUnsafe(element: PsiElement): TranslationInstance? {
+    fun identifyUnsafe(element: UElement): TranslationInstance? {
         return identify(element as T)
     }
 
@@ -61,20 +66,19 @@ abstract class TranslationIdentifier<T : PsiElement> {
 
         fun identify(
             project: Project,
-            element: PsiExpression,
-            container: PsiElement,
-            referenceElement: PsiElement,
+            element: UExpression,
+            container: UElement,
+            referenceElement: UElement,
         ): TranslationInstance? {
-            if (container !is PsiExpressionList) {
-                return null
-            }
-            val call = container.parent as? PsiCall ?: return null
-            val index = container.expressions.indexOf(element)
+            val call = container as? UCallExpression ?: return null
+            val index = container.valueArguments.indexOf(element)
 
             val method = call.referencedMethod ?: return null
-            val parameter = method.parameterList.getParameter(index) ?: return null
-            val translatableAnnotation =
-                AnnotationUtil.findAnnotation(parameter, TranslationConstants.TRANSLATABLE_ANNOTATION) ?: return null
+            val parameter = method.uastParameters.getOrNull(index) ?: return null
+            val translatableAnnotation = AnnotationUtil.findAnnotation(
+                parameter.javaPsi as PsiParameter,
+                TranslationConstants.TRANSLATABLE_ANNOTATION
+            ) ?: return null
 
             val prefix =
                 translatableAnnotation.findAttributeValue(TranslationConstants.PREFIX)?.constantStringValue ?: ""
@@ -84,13 +88,16 @@ abstract class TranslationIdentifier<T : PsiElement> {
                 translatableAnnotation.findAttributeValue(TranslationConstants.REQUIRED)?.constantValue as? Boolean
                     ?: true
             val isPreEscapeException =
-                method.containingClass?.qualifiedName?.startsWith("net.minecraft.") == true &&
-                    isPreEscapeMcVersion(project, element)
+                method.getContainingUClass()?.qualifiedName?.startsWith("net.minecraft.") == true &&
+                    isPreEscapeMcVersion(project, element.sourcePsi!!)
             val allowArbitraryArgs = isPreEscapeException || translatableAnnotation.findAttributeValue(
                 TranslationConstants.ALLOW_ARBITRARY_ARGS
             )?.constantValue as? Boolean ?: false
 
-            val translationKey = CommonDataflow.computeValue(element) as? String ?: return null
+            val translationKey = when (val javaPsi = element.javaPsi) {
+                is PsiExpression -> CommonDataflow.computeValue(javaPsi) as? String
+                else -> element.evaluateString()
+            } ?: return null
 
             val entries = TranslationIndex.getAllDefaultEntries(project).merge("")
             val translation = entries[prefix + translationKey + suffix]?.text
@@ -109,15 +116,16 @@ abstract class TranslationIdentifier<T : PsiElement> {
                     ?: false
 
             val formatting =
-                (method.parameterList.parameters.last().type as? PsiEllipsisType)
+                (method.uastParameters.last().type as? PsiEllipsisType)
                     ?.componentType?.equalsToText(CommonClassNames.JAVA_LANG_OBJECT) == true
 
             val foldingElement = if (foldMethod) {
-                call
+                // Make sure qualifiers, like I18n in 'I18n.translate()' is also folded
+                call.uastParent as? UQualifiedReferenceExpression ?: call
             } else if (
                 index == 0 &&
-                container.expressionCount > 1 &&
-                method.parameterList.parametersCount == 2 &&
+                container.valueArgumentCount > 1 &&
+                method.uastParameters.size == 2 &&
                 formatting
             ) {
                 container
@@ -155,14 +163,15 @@ abstract class TranslationIdentifier<T : PsiElement> {
             }
         }
 
-        private fun format(method: PsiMethod, translation: String, call: PsiCall): Pair<String, Int>? {
+        private fun format(method: UMethod, translation: String, call: UCallExpression): Pair<String, Int>? {
             val format = NUMBER_FORMATTING_PATTERN.replace(translation, "%$1s")
             val paramCount = STRING_FORMATTING_PATTERN.findAll(format).count()
 
-            val varargs = call.extractVarArgs(method.parameterList.parametersCount - 1, true, true)
+            val parametersCount = method.uastParameters.size
+            val varargs = call.extractVarArgs(parametersCount - 1, true, true)
                 ?: return null
             val varargStart = if (varargs.size > paramCount) {
-                method.parameterList.parametersCount - 1 + paramCount
+                parametersCount - 1 + paramCount
             } else {
                 -1
             }

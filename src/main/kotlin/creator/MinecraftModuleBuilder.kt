@@ -35,7 +35,7 @@ import com.intellij.openapi.roots.ModifiableRootModel
 
 class MinecraftModuleBuilder : AbstractNewProjectWizardBuilder() {
 
-    override fun getPresentableName() = "Minecraft"
+    override fun getPresentableName() = "Minecraft (Old Wizard)"
     override fun getNodeIcon() = PlatformAssets.MINECRAFT_ICON
     override fun getGroupName() = "Minecraft"
     override fun getBuilderId() = "MINECRAFT_MODULE"

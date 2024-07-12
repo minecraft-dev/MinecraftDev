@@ -24,31 +24,38 @@ import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.identification.TranslationInstance.Companion.FormattingError
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiExpression
-import com.intellij.psi.PsiLiteralExpression
-import com.intellij.psi.PsiReferenceExpression
+import com.intellij.uast.UastHintedVisitorAdapter
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.ULiteralExpression
+import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class MissingFormatInspection : TranslationInspection() {
     override fun getStaticDescription() = "Detects missing format arguments for translations"
 
-    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
+    private val typesHint: Array<Class<out UElement>> = arrayOf(UExpression::class.java)
 
-    private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
-        override fun visitReferenceExpression(expression: PsiReferenceExpression) {
-            visit(expression)
+    override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor =
+        UastHintedVisitorAdapter.create(holder.file.language, Visitor(holder), typesHint)
+
+    private class Visitor(private val holder: ProblemsHolder) : AbstractUastNonRecursiveVisitor() {
+
+        override fun visitExpression(node: UExpression): Boolean {
+            visit(node)
+            return super.visitElement(node)
         }
 
-        override fun visitLiteralExpression(expression: PsiLiteralExpression) {
-            visit(expression, ChangeTranslationQuickFix("Use a different translation"))
+        override fun visitLiteralExpression(node: ULiteralExpression): Boolean {
+            visit(node, ChangeTranslationQuickFix("Use a different translation"))
+            return true
         }
 
-        private fun visit(expression: PsiExpression, vararg quickFixes: LocalQuickFix) {
+        private fun visit(expression: UExpression, vararg quickFixes: LocalQuickFix) {
             val result = TranslationInstance.find(expression)
             if (result != null && result.required && result.formattingError == FormattingError.MISSING) {
                 holder.registerProblem(
-                    expression,
+                    expression.sourcePsi!!,
                     "There are missing formatting arguments to satisfy '${result.text}'",
                     *quickFixes,
                 )

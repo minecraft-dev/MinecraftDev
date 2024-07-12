@@ -34,8 +34,11 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.options.BeanConfigurable
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiExpressionList
-import com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.textRange
+import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.visitor.AbstractUastVisitor
 
 class TranslationCodeFoldingOptionsProvider :
     BeanConfigurable<TranslationFoldingSettings>(TranslationFoldingSettings.instance), CodeFoldingOptionsProvider {
@@ -88,23 +91,35 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
 
         val descriptors = mutableListOf<FoldingDescriptor>()
         for (identifier in TranslationIdentifier.INSTANCES) {
-            val elements = PsiTreeUtil.findChildrenOfType(root, identifier.elementClass())
-            for (element in elements) {
+            val uElement = root.toUElement() ?: continue
+            val children = mutableListOf<UElement>()
+            uElement.accept(object : AbstractUastVisitor() {
+                override fun visitElement(node: UElement): Boolean {
+                    if (identifier.elementClass().isAssignableFrom(node.javaClass)) {
+                        children.add(node)
+                    }
+
+                    return super.visitElement(node)
+                }
+            })
+            for (element in children) {
                 val translation = identifier.identifyUnsafe(element)
                 val foldingElement = translation?.foldingElement ?: continue
                 val range =
-                    if (foldingElement is PsiExpressionList) {
-                        val args = foldingElement.expressions.drop(translation.foldStart)
-                        args.first().textRange.union(args.last().textRange)
+                    if (foldingElement is UCallExpression && translation.foldStart != 0) {
+                        val args = foldingElement.valueArguments.drop(translation.foldStart)
+                        val startRange = args.first().textRange ?: continue
+                        val endRange = args.last().textRange ?: continue
+                        startRange.union(endRange)
                     } else {
-                        foldingElement.textRange
+                        foldingElement.textRange ?: continue
                     }
                 if (!translation.required && translation.formattingError != null) {
                     continue
                 }
                 descriptors.add(
                     FoldingDescriptor(
-                        translation.foldingElement.node,
+                        translation.foldingElement.sourcePsi?.node!!,
                         range,
                         FoldingGroup.newGroup("mc.translation." + translation.key),
                         if (translation.formattingError == TranslationInstance.Companion.FormattingError.MISSING) {
