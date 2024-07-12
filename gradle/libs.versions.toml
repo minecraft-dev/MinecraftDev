@@ -11,6 +11,7 @@ coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", ve
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 mappingIo = "net.fabricmc:mapping-io:0.2.1"
+mixinExtras-expressions = "io.github.llamalad7:mixinextras-expressions:0.0.1"
 
 # GrammarKit
 jflex-lib = "org.jetbrains.idea:jflex:1.7.0-b7f882a"
@@ -39,6 +40,8 @@ test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junit-entine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+
+mixinExtras-common = "io.github.llamalad7:mixinextras-common:0.5.0-beta.1"
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-swing"]

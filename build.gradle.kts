@@ -87,25 +87,15 @@ repositories {
         }
     }
     mavenCentral()
-
-    // TODO: temporary waiting for MixinExtras expression library
     maven("https://repo.spongepowered.org/maven/")
-    maven("https://jitpack.io/") {
-        content {
-            includeGroupByRegex("com\\.github\\..+")
-        }
-    }
 }
 
 dependencies {
     // Add tools.jar for the JDI API
     implementation(files(Jvm.current().toolsJar))
 
-    // TODO: temporary waiting for a release
-    fun mixinExtras(variant: String) = "com.github.LlamaLad7.MixinExtras:mixinextras-$variant:2ad48e8"
-
-    implementation(mixinExtras("expressions"))
-    testLibs(mixinExtras("common"))
+    implementation(libs.mixinExtras.expressions)
+    testLibs(libs.mixinExtras.common)
     implementation("org.ow2.asm:asm-util:9.3")
 
     // Kotlin
