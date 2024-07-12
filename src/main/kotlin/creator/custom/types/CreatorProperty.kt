@@ -27,17 +27,14 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
 import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
 import com.intellij.ide.util.projectWizard.WizardContext
-import com.intellij.openapi.diagnostic.getOrLogException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.ObservableMutableProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.observable.util.transform
-import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
-import com.intellij.ui.dsl.builder.bindItem
 
 abstract class CreatorProperty<T>(
     val descriptor: TemplatePropertyDescriptor,
@@ -97,17 +94,6 @@ abstract class CreatorProperty<T>(
     }
 
     protected open fun convertSelectDerivationResult(original: Any?): Any? = original
-
-    fun deriveSelectFirst(parentValues: List<Any?>, derivation: PropertyDerivation): Any? {
-        val properties = parentValues.mapIndexed { i, value -> derivation.parents!![i] to value }.toMap()
-        for (select in derivation.select ?: emptyList()) {
-            if (TemplateEvaluator.condition(properties, select.condition).getOrLogException(thisLogger()) == true) {
-                return select.value
-            }
-        }
-
-        return derivation.default
-    }
 
     abstract fun buildUi(panel: Panel, context: WizardContext)
 
@@ -298,14 +284,5 @@ abstract class CreatorProperty<T>(
         }
 
         return prop
-    }
-
-    protected fun <E> Panel.buildDropdownUi(options: List<E>, graphProp: GraphProperty<E>) {
-        row(descriptor.translatedLabel) {
-            comboBox(options)
-                .bindItem(graphProp)
-                .enabled(descriptor.editable != false)
-                .also { ComboboxSpeedSearch.installOn(it.component) }
-        }.propertyVisibility()
     }
 }
