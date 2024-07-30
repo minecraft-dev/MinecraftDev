@@ -184,7 +184,7 @@
        stroke="none"
        fill="#ebac24"
        fill-rule="evenodd"
-       style="stroke:#6c707e;stroke-width:0.781793;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.8;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill" /></g><image
+       style="stroke:#ebac24;stroke-width:0.40312282;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.8;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers;fill:#ebac24;fill-opacity:1" /></g><image
      width="9.3349571"
      height="9.3349571"
      preserveAspectRatio="none"
