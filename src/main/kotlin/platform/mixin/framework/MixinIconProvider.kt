@@ -23,19 +23,17 @@ package com.demonwav.mcdev.platform.mixin.framework
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.isMixin
-import com.demonwav.mcdev.platform.mixin.util.mixinAnnotation
-import com.intellij.ide.IconProvider
+import com.intellij.ide.IconLayerProvider
+import com.intellij.openapi.util.Iconable
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
-import com.intellij.ui.LayeredIcon
 import javax.swing.Icon
 
-class MixinIconProvider : IconProvider() {
-    override fun getIcon(element: PsiElement, flags: Int) : Icon? =
-        if (MinecraftSettings.instance.mixinClassIcon && element is PsiClass && element.isMixin)
-            LayeredIcon.create(element.withoutMixin().getIcon(flags), MixinAssets.MIXIN_MARK)
-        else null
+class MixinIconProvider : IconLayerProvider {
+    override fun getLayerIcon(element: Iconable, isLocked: Boolean): Icon? =
+        MixinAssets.MIXIN_MARK.takeIf {
+            MinecraftSettings.instance.mixinClassIcon && element is PsiClass && element.isMixin
+        }
 
-    private fun PsiClass.withoutMixin(): PsiClass =
-       (copy() as PsiClass).apply { mixinAnnotation?.delete() }
+    override fun getLayerDescription(): String =
+        "Mixin class"
 }

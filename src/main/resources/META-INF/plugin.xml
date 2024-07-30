@@ -528,7 +528,7 @@
 
         <library.presentationProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider" />
 
-        <iconProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinIconProvider" />
+        <iconLayerProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinIconProvider" />
 
         <!--region MixinExtras Expression Language-->
         <fileType name="MixinExtras Expression File"
