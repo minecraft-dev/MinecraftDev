@@ -32,6 +32,7 @@ import com.demonwav.mcdev.platform.mixin.util.isAssignable
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
 import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.demonwav.mcdev.util.Parameter
+import com.demonwav.mcdev.util.findKeyword
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.invokeLater
 import com.demonwav.mcdev.util.synchronize
@@ -133,7 +134,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                         } else if (!shouldBeStatic && modifiers.hasModifierProperty(PsiModifier.STATIC)) {
                             reportedStatic = true
                             holder.registerProblem(
-                                identifier,
+                                modifiers.findKeyword(PsiModifier.STATIC) ?: identifier,
                                 "Method must not be static",
                                 QuickFixFactory.getInstance().createModifierListFix(
                                     modifiers,
