@@ -32,14 +32,13 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementVisitor
-import org.jetbrains.annotations.Nls
 import org.jetbrains.yaml.psi.YAMLKeyValue
 import org.jetbrains.yaml.psi.YAMLScalar
 import org.jetbrains.yaml.psi.YamlPsiElementVisitor
 
 class PluginYmlInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription(): @Nls String? = "Reports issues in Bukkit-like plugin.yml files"
+    override fun getStaticDescription(): String? = "Reports issues in Bukkit-like plugin.yml files"
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         val module = holder.file.findModule() ?: return PsiElementVisitor.EMPTY_VISITOR

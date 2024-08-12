@@ -26,59 +26,34 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.facet.FacetManager
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.LanguageLevelModuleExtension
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.pom.java.LanguageLevel
+import com.intellij.testFramework.IdeaTestUtil
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
 import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseMinecraftTest(
     platformTypes: Set<PlatformType> = emptySet(),
-    private val libraries: Set<String> = emptySet(),
+    libraries: Set<String> = emptySet(),
 ) : ProjectBuilderTest(
-    getProjectDescriptor(platformTypes),
+    getProjectDescriptor(platformTypes, libraries),
 ) {
     protected open val testPath = ""
-
-    private var initialized = false
 
     @BeforeEach
     fun setUp() {
         if (testPath.isNotBlank()) {
             fixture.testDataPath = "$BASE_DATA_PATH/$testPath"
         }
-
-        if (initialized) {
-            return
-        }
-
-        initialized = true
-        runWriteTask {
-            // TODO this can be moved into the project descriptor configureModule method below in 2023.3+
-            val table = LibraryTablesRegistrar.getInstance().getLibraryTable(module.project)
-            val model = module.rootManager.modifiableModel
-            for (libraryName in libraries) {
-                val root = checkNotNull(findLibraryRoot(libraryName)) { "Could not find library $libraryName" }
-                val library = table.createLibrary(libraryName)
-
-                val libraryModel = library.modifiableModel
-                libraryModel.addRoot(root, OrderRootType.CLASSES)
-                libraryModel.commit()
-
-                model.addLibraryEntry(library)
-            }
-
-            model.commit()
-        }
     }
 }
 
-fun getProjectDescriptor(platformTypes: Set<PlatformType>): LightProjectDescriptor {
+fun getProjectDescriptor(platformTypes: Set<PlatformType>, libraries: Set<String>): LightProjectDescriptor {
     return object : DefaultLightProjectDescriptor() {
         override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
             model.getModuleExtension(LanguageLevelModuleExtension::class.java).languageLevel = LanguageLevel.JDK_1_8
@@ -94,9 +69,21 @@ fun getProjectDescriptor(platformTypes: Set<PlatformType>): LightProjectDescript
                 val modifiableModel = facetManager.createModifiableModel()
                 modifiableModel.addFacet(facet)
                 modifiableModel.commit()
+
+                val table = LibraryTablesRegistrar.getInstance().getLibraryTable(module.project)
+                for (libraryName in libraries) {
+                    val root = checkNotNull(findLibraryRoot(libraryName)) { "Could not find library $libraryName" }
+                    val library = table.createLibrary(libraryName)
+
+                    val libraryModel = library.modifiableModel
+                    libraryModel.addRoot(root, OrderRootType.CLASSES)
+                    libraryModel.commit()
+
+                    model.addLibraryEntry(library)
+                }
             }
         }
 
-        override fun getSdk() = mockJdk // TODO replace by proper JDK in IdeaTestUtil in 2023.3+?
+        override fun getSdk() = IdeaTestUtil.getMockJdk21()
     }
 }
