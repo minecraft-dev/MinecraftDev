@@ -44,6 +44,11 @@ import org.junit.jupiter.api.Assertions
 typealias ProjectBuilderFunc =
     ProjectBuilder.(path: String, code: String, configure: Boolean, allowAst: Boolean) -> VirtualFile
 
+const val RESOURCE_ROOT = "src/test/resources"
+const val ROOT_PACKAGE = "com/demonwav/mcdev"
+const val BASE_DATA_PATH = "$RESOURCE_ROOT/$ROOT_PACKAGE"
+const val BASE_DATA_PATH_2 = "\$PROJECT_ROOT/$BASE_DATA_PATH/"
+
 val mockJdk by lazy {
     val path = findLibraryPath("mock-jdk")
     val rtFile = StandardFileSystems.local().findFileByPath(path)!!

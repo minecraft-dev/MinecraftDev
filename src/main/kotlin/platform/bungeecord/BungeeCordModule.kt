@@ -37,14 +37,18 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import com.intellij.util.application
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
 
 class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
+    // Light test cases only support a single source content root, so we mix sources and resources under unit test mode
+    private val pluginYmlSourceType = if (application.isUnitTestMode) SourceType.SOURCE else SourceType.RESOURCE
+
     var pluginYml by nullable {
-        val file = facet.findFile("bungee.yml", SourceType.RESOURCE)
+        val file = facet.findFile("bungee.yml", pluginYmlSourceType)
         if (file != null) {
             return@nullable file
         }
@@ -53,7 +57,7 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
             // So we don't check
             return@nullable null
         }
-        return@nullable facet.findFile("plugin.yml", SourceType.RESOURCE)
+        return@nullable facet.findFile("plugin.yml", pluginYmlSourceType)
     }
         private set
 

@@ -42,21 +42,25 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.util.application
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
 
 class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
+    // Light test cases only support a single source content root, so we mix sources and resources under unit test mode
+    private val pluginYmlSourceType = if (application.isUnitTestMode) SourceType.SOURCE else SourceType.RESOURCE
+
     var pluginYml by nullable {
         if (moduleType is PaperModuleType) {
-            val paperPlugin = facet.findFile("paper-plugin.yml", SourceType.RESOURCE)
+            val paperPlugin = facet.findFile("paper-plugin.yml", pluginYmlSourceType)
             if (paperPlugin != null) {
                 return@nullable paperPlugin
             }
         }
 
-        facet.findFile("plugin.yml", SourceType.RESOURCE)
+        facet.findFile("plugin.yml", pluginYmlSourceType)
     }
         private set
 

@@ -1,5 +1,11 @@
 # Minecraft Development for IntelliJ
 
+## [Unreleased]
+
+### Added
+
+- `plugin.yml`, `paper-plugin.yml` and `bungee.yml` main class reference and validity inspection
+
 ## [1.8.1] - 2024-08-10
 
 ### Added

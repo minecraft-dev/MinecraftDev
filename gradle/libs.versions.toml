@@ -34,6 +34,8 @@ fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", versio
 # Testing
 test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
 test-mixin = "org.spongepowered:mixin:0.8.5"
+test-spigotapi = "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
+test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT"
 test-spongeapi = "org.spongepowered:spongeapi:7.4.0"
 test-fabricloader = "net.fabricmc:fabric-loader:0.15.11"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
