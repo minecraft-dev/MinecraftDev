@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.bungeecord
+package com.demonwav.mcdev.platform.fabric
 
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.platform.PlatformType
 
-abstract class BaseBungeeCordTest : BaseMinecraftTest(setOf(PlatformType.BUNGEECORD), setOf("bungeecord-api"))
+abstract class BaseFabricTest : BaseMinecraftTest(setOf(PlatformType.FABRIC), setOf("fabric-loader"))

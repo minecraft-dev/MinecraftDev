@@ -22,7 +22,7 @@ package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.MinecraftProjectSettings
 import com.demonwav.mcdev.framework.EdtInterceptor
-import com.demonwav.mcdev.platform.mixin.BaseMixinTest
+import com.demonwav.mcdev.platform.mixin.BaseMixinExtrasTest
 import com.demonwav.mcdev.util.BeforeOrAfter
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import org.intellij.lang.annotations.Language
@@ -39,7 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("MixinExtras expression completion test")
-class MEExpressionCompletionTest : BaseMixinTest() {
+class MEExpressionCompletionTest : BaseMixinExtrasTest() {
     private fun assertLookupAppears(
         lookupString: String,
         @Language("JAVA") code: String,

@@ -20,58 +20,17 @@
 
 package com.demonwav.mcdev.platform.fabric
 
-import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.framework.ProjectBuilder
-import com.demonwav.mcdev.framework.createLibrary
-import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection
-import com.demonwav.mcdev.util.runWriteTask
-import com.intellij.openapi.roots.ModuleRootModificationUtil
-import com.intellij.openapi.roots.libraries.Library
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import org.intellij.lang.annotations.Language
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(EdtInterceptor::class)
 @DisplayName("Fabric Entrypoints Inspection Tests")
-class FabricEntrypointsInspectionTest : BaseMinecraftTest(PlatformType.FABRIC) {
-
-    private var library: Library? = null
-
-    @BeforeEach
-    fun initFabric() {
-        runWriteTask {
-            library = createLibrary(project, "fabric-loader")
-        }
-
-        ModuleRootModificationUtil.updateModel(module) { model ->
-            model.addLibraryEntry(library ?: throw IllegalStateException("Library not created"))
-        }
-    }
-
-    @AfterEach
-    fun cleanupFabric() {
-        library?.let { l ->
-            ModuleRootModificationUtil.updateModel(module) { model ->
-                model.removeOrderEntry(
-                    model.findLibraryOrderEntry(l) ?: throw IllegalStateException("Library not found"),
-                )
-            }
-
-            runWriteTask {
-                val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-                table.modifiableModel.let { model ->
-                    model.removeLibrary(l)
-                    model.commit()
-                }
-            }
-        }
-    }
+class FabricEntrypointsInspectionTest : BaseFabricTest() {
 
     private fun doTest(@Language("JSON") json: String, builder: (ProjectBuilder.() -> Unit) = {}) {
         buildProject {
