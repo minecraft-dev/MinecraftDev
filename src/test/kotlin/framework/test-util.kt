@@ -24,16 +24,10 @@ package com.demonwav.mcdev.framework
 
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lexer.Lexer
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.OrderRootType
-import com.intellij.openapi.roots.libraries.Library
-import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.DebugUtil
 import com.intellij.testFramework.LexerTestCase
@@ -58,35 +52,10 @@ val mockJdk by lazy {
 }
 
 fun findLibraryPath(name: String) = FileUtil.toSystemIndependentName(System.getProperty("testLibs.$name")!!)
-private fun findLibrary(name: String): VirtualFile? {
+fun findLibraryRoot(name: String): VirtualFile? {
     val fsRoot = StandardFileSystems.jar()
         .refreshAndFindFileByPath(findLibraryPath(name) + JarFileSystem.JAR_SEPARATOR)
-    if (fsRoot != null) {
-        // force refresh every directory, it's the only way I could get intellij to behave
-        VfsUtilCore.iterateChildrenRecursively(
-            fsRoot,
-            { it.isDirectory },
-            {
-                it.children
-                it.refresh(false, false)
-                true
-            },
-        )
-    }
     return fsRoot
-}
-
-fun createLibrary(project: Project, name: String): Library {
-    val table = LibraryTablesRegistrar.getInstance().getLibraryTable(project)
-    return table.getLibraryByName(name) ?: run {
-        val library = table.createLibrary(name)
-        val libraryModel = library.modifiableModel
-        libraryModel.addRoot(findLibrary(name)!!, OrderRootType.CLASSES)
-        libraryModel.commit()
-        // sync refresh, otherwise intellij might not find files added to the library jar
-        VirtualFileManager.getInstance().syncRefresh()
-        library
-    }
 }
 
 fun testLexer(basePath: String, lexer: Lexer) {
