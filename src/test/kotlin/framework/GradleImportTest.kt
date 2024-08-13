@@ -50,7 +50,7 @@ abstract class BaseGradleImportTest : ExternalSystemImportingTestCase() {
     companion object {
         const val GRADLE_WRAPPER_PROPERTIES = "gradle/wrapper/gradle-wrapper.properties"
         const val BUILD_GRADLE = "build.gradle"
-        const val BUILD_GRADLE_KT = "build.gradle.kts"
+        const val BUILD_GRADLE_KTS = "build.gradle.kts"
         const val GRADLE_PROPERTIES = "build.gradle"
         const val SETTINGS_GRADLE = "settings.gradle"
     }
@@ -73,11 +73,17 @@ abstract class BaseGradleImportTest : ExternalSystemImportingTestCase() {
 
         runWriteTask {
             val envNames = setOf("JDK_21_0", "JDK_21", "JDK21", "JAVA_HOME_21_x64")
-            val jdk21Home = envNames.firstNotNullOfOrNull(System::getenv)
-            assertNotNull("Could not find JDK 21 home", jdk21Home)
+            val jdkHome = envNames.firstNotNullOfOrNull(System::getenv)
+            assertNotNull("Could not find JDK 21 home", jdkHome)
 
-            val jdk = JavaSdk.getInstance().createJdk("JDK 21", jdk21Home!!, false)
-            assertEquals(JavaSdkVersion.JDK_21, JavaSdk.getInstance().getVersion(jdk))
+            val jdk = JavaSdk.getInstance().createJdk("JDK 21", jdkHome!!, false)
+            val jdkVersion = JavaSdk.getInstance().getVersion(jdk)
+            assertNotNull("Could not get version of JDK at '$jdkHome'", jdkVersion)
+            assertEquals(
+                "Expected JDK at '$jdkHome' to be 21, got ${jdkVersion!!.description} instead",
+                JavaSdkVersion.JDK_21,
+                jdkVersion
+            )
 
             ProjectJdkTable.getInstance().addJdk(jdk)
             JavaSdkUtil.applyJdkToProject(myProject, jdk)
