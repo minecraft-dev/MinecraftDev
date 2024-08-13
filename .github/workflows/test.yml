@@ -35,3 +35,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - run: ./gradlew build --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-reports
+          path: 'build/reports/'
+
+
