@@ -70,6 +70,52 @@ suspend fun collectMavenVersions(url: String, filter: Predicate<String> = Predic
     return result
 }
 
+data class MavenLatestAndReleaseVersion(val latest: String?, val release: String?)
+
+@Throws(IOException::class)
+suspend fun collectMavenLatestAndReleaseVersion(url: String): MavenLatestAndReleaseVersion {
+    val manager = FuelManager()
+    manager.proxy = selectProxy(url)
+
+    val response = manager.get(url)
+        .header("User-Agent", PluginUtil.useragent)
+        .allowRedirects(true)
+        .suspendable()
+        .await()
+
+    var latest: String? = null
+    var release: String? = null
+    response.body().toStream().use { stream ->
+        val inputFactory = XMLInputFactory.newInstance()
+
+        @Suppress("UNCHECKED_CAST")
+        val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
+        for (event in reader) {
+            if (!event.isStartElement) {
+                continue
+            }
+            val start = event.asStartElement()
+            val name = start.name.localPart
+            if (name != "latest" && name != "release") {
+                continue
+            }
+
+            val versionEvent = reader.next()
+            if (!versionEvent.isCharacters) {
+                continue
+            }
+
+            val version = versionEvent.asCharacters().data
+            when (name) {
+                "latest" -> latest = version
+                "release" -> release = version
+            }
+        }
+    }
+
+    return MavenLatestAndReleaseVersion(latest, release)
+}
+
 @Throws(IOException::class)
 suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> {
     val manager = FuelManager()

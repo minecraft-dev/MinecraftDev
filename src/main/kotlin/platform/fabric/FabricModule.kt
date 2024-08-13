@@ -52,6 +52,12 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
     var fabricJson by nullable { facet.findFile(FabricConstants.FABRIC_MOD_JSON, SourceType.RESOURCE) }
         private set
 
+    val loomData: FabricLoomData?
+        get() {
+            val gradleData = GradleUtil.findGradleModuleData(facet.module) ?: return null
+            return gradleData.children.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
+        }
+
     private var namedToMojangManagerField: MappingsManager? = null
     override val namedToMojangManager: MappingsManager?
         get() = namedToMojangManagerField
