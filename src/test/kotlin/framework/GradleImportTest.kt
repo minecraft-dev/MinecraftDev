@@ -72,7 +72,9 @@ abstract class BaseGradleImportTest : ExternalSystemImportingTestCase() {
         super.setUp()
 
         runWriteTask {
-            val envNames = setOf("JDK_21_0", "JDK_21", "JDK21", "JAVA_HOME_21_X64")
+            val envNames = mutableSetOf("JDK_21_0", "JDK_21", "JDK21")
+            System.getenv().keys.filterTo(envNames) { it.startsWith("JAVA_HOME_21") }
+
             val jdkHome = envNames.firstNotNullOfOrNull(System::getenv)
             assertNotNull("Could not find JDK 21 home", jdkHome)
 
