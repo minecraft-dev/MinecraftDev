@@ -30,6 +30,7 @@ import com.intellij.openapi.externalSystem.settings.ExternalProjectSettings
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.modules
 import com.intellij.openapi.projectRoots.JavaSdk
+import com.intellij.openapi.projectRoots.JavaSdkVersion
 import com.intellij.openapi.projectRoots.ProjectJdkTable
 import com.intellij.openapi.projectRoots.ex.JavaSdkUtil
 import com.intellij.openapi.roots.ProjectRootManager
@@ -71,10 +72,13 @@ abstract class BaseGradleImportTest : ExternalSystemImportingTestCase() {
         super.setUp()
 
         runWriteTask {
-            val jdk21Home = System.getenv("JDK_21_0") ?: System.getenv("JDK_21") ?: System.getenv("JDK21")
+            val envNames = setOf("JDK_21_0", "JDK_21", "JDK21", "JAVA_HOME_21_x64")
+            val jdk21Home = envNames.firstNotNullOfOrNull(System::getenv)
             assertNotNull("Could not find JDK 21 home", jdk21Home)
 
-            val jdk = JavaSdk.getInstance().createJdk("JDK 21", jdk21Home, false)
+            val jdk = JavaSdk.getInstance().createJdk("JDK 21", jdk21Home!!, false)
+            assertEquals(JavaSdkVersion.JDK_21, JavaSdk.getInstance().getVersion(jdk))
+
             ProjectJdkTable.getInstance().addJdk(jdk)
             JavaSdkUtil.applyJdkToProject(myProject, jdk)
         }
