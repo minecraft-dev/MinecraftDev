@@ -177,8 +177,15 @@ dependencies {
     gradleToolingExtension(libs.annotations)
 
     testImplementation(libs.junit.api)
+    testImplementation(libs.junit.pioneer)
     testRuntimeOnly(libs.junit.entine)
     testRuntimeOnly(libs.junit.platform.launcher)
+
+    testApi(libs.externalSystemTestFramework) {
+        isTransitive = false
+    }
+    // Plexus logging is required to run import tests
+    testRuntimeOnly(libs.plexusLogging)
 }
 
 val artifactType = Attribute.of("artifactType", String::class.java)
@@ -309,6 +316,14 @@ tasks.processResources {
     }
 }
 
+val testTmpDir = intellij.sandboxDir.get() + "/test-tmp"
+
+val cleanTestTmp = tasks.register("cleanTestTmp", Delete::class) {
+    group = "intellij"
+    description = "Deletes the tests tmp directory."
+    delete(testTmpDir)
+}
+
 tasks.test {
     dependsOn(tasks.jar, testLibs)
     useJUnitPlatform()
@@ -318,11 +333,14 @@ tasks.test {
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     systemProperty("java.awt.headless", "true")
+    systemProperty("java.io.tmpdir", testTmpDir)
 
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",
         "-Dsun.io.useCanonPrefixCache=false",
     )
+
+    finalizedBy(cleanTestTmp)
 }
 
 idea {

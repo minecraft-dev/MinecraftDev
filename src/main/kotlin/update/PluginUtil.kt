@@ -22,6 +22,7 @@ package com.demonwav.mcdev.update
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.PluginId
 
 object PluginUtil {
@@ -34,7 +35,8 @@ object PluginUtil {
         }
 
     val pluginVersion: String
-        get() = plugin.version
+        // Null in cases where we are in test data factories, when there is no Application
+        get() = if (ApplicationManager.getApplication() == null) "test" else plugin.version
 
     val useragent: String
         get() = "github_org/minecraft-dev/$pluginVersion"
