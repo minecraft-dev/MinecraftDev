@@ -45,7 +45,7 @@ object McpModelNMDHandler : McpModelDataHandler {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelNMD::class.java) ?: return
 
         val state = McpModuleSettings.State(
-            "1." + data.neoForgeVersion.substringBefore('.'),
+            "1." + data.neoForgeVersion.substringBeforeLast('.').removeSuffix(".0"),
             null,
             data.mappingsFile?.absolutePath,
             SrgType.TSRG,
