@@ -32,7 +32,7 @@
     elementTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtElementType"
     tokenTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTokenType"
 
-    consumeTokenMethod="consumeTokenFast"
+    consumeTokenMethod(".*_recover")="consumeTokenFast"
 }
 
 at_file ::= line*
@@ -60,7 +60,9 @@ keyword ::= KEYWORD_ELEMENT {
     methods=[
         keywordElement="KEYWORD_ELEMENT"
     ]
+    recoverWhile=keyword_recover
 }
+private keyword_recover ::= !(NAME_ELEMENT | CLASS_NAME_ELEMENT)
 
 class_name ::= CLASS_NAME_ELEMENT {
     mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtClassNameImplMixin"
