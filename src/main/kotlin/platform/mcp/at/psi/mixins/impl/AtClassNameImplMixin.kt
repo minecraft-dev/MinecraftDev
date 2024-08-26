@@ -22,19 +22,29 @@ package com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtClassNameMixin
-import com.demonwav.mcdev.util.findQualifiedClass
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiReference
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 
 abstract class AtClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtClassNameMixin {
 
     override val classNameValue
-        get() = findQualifiedClass(project, classNameText)
+        get() = references.last()?.resolve() as? PsiClass
 
     override val classNameText: String
         get() = classNameElement.text
 
     override fun setClassName(className: String) {
         replace(AtElementFactory.createClassName(project, className))
+    }
+
+    override fun getReference(): PsiReference? {
+        return references.firstOrNull()
+    }
+
+    override fun getReferences(): Array<out PsiReference?> {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(this)
     }
 }

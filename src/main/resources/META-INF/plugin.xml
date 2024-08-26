@@ -625,8 +625,15 @@
         <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate"/>
         <completion.contributor language="Access Transformers"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
-        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler"/>
+
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
+        <psi.referenceContributor language="Access Transformers" implementation="com.demonwav.mcdev.platform.mcp.at.AtReferenceContributor"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtClassNameElementManipulator"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFieldNameElementManipulator"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFuncNameElementManipulator"/>
 
         <!-- access widener file type -->
         <fileType name="Access Widener" language="Access Widener"
@@ -1546,6 +1553,11 @@
         <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAtAction" id="CopyATAction"
                 text="AT Entry"
                 description="Copy the reference to clipboard in Access Transformer format">
+            <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyNeoForgeAtAction" id="CopyNeoForgeATAction"
+                text="NeoForge AT Entry"
+                description="Copy the reference to clipboard in NeoForge's Access Transformer format">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"

@@ -49,6 +49,12 @@
 - [#1813](https://github.com/minecraft-dev/MinecraftDev/issues/1813) Single character Accessor targets aren't inferred correctly
 - [#1886](https://github.com/minecraft-dev/MinecraftDev/issues/1886) Sync error in ForgeGradle composite builds
 
+### Changed
+
+- Overhauled Access Transformer support:
+  - many lexing errors should now be fixed
+  - class names and member names now have their own references, replacing the custom Goto handler
+
 ## [1.8.1] - 2024-08-10
 
 ### Added
