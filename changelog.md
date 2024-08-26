@@ -54,6 +54,7 @@
 - Overhauled Access Transformer support:
   - many lexing errors should now be fixed
   - class names and member names now have their own references, replacing the custom Goto handler
+  - SRG names are no longer used on NeoForge 1.20.2+ and a new copy action is available for it
 
 ## [1.8.1] - 2024-08-10
 
