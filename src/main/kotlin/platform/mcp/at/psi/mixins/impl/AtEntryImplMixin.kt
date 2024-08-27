@@ -24,8 +24,16 @@ import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
+import com.intellij.psi.util.PsiTreeUtil
 
 abstract class AtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtEntryMixin {
+
+    override val comment: PsiComment?
+        get() = PsiTreeUtil.skipWhitespacesForward(this) as? PsiComment
+
+    override val commentText: String?
+        get() = comment?.text?.substring(1)
 
     override fun setEntry(entry: String) {
         replace(AtElementFactory.createEntry(project, entry))
@@ -52,5 +60,21 @@ abstract class AtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtE
     override fun setAsterisk() {
         val asterisk = AtElementFactory.createAsterisk(project)
         replaceMember(asterisk)
+    }
+
+    override fun setComment(text: String?) {
+        if (text == null) {
+            comment?.delete()
+            return
+        }
+
+        val newComment = AtElementFactory.createComment(project, text)
+        val existingComment = comment
+        if (existingComment == null) {
+            parent.addAfter(newComment, this)
+            return
+        }
+
+        existingComment.replace(newComment)
     }
 }

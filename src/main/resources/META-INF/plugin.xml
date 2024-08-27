@@ -627,6 +627,7 @@
                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
 
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
+        <lang.inspectionSuppressor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtInspectionSuppressor"/>
         <psi.referenceContributor language="Access Transformers" implementation="com.demonwav.mcdev.platform.mcp.at.AtReferenceContributor"/>
         <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName"
                                  implementationClass="com.demonwav.mcdev.platform.mcp.at.AtClassNameElementManipulator"/>
