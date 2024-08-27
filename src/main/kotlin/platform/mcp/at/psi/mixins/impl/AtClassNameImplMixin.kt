@@ -41,7 +41,7 @@ abstract class AtClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node),
     }
 
     override fun getReference(): PsiReference? {
-        return references.firstOrNull()
+        return references.lastOrNull()
     }
 
     override fun getReferences(): Array<out PsiReference?> {
