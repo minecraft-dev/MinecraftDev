@@ -79,7 +79,8 @@ class AtUsageInspectionTest : BaseMinecraftTest(PlatformType.MCP, PlatformType.N
                 public net.minecraft.Used usedMethod()V
                 <warning descr="Access Transformer entry is never used">public net.minecraft.Used unusedMethod()V</warning>
                 <warning descr="Access Transformer entry is never used">public net.minecraft.server.Unused</warning>
-                """.trimIndent())
+                """.trimIndent()
+            )
         }
 
         // Force 1.20.2 because we test the non-SRG member names with NeoForge

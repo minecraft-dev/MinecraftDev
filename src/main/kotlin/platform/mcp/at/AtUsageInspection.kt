@@ -46,10 +46,6 @@ class AtUsageInspection : LocalInspectionTool() {
         return "Reports unused Access Transformer entries"
     }
 
-    override fun isSuppressedFor(element: PsiElement): Boolean {
-        return super.isSuppressedFor(element)
-    }
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return object : PsiElementVisitor() {
             override fun visitElement(element: PsiElement) {
