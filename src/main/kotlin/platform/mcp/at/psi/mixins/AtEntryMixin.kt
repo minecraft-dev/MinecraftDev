@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtKeyword
 import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.psi.PsiComment
 
 interface AtEntryMixin : AtElement {
@@ -38,6 +39,7 @@ interface AtEntryMixin : AtElement {
     val keyword: AtKeyword
     val comment: PsiComment?
     val commentText: String?
+    val memberReference: MemberReference?
 
     fun setEntry(entry: String)
     fun setKeyword(keyword: AtElementFactory.Keyword)

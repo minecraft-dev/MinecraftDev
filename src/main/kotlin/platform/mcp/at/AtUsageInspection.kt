@@ -21,24 +21,16 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
-import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
 import com.demonwav.mcdev.util.excludeFileTypes
 import com.intellij.codeInspection.LocalInspectionTool
-import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.codeInspection.util.IntentionFamilyName
-import com.intellij.codeInspection.util.IntentionName
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.search.searches.ReferencesSearch
-import com.intellij.psi.util.elementType
-import com.intellij.psi.util.siblings
 
 class AtUsageInspection : LocalInspectionTool() {
 
@@ -119,36 +111,8 @@ class AtUsageInspection : LocalInspectionTool() {
                     }
                 }
 
-                val fix = RemoveAtEntryFix.forWholeLine(entry)
+                val fix = RemoveAtEntryFix.forWholeLine(entry, true)
                 holder.registerProblem(entry, "Access Transformer entry is never used", fix)
-            }
-        }
-    }
-
-    private class RemoveAtEntryFix(startElement: PsiElement, endElement: PsiElement) :
-        LocalQuickFixOnPsiElement(startElement, endElement) {
-
-        override fun getFamilyName(): @IntentionFamilyName String = "Remove entry"
-
-        override fun getText(): @IntentionName String = familyName
-
-        override fun invoke(
-            project: Project,
-            file: PsiFile,
-            startElement: PsiElement,
-            endElement: PsiElement
-        ) {
-            startElement.parent.deleteChildRange(startElement, endElement)
-        }
-
-        companion object {
-
-            fun forWholeLine(entry: AtEntry): RemoveAtEntryFix {
-                val start = entry.siblings(forward = false, withSelf = false)
-                    .firstOrNull { it.elementType == AtTypes.CRLF }?.nextSibling
-                val end = entry.siblings(forward = true, withSelf = true)
-                    .firstOrNull { it.elementType == AtTypes.CRLF }
-                return RemoveAtEntryFix(start ?: entry, end ?: entry)
             }
         }
     }

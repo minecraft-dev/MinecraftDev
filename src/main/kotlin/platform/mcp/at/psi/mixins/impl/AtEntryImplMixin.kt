@@ -21,7 +21,10 @@
 package com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
+import com.demonwav.mcdev.platform.mcp.at.AtMemberReference
+import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiComment
@@ -34,6 +37,9 @@ abstract class AtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtE
 
     override val commentText: String?
         get() = comment?.text?.substring(1)
+
+    override val memberReference: MemberReference?
+        get() = (function ?: fieldName ?: asterisk)?.let { AtMemberReference.get(this as AtEntry, it) }
 
     override fun setEntry(entry: String) {
         replace(AtElementFactory.createEntry(project, entry))
