@@ -1004,6 +1004,13 @@
                          editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
+        <localInspection displayName="Unresolved reference"
+                         groupName="MCP"
+                         language="Access Transformers"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUnresolvedReferenceInspection"/>
         <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
                          groupName="MCP"
                          language="JAVA"
