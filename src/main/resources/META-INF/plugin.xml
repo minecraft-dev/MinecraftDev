@@ -622,10 +622,12 @@
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage"/>
         <lang.commenter language="Access Transformers"
                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter"/>
+        <codeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.at.format.AtCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.at.format.AtLanguageCodeStyleSettingsProvider"/>
+        <lang.formatter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.format.AtFormattingModelBuilder"/>
         <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate"/>
         <completion.contributor language="Access Transformers"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
-
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
         <lang.inspectionSuppressor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtInspectionSuppressor"/>
         <psi.referenceContributor language="Access Transformers" implementation="com.demonwav.mcdev.platform.mcp.at.AtReferenceContributor"/>
