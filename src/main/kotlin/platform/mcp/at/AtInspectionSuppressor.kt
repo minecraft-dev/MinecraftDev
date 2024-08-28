@@ -29,14 +29,26 @@ import com.intellij.codeInspection.util.IntentionName
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
 
 class AtInspectionSuppressor : InspectionSuppressor {
 
     override fun isSuppressedFor(element: PsiElement, toolId: String): Boolean {
         val entry = element.parentOfType<AtEntry>(withSelf = true) ?: return false
-        val comment = entry.commentText ?: return false
-        val suppressed = comment.substringAfter("Suppress:").substringBefore(' ').split(',')
+        val entryComment = entry.commentText
+        if (entryComment != null) {
+            if (isSuppressing(entryComment, toolId)) {
+                return true
+            }
+        }
+
+        val file = element.containingFile as AtFile
+        return file.headComments.any { comment -> isSuppressing(comment.text, toolId) }
+    }
+
+    private fun isSuppressing(entryComment: String, toolId: String): Boolean {
+        val suppressed = entryComment.substringAfter("Suppress:").substringBefore(' ').split(',')
         return toolId in suppressed
     }
 
@@ -48,12 +60,24 @@ class AtInspectionSuppressor : InspectionSuppressor {
             return SuppressQuickFix.EMPTY_ARRAY
         }
 
-        return arrayOf(AtSuppressQuickFix(element, toolId))
+        val entry = element as? AtEntry
+            ?: element.parentOfType<AtEntry>(withSelf = true)
+            ?: PsiTreeUtil.getPrevSiblingOfType(element, AtEntry::class.java) // For when we are at a CRLF
+        return if (entry != null) {
+            arrayOf(AtSuppressQuickFix(entry, toolId), AtSuppressQuickFix(element.containingFile, toolId))
+        } else {
+            arrayOf(AtSuppressQuickFix(element.containingFile, toolId))
+        }
     }
 
-    class AtSuppressQuickFix(element: PsiElement, val toolId: String) : LocalQuickFixOnPsiElement(element), SuppressQuickFix {
+    class AtSuppressQuickFix(element: PsiElement, val toolId: String) :
+        LocalQuickFixOnPsiElement(element), SuppressQuickFix {
 
-        override fun getText(): @IntentionName String = "Suppress $toolId"
+        override fun getText(): @IntentionName String = when (startElement) {
+            is AtEntry -> "Suppress $toolId for entry"
+            is AtFile -> "Suppress $toolId for file"
+            else -> "Suppress $toolId"
+        }
 
         override fun getFamilyName(): @IntentionFamilyName String = "Suppress inspection"
 
@@ -63,7 +87,13 @@ class AtInspectionSuppressor : InspectionSuppressor {
             startElement: PsiElement,
             endElement: PsiElement
         ) {
-            val entry = startElement.parentOfType<AtEntry>(withSelf = true) ?: return
+            when (startElement) {
+                is AtEntry -> suppressForEntry(startElement)
+                is AtFile -> suppressForFile(startElement)
+            }
+        }
+
+        private fun suppressForEntry(entry: AtEntry) {
             val commentText = entry.commentText?.trim()
             if (commentText == null) {
                 entry.setComment("Suppress:$toolId")
@@ -77,8 +107,30 @@ class AtInspectionSuppressor : InspectionSuppressor {
             }
 
             val suppressEnd = commentText.indexOf(' ', suppressStart).takeUnless { it == -1 } ?: commentText.length
-            val newComment = commentText.substring(suppressStart, suppressEnd) + ",$toolId" + commentText.substring(suppressEnd)
+            val newComment =
+                commentText.substring(suppressStart, suppressEnd) + ",$toolId" + commentText.substring(suppressEnd)
             entry.setComment(newComment)
+        }
+
+        private fun suppressForFile(file: AtFile) {
+            val existingSuppressComment = file.headComments.firstOrNull { it.text.contains("Suppress:") }
+            if (existingSuppressComment == null) {
+                file.addHeadComment("Suppress:$toolId")
+                return
+            }
+
+            val commentText = existingSuppressComment.text
+            val suppressStart = commentText.indexOf("Suppress:")
+            if (suppressStart == -1) {
+                file.addHeadComment("Suppress:$toolId")
+                return
+            }
+
+            val suppressEnd = commentText.indexOf(' ', suppressStart).takeUnless { it == -1 } ?: commentText.length
+            val newCommentText =
+                commentText.substring(suppressStart, suppressEnd) + ",$toolId" + commentText.substring(suppressEnd)
+            val newComment = AtElementFactory.createComment(file.project, newCommentText)
+            existingSuppressComment.replace(newComment)
         }
 
         override fun isAvailable(

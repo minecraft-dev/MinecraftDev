@@ -24,6 +24,7 @@ package com.demonwav.mcdev.framework
 
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
@@ -131,6 +132,19 @@ fun testInspectionFix(fixture: JavaCodeInsightTestFixture, basePath: String, fix
     val intention = fixture.findSingleIntention(fixName)
     fixture.launchAction(intention)
     fixture.checkResult(expected)
+}
+
+fun testInspectionFix(
+    fixture: JavaCodeInsightTestFixture,
+    fixName: String,
+    fileType: FileType,
+    before: String,
+    after: String
+) {
+    fixture.configureByText(fileType, before)
+    val intention = fixture.findSingleIntention(fixName)
+    fixture.launchAction(intention)
+    fixture.checkResult(after)
 }
 
 fun <T> assertEqualsUnordered(expected: Collection<T>, actual: Collection<T>) {

@@ -24,7 +24,7 @@ import com.demonwav.mcdev.framework.BaseMinecraftTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Access Transformer Duplicate Entry Inspection")
+@DisplayName("Access Transformer Duplicate Entry Inspection Tests")
 class AtDuplicateEntryInspectionTest : BaseMinecraftTest() {
 
     @Test

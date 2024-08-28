@@ -43,8 +43,7 @@ class AtParserDefinition : ParserDefinition {
     override fun createElement(node: ASTNode): PsiElement = AtTypes.Factory.createElement(node)
 
     override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode) =
-        map.entries.firstOrNull { e -> left.elementType == e.key.first || right.elementType == e.key.second }?.value
-            ?: ParserDefinition.SpaceRequirements.MUST_NOT
+        map[left.elementType to right.elementType] ?: ParserDefinition.SpaceRequirements.MUST_NOT
 
     companion object {
         private val COMMENTS = TokenSet.create(AtTypes.COMMENT)
@@ -52,13 +51,14 @@ class AtParserDefinition : ParserDefinition {
         private val FILE = IFileElementType(Language.findInstance(AtLanguage::class.java))
 
         private val map: Map<Pair<IElementType, IElementType>, ParserDefinition.SpaceRequirements> = mapOf(
-            (AtTypes.KEYWORD to AtTypes.CLASS_NAME) to ParserDefinition.SpaceRequirements.MUST,
-            (AtTypes.CLASS_NAME to AtTypes.FIELD_NAME) to ParserDefinition.SpaceRequirements.MUST,
-            (AtTypes.CLASS_NAME to AtTypes.FUNCTION) to ParserDefinition.SpaceRequirements.MUST,
-            (AtTypes.CLASS_NAME to AtTypes.ASTERISK) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.KEYWORD_ELEMENT to AtTypes.CLASS_NAME_ELEMENT) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.CLASS_NAME_ELEMENT to AtTypes.FIELD_NAME) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.CLASS_NAME_ELEMENT to AtTypes.FUNCTION) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.CLASS_NAME_ELEMENT to AtTypes.ASTERISK_ELEMENT) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.CLASS_NAME_ELEMENT to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
             (AtTypes.FIELD_NAME to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
-            (AtTypes.ASTERISK to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
-            (AtTypes.COMMENT to AtTypes.KEYWORD) to ParserDefinition.SpaceRequirements.MUST_LINE_BREAK,
+            (AtTypes.ASTERISK_ELEMENT to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
+            (AtTypes.COMMENT to AtTypes.KEYWORD_ELEMENT) to ParserDefinition.SpaceRequirements.MUST_LINE_BREAK,
             (AtTypes.COMMENT to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST_LINE_BREAK,
             (AtTypes.FUNCTION to AtTypes.COMMENT) to ParserDefinition.SpaceRequirements.MUST,
         )
