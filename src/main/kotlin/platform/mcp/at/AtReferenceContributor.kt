@@ -27,10 +27,7 @@ import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFunction
 import com.demonwav.mcdev.platform.mcp.at.psi.AtElement
-import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.findQualifiedClass
@@ -177,12 +174,12 @@ abstract class AtClassMemberReference<E : AtElement>(element: E, range: TextRang
         val entry = element.parent as? AtEntry ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
 
         val module = element.findModule() ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-        val instance = MinecraftFacet.getInstance(module)
-        val mcpModule = instance?.getModuleOfType(McpModuleType) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-        val isNeoForge = instance.isOfType(NeoForgeModuleType)
-        val (mapField, mapMethod) = if (isNeoForge) {
+        val instance = MinecraftFacet.getInstance(module) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        val useSrg = instance.usesSrgMemberNames()
+        val (mapField, mapMethod) = if (!useSrg) {
             { it: PsiField -> it.memberReference } to { it: PsiMethod -> it.memberReference }
         } else {
+            val mcpModule = instance.getModuleOfType(McpModuleType)!!
             val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
             { it: PsiField -> srgMap.getIntermediaryField(it) } to { it: PsiMethod -> srgMap.getIntermediaryMethod(it) }
         }
@@ -197,8 +194,8 @@ abstract class AtClassMemberReference<E : AtElement>(element: E, range: TextRang
                 .withPsiElement(field)
                 .withPresentableText(field.name)
                 .withIcon(PlatformIcons.FIELD_ICON)
-                .withTailText(" (${memberReference.name})".takeUnless { isNeoForge }, true)
-                .withInsertHandler(AtClassMemberInsertionHandler(field.name.takeUnless { isNeoForge }))
+                .withTailText(" (${memberReference.name})".takeIf { useSrg }, true)
+                .withInsertHandler(AtClassMemberInsertionHandler(field.name.takeIf { useSrg }))
             results.add(PrioritizedLookupElement.withPriority(lookupElement, 1.0))
         }
 
@@ -209,8 +206,8 @@ abstract class AtClassMemberReference<E : AtElement>(element: E, range: TextRang
                 .withPsiElement(method)
                 .withPresentableText(method.nameAndParameterTypes)
                 .withIcon(PlatformIcons.METHOD_ICON)
-                .withTailText(" (${memberReference.name})".takeUnless { isNeoForge }, true)
-                .withInsertHandler(AtClassMemberInsertionHandler(method.name.takeUnless { isNeoForge }))
+                .withTailText(" (${memberReference.name})".takeIf { useSrg }, true)
+                .withInsertHandler(AtClassMemberInsertionHandler(method.name.takeIf { useSrg }))
             results.add(PrioritizedLookupElement.withPriority(lookupElement, 0.0))
         }
 
@@ -237,10 +234,7 @@ class AtFieldNameReference(element: AtFieldName) :
         val instance = MinecraftFacet.getInstance(module) ?: return null
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        return if (instance.isOfType(NeoForgeModuleType) &&
-            mcpModule.getSettings().minecraftVersion?.let(SemanticVersion::tryParse)
-                ?.let { it >= MinecraftVersions.MC1_20_2 } == true
-        ) {
+        return if (!instance.usesSrgMemberNames()) {
             entryClass.findFieldByName(element.text, false)
         } else {
             val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return null
@@ -278,10 +272,7 @@ class AtFuncNameReference(element: AtFunction) :
         val instance = MinecraftFacet.getInstance(module) ?: return null
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        return if (instance.isOfType(NeoForgeModuleType) &&
-            mcpModule.getSettings().minecraftVersion?.let(SemanticVersion::tryParse)
-                ?.let { it >= MinecraftVersions.MC1_20_2 } == true
-        ) {
+        return if (!instance.usesSrgMemberNames()) {
             val memberReference = MemberReference.parse(element.text) ?: return null
             entryClass.findMethods(memberReference).firstOrNull()
         } else {

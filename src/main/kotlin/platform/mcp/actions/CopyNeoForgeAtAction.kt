@@ -20,13 +20,10 @@
 
 package com.demonwav.mcdev.platform.mcp.actions
 
-import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.actions.SrgActionBase.Companion.showBalloon
 import com.demonwav.mcdev.platform.mcp.actions.SrgActionBase.Companion.showSuccessBalloon
+import com.demonwav.mcdev.platform.mcp.at.usesSrgMemberNames
 import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
-import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
-import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -52,13 +49,7 @@ class CopyNeoForgeAtAction : AnAction() {
 
     private fun isAvailable(e: AnActionEvent): Boolean {
         val data = getDataFromActionEvent(e) ?: return false
-        if (!data.instance.isOfType(NeoForgeModuleType)) {
-            return false
-        }
-
-        val mcpModule = data.instance.getModuleOfType(McpModuleType) ?: return false
-        val mcVersion = mcpModule.getSettings().minecraftVersion?.let(SemanticVersion::tryParse) ?: return false
-        return mcVersion >= MinecraftVersions.MC1_20_2
+        return !data.instance.usesSrgMemberNames()
     }
 
     override fun actionPerformed(e: AnActionEvent) {
