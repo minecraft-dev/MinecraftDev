@@ -629,7 +629,7 @@
         <completion.contributor language="Access Transformers"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
-        <lang.inspectionSuppressor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtInspectionSuppressor"/>
+        <lang.inspectionSuppressor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtInspectionSuppressor"/>
         <psi.referenceContributor language="Access Transformers" implementation="com.demonwav.mcdev.platform.mcp.at.AtReferenceContributor"/>
         <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName"
                                  implementationClass="com.demonwav.mcdev.platform.mcp.at.AtClassNameElementManipulator"/>
@@ -1005,14 +1005,14 @@
                          level="WARNING"
                          editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtUsageInspection"/>
         <localInspection displayName="Unresolved reference"
                          groupName="MCP"
                          language="Access Transformers"
                          enabledByDefault="true"
                          level="ERROR"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUnresolvedReferenceInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtUnresolvedReferenceInspection"/>
         <localInspection displayName="Duplicate entry"
                          groupName="MCP"
                          language="Access Transformers"
@@ -1020,7 +1020,7 @@
                          level="WARNING"
                          editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtDuplicateEntryInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtDuplicateEntryInspection"/>
         <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
                          groupName="MCP"
                          language="JAVA"

@@ -18,10 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.at
+package com.demonwav.mcdev.platform.mcp.at.inspections
 
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.testInspectionFix
+import com.demonwav.mcdev.platform.mcp.at.AtFileType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

@@ -18,8 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.at
+package com.demonwav.mcdev.platform.mcp.at.inspections
 
+import com.demonwav.mcdev.platform.mcp.at.AtFileType
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtEntry
 import com.demonwav.mcdev.util.excludeFileTypes
 import com.intellij.codeInspection.LocalInspectionTool
