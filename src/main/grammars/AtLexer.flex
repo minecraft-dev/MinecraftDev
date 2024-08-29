@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mcp.at.gen;
 
 import com.intellij.lexer.*;
-import com.intellij.psi.TokenType;import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.IElementType;
 import static com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes.*;
 import static com.intellij.psi.TokenType.*;
 
