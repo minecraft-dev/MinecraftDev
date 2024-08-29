@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mcp.at.format
 
 import com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes
+import com.demonwav.mcdev.util.children
 import com.intellij.formatting.Alignment
 import com.intellij.formatting.Block
 import com.intellij.formatting.Indent
@@ -28,7 +29,6 @@ import com.intellij.formatting.Spacing
 import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.Wrap
 import com.intellij.lang.ASTNode
-import com.intellij.lang.tree.util.children
 import com.intellij.psi.TokenType
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.formatter.common.AbstractBlock

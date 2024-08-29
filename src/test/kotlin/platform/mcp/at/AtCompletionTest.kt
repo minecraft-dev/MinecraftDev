@@ -27,8 +27,8 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.at.AtElementFactory.Keyword
-import com.demonwav.mcdev.util.runWriteActionAndWait
 import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.openapi.application.runWriteActionAndWait
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
