@@ -28,8 +28,6 @@ import com.intellij.formatting.FormattingModel
 import com.intellij.formatting.FormattingModelBuilder
 import com.intellij.formatting.FormattingModelProvider
 import com.intellij.formatting.SpacingBuilder
-import com.intellij.formatting.Wrap
-import com.intellij.formatting.WrapType
 import com.intellij.psi.codeStyle.CodeStyleSettings
 
 class AtFormattingModelBuilder : FormattingModelBuilder {
@@ -49,8 +47,8 @@ class AtFormattingModelBuilder : FormattingModelBuilder {
         val codeStyleSettings = formattingContext.codeStyleSettings
         val rootBlock = AtBlock(
             formattingContext.node,
-            Wrap.createWrap(WrapType.NONE, false),
-            Alignment.createAlignment(),
+            null,
+            null,
             createSpaceBuilder(codeStyleSettings),
             codeStyleSettings,
             Alignment.createAlignment(true),

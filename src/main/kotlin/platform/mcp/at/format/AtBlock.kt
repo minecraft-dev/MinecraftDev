@@ -27,7 +27,6 @@ import com.intellij.formatting.Indent
 import com.intellij.formatting.Spacing
 import com.intellij.formatting.SpacingBuilder
 import com.intellij.formatting.Wrap
-import com.intellij.formatting.WrapType
 import com.intellij.lang.ASTNode
 import com.intellij.lang.tree.util.children
 import com.intellij.psi.TokenType
@@ -83,7 +82,7 @@ class AtBlock(
             blocks.add(
                 AtBlock(
                     child,
-                    Wrap.createWrap(WrapType.NONE, false),
+                    null,
                     alignment,
                     spacingBuilder,
                     codeStyleSettings,
@@ -97,6 +96,8 @@ class AtBlock(
     }
 
     override fun getIndent(): Indent? = Indent.getNoneIndent()
+
+    override fun getChildIndent(): Indent? = Indent.getNoneIndent()
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? = spacingBuilder.getSpacing(this, child1, child2)
 
