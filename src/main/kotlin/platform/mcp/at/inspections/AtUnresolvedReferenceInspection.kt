@@ -29,7 +29,7 @@ import com.intellij.psi.PsiElementVisitor
 
 class AtUnresolvedReferenceInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription(): String? = "Unresolved reference"
+    override fun getStaticDescription(): String? = "Reports unresolved AT targets."
 
     override fun buildVisitor(
         holder: ProblemsHolder,
