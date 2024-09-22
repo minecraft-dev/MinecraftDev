@@ -155,37 +155,37 @@ fun <T> assertEqualsUnordered(expected: Collection<T>, actual: Collection<T>) {
 
     if (notExpected.isNotEmpty() && notFound.isNotEmpty()) {
         val message = """|
-      |Expecting actual:
-      |  $actual
-      |to contain exactly in any order:
-      |  $expected
-      |elements not found:
-      |  $notFound
-      |and elements not expected:
-      |  $notExpected
-    """.trimMargin()
+          |Expecting actual:
+          |  $actual
+          |to contain exactly in any order:
+          |  $expected
+          |elements not found:
+          |  $notFound
+          |and elements not expected:
+          |  $notExpected
+        """.trimMargin()
         throw AssertionFailedError(message, expected, actual)
     }
     if (notFound.isNotEmpty()) {
         val message = """|
-      |Expecting actual:
-      |  $actual
-      |to contain exactly in any order:
-      |  $expected
-      |but could not find the following elements:
-      |  $notFound
-    """.trimMargin()
+          |Expecting actual:
+          |  $actual
+          |to contain exactly in any order:
+          |  $expected
+          |but could not find the following elements:
+          |  $notFound
+        """.trimMargin()
         throw AssertionFailedError(message, expected, actual)
     }
     if (notExpected.isNotEmpty()) {
         val message = """|
-      |Expecting actual:
-      |  $actual
-      |to contain exactly in any order:
-      |  $expected
-      |but the following elements were unexpected:
-      |  $notExpected
-    """.trimMargin()
+          |Expecting actual:
+          |  $actual
+          |to contain exactly in any order:
+          |  $expected
+          |but the following elements were unexpected:
+          |  $notExpected
+        """.trimMargin()
         throw AssertionFailedError(message, expected, actual)
     }
 }
