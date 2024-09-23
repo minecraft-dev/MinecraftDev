@@ -49,7 +49,7 @@ class CopyNeoForgeAtAction : AnAction() {
 
     private fun isAvailable(e: AnActionEvent): Boolean {
         val data = getDataFromActionEvent(e) ?: return false
-        return !data.instance.usesSrgMemberNames()
+        return data.instance.usesSrgMemberNames() == false
     }
 
     override fun actionPerformed(e: AnActionEvent) {

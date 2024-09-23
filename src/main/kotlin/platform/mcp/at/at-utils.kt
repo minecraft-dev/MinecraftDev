@@ -21,17 +21,18 @@
 package com.demonwav.mcdev.platform.mcp.at
 
 import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 
-fun MinecraftFacet.usesSrgMemberNames(): Boolean {
+fun MinecraftFacet.usesSrgMemberNames(): Boolean? {
     if (!this.isOfType(NeoForgeModuleType)) {
-        return true
+        return this.isOfType(ForgeModuleType)
     }
 
-    val mcpModule = this.getModuleOfType(McpModuleType) ?: return true
-    val mcVersion = mcpModule.getSettings().minecraftVersion?.let(SemanticVersion::tryParse) ?: return true
+    val mcpModule = this.getModuleOfType(McpModuleType) ?: return null
+    val mcVersion = mcpModule.getSettings().minecraftVersion?.let(SemanticVersion::tryParse) ?: return null
     return mcVersion < MinecraftVersions.MC1_20_2
 }

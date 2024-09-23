@@ -175,7 +175,7 @@ abstract class AtClassMemberReference<E : AtElement>(element: E, range: TextRang
 
         val module = element.findModule() ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
         val instance = MinecraftFacet.getInstance(module) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-        val useSrg = instance.usesSrgMemberNames()
+        val useSrg = instance.usesSrgMemberNames() == true
         val (mapField, mapMethod) = if (!useSrg) {
             { it: PsiField -> it.memberReference } to { it: PsiMethod -> it.memberReference }
         } else {
@@ -234,7 +234,7 @@ class AtFieldNameReference(element: AtFieldName) :
         val instance = MinecraftFacet.getInstance(module) ?: return null
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        return if (!instance.usesSrgMemberNames()) {
+        return if (instance.usesSrgMemberNames() != true) {
             entryClass.findFieldByName(element.text, false)
         } else {
             val srgMap = mcpModule.mappingsManager?.mappingsNow ?: return null
@@ -272,7 +272,7 @@ class AtFuncNameReference(element: AtFunction) :
         val instance = MinecraftFacet.getInstance(module) ?: return null
         val mcpModule = instance.getModuleOfType(McpModuleType) ?: return null
 
-        return if (!instance.usesSrgMemberNames()) {
+        return if (instance.usesSrgMemberNames() != true) {
             val memberReference = MemberReference.parse(element.text) ?: return null
             entryClass.findMethods(memberReference).firstOrNull()
         } else {
