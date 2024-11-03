@@ -43,6 +43,11 @@ data class ClassFqn(val fqn: String) {
      */
     val packagePath by lazy { packageName.replace('.', '/') }
 
+    /**
+     * The module name, which is the last part of the packageName
+     */
+    val moduleName by lazy { packageName.substringAfterLast('.') }
+
     fun withClassName(className: String) = copy("$packageName.$className")
 
     fun withSubPackage(name: String) = copy("$packageName.$name.$className")
