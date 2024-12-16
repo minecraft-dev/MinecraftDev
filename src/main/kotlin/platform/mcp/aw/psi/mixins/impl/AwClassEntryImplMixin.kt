@@ -29,7 +29,8 @@ import com.intellij.util.resettableLazy
 abstract class AwClassEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), AwClassEntry, AwClassEntryMixin {
 
     private val lazyMemberReference = resettableLazy {
-        MemberReference("", owner = checkNotNull(targetClassName) { "Expected targetClassName" }.replace('/', '.'))
+        val owner = targetClassName?.replace('/', '.') ?: return@resettableLazy null
+        MemberReference("", owner = owner)
     }
 
     override val memberReference: MemberReference? by lazyMemberReference

@@ -35,10 +35,9 @@ abstract class AwFieldEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), Aw
         get() = findChildByType<PsiElement>(AwTypes.FIELD_DESC)?.text
 
     private val lazyMemberReference = resettableLazy {
-        MemberReference(
-            checkNotNull(fieldName) { "Expected fieldName" },
-            owner = checkNotNull(targetClassName) { "Expected targetClassName" }.replace('/', '.')
-        )
+        val name = fieldName ?: return@resettableLazy null
+        val owner = targetClassName?.replace('/', '.') ?: return@resettableLazy null
+        MemberReference(name, owner = owner)
     }
 
     override val memberReference: MemberReference? by lazyMemberReference

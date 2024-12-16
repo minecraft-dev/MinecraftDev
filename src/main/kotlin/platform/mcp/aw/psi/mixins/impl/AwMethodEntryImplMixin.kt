@@ -35,11 +35,10 @@ abstract class AwMethodEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), A
         get() = findChildByType<PsiElement>(AwTypes.METHOD_DESC)?.text
 
     private val lazyMemberReference = resettableLazy {
-        MemberReference(
-            checkNotNull(methodName) { "Expected methodName" },
-            descriptor = checkNotNull(methodDescriptor) { "Expected methodDescriptor" },
-            owner = checkNotNull(targetClassName) { "Expected targetClassName" }.replace('/', '.')
-        )
+        val name = methodName ?: return@resettableLazy null
+        val desc = methodDescriptor ?: return@resettableLazy null
+        val owner = targetClassName?.replace('/', '.') ?: return@resettableLazy null
+        MemberReference(name, desc, owner)
     }
 
     override val memberReference: MemberReference? by lazyMemberReference
