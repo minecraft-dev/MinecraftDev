@@ -648,7 +648,11 @@
                                        implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.aw.AwColorSettingsPage"/>
         <lang.commenter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCommenter"/>
+        <codeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.aw.format.AwCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.aw.format.AwLanguageCodeStyleSettingsProvider"/>
+        <lang.formatter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.format.AwFormattingModelBuilder"/>
         <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
+        <lang.inspectionSuppressor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwInspectionSuppressor"/>
         <completion.contributor language="Access Widener"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
         <codeInsight.unresolvedReferenceQuickFixProvider
@@ -1033,8 +1037,31 @@
                          language="Access Widener"
                          enabledByDefault="true"
                          level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.DuplicateAwEntryInspection"/>
+        <localInspection displayName="Unresolved reference"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwUnresolvedReferenceInspection"/>
+        <localInspection displayName="Unused access widener"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwUsageInspection"/>
+        <localInspection displayName="Access Widener header validation"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwHeaderInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->

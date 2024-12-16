@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Overhauled Access Transformer and Access Widener support:
+  - many lexing errors should now be fixed
+  - class names and member names now have their own references, replacing the custom Goto handler
+  - SRG names are no longer used on NeoForge 1.20.2+ and a new copy action is available for it
+  - the usage inspection no longer incorrectly reports methods overridden in your code or entries covering super methods
+  - suppressing inspections is now possible by adding `# Suppress:AtInspectionName` after an entry or at the start of the file, or using the built-in suppress action
+  - added an inspection to report unresolved references, to help find out old, superfluous entries
+  - added an inspection to report duplicate entries in the same file
+  - added formatting support, class and member names are configured to align by default
+
 ### Added
 
 - [#2391](https://github.com/minecraft-dev/MinecraftDev/issues/2391) Project creator template repo and maven repo authorization
@@ -48,18 +60,6 @@
 - [#2308](https://github.com/minecraft-dev/MinecraftDev/issues/2308) Mixin Inject signature fix adds last parameter as first local
 - [#1813](https://github.com/minecraft-dev/MinecraftDev/issues/1813) Single character Accessor targets aren't inferred correctly
 - [#1886](https://github.com/minecraft-dev/MinecraftDev/issues/1886) Sync error in ForgeGradle composite builds
-
-### Changed
-
-- Overhauled Access Transformer support:
-  - many lexing errors should now be fixed
-  - class names and member names now have their own references, replacing the custom Goto handler
-  - SRG names are no longer used on NeoForge 1.20.2+ and a new copy action is available for it
-  - the usage inspection no longer incorrectly reports methods overridden in your code or entries covering super methods
-  - suppressing inspections is now possible by adding `# Suppress:AtInspectionName` after an entry or at the start of the file, or using the built-in suppress action
-  - added an inspection to report unresolved references, to help find out old, superfluous entries
-  - added an inspection to report duplicate entries in the same file
-  - added formatting support, class and member names are configured to align by default
 
 ## [1.8.1] - 2024-08-10
 

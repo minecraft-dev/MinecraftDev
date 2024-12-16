@@ -29,7 +29,9 @@ import com.intellij.psi.PsiElementVisitor
 
 class AtDuplicateEntryInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription(): String? = "Reports duplicate AT entries in the same file"
+    override fun runForWholeFile(): Boolean = true
+
+    override fun getStaticDescription(): String = "Reports duplicate AT entries in the same file"
 
     override fun buildVisitor(
         holder: ProblemsHolder,

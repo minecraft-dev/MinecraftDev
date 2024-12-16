@@ -56,12 +56,14 @@ CLASS_ELEMENT=class
 METHOD_ELEMENT=method
 FIELD_ELEMENT=field
 NAME_ELEMENT=\w+|<init>
-CLASS_NAME_ELEMENT=(\w+\/)*\w+(\$\w+)*
+CLASS_NAME_ELEMENT=[\w/$]+
 COMMENT=#.*
 CRLF=\n|\r|\r\n
 WHITE_SPACE=\s
 
 %%
+
+{COMMENT}                                       { return COMMENT; }
 
 <YYINITIAL> {
     {HEADER_NAME}                               { yybegin(HEADER); return HEADER_NAME; }
@@ -69,6 +71,8 @@ WHITE_SPACE=\s
     {CLASS_ELEMENT}                             { yybegin(CLASS_NAME); return CLASS_ELEMENT; }
     {METHOD_ELEMENT}                            { yybegin(CLASS_NAME); return METHOD_ELEMENT; }
     {FIELD_ELEMENT}                             { yybegin(CLASS_NAME); return FIELD_ELEMENT; }
+    // Fallback to avoid breaking code highlighting at the access or target kind while editing
+    \S+                                         { return NAME_ELEMENT; }
 }
 
 <HEADER> {
@@ -94,5 +98,4 @@ WHITE_SPACE=\s
 {CRLF}                                          { yybegin(YYINITIAL); return CRLF; }
 {WHITE_SPACE}                                   { return WHITE_SPACE; }
 
-{COMMENT}                                       { return COMMENT; }
 [^]                                             { return BAD_CHARACTER; }

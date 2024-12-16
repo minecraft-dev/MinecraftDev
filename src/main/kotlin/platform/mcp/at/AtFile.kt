@@ -54,7 +54,7 @@ class AtFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, AtLangu
         }
 
     fun addHeadComment(text: String) {
-        val toAdd = text.lines().flatMap { listOf(AtElementFactory.createComment(project, it)) }
+        val toAdd = text.lines().map { AtElementFactory.createComment(project, it) }
         val lastHeadComment = headComments.lastOrNull()
         if (lastHeadComment == null) {
             for (comment in toAdd.reversed()) {

@@ -18,18 +18,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.at.inspections
+package com.demonwav.mcdev.platform.mcp.aw.inspections
 
-import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.platform.PlatformType
-import com.demonwav.mcdev.platform.mcp.McpModuleSettings
-import com.demonwav.mcdev.platform.mcp.McpModuleType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
-@DisplayName("Access Transformer Usage Inspection Tests")
-class AtUsageInspectionTest : BaseMinecraftTest(PlatformType.MCP, PlatformType.NEOFORGE) {
+@DisplayName("Access Widener Usage Inspection Tests")
+class AwUsageInspectionTest : BaseMinecraftTest(PlatformType.MCP, PlatformType.FABRIC) {
 
     @Test
     @DisplayName("Usage Inspection")
@@ -70,24 +67,22 @@ class AtUsageInspectionTest : BaseMinecraftTest(PlatformType.MCP, PlatformType.N
                 """.trimIndent(),
                 allowAst = true
             )
-            at(
-                "test_at.cfg",
+            aw(
+                "test.accesswidener",
                 """
-                public net.minecraft.Used
-                public net.minecraft.Used usedField
-                <warning descr="Entry is never used">public net.minecraft.Used unusedField</warning>
-                public net.minecraft.Used usedMethod()V
-                <warning descr="Entry is never used">public net.minecraft.Used unusedMethod()V</warning>
-                <warning descr="Entry is never used">public net.minecraft.server.Unused</warning>
+                accessWidener v2 named
+                
+                accessible class net/minecraft/Used
+                accessible field net/minecraft/Used usedField I
+                <warning descr="Entry is never used">accessible field net/minecraft/Used unusedField I</warning>
+                accessible method net/minecraft/Used usedMethod ()V
+                <warning descr="Entry is never used">accessible method net/minecraft/Used unusedMethod ()V</warning>
+                <warning descr="Entry is never used">accessible class net/minecraft/server/Unused</warning>
                 """.trimIndent()
             )
         }
 
-        // Force 1.20.2 because we test the non-SRG member names with NeoForge
-        MinecraftFacet.getInstance(fixture.module, McpModuleType)!!
-            .updateSettings(McpModuleSettings.State(minecraftVersion = "1.20.2"))
-
-        fixture.enableInspections(AtUsageInspection::class.java)
+        fixture.enableInspections(AwUsageInspection::class.java)
         fixture.checkHighlighting()
     }
 }

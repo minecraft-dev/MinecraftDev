@@ -22,8 +22,10 @@ package com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwTypes
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwFieldEntryMixin
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.util.resettableLazy
 
 abstract class AwFieldEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), AwFieldEntryMixin {
     override val fieldName: String?
@@ -31,4 +33,18 @@ abstract class AwFieldEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), Aw
 
     override val fieldDescriptor: String?
         get() = findChildByType<PsiElement>(AwTypes.FIELD_DESC)?.text
+
+    private val lazyMemberReference = resettableLazy {
+        MemberReference(
+            checkNotNull(fieldName) { "Expected fieldName" },
+            owner = checkNotNull(targetClassName) { "Expected targetClassName" }.replace('/', '.')
+        )
+    }
+
+    override val memberReference: MemberReference? by lazyMemberReference
+
+    override fun subtreeChanged() {
+        super.subtreeChanged()
+        lazyMemberReference.reset()
+    }
 }

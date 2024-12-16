@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwDescElementMixin
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.findQualifiedClass
+import com.demonwav.mcdev.util.toTextRange
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
@@ -36,14 +37,14 @@ abstract class AwDescElementImplMixin(node: ASTNode) : ASTWrapperPsiElement(node
 
     override fun getElement(): PsiElement = this
 
-    override fun getReference(): PsiReference? = this
+    override fun getReference(): PsiReference? = if (textContains('L')) this else null
 
     override fun resolve(): PsiElement? = cached(PsiModificationTracker.MODIFICATION_COUNT) {
         val name = asQualifiedName() ?: return@cached null
         return@cached findQualifiedClass(name, this)
     }
 
-    override fun getRangeInElement(): TextRange = TextRange(0, text.length)
+    override fun getRangeInElement(): TextRange = getQualifiedNameRange().toTextRange()
 
     override fun getCanonicalText(): String = text
 
@@ -59,9 +60,13 @@ abstract class AwDescElementImplMixin(node: ASTNode) : ASTWrapperPsiElement(node
         return element is PsiClass && element.qualifiedName == asQualifiedName()
     }
 
+    private fun getQualifiedNameRange(): IntRange {
+        return (text.indexOf('L') + 1)..(textLength - 2)
+    }
+
     private fun asQualifiedName(): String? =
         if (text.length > 1) {
-            text.substring(1, text.length - 1).replace('/', '.')
+            text.substring(getQualifiedNameRange()).replace('/', '.').replace('$', '.')
         } else {
             null
         }

@@ -27,7 +27,9 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runReadAction
 import com.intellij.patterns.PlatformPatterns
@@ -46,9 +48,9 @@ class AwCompletionContributor : CompletionContributor() {
         extend(null, namespacePattern, AwNamespaceCompletionProvider)
         val accessPattern = PlatformPatterns.psiElement().afterLeaf(PlatformPatterns.psiElement(AwTypes.CRLF))
         extend(null, accessPattern, AwAccessCompletionProvider)
-        val targetPattern = PlatformPatterns.psiElement()
+        val targetKindPattern = PlatformPatterns.psiElement()
             .afterLeafSkipping(whitespace, PlatformPatterns.psiElement(AwTypes.ACCESS_ELEMENT))
-        extend(null, targetPattern, AwTargetCompletionProvider)
+        extend(null, targetKindPattern, AwTargetKindCompletionProvider)
     }
 }
 
@@ -107,7 +109,7 @@ object AwAccessCompletionProvider : CompletionProvider<CompletionParameters>() {
     }
 }
 
-object AwTargetCompletionProvider : CompletionProvider<CompletionParameters>() {
+object AwTargetKindCompletionProvider : CompletionProvider<CompletionParameters>() {
 
     override fun addCompletions(
         parameters: CompletionParameters,
@@ -119,5 +121,13 @@ object AwTargetCompletionProvider : CompletionProvider<CompletionParameters>() {
         val elements = AwAnnotator.compatibleByAccessMap.get(text)
             .map { LookupElementBuilder.create(it).withInsertHandler { ctx, _ -> insertWhitespace(ctx) } }
         result.addAllElements(elements)
+    }
+}
+
+object DeleteEndOfLineInsertionHandler : InsertHandler<LookupElement> {
+
+    override fun handleInsert(context: InsertionContext, item: LookupElement) {
+        val line = context.document.getLineNumber(context.tailOffset)
+        context.document.deleteString(context.tailOffset, context.document.getLineEndOffset(line))
     }
 }

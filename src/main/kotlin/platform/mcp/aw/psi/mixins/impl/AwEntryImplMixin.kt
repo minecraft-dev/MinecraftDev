@@ -20,17 +20,42 @@
 
 package com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mcp.aw.AwElementFactory
 import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwTypes
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwEntryMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 
 abstract class AwEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AwEntryMixin {
 
-    override val accessKind: String?
-        get() = findChildByType<PsiElement>(AwTypes.ACCESS)?.text
+    override val accessKind: String
+        get() = findNotNullChildByType<PsiElement>(AwTypes.ACCESS_ELEMENT).text
 
     override val targetClassName: String?
         get() = findChildByType<PsiElement>(AwTypes.CLASS_NAME)?.text
+
+    override val comment: PsiComment?
+        get() = PsiTreeUtil.skipWhitespacesForward(this) as? PsiComment
+
+    override val commentText: String?
+        get() = comment?.text?.substring(1)
+
+    override fun setComment(text: String?) {
+        if (text == null) {
+            comment?.delete()
+            return
+        }
+
+        val newComment = AwElementFactory.createComment(project, text)
+        val existingComment = comment
+        if (existingComment == null) {
+            parent.addAfter(newComment, this)
+            return
+        }
+
+        existingComment.replace(newComment)
+    }
 }

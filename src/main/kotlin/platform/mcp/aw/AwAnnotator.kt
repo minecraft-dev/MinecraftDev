@@ -20,11 +20,8 @@
 
 package com.demonwav.mcdev.platform.mcp.aw
 
-import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwAccess
-import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwClassLiteral
-import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwFieldLiteral
 import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwHeader
-import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwMethodLiteral
+import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwTypes
 import com.demonwav.mcdev.util.childOfType
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimaps
@@ -34,23 +31,25 @@ import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
+import org.jetbrains.plugins.groovy.util.TokenSet
 
 class AwAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (element is AwAccess) {
+        if (element.elementType == AwTypes.ACCESS_ELEMENT) {
             val access = element.text
             val target = PsiTreeUtil.skipSiblingsForward(element, PsiWhiteSpace::class.java)?.text
             if (!compatibleByAccessMap.get(access).contains(target)) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "Access '$access' cannot be used on '$target'").create()
             }
 
-            if (element.accessElement.text.startsWith("transitive-") &&
+            if (element.text.startsWith("transitive-") &&
                 element.containingFile?.childOfType<AwHeader>()?.versionString == "v1"
             ) {
                 holder.newAnnotation(HighlightSeverity.ERROR, "Transitive accesses were introduced in v2").create()
             }
-        } else if (element is AwFieldLiteral || element is AwMethodLiteral || element is AwClassLiteral) {
+        } else if (element.elementType in targetLiterals) {
             val target = element.text
             val access = PsiTreeUtil.skipSiblingsBackward(element, PsiWhiteSpace::class.java)?.text
             if (!compatibleByTargetMap.get(target).contains(access)) {
@@ -63,6 +62,8 @@ class AwAnnotator : Annotator {
 
         val compatibleByAccessMap = HashMultimap.create<String, String>()
         val compatibleByTargetMap = HashMultimap.create<String, String>()
+
+        val targetLiterals = TokenSet(AwTypes.FIELD_ELEMENT, AwTypes.METHOD_ELEMENT, AwTypes.CLASS_ELEMENT)
 
         init {
             compatibleByAccessMap.putAll("accessible", setOf("class", "method", "field"))
