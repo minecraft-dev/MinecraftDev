@@ -51,6 +51,12 @@ class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private va
         configure: Boolean = true,
         allowAst: Boolean = false,
     ) = file(path, code, "_at.cfg", configure, allowAst)
+    fun aw(
+        path: String,
+        @Language("Access Widener") code: String,
+        configure: Boolean = true,
+        allowAst: Boolean = false,
+    ) = file(path, code, "accesswidener", configure, allowAst)
     fun lang(
         path: String,
         @Language("MCLang") code: String,

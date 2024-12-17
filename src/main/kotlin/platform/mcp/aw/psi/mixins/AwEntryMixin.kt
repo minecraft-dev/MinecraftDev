@@ -21,9 +21,16 @@
 package com.demonwav.mcdev.platform.mcp.aw.psi.mixins
 
 import com.demonwav.mcdev.platform.mcp.aw.psi.AwElement
+import com.demonwav.mcdev.util.MemberReference
+import com.intellij.psi.PsiComment
 
 interface AwEntryMixin : AwElement {
 
-    val accessKind: String?
+    val accessKind: String
     val targetClassName: String?
+    val comment: PsiComment?
+    val commentText: String?
+    val memberReference: MemberReference?
+
+    fun setComment(text: String?)
 }

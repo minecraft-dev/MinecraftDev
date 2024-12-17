@@ -42,6 +42,7 @@ import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.ThrowableComputable
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
@@ -425,3 +426,5 @@ inline fun <reified T : Enum<T>> enumValueOfOrNull(str: String): T? {
         null
     }
 }
+
+fun IntRange.toTextRange() = TextRange(this.start, this.last + 1)

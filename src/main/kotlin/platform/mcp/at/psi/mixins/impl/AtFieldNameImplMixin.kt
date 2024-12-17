@@ -24,6 +24,8 @@ import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFieldNameMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiReference
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 
 abstract class AtFieldNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtFieldNameMixin {
 
@@ -33,4 +35,12 @@ abstract class AtFieldNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node),
 
     override val fieldNameText: String
         get() = nameElement.text
+
+    override fun getReference(): PsiReference? {
+        return references.firstOrNull()
+    }
+
+    override fun getReferences(): Array<out PsiReference?> {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(this)
+    }
 }

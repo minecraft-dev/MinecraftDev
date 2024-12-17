@@ -32,55 +32,51 @@
     elementTypeClass="com.demonwav.mcdev.platform.mcp.aw.psi.AwElementType"
     tokenTypeClass="com.demonwav.mcdev.platform.mcp.aw.psi.AwTokenType"
 
-    consumeTokenMethod="consumeTokenFast"
+    consumeTokenMethod(".*_recover")="consumeTokenFast"
 }
 
-aw_file ::= header_line line*
+aw_file ::= header_line? line*
 
 private header_line ::= !<<eof>> header COMMENT? end_line
 
-private line ::= !<<eof>> entry? COMMENT? end_line
-private end_line ::= crlf | <<eof>>
+private line ::= !<<eof>> line_content end_line
+private line_recover ::= !(end_line | COMMENT)
+private end_line ::= CRLF | <<eof>>
+
+private line_content ::= entry? COMMENT? {
+    recoverWhile=line_recover
+}
 
 header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwHeaderImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwHeaderMixin"
 }
 
-private entry ::= class_entry | method_entry | field_entry {
+entry ::= class_entry | method_entry | field_entry {
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwEntryMixin"
-    recoverWhile = line_recover
 }
 
-class_entry ::= access class_literal class_name {
+class_entry ::= ACCESS_ELEMENT CLASS_ELEMENT class_name {
+    extends=entry
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwClassEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwClassEntryMixin"
+    pin=2
 }
 
-method_entry ::= access method_literal class_name member_name method_desc{
+method_entry ::= ACCESS_ELEMENT METHOD_ELEMENT class_name member_name method_desc {
+    extends=entry
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwMethodEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMethodEntryMixin"
+    pin=2
 }
 
-field_entry ::= access field_literal class_name member_name field_desc{
+field_entry ::= ACCESS_ELEMENT FIELD_ELEMENT class_name member_name field_desc {
+    extends=entry
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwFieldEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwFieldEntryMixin"
+    pin=2
 }
-
-private line_recover ::= !(end_line | COMMENT)
-
-access ::= ACCESS_ELEMENT {
-    methods=[
-        accessElement="ACCESS_ELEMENT"
-    ]
-}
-
-class_literal ::= CLASS_ELEMENT
-
-method_literal ::= METHOD_ELEMENT
-
-field_literal ::= FIELD_ELEMENT
 
 class_name ::= CLASS_NAME_ELEMENT {
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwClassNameImplMixin"
@@ -98,7 +94,9 @@ member_name ::= NAME_ELEMENT {
     ]
 }
 
-method_desc ::= OPEN_PAREN desc_element* CLOSE_PAREN desc_element
+method_desc ::= OPEN_PAREN desc_element* CLOSE_PAREN desc_element {
+    pin=1
+}
 
 field_desc ::= desc_element
 

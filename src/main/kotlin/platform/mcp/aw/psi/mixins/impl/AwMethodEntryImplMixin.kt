@@ -22,8 +22,10 @@ package com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwTypes
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMethodEntryMixin
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.util.resettableLazy
 
 abstract class AwMethodEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), AwMethodEntryMixin {
     override val methodName: String?
@@ -31,4 +33,18 @@ abstract class AwMethodEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), A
 
     override val methodDescriptor: String?
         get() = findChildByType<PsiElement>(AwTypes.METHOD_DESC)?.text
+
+    private val lazyMemberReference = resettableLazy {
+        val name = methodName ?: return@resettableLazy null
+        val desc = methodDescriptor ?: return@resettableLazy null
+        val owner = targetClassName?.replace('/', '.') ?: return@resettableLazy null
+        MemberReference(name, desc, owner)
+    }
+
+    override val memberReference: MemberReference? by lazyMemberReference
+
+    override fun subtreeChanged() {
+        super.subtreeChanged()
+        lazyMemberReference.reset()
+    }
 }

@@ -20,7 +20,23 @@
 
 package com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl
 
+import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwClassEntry
 import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwClassEntryMixin
+import com.demonwav.mcdev.util.MemberReference
 import com.intellij.lang.ASTNode
+import com.intellij.util.resettableLazy
 
-abstract class AwClassEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), AwClassEntryMixin
+abstract class AwClassEntryImplMixin(node: ASTNode) : AwEntryImplMixin(node), AwClassEntry, AwClassEntryMixin {
+
+    private val lazyMemberReference = resettableLazy {
+        val owner = targetClassName?.replace('/', '.') ?: return@resettableLazy null
+        MemberReference("", owner = owner)
+    }
+
+    override val memberReference: MemberReference? by lazyMemberReference
+
+    override fun subtreeChanged() {
+        super.subtreeChanged()
+        lazyMemberReference.reset()
+    }
+}

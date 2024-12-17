@@ -41,18 +41,33 @@ class AwParserDefinition : ParserDefinition {
     override fun createLexer(project: Project): Lexer = AwLexerAdapter()
     override fun createParser(project: Project): PsiParser = AwParser()
     override fun getFileNodeType(): IFileElementType = FILE
-    override fun getWhitespaceTokens(): TokenSet = WHITE_SPACES
     override fun getCommentTokens(): TokenSet = COMMENTS
     override fun getStringLiteralElements(): TokenSet = TokenSet.EMPTY
     override fun createElement(node: ASTNode): PsiElement = AwTypes.Factory.createElement(node)
     override fun createFile(viewProvider: FileViewProvider): PsiFile = AwFile(viewProvider)
 
     override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
+        var leftType = left.elementType
+        val rightType = right.elementType
+
+        if (leftType == AwTypes.CRLF || rightType == AwTypes.CRLF) {
+            return ParserDefinition.SpaceRequirements.MAY
+        }
+
+        // Always add a line break after a comment
+        if (leftType == AwTypes.COMMENT) {
+            return ParserDefinition.SpaceRequirements.MUST_LINE_BREAK
+        }
+
+        // Add a comment before an end of line comment
+        if (rightType == AwTypes.COMMENT && leftType != AwTypes.CRLF && leftType != TokenType.WHITE_SPACE) {
+            return ParserDefinition.SpaceRequirements.MUST
+        }
+
         return LanguageUtil.canStickTokensTogetherByLexer(left, right, AwLexerAdapter())
     }
 
     companion object {
-        private val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
         private val COMMENTS = TokenSet.create(AwTypes.COMMENT)
 
         private val FILE = IFileElementType(Language.findInstance(AwLanguage::class.java))

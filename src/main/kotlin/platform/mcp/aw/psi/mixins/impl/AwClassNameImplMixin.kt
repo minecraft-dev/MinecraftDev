@@ -55,7 +55,7 @@ abstract class AwClassNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(node),
     }
 
     override fun isReferenceTo(element: PsiElement): Boolean {
-        return element is PsiClass && element.qualifiedName == text.replace('/', '.')
+        return element is PsiClass && element.qualifiedName == text.replace('/', '.').replace('$', '.')
     }
 
     override fun isSoft(): Boolean = false

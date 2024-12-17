@@ -622,11 +622,21 @@
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage"/>
         <lang.commenter language="Access Transformers"
                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter"/>
+        <codeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.at.format.AtCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.at.format.AtLanguageCodeStyleSettingsProvider"/>
+        <lang.formatter language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.format.AtFormattingModelBuilder"/>
         <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate"/>
         <completion.contributor language="Access Transformers"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
-        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler"/>
         <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
+        <lang.inspectionSuppressor language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtInspectionSuppressor"/>
+        <psi.referenceContributor language="Access Transformers" implementation="com.demonwav.mcdev.platform.mcp.at.AtReferenceContributor"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtClassName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtClassNameElementManipulator"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFieldName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFieldNameElementManipulator"/>
+        <lang.elementManipulator forClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtFuncName"
+                                 implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFuncNameElementManipulator"/>
 
         <!-- access widener file type -->
         <fileType name="Access Widener" language="Access Widener"
@@ -638,7 +648,11 @@
                                        implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.aw.AwColorSettingsPage"/>
         <lang.commenter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCommenter"/>
+        <codeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.aw.format.AwCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider implementation="com.demonwav.mcdev.platform.mcp.aw.format.AwLanguageCodeStyleSettingsProvider"/>
+        <lang.formatter language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.format.AwFormattingModelBuilder"/>
         <annotator language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwAnnotator"/>
+        <lang.inspectionSuppressor language="Access Widener" implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwInspectionSuppressor"/>
         <completion.contributor language="Access Widener"
                                 implementationClass="com.demonwav.mcdev.platform.mcp.aw.AwCompletionContributor"/>
         <codeInsight.unresolvedReferenceQuickFixProvider
@@ -993,8 +1007,24 @@
                          language="Access Transformers"
                          enabledByDefault="true"
                          level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtUsageInspection"/>
+        <localInspection displayName="Unresolved reference"
+                         groupName="MCP"
+                         language="Access Transformers"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtUnresolvedReferenceInspection"/>
+        <localInspection displayName="Duplicate entry"
+                         groupName="MCP"
+                         language="Access Transformers"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.at.inspections.AtDuplicateEntryInspection"/>
         <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
                          groupName="MCP"
                          language="JAVA"
@@ -1007,8 +1037,31 @@
                          language="Access Widener"
                          enabledByDefault="true"
                          level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.DuplicateAwEntryInspection"/>
+        <localInspection displayName="Unresolved reference"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwUnresolvedReferenceInspection"/>
+        <localInspection displayName="Unused access widener"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         editorAttributes="NOT_USED_ELEMENT_ATTRIBUTES"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwUsageInspection"/>
+        <localInspection displayName="Access Widener header validation"
+                         groupName="MCP"
+                         language="Access Widener"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mcp.aw.inspections.AwHeaderInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
@@ -1546,6 +1599,11 @@
         <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAtAction" id="CopyATAction"
                 text="AT Entry"
                 description="Copy the reference to clipboard in Access Transformer format">
+            <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyNeoForgeAtAction" id="CopyNeoForgeATAction"
+                text="NeoForge AT Entry"
+                description="Copy the reference to clipboard in NeoForge's Access Transformer format">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"

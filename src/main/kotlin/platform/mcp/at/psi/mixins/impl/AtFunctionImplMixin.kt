@@ -24,6 +24,8 @@ import com.demonwav.mcdev.platform.mcp.at.AtElementFactory
 import com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFunctionMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiReference
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 
 abstract class AtFunctionImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), AtFunctionMixin {
 
@@ -41,5 +43,13 @@ abstract class AtFunctionImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 
     override fun setFunction(function: String) {
         replace(AtElementFactory.createFunction(project, function))
+    }
+
+    override fun getReference(): PsiReference? {
+        return references.firstOrNull()
+    }
+
+    override fun getReferences(): Array<out PsiReference?> {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(this)
     }
 }

@@ -48,8 +48,9 @@ import static com.intellij.psi.TokenType.*;
 PRIMITIVE=[ZBCSIFDJV]
 CLASS_VALUE=(\[+[ZBCSIFDJ]|(\[*L[^;\n]+;))
 KEYWORD_ELEMENT=(public|private|protected|default)([-+]f)?
-NAME_ELEMENT=([\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*)|<init>
-CLASS_NAME_ELEMENT=([\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*\.)*[\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*
+IDENTIFIER=[\p{L}_\p{Sc}][\p{L}\p{N}_\p{Sc}]*
+NAME_ELEMENT=({IDENTIFIER})|<init>
+CLASS_NAME_ELEMENT=({IDENTIFIER}*\.)*{IDENTIFIER}
 COMMENT=#.*
 CRLF=\n|\r|\r\n
 WHITE_SPACE=\s
@@ -57,7 +58,10 @@ WHITE_SPACE=\s
 %%
 
 <YYINITIAL> {
-    {KEYWORD_ELEMENT}                           { yybegin(CLASS_NAME); return KEYWORD_ELEMENT; }
+    // Force a whitespace because otherwise the keyword and class name can be right next to each other
+    {KEYWORD_ELEMENT}/{WHITE_SPACE}             { yybegin(CLASS_NAME); return KEYWORD_ELEMENT; }
+    // Fallback to avoid breaking code highlighting at the keyword
+    {NAME_ELEMENT}                              { return NAME_ELEMENT; }
 }
 
 <CLASS_NAME> {
@@ -73,7 +77,7 @@ WHITE_SPACE=\s
     "("                                         { return OPEN_PAREN; }
     ")"                                         { return CLOSE_PAREN; }
     {CLASS_VALUE}                               { return CLASS_VALUE; }
-    {PRIMITIVE} ({PRIMITIVE}|{CLASS_VALUE})*    { zzMarkedPos = zzStartRead + 1; return PRIMITIVE; }
+    {PRIMITIVE}                                 { return PRIMITIVE; }
 }
 
 {CRLF}                                          { yybegin(YYINITIAL); return CRLF; }

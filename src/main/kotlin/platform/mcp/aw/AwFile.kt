@@ -21,19 +21,52 @@
 package com.demonwav.mcdev.platform.mcp.aw
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwEntry
 import com.demonwav.mcdev.platform.mcp.aw.gen.psi.AwHeader
-import com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwEntryMixin
 import com.demonwav.mcdev.util.childrenOfType
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiElement
 
 class AwFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, AwLanguage) {
 
     val header: AwHeader?
-        get() = children.first { it is AwHeader } as? AwHeader
+        get() = children.firstOrNull { it is AwHeader } as? AwHeader
 
-    val entries: Collection<AwEntryMixin>
+    val entries: Collection<AwEntry>
         get() = childrenOfType()
+
+    val headComments: List<PsiComment>
+        get() {
+            val comments = mutableListOf<PsiComment>()
+            for (child in children) {
+                if (child is AwEntry) {
+                    break
+                }
+
+                if (child is PsiComment) {
+                    comments.add(child)
+                }
+            }
+
+            return comments
+        }
+
+    fun addHeadComment(text: String) {
+        val toAdd = text.lines().map { AwElementFactory.createComment(project, it) }
+        val lastHeadComment = headComments.lastOrNull()
+        if (lastHeadComment == null) {
+            for (comment in toAdd.reversed()) {
+                addAfter(comment, null)
+            }
+        } else {
+            var previousComment: PsiElement? = lastHeadComment
+            for (comment in toAdd) {
+                previousComment = addAfter(comment, previousComment)
+            }
+        }
+    }
 
     override fun getFileType() = AwFileType
     override fun toString() = "Access Widener File"
