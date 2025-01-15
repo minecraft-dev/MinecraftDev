@@ -83,6 +83,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.PsiUtil
@@ -323,9 +324,10 @@ inline fun <T> PsiElement.lockedCached(
     val cacheLock = cacheLocks.computeIfAbsent(key) { ReentrantReadWriteLock() }
 
     cacheLock.read {
-        val value = getUserData(key)?.upToDateOrNull
-        if (value != null) {
-            return value.get()
+        // The cast seems necessary since 2025.1, ParameterizedCachedValue doesn't extend CachedValue anymore...
+        @Suppress("UNCHECKED_CAST") val value = getUserData(key as Key<ParameterizedCachedValue<T, Any>>)
+        if (value?.hasUpToDateValue() == true) {
+            return value.getValue(dependencies)
         }
     }
 
