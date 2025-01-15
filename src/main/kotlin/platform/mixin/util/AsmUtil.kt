@@ -190,7 +190,7 @@ fun shortDescString(desc: String) = Type.getArgumentTypes(desc).joinToString(pre
 }
 
 private val LOAD_CLASS_FILE_BYTES: Method? = runCatching {
-    com.intellij.byteCodeViewer.ByteCodeViewerManager::class.java
+    com.intellij.byteCodeViewer.BytecodeViewerManager::class.java
         .getDeclaredMethod("loadClassFileBytes", PsiClass::class.java)
         .let { it.isAccessible = true; it }
 }.getOrNull()
