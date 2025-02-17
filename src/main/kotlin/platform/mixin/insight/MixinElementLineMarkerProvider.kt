@@ -43,10 +43,10 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.PsiNavigateUtil
 import java.awt.event.MouseEvent
 
-class MixinTargetLineMarkerProvider : LineMarkerProviderDescriptor() {
+class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
 
-    override fun getName() = "Mixin target line marker"
-    override fun getIcon() = MixinAssets.SHADOW
+    override fun getName() = "Mixin element line marker"
+    override fun getIcon() = MixinAssets.MIXIN_ELEMENT_ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
         if (element !is PsiMember) {
