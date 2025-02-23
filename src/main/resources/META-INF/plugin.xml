@@ -84,6 +84,9 @@
             <with attribute="implementation" implements="com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport"/>
         </extensionPoint>
 
+        <extensionPoint name="libraryModIdProvider"
+                        interface="com.demonwav.mcdev.platform.LibraryModIdProvider" dynamic="true"/>
+
         <extensionPoint name="gradleFileType" interface="com.demonwav.mcdev.creator.buildsystem.GradleFile$Type"
                         dynamic="true"/>
 
@@ -176,6 +179,8 @@
                             implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeGradleSupport"/>
         <buildSystemSupport platform="BungeeCord" buildSystem="Maven"
                             implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMavenSupport"/>
+
+        <libraryModIdProvider implementation="com.demonwav.mcdev.platform.fabric.FabricLibraryModIdProvider"/>
 
         <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type"/>
 
@@ -740,6 +745,9 @@
                                         implementationClass="com.demonwav.mcdev.platform.mixin.insight.target.MixinTargetLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JAVA"
                                         implementationClass="com.demonwav.mcdev.platform.mixin.insight.target.MixinAccessorTargetLineMarkerProvider"/>
+
+        <codeInsight.inlayProvider language="JAVA"
+                                   implementationClass="com.demonwav.mcdev.platform.mixin.insight.target.MixinTargetElementsInlayHintsProvider"/>
 
         <!-- Mixin Code Vision Providers -->
         <codeInsight.daemonBoundCodeVisionProvider implementation="com.demonwav.mcdev.platform.mixin.insight.target.MixinTargetCodeVisionProvider"/>

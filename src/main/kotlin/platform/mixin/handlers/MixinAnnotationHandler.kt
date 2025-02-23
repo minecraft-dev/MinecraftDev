@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
+import com.demonwav.mcdev.platform.mixin.insight.target.MixinTargetElementsInlayHintsProvider
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
@@ -73,6 +74,10 @@ interface MixinAnnotationHandler {
 
     fun createUnresolvedMessage(annotation: PsiAnnotation): String?
 
+    fun createTargetInlay(context: TargetInlayContext): TargetInlayProperties? {
+        return MixinTargetElementsInlayHintsProvider.createDefaultTargetInlay(this, context)
+    }
+
     /**
      * Returns true if we don't actually know the implementation of the annotation, and we're just making
      * a guess. Prevents unresolved errors but still attempts navigation
@@ -86,6 +91,26 @@ interface MixinAnnotationHandler {
     val isEntryPoint: Boolean
 
     val icon: Icon get() = MixinAssets.MIXIN_ELEMENT_ICON
+    val targetIcon: Icon get() = icon
+
+    class TargetInlayContext(
+        val annotation: PsiAnnotation,
+        val targetElement: PsiElement,
+        val mixinName: String,
+        val libraryModId: String?,
+        val navigationIndex: Int,
+    )
+
+    data class TargetInlayProperties(
+        val anchor: PsiElement,
+        val placement: TargetInlayPlacement,
+        val icon: Icon,
+        val text: String,
+    )
+
+    enum class TargetInlayPlacement {
+        BEFORE, AFTER, END_OF_LINE, PREVIOUS_LINE, NEXT_LINE
+    }
 
     companion object {
         private val EP_NAME = ExtensionPointName<KeyedLazyInstance<MixinAnnotationHandler>>(

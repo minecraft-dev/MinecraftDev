@@ -36,16 +36,37 @@ import com.intellij.codeInspection.dataFlow.value.DfaValue
 import com.intellij.codeInspection.dataFlow.value.DfaValueFactory
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassInitializer
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEnumConstantInitializer
 import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiLambdaExpression
+import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiType
 import com.intellij.psi.impl.light.LightParameter
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
 
 object McdevDfaUtil {
+    // Copy of private UnnecessaryDefaultInspection.getContext
+    fun getControlFlowContext(element: PsiElement): PsiElement? {
+        val context = PsiTreeUtil.getParentOfType(
+            element,
+            PsiMember::class.java,
+            PsiLambdaExpression::class.java
+        )
+        return when (context) {
+            is PsiField -> context.initializer
+            is PsiClassInitializer -> context.body
+            is PsiMethod -> context.body
+            is PsiLambdaExpression -> context.body
+            else -> null
+        }
+    }
+
     // Copy of package-private DfaUtil.getDataflowContext
     fun getDataflowContext(expression: PsiExpression): PsiElement? {
         var element = expression.parent

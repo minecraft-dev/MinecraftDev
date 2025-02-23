@@ -20,11 +20,13 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.hasImplicitReturnStatement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.JavaTokenType
 import com.intellij.psi.LambdaUtil
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
@@ -37,6 +39,7 @@ import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiReturnStatement
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.controlFlow.AnalysisCanceledException
+import com.intellij.psi.util.elementType
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.AbstractInsnNode
 import org.objectweb.asm.tree.ClassNode
@@ -65,6 +68,30 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
         result: CollectVisitor.Result<PsiElement>,
     ): LookupElementBuilder? {
         return null
+    }
+
+    override fun createTargetInlay(
+        at: PsiAnnotation,
+        context: MixinAnnotationHandler.TargetInlayContext,
+    ): MixinAnnotationHandler.TargetInlayProperties? {
+        val inlayProps = super.createTargetInlay(at, context) ?: return null
+
+        if (context.targetElement.elementType == JavaTokenType.RBRACE) {
+            val parent = context.targetElement.parent
+            if (parent is PsiCodeBlock) {
+                val lastStatement = parent.statements.lastOrNull()
+                if (lastStatement != null) {
+                    return inlayProps.copy(
+                        anchor = lastStatement,
+                        placement = MixinAnnotationHandler.TargetInlayPlacement.NEXT_LINE,
+                    )
+                }
+            }
+
+            return inlayProps.copy(placement = MixinAnnotationHandler.TargetInlayPlacement.PREVIOUS_LINE)
+        }
+
+        return inlayProps
     }
 
     private class MyNavigationVisitor(private val tailOnly: Boolean) : NavigationVisitor() {
@@ -108,6 +135,15 @@ abstract class AbstractReturnInjectionPoint(private val tailOnly: Boolean) : Inj
                 }
                 is PsiClassInitializer -> {
                     executableElement.body
+                }
+                is PsiClass -> {
+                    executableElement.rBrace?.let {
+                        if (tailOnly) {
+                            result.clear()
+                        }
+                        addResult(it)
+                    }
+                    return
                 }
                 else -> return
             }

@@ -20,6 +20,8 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.insight.target.MixinTargetElementsInlayHintsProvider
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.SourceCodeLocationInfo
@@ -50,7 +52,6 @@ import com.intellij.psi.PsiLambdaExpression
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.parentOfType
@@ -224,6 +225,27 @@ abstract class InjectionPoint<T : PsiElement> {
             return bold()
         }
         return this
+    }
+
+    open fun createTargetInlay(
+        at: PsiAnnotation,
+        context: MixinAnnotationHandler.TargetInlayContext,
+    ): MixinAnnotationHandler.TargetInlayProperties? {
+        val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return null
+        val qName = injectorAnnotation.qualifiedName ?: return null
+        val handler = MixinAnnotationHandler.forMixinAnnotation(qName, injectorAnnotation.project) ?: return null
+        val inlayProps = MixinTargetElementsInlayHintsProvider.createDefaultTargetInlay(handler, context)
+            ?: return null
+
+        if (inlayProps.placement != MixinAnnotationHandler.TargetInlayPlacement.BEFORE) {
+            return inlayProps
+        }
+
+        if (AtResolver.getShift(at) > 0) {
+            return inlayProps.copy(placement = MixinAnnotationHandler.TargetInlayPlacement.AFTER)
+        }
+
+        return inlayProps
     }
 }
 

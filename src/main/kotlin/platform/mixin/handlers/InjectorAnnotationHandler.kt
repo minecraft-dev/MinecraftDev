@@ -171,6 +171,16 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         return "Cannot resolve any target instructions in target class"
     }
 
+    override fun createTargetInlay(
+        context: MixinAnnotationHandler.TargetInlayContext
+    ): MixinAnnotationHandler.TargetInlayProperties? {
+        val at = context.annotation.findAttributeValue(getAtKey(context.annotation))
+            ?.findAnnotations()
+            ?.getOrNull(context.navigationIndex)
+            ?: return null
+        return AtResolver.getInjectionPoint(at)?.createTargetInlay(at, context)
+    }
+
     open val allowCoerce = false
 
     override val isEntryPoint = true

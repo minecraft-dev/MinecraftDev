@@ -82,7 +82,7 @@ class AtResolver(
     private val targetMethod: MethodNode,
 ) {
     companion object {
-        private fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
+        fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
             var atCode = at.qualifiedName?.let { InjectionPointAnnotation.atCodeFor(it) }
                 ?: at.findDeclaredAttributeValue("value")?.constantStringValue ?: return null
 
@@ -247,10 +247,10 @@ class AtResolver(
         targetElements.forEach { it.accept(navigationVisitor) }
         navigationVisitor.visitEnd(mainTargetElement ?: targetElements.last())
 
-        return bytecodeResults.mapNotNull { bytecodeResult ->
+        return bytecodeResults.map { bytecodeResult ->
             val matcher = bytecodeResult.sourceLocationInfo.createMatcher<PsiElement>(targetPsiFile)
             navigationVisitor.result.forEach(matcher::accept)
-            matcher.result
+            matcher.result ?: mainTargetElement ?: targetElements.last()
         }
     }
 
