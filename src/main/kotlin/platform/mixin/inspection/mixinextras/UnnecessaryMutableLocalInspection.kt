@@ -54,7 +54,7 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
         override fun visitMethod(method: PsiMethod) {
             val project = method.project
             val hasValidMixinAnnotation = method.annotations.any { ann ->
-                ann.qualifiedName?.let { MixinAnnotationHandler.forMixinAnnotation(it, project) }
+                MixinAnnotationHandler.forMixinAnnotation(ann, project)
                     // Mutable Local references do have different semantics inside a WrapOperation.
                     ?.let { it is InjectorAnnotationHandler && it !is WrapOperationHandler } == true
             }

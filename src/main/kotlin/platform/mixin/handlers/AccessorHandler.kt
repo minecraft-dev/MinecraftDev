@@ -98,7 +98,8 @@ class AccessorHandler : MixinMemberAnnotationHandler {
 
     fun findAccessorTargetForReference(method: PsiMethod): SmartPsiElementPointer<PsiField>? {
         val accessor = method.findAnnotation(ACCESSOR) ?: return null
-        val targetMember = resolveTarget(accessor).firstOrNull() as? FieldTargetMember ?: return null
+        val targetMember = MixinAnnotationHandler.resolveTarget(accessor).firstOrNull() as? FieldTargetMember
+            ?: return null
         return targetMember.classAndField.field.findOrConstructSourceField(
             targetMember.classAndField.clazz,
             method.project,

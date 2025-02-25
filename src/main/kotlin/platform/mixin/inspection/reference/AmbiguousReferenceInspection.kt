@@ -45,8 +45,7 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection("method"
         value: PsiAnnotationMemberValue,
         holder: ProblemsHolder,
     ) {
-        val qName = annotation.qualifiedName ?: return
-        val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)
+        val handler = MixinAnnotationHandler.forMixinAnnotation(annotation)
         if (handler !is InjectorAnnotationHandler || handler.isSoft) {
             return
         }

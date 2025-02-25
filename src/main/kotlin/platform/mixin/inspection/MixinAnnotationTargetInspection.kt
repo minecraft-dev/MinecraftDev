@@ -43,8 +43,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                 if (qName == AT) {
                     var parentAnnotation = annotation.parentOfType<PsiAnnotation>()
                     while (parentAnnotation != null) {
-                        val parentQName = parentAnnotation.qualifiedName ?: return
-                        if (MixinAnnotationHandler.forMixinAnnotation(parentQName, parentAnnotation.project) != null) {
+                        if (MixinAnnotationHandler.forMixinAnnotation(parentAnnotation) != null) {
                             break
                         }
                         parentAnnotation = parentAnnotation.parentOfType()
@@ -52,10 +51,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                     if (parentAnnotation == null) {
                         return
                     }
-                    val parentQName = parentAnnotation.qualifiedName ?: return
-                    val handler = MixinAnnotationHandler.forMixinAnnotation(parentQName, parentAnnotation.project)
-                        ?: return
-                    val targets = handler.resolveTarget(parentAnnotation).ifEmpty { return }
+                    val targets = MixinAnnotationHandler.resolveTarget(parentAnnotation).ifEmpty { return }
                     val failure = targets.asSequence()
                         .mapNotNull {
                             (it as? MethodTargetMember)?.classAndMethod

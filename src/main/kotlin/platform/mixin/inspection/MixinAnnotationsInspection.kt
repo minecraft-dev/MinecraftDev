@@ -40,8 +40,7 @@ class MixinAnnotationsInspection : MixinInspection() {
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {
 
         override fun visitAnnotation(annotation: PsiAnnotation) {
-            val qualifiedName = annotation.qualifiedName ?: return
-            if (MixinAnnotationHandler.forMixinAnnotation(qualifiedName, annotation.project) == null) {
+            if (MixinAnnotationHandler.forMixinAnnotation(annotation, annotation.project) == null) {
                 return
             }
 

@@ -95,8 +95,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             var reportedSignature = false
 
             for (annotation in modifiers.annotations) {
-                val qName = annotation.qualifiedName ?: continue
-                val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)
+                val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, annotation.project)
                     as? InjectorAnnotationHandler ?: continue
                 val methodAttribute = annotation.findDeclaredAttributeValue("method") ?: continue
                 val targetMethods = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue

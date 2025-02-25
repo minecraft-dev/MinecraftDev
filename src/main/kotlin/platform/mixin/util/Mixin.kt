@@ -239,8 +239,7 @@ fun isMixinEntryPoint(element: PsiElement?): Boolean {
     }
     val project = element.project
     for (annotation in element.annotations) {
-        val qName = annotation.qualifiedName ?: continue
-        val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
+        val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, project)
         if (handler != null && handler.isEntryPoint) {
             return true
         }

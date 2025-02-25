@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -64,8 +63,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
             override fun visitMethod(method: PsiMethod) {
                 val injectAnnotation = method.findAnnotation(INJECT) ?: return
                 val problemElement = injectAnnotation.nameReferenceElement ?: return
-                val handler = MixinAnnotationHandler.forMixinAnnotation(INJECT) as? InjectorAnnotationHandler ?: return
-                val targets = handler.resolveTarget(injectAnnotation)
+                val targets = MixinAnnotationHandler.resolveTarget(injectAnnotation)
 
                 val ats = injectAnnotation.findDeclaredAttributeValue("at")
                     ?.findAnnotations()

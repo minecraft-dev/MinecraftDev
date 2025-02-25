@@ -72,10 +72,8 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
 
     override fun isUnresolved(context: PsiElement): Boolean {
         // check if the annotation handler is soft
-        val annotationQName = context.parentOfType<PsiAnnotation>()?.qualifiedName
-        if (annotationQName != null &&
-            MixinAnnotationHandler.forMixinAnnotation(annotationQName, context.project)?.isSoft == true
-        ) {
+        val annotation = context.parentOfType<PsiAnnotation>()
+        if (annotation != null && MixinAnnotationHandler.forMixinAnnotation(annotation)?.isSoft == true) {
             return false
         }
 

@@ -60,8 +60,7 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
         }
         val project = member.project
         for (annotation in member.annotations) {
-            val qName = annotation.qualifiedName ?: continue
-            val handler = MixinAnnotationHandler.forMixinAnnotation(qName, project)
+            val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, project)
             if (handler is InjectorAnnotationHandler) {
                 return PsiUtil.ACCESS_LEVEL_PRIVATE
             }

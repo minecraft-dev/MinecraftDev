@@ -49,9 +49,8 @@ class UnresolvedLocalCaptureInspection : MixinInspection() {
             val parameter = localAnnotation.parentOfType<PsiParameter>() ?: return
             val method = parameter.findContainingMethod() ?: return
             val targets = method.annotations.mapFirstNotNull { annotation ->
-                val qName = annotation.qualifiedName ?: return@mapFirstNotNull null
                 val handler =
-                    MixinAnnotationHandler.forMixinAnnotation(qName, holder.project) as? InjectorAnnotationHandler
+                    MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InjectorAnnotationHandler
                         ?: return@mapFirstNotNull null
                 handler.resolveInstructions(annotation)
             } ?: return

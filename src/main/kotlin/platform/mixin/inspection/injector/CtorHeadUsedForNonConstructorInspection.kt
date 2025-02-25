@@ -41,7 +41,7 @@ class CtorHeadUsedForNonConstructorInspection : MixinInspection() {
             if (atValue.constantValue != "CTOR_HEAD") {
                 return
             }
-            if (!UnnecessaryUnsafeInspection.mightTargetConstructor(holder.project, annotation)) {
+            if (!UnnecessaryUnsafeInspection.mightTargetConstructor(annotation)) {
                 holder.registerProblem(
                     atValue,
                     "CTOR_HEAD used without targeting a constructor",

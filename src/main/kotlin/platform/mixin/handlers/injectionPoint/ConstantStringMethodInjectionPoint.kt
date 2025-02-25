@@ -99,11 +99,8 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         }
 
         val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
-        val handler = injectorAnnotation.qualifiedName
-            ?.let { MixinAnnotationHandler.forMixinAnnotation(it, at.project) }
-            ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
 
-        return handler.resolveTarget(injectorAnnotation).asSequence()
+        return MixinAnnotationHandler.resolveTarget(injectorAnnotation).asSequence()
             .filterIsInstance<MethodTargetMember>()
             .flatMap { target ->
                 val insns = target.classAndMethod.method.instructions ?: return@flatMap emptySequence()

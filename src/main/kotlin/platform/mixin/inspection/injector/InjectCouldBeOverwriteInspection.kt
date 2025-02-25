@@ -108,9 +108,9 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
             }
 
             // check there is only one target
-            val injectHandler = MixinAnnotationHandler.forMixinAnnotation(MixinConstants.Annotations.INJECT)!!
-            val targetMethod = (injectHandler.resolveTarget(injectAnnotation).singleOrNull() as? MethodTargetMember)
-                ?.classAndMethod ?: return
+            val targetMethod =
+                (MixinAnnotationHandler.resolveTarget(injectAnnotation).singleOrNull() as? MethodTargetMember)
+                    ?.classAndMethod ?: return
 
             // can't overwrite constructors / static initializers
             if (targetMethod.method.isConstructor || targetMethod.method.isClinit) {

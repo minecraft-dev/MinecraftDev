@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.handlers.AccessorHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFieldByName
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
@@ -58,9 +58,8 @@ object AccessorReference : PolyReferenceResolver() {
                 it.findFieldByName(name)?.findSourceField(it, project, context.resolveScope, canDecompile = false)
             }.toResolveResults()
         } else {
-            val handler = AccessorHandler.getInstance() ?: return ResolveResult.EMPTY_ARRAY
             val annotation = context.parentOfType<PsiAnnotation>() ?: return ResolveResult.EMPTY_ARRAY
-            handler.resolveTarget(annotation).asSequence()
+            MixinAnnotationHandler.resolveTarget(annotation).asSequence()
                 .mapNotNull { it.findSourceElement(project, context.resolveScope, canDecompile = false) }
                 .toResolveResults()
         }

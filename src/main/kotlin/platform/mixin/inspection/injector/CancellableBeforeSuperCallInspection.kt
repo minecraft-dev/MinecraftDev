@@ -64,7 +64,7 @@ class CancellableBeforeSuperCallInspection : MixinInspection() {
             val handler = MixinAnnotationHandler.forMixinAnnotation(MixinConstants.Annotations.INJECT)!!
                 as InjectorAnnotationHandler
 
-            for (target in handler.resolveTarget(annotation)) {
+            for (target in MixinAnnotationHandler.resolveTarget(annotation)) {
                 if (target !is MethodTargetMember) {
                     continue
                 }

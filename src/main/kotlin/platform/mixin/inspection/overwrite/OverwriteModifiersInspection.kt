@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
-import com.demonwav.mcdev.platform.mixin.handlers.OverwriteHandler
+import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
@@ -47,8 +47,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val overwriteAnnotation = method.getAnnotation(OVERWRITE) ?: return
-        val overwriteHandler = OverwriteHandler.getInstance() ?: return
-        val target = (overwriteHandler.resolveTarget(overwriteAnnotation).firstOrNull() as? MethodTargetMember)
+        val target = (MixinAnnotationHandler.resolveTarget(overwriteAnnotation).firstOrNull() as? MethodTargetMember)
             ?.classAndMethod ?: return
         val nameIdentifier = method.nameIdentifier ?: return
         val modifierList = method.modifierList

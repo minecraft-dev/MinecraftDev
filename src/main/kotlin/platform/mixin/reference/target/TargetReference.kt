@@ -74,16 +74,14 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
             .filterIsInstance<PsiAnnotation>()
             .flatMap { it.owner?.annotations?.asSequence() ?: emptySequence() }
             .mapNotNull { annotation ->
-                val qName = annotation.qualifiedName ?: return@mapNotNull null
-                (
-                    MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)
-                        as? InjectorAnnotationHandler
-                    )?.let { it to annotation }
+                (MixinAnnotationHandler.forMixinAnnotation(annotation) as? InjectorAnnotationHandler)
+                    ?.let { it to annotation }
             }.firstOrNull() ?: return null
         if (forUnresolved && handler.isSoft) {
             return null
         }
-        return handler.resolveTarget(annotation).mapNotNull { (it as? MethodTargetMember)?.classAndMethod }
+        return MixinAnnotationHandler.resolveTarget(annotation)
+            .mapNotNull { (it as? MethodTargetMember)?.classAndMethod }
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {

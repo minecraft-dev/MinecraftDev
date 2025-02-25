@@ -49,10 +49,6 @@ import javax.swing.Icon
 import org.objectweb.asm.tree.ClassNode
 
 interface MixinAnnotationHandler {
-    fun resolveTarget(annotation: PsiAnnotation) = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
-        val containingClass = annotation.findContainingClass() ?: return@cached emptyList()
-        containingClass.mixinTargets.flatMap { resolveTarget(annotation, it) }
-    }
 
     fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember>
 
@@ -121,6 +117,11 @@ interface MixinAnnotationHandler {
         fun getBuiltinHandlers(): Sequence<Pair<String, MixinAnnotationHandler>> =
             EP_NAME.extensions.asSequence().map { it.key to it.instance }
 
+        fun forMixinAnnotation(annotation: PsiAnnotation, project: Project = annotation.project): MixinAnnotationHandler? {
+            val qName = annotation.qualifiedName ?: return null
+            return forMixinAnnotation(qName, project)
+        }
+
         fun forMixinAnnotation(qualifiedName: String, project: Project? = null): MixinAnnotationHandler? {
             val extension = COLLECTOR.findSingle(qualifiedName)
             if (extension != null) {
@@ -150,6 +151,14 @@ interface MixinAnnotationHandler {
             }
 
             return null
+        }
+
+        fun resolveTarget(annotation: PsiAnnotation): List<MixinTargetMember> {
+            return annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
+                val handler = forMixinAnnotation(annotation) ?: return@cached emptyList()
+                val containingClass = annotation.findContainingClass() ?: return@cached emptyList()
+                containingClass.mixinTargets.flatMap { handler.resolveTarget(annotation, it) }
+            }
         }
     }
 }

@@ -64,9 +64,7 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
         } ?: return null
 
         val (handler, annotation) = element.annotations.mapFirstNotNull { annotation ->
-            annotation.qualifiedName?.let { qName ->
-                MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project)?.let { it to annotation }
-            }
+            MixinAnnotationHandler.forMixinAnnotation(annotation)?.let { it to annotation }
         } ?: return null
         if (handler.isUnresolved(annotation) != null) {
             return null

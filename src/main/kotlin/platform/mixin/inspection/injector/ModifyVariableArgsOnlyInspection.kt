@@ -51,8 +51,7 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
                 val wantedType = method.parameterList.getParameter(0)?.type ?: return
                 val problemElement = modifyVariable.nameReferenceElement ?: return
 
-                val handler = MixinAnnotationHandler.forMixinAnnotation(MODIFY_VARIABLE) ?: return
-                val targets = handler.resolveTarget(modifyVariable).ifEmpty { return }
+                val targets = MixinAnnotationHandler.resolveTarget(modifyVariable).ifEmpty { return }
                 val methodTargets = targets.asSequence()
                     .filterIsInstance<MethodTargetMember>()
                     .map { it.classAndMethod }

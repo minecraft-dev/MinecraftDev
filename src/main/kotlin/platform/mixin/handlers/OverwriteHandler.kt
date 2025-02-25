@@ -21,7 +21,6 @@
 package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
-import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.util.memberReference
@@ -43,10 +42,4 @@ class OverwriteHandler : MixinMemberAnnotationHandler {
     }
 
     override val isEntryPoint = true
-
-    companion object {
-        fun getInstance(): OverwriteHandler? {
-            return MixinAnnotationHandler.forMixinAnnotation(OVERWRITE) as? OverwriteHandler
-        }
-    }
 }

@@ -44,8 +44,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         value: PsiAnnotationMemberValue,
         holder: ProblemsHolder,
     ) {
-        val qName = annotation.qualifiedName ?: return
-        if (MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project) !is InjectorAnnotationHandler) {
+        if (MixinAnnotationHandler.forMixinAnnotation(annotation) !is InjectorAnnotationHandler) {
             return
         }
 

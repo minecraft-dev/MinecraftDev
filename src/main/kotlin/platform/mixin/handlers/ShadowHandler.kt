@@ -80,14 +80,14 @@ class ShadowHandler : MixinMemberAnnotationHandler {
 
     fun findFirstShadowTargetForNavigation(member: PsiMember): SmartPsiElementPointer<PsiElement>? {
         val shadow = member.findAnnotation(SHADOW) ?: return null
-        val shadowTarget = resolveTarget(shadow).firstOrNull() ?: return null
+        val shadowTarget = MixinAnnotationHandler.resolveTarget(shadow).firstOrNull() ?: return null
         return shadowTarget.findSourceElement(member.project, member.resolveScope, canDecompile = false)
             ?.createSmartPointer()
     }
 
     fun findFirstShadowTargetForReference(member: PsiMember): SmartPsiElementPointer<PsiMember>? {
         val shadow = member.findAnnotation(SHADOW) ?: return null
-        val shadowTarget = resolveTarget(shadow).firstOrNull() ?: return null
+        val shadowTarget = MixinAnnotationHandler.resolveTarget(shadow).firstOrNull() ?: return null
         return shadowTarget.findOrConstructSourceMember(member.project, member.resolveScope, canDecompile = false)
             .createSmartPointer()
     }

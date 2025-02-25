@@ -99,7 +99,8 @@ class InvokerHandler : MixinMemberAnnotationHandler {
 
     fun findInvokerTargetForReference(member: PsiMember): SmartPsiElementPointer<PsiMethod>? {
         val accessor = member.findAnnotation(INVOKER) ?: return null
-        val invokerTarget = resolveTarget(accessor).firstOrNull() as? MethodTargetMember ?: return null
+        val invokerTarget = MixinAnnotationHandler.resolveTarget(accessor).firstOrNull() as? MethodTargetMember
+            ?: return null
         return invokerTarget.classAndMethod.method.findOrConstructSourceMethod(
             invokerTarget.classAndMethod.clazz,
             member.project,

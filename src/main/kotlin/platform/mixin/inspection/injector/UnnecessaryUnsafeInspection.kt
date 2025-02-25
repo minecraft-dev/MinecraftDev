@@ -32,7 +32,6 @@ import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findInspection
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElementVisitor
@@ -81,7 +80,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
                     return
                 }
 
-                if (alwaysUnnecessary || !mightTargetConstructor(holder.project, annotation)) {
+                if (alwaysUnnecessary || !mightTargetConstructor(annotation)) {
                     holder.registerProblem(
                         unsafeValue,
                         "Unnecessary unsafe = true",
@@ -93,13 +92,10 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     }
 
     companion object {
-        fun mightTargetConstructor(project: Project, at: PsiAnnotation): Boolean {
+        fun mightTargetConstructor(at: PsiAnnotation): Boolean {
             val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return true
-            val handler = injectorAnnotation.qualifiedName?.let {
-                MixinAnnotationHandler.forMixinAnnotation(it, project)
-            } ?: return true
 
-            val targets = handler.resolveTarget(injectorAnnotation)
+            val targets = MixinAnnotationHandler.resolveTarget(injectorAnnotation)
                 .filterIsInstance<MethodTargetMember>()
                 .ifEmpty { return true }
 
