@@ -62,6 +62,14 @@ abstract class AbstractInvokeInjectionPoint(private val assign: Boolean) : Abstr
         return true
     }
 
+    override fun isInjectingAfter(at: PsiAnnotation): Boolean {
+        return if (assign) {
+            AtResolver.getShift(at) >= 0
+        } else {
+            AtResolver.getShift(at) > 0
+        }
+    }
+
     override fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,

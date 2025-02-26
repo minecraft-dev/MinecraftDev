@@ -26,6 +26,7 @@ import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
 import com.demonwav.mcdev.platform.mixin.util.AsmDfaUtil
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.getGenericSignature
 import com.demonwav.mcdev.platform.mixin.util.getGenericType
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
@@ -103,6 +104,8 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
             MethodSignature(paramGroups + extraGroup, returnType)
         }
     }
+
+    override val defaultOrder = MixinConstants.InjectorOrder.REDIRECT
 
     override val allowCoerce = true
 

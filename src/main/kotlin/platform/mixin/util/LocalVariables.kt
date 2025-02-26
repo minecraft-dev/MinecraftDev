@@ -105,6 +105,7 @@ object LocalVariables {
         return element.getUserData(LOCAL_INDEX_KEY)
     }
 
+    // TODO: use bytecode LVT to improve guesses
     fun guessLocalsAt(element: PsiElement, argsOnly: Boolean, start: Boolean): List<SourceLocalVariable> {
         val method = PsiTreeUtil.getParentOfType(element, PsiMethod::class.java, PsiLambdaExpression::class.java)
             ?: return emptyList()

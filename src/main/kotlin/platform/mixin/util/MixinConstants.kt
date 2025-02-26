@@ -84,6 +84,18 @@ object MixinConstants {
         const val SURROGATE = "org.spongepowered.asm.mixin.injection.Surrogate"
     }
 
+    object InjectorOrder {
+        const val EARLY = 0L
+        const val DEFAULT = 1000L
+        const val LATE = 2000L
+        const val REDIRECT = 10000L
+        const val AFTER_REDIRECT = 20000L
+
+        const val MODIFY_EXPRESSION_VALUE = Int.MAX_VALUE + 1000L
+        const val WRAP_WITH_CONDITION = Int.MAX_VALUE + 2000L
+        const val WRAP_OPERATION = Int.MAX_VALUE + 3000L
+    }
+
     object MixinExtras {
         const val PACKAGE = "com.llamalad7.mixinextras."
         const val OPERATION = "com.llamalad7.mixinextras.injector.wrapoperation.Operation"

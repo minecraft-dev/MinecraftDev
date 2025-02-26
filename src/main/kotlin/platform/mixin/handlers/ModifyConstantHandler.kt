@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjecti
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.findAnnotations
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiManager
@@ -79,7 +80,7 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-    ): List<MethodSignature>? {
+    ): List<MethodSignature> {
         val constantInfos = getConstantInfos(annotation)
         if (constantInfos == null) {
             val method = annotation.parentOfType<PsiMethod>()
@@ -132,6 +133,8 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
     override fun isInsnAllowed(insn: AbstractInsnNode): Boolean {
         return insn.opcode in allowedOpcodes
     }
+
+    override val defaultOrder = MixinConstants.InjectorOrder.REDIRECT
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.MODIFY_CONSTANT
 }

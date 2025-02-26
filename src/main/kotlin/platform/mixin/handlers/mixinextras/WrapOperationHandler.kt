@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinExtrasOperationType
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
@@ -94,6 +95,8 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         val type = target.getDecoration<Type>(ExpressionDecorations.SIMPLE_OPERATION_RETURN_TYPE) ?: return null
         return type.toPsiType(JavaPsiFacade.getElementFactory(annotation.project))
     }
+
+    override val defaultOrder = MixinConstants.InjectorOrder.WRAP_OPERATION
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.WRAP_OPERATION
 }

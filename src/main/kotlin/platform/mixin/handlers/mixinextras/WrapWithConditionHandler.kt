@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
@@ -48,6 +49,8 @@ class WrapWithConditionHandler : MixinExtrasInjectorAnnotationHandler() {
         val params = getPsiParameters(target.insn, targetClass, annotation) ?: return null
         return ParameterGroup(params) to PsiTypes.booleanType()
     }
+
+    override val defaultOrder = MixinConstants.InjectorOrder.WRAP_WITH_CONDITION
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.WRAP_WITH_CONDITION
 }

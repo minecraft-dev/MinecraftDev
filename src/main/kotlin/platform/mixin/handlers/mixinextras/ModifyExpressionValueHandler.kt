@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
@@ -80,6 +81,8 @@ class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
         }
         return psiReturnType
     }
+
+    override val defaultOrder = MixinConstants.InjectorOrder.MODIFY_EXPRESSION_VALUE
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.MODIFY_EXPRESSION_VALUE
 }

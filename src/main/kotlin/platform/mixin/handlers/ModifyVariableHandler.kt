@@ -87,5 +87,12 @@ class ModifyVariableHandler : InjectorAnnotationHandler() {
         return result
     }
 
+    override fun createTargetInlay(
+        context: MixinAnnotationHandler.TargetInlayContext
+    ): MixinAnnotationHandler.TargetInlayProperties? {
+        val inlayProps = super.createTargetInlay(context) ?: return null
+        return InjectAnnotationHandler.moveInlayAcrossNonSideEffectCodeToPrettierSpot(context, this, inlayProps)
+    }
+
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.MODIFY_VARIABLE
 }

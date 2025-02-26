@@ -109,6 +109,14 @@ abstract class InjectionPoint<T : PsiElement> {
 
     open fun isShiftDiscouraged(shift: Int): Boolean = shift != 0
 
+    /**
+     * If an injection point is injecting after, rather than before, then injections targeting the same instruction are
+     * sorted in the opposite order by priority when displayed to the user. This is because even though the order the
+     * injections are applied is the same, repeatedly injecting at start of a list results in the opposite order than
+     * repeatedly injecting at the end of a list.
+     */
+    open fun isInjectingAfter(at: PsiAnnotation) = AtResolver.getShift(at) > 0
+
     abstract fun createNavigationVisitor(
         at: PsiAnnotation,
         target: MixinSelector?,
@@ -232,8 +240,7 @@ abstract class InjectionPoint<T : PsiElement> {
         context: MixinAnnotationHandler.TargetInlayContext,
     ): MixinAnnotationHandler.TargetInlayProperties? {
         val injectorAnnotation = AtResolver.findInjectorAnnotation(at) ?: return null
-        val qName = injectorAnnotation.qualifiedName ?: return null
-        val handler = MixinAnnotationHandler.forMixinAnnotation(qName, injectorAnnotation.project) ?: return null
+        val handler = MixinAnnotationHandler.forMixinAnnotation(injectorAnnotation) ?: return null
         val inlayProps = MixinTargetElementsInlayHintsProvider.createDefaultTargetInlay(handler, context)
             ?: return null
 
@@ -241,11 +248,7 @@ abstract class InjectionPoint<T : PsiElement> {
             return inlayProps
         }
 
-        if (AtResolver.getShift(at) > 0) {
-            return inlayProps.copy(placement = MixinAnnotationHandler.TargetInlayPlacement.AFTER)
-        }
-
-        return inlayProps
+        return inlayProps.copy(placement = MixinAnnotationHandler.TargetInlayPlacement.SURROUND)
     }
 }
 

@@ -105,7 +105,7 @@ interface MixinAnnotationHandler {
     )
 
     enum class TargetInlayPlacement {
-        BEFORE, AFTER, END_OF_LINE, PREVIOUS_LINE, NEXT_LINE
+        BEFORE, AFTER, END_OF_LINE, PREVIOUS_LINE, NEXT_LINE, SURROUND
     }
 
     companion object {

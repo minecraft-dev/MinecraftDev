@@ -30,6 +30,7 @@ import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
@@ -37,6 +38,7 @@ import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.Parameter
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
+import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.ifNullOrEmpty
@@ -179,6 +181,12 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
             ?.getOrNull(context.navigationIndex)
             ?: return null
         return AtResolver.getInjectionPoint(at)?.createTargetInlay(at, context)
+    }
+
+    protected open val defaultOrder = MixinConstants.InjectorOrder.DEFAULT
+
+    fun getOrder(annotation: PsiAnnotation): Long {
+        return (annotation.findAttributeValue("order")?.constantValue as? Int)?.toLong() ?: defaultOrder
     }
 
     open val allowCoerce = false

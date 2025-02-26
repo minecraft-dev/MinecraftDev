@@ -137,8 +137,7 @@ class MixinTargetElementsInlayHintsProvider : InlayHintsProvider<NoSettings> {
                             continue
                         }
                         for (annotation in member.annotations) {
-                            val qName = annotation.qualifiedName ?: continue
-                            val mixinHandler = MixinAnnotationHandler.forMixinAnnotation(qName, project) ?: continue
+                            val mixinHandler = MixinAnnotationHandler.forMixinAnnotation(annotation, project) ?: continue
                             for ((index, navigationResult) in mixinHandler
                                 .resolveForNavigation(annotation, targetClassNode)
                                 .withIndex()
@@ -207,8 +206,7 @@ class MixinTargetElementsInlayHintsProvider : InlayHintsProvider<NoSettings> {
                     (annotationPtr, uniqueMixinName, libraryModId, navigationIndex) in annotationsTargetingThisElement
                 ) {
                     val annotation = annotationPtr.element ?: continue
-                    val qName = annotation.qualifiedName ?: continue
-                    val annotationHandler = MixinAnnotationHandler.forMixinAnnotation(qName, project) ?: continue
+                    val annotationHandler = MixinAnnotationHandler.forMixinAnnotation(annotation, project) ?: continue
                     val inlayProperties = annotationHandler.createTargetInlay(
                         MixinAnnotationHandler.TargetInlayContext(
                             annotation,
@@ -305,6 +303,21 @@ class MixinTargetElementsInlayHintsProvider : InlayHintsProvider<NoSettings> {
                                     adjustedPresentation,
                                 )
                             }
+                        }
+                        MixinAnnotationHandler.TargetInlayPlacement.SURROUND -> {
+                            val textRange = inlayProperties.anchor.textRange
+                            sink.addInlineElement(
+                                textRange.startOffset,
+                                relatesToPrecedingText = false,
+                                factory.seq(presentation, factory.text("(")),
+                                placeAtTheEndOfLine = false,
+                            )
+                            sink.addInlineElement(
+                                textRange.endOffset,
+                                relatesToPrecedingText = true,
+                                factory.text(")"),
+                                placeAtTheEndOfLine = false,
+                            )
                         }
                     }
                 }

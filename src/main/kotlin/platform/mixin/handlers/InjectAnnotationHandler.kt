@@ -161,9 +161,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         context: MixinAnnotationHandler.TargetInlayContext
     ): MixinAnnotationHandler.TargetInlayProperties? {
         val inlayProps = super.createTargetInlay(context) ?: return null
-        val at = context.annotation.findAttributeValue("at")?.findAnnotations()?.getOrNull(context.navigationIndex)
-            ?: return null
-        return moveInlayAcrossNonSideEffectCodeToPrettierSpot(context, AtResolver.getShift(at) > 0, inlayProps)
+        return moveInlayAcrossNonSideEffectCodeToPrettierSpot(context, this, inlayProps)
     }
 
     companion object {
@@ -173,17 +171,20 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
          */
         fun moveInlayAcrossNonSideEffectCodeToPrettierSpot(
             context: MixinAnnotationHandler.TargetInlayContext,
-            isAfter: Boolean,
+            handler: InjectorAnnotationHandler,
             inlayProps: MixinAnnotationHandler.TargetInlayProperties
         ): MixinAnnotationHandler.TargetInlayProperties {
-            val targetElement = context.targetElement
-
-            if (
-                inlayProps.placement != MixinAnnotationHandler.TargetInlayPlacement.BEFORE &&
-                inlayProps.placement != MixinAnnotationHandler.TargetInlayPlacement.AFTER
-            ) {
+            if (inlayProps.placement != MixinAnnotationHandler.TargetInlayPlacement.SURROUND) {
                 return inlayProps
             }
+
+            val targetElement = context.targetElement
+
+            val at = context.annotation.findAttributeValue(handler.getAtKey(context.annotation))
+                ?.findAnnotations()
+                ?.getOrNull(context.navigationIndex)
+                ?: return inlayProps
+            val isAfter = AtResolver.getInjectionPoint(at)?.isInjectingAfter(at) ?: return inlayProps
 
             val controlFlowBlock = McdevDfaUtil.getControlFlowContext(targetElement) ?: return inlayProps
             val project = controlFlowBlock.project

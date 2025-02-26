@@ -67,6 +67,8 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
         return null
     }
 
+    override fun isInjectingAfter(at: PsiAnnotation) = true
+
     override fun createTargetInlay(
         at: PsiAnnotation,
         context: MixinAnnotationHandler.TargetInlayContext,
