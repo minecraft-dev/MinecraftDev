@@ -83,13 +83,13 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
-import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
+import com.intellij.util.CachedValueBase
 import com.intellij.util.IncorrectOperationException
 import com.siyeh.ig.psiutils.ImportUtils
 import java.util.concurrent.ConcurrentHashMap
@@ -315,6 +315,7 @@ inline fun <T> PsiElement.cached(vararg dependencies: Any, crossinline compute: 
 @PublishedApi
 internal val CACHE_LOCKS_KEY = Key.create<ConcurrentMap<Key<*>, ReentrantReadWriteLock>>("mcdev.cacheLock")
 
+@Suppress("UNCHECKED_CAST")
 inline fun <T> PsiElement.lockedCached(
     key: Key<CachedValue<T>>,
     vararg dependencies: Any,
@@ -324,15 +325,14 @@ inline fun <T> PsiElement.lockedCached(
     val cacheLock = cacheLocks.computeIfAbsent(key) { ReentrantReadWriteLock() }
 
     cacheLock.read {
-        // The cast seems necessary since 2025.1, ParameterizedCachedValue doesn't extend CachedValue anymore...
-        @Suppress("UNCHECKED_CAST") val value = getUserData(key as Key<ParameterizedCachedValue<T, Any>>)
-        if (value?.hasUpToDateValue() == true) {
-            return value.getValue(dependencies)
+        val value = getUserData(key as Key<CachedValueBase<T>>)?.upToDateOrNull
+        if (value != null) {
+            return value.get()
         }
     }
 
     cacheLock.write {
-        val value = getUserData(key)?.upToDateOrNull
+        val value = getUserData(key as Key<CachedValueBase<T>>)?.upToDateOrNull
         if (value != null) {
             return value.get()
         }
