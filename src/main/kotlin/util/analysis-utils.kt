@@ -20,13 +20,13 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.codeInsight.daemon.impl.analysis.HighlightControlFlowUtil
 import com.intellij.psi.PsiCodeBlock
 import com.intellij.psi.controlFlow.AnalysisCanceledException
+import com.intellij.psi.controlFlow.ControlFlowFactory
 import com.intellij.psi.controlFlow.ControlFlowUtil
 
 @Throws(AnalysisCanceledException::class)
 fun hasImplicitReturnStatement(body: PsiCodeBlock): Boolean {
-    val controlFlow = HighlightControlFlowUtil.getControlFlowNoConstantEvaluate(body)
+    val controlFlow = ControlFlowFactory.getControlFlowNoConstantEvaluate(body)
     return ControlFlowUtil.canCompleteNormally(controlFlow, 0, controlFlow.size)
 }

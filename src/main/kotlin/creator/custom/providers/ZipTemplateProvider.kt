@@ -67,7 +67,7 @@ class ZipTemplateProvider : TemplateProvider {
 
         return panel {
             row(MCDevBundle("creator.ui.custom.path.label")) {
-                val pathChooserDescriptor = FileChooserDescriptorFactory.createSingleLocalFileDescriptor()
+                val pathChooserDescriptor = FileChooserDescriptorFactory.singleFile()
                     .withTitle(MCDevBundle("creator.ui.custom.archive.dialog.title"))
                     .withFileFilter { it.extension == "zip" }
                     .apply { description = MCDevBundle("creator.ui.custom.archive.dialog.description") }

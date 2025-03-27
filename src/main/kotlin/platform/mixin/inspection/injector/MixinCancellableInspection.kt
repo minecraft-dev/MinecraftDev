@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mixin.inspection.injector
+package com.demonwav.mcdev.platform.mixin.inspection
 
-import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO_RETURNABLE
@@ -44,6 +44,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiUtil
+import com.intellij.util.Processor
 
 class MixinCancellableInspection : MixinInspection() {
 
@@ -65,24 +66,26 @@ class MixinCancellableInspection : MixinInspection() {
             } ?: return
 
             val ciType = (ciParam.type as? PsiClassType)?.resolve() ?: return
-            val searchingFor = ciType.findMethodsByName("setReturnValue", false) +
-                ciType.findMethodsByName("cancel", true)
-            searchingFor.ifEmpty { return }
+            val searchingFor = ciType.findMethodsByName("setReturnValue", false).firstOrNull()
+                ?: ciType.findMethodsByName("cancel", false).firstOrNull()
+                ?: return
 
             var mayUseCancel = false
             var definitelyUsesCancel = false
-            for (ref in ReferencesSearch.search(ciParam)) {
+            ReferencesSearch.search(ciParam).forEach(Processor { ref ->
                 val parent = PsiUtil.skipParenthesizedExprUp(ref.element.parent)
                 if (parent is PsiExpressionList) {
                     // method argument, we can't tell whether it uses cancel
                     mayUseCancel = true
                 }
-                val methodCall = parent as? PsiReferenceExpression ?: continue
-                if (methodCall.references.any { reference -> searchingFor.any(reference::isReferenceTo) }) {
+                val methodCall = parent as? PsiReferenceExpression ?: return@Processor true
+                if (methodCall.references.any { it.isReferenceTo(searchingFor) }) {
                     definitelyUsesCancel = true
-                    break
+                    return@Processor false
                 }
-            }
+
+                return@Processor true
+            })
 
             if (definitelyUsesCancel && !isCancellable) {
                 val fixes = mutableListOf<LocalQuickFix>()

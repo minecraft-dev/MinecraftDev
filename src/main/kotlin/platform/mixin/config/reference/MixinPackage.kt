@@ -32,6 +32,7 @@ import com.intellij.psi.search.PackageScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.util.ArrayUtil
 import com.intellij.util.PlatformIcons
+import com.intellij.util.Processor
 
 object MixinPackage : PackageNameReferenceProvider() {
 
@@ -49,8 +50,8 @@ object MixinPackage : PackageNameReferenceProvider() {
         val packages = HashSet<String>()
         val list = ArrayList<LookupElementBuilder>()
 
-        for (mixin in AnnotatedElementsSearch.searchPsiClasses(mixinAnnotation, element.resolveScope)) {
-            val packageName = mixin.packageName ?: continue
+        AnnotatedElementsSearch.searchPsiClasses(mixinAnnotation, element.resolveScope).forEach(Processor { mixin ->
+            val packageName = mixin.packageName ?: return@Processor true
             if (packages.add(packageName)) {
                 list.add(LookupElementBuilder.create(packageName).withIcon(PlatformIcons.PACKAGE_ICON))
             }
@@ -59,7 +60,8 @@ object MixinPackage : PackageNameReferenceProvider() {
             if (packages.add(topLevelPackage)) {
                 list.add(LookupElementBuilder.create(topLevelPackage).withIcon(PlatformIcons.PACKAGE_ICON))
             }
-        }
+            return@Processor true
+        })
 
         return list.toArray()
     }

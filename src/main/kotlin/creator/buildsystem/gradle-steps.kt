@@ -56,10 +56,11 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.plugins.gradle.service.execution.GradleExternalTaskConfigurationType
 import org.jetbrains.plugins.gradle.service.execution.GradleRunConfiguration
 import org.jetbrains.plugins.gradle.service.project.open.canLinkAndRefreshGradleProject
-import org.jetbrains.plugins.gradle.service.project.open.linkAndRefreshGradleProject
+import org.jetbrains.plugins.gradle.service.project.open.linkAndSyncGradleProject
 
 val DEFAULT_GRADLE_VERSION = SemanticVersion.release(8, 7)
 val GRADLE_VERSION_KEY = Key.create<SemanticVersion>("mcdev.gradleVersion")
@@ -216,7 +217,9 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
         invokeLater(project.disposed) {
             val path = rootDirectory.toAbsolutePath().toString()
             if (canLinkAndRefreshGradleProject(path, project, false)) {
-                linkAndRefreshGradleProject(path, project)
+                runBlocking {
+                    linkAndSyncGradleProject(project, path)
+                }
                 showProgress(project)
             }
 

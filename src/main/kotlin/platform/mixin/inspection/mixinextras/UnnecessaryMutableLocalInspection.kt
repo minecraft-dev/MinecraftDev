@@ -46,6 +46,7 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
+import com.intellij.util.Processor
 import com.siyeh.ig.psiutils.MethodCallUtils
 
 class UnnecessaryMutableLocalInspection : MixinInspection() {
@@ -97,16 +98,28 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
         for (method in OverridingMethodsSearch.search(originalMethod).findAll() + listOf(originalMethod)) {
             val param = method.parameterList.getParameter(paramIndex) ?: return
             val getMethod = paramType.findMethodsByName("get", false).firstOrNull() ?: return
-            for (ref in ReferencesSearch.search(param)) {
+
+            var exitEarly = false
+            ReferencesSearch.search(param).forEach(Processor { ref ->
                 if (isDelegationToSuper(ref.element, paramIndex)) {
-                    continue
+                    return@Processor true
                 }
-                val parent = PsiUtil.skipParenthesizedExprUp(ref.element.parent) as? PsiReferenceExpression ?: return
+                val parent = PsiUtil.skipParenthesizedExprUp(ref.element.parent) as? PsiReferenceExpression ?: run {
+                    exitEarly = true
+                    return@Processor false
+                }
                 if (parent.references.any { it.isReferenceTo(getMethod) }) {
                     hasAnyGets = true
                 } else {
-                    return
+                    exitEarly = true
+                    return@Processor false
                 }
+
+                return@Processor true
+            })
+
+            if (exitEarly) {
+                return
             }
         }
         if (!hasAnyGets) {
@@ -127,11 +140,9 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
             ?: return false
 
         // For some reason ref is sometimes the identifier rather than the reference expression. Get the reference expr
-        val actualRef = if (ref is PsiReferenceExpression) {
-            ref
-        } else {
-            PsiUtil.skipParenthesizedExprUp(ref.parent) as? PsiReferenceExpression ?: return false
-        }
+        val actualRef = ref as? PsiReferenceExpression
+            ?: PsiUtil.skipParenthesizedExprUp(ref.parent) as? PsiReferenceExpression
+            ?: return false
         val param = PsiUtil.skipParenthesizedExprUp(actualRef)
         val paramList = param.parent as? PsiExpressionList ?: return false
         val methodCall = paramList.parent as? PsiMethodCallExpression ?: return false
@@ -172,12 +183,14 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
             val innerType = param.type.unwrapLocalRef()
             val factory = PsiElementFactory.getInstance(method.project)
             param.typeElement?.replace(factory.createTypeElement(innerType))
-            for (ref in ReferencesSearch.search(param)) {
+            ReferencesSearch.search(param).forEach(Processor { ref ->
                 val refExpression = PsiUtil.skipParenthesizedExprUp(ref.element.parent) as? PsiReferenceExpression
-                    ?: continue
-                val call = refExpression.parent as? PsiMethodCallExpression ?: continue
+                    ?: return@Processor true
+                val call = refExpression.parent as? PsiMethodCallExpression ?: return@Processor true
                 call.replace(ref.element)
-            }
+
+                return@Processor true
+            })
         }
     }
 }
