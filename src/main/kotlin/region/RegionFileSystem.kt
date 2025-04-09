@@ -47,5 +47,5 @@ class RegionFileSystem : ArchiveFileSystem() {
     override fun refresh(asynchronous: Boolean) = VfsImplUtil.refresh(this, asynchronous)
     override fun refreshAndFindFileByPath(path: String) = VfsImplUtil.refreshAndFindFileByPath(this, path)
     override fun findFileByPathIfCached(path: String) = VfsImplUtil.findFileByPathIfCached(this, path)
-    override fun getHandler(entryFile: VirtualFile) = VfsImplUtil.getHandler(this, entryFile, ::RegionArchiveHandler)
+    public override fun getHandler(entryFile: VirtualFile) = VfsImplUtil.getHandler(this, entryFile, ::RegionArchiveHandler)
 }

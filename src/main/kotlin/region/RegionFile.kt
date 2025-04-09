@@ -106,11 +106,14 @@ class RegionFile(private val filePath: File) : AutoCloseable {
         private val sectorCount: Int,
     ) {
         private val firstByte get() = (sectorOffset.toLong() * SECTOR_SIZE.toLong())
-        val payloadLength: Int
-            get() {
-                file.seek(firstByte)
-                return file.readInt()
-            }
+        val payloadLength by lazy {
+            file.seek(firstByte)
+            file.readInt()
+        }
+        val payloadCompressionAlgorithm by lazy {
+            file.seek(firstByte + 4)
+            file.readByte().toInt()
+        }
 
         internal constructor(x: Int, z: Int, chunkIndexEntry: ChunkIndexEntry) : this(
             x,
@@ -131,11 +134,10 @@ class RegionFile(private val filePath: File) : AutoCloseable {
             }
 
             val chunkReader = BufferedInputStream(FileInputStream(filePath))
-            chunkReader.skip(firstByte + 4)
-            val payloadCompression = chunkReader.readNBytes(1)[0]
+            chunkReader.skip(firstByte + 5)
             val compressedPayload = LimitedInputStream(chunkReader, payloadLength - 1)
 
-            return when (payloadCompression.toInt()) {
+            return when (payloadCompressionAlgorithm) {
                 // GZip
                 1 -> GZIPInputStream(compressedPayload)
                 // ZLib

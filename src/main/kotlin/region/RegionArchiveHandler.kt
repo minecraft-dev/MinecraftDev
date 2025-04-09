@@ -66,18 +66,22 @@ class RegionArchiveHandler(path: String) : ArchiveHandler(path) {
         }
     }
 
-    override fun getInputStream(relativePath: String): InputStream {
+    fun resolveChunk(relativePath: String): RegionFile.Chunk? {
         var (x, z) = parseFileNameCoordinates(relativePath.substringAfterLast('/'))
             ?: throw FileNotFoundException("Illegal name for region file entry: $relativePath")
 
         x = x.mod(32)
         z = z.mod(32)
-        val entry = regionFile[x, z]?.read()
+        return regionFile[x, z]
+    }
 
-        if (entry == null) {
+    override fun getInputStream(relativePath: String): InputStream {
+        val stream = resolveChunk(relativePath)?.read()
+
+        if (stream == null) {
             throw FileNotFoundException("Chunk entry is not initialized")
         } else {
-            return entry
+            return stream
         }
     }
 

@@ -25,6 +25,7 @@ import com.demonwav.mcdev.nbt.editor.CompressionSelection
 import com.demonwav.mcdev.nbt.editor.NbtToolbar
 import com.demonwav.mcdev.nbt.lang.NbttFile
 import com.demonwav.mcdev.nbt.lang.NbttLanguage
+import com.demonwav.mcdev.region.RegionFileSystem
 import com.demonwav.mcdev.util.loggerForTopLevel
 import com.demonwav.mcdev.util.runReadActionAsync
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -136,6 +137,7 @@ class NbtVirtualFile(
                 val filteredStream = when (toolbar.selection) {
                     CompressionSelection.GZIP -> GZIPOutputStream(this.parent.getOutputStream(requester))
                     CompressionSelection.UNCOMPRESSED -> this.parent.getOutputStream(requester)
+                    else -> throw NotImplementedError("Region-only compression algorithms are not supported for standalone NBT files")
                 }
 
                 DataOutputStream(filteredStream).use { stream ->
@@ -149,6 +151,24 @@ class NbtVirtualFile(
                     NotificationType.INFORMATION,
                 ).notify(project)
             }
+        }
+    }
+
+    // If the NBT file is part of a region file, this will be non-null and represent the file's compression algorithm
+    val compressionInRegionFile: CompressionSelection? by lazy {
+        val compressionAlgorithm = (backingFile.fileSystem as? RegionFileSystem)
+            ?.getHandler(backingFile)
+            ?.resolveChunk(backingFile.name)
+            ?.payloadCompressionAlgorithm
+
+        when (compressionAlgorithm) {
+            null -> null
+            1 -> CompressionSelection.GZIP
+            2 -> CompressionSelection.ZLIB
+            3 -> CompressionSelection.UNCOMPRESSED
+            4 -> CompressionSelection.LZ4
+            // We shouldn't be able to open NBT files if the compression algorithm is unsupported anyway
+            else -> CompressionSelection.UNCOMPRESSED
         }
     }
 }

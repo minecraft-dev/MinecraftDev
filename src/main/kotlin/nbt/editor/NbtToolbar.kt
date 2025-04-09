@@ -24,14 +24,14 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.nbt.NbtVirtualFile
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.panel
 
 class NbtToolbar(nbtFile: NbtVirtualFile) {
 
     private var compressionSelection: CompressionSelection? =
-        if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
+        nbtFile.compressionInRegionFile
+            ?: if (nbtFile.isCompressed) CompressionSelection.GZIP else CompressionSelection.UNCOMPRESSED
 
     val selection: CompressionSelection
         get() = compressionSelection!!
@@ -41,7 +41,9 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
     init {
         panel = panel {
             row(MCDevBundle("nbt.compression.file_type.label")) {
-                comboBox(EnumComboBoxModel(CompressionSelection::class.java))
+                val isInRegionFile = nbtFile.compressionInRegionFile != null
+
+                comboBox(CompressionComboBoxModel(isInRegionFile))
                     .bindItem(::compressionSelection)
                     .enabled(nbtFile.isWritable && nbtFile.parseSuccessful)
 
