@@ -89,6 +89,10 @@ class NbtVirtualFile(
     override fun isTooLargeForIntelligence() = ThreeState.NO
 
     fun writeFile(requester: Any) {
+        if (!isWritable) {
+            throw IllegalStateException("Backing file is not writable")
+        }
+
         runReadActionAsync {
             val nbttFile = PsiManager.getInstance(project).findFile(this) as? NbttFile
 

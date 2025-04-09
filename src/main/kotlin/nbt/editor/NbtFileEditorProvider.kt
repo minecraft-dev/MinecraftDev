@@ -97,7 +97,7 @@ private class NbtFileEditor(
             AnActionListener.TOPIC,
             object : AnActionListener {
                 override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
-                    if (action !is SaveAllAction) {
+                    if (action !is SaveAllAction || !file.isWritable) {
                         return
                     }
 

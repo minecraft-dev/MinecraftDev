@@ -44,10 +44,13 @@ class NbtToolbar(nbtFile: NbtVirtualFile) {
                 comboBox(EnumComboBoxModel(CompressionSelection::class.java))
                     .bindItem(::compressionSelection)
                     .enabled(nbtFile.isWritable && nbtFile.parseSuccessful)
-                button(MCDevBundle("nbt.compression.save.button")) {
-                    panel.apply()
-                    runWriteTaskLater {
-                        nbtFile.writeFile(this)
+
+                if (nbtFile.isWritable) {
+                    button(MCDevBundle("nbt.compression.save.button")) {
+                        panel.apply()
+                        runWriteTaskLater {
+                            nbtFile.writeFile(this)
+                        }
                     }
                 }
             }
