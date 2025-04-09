@@ -339,6 +339,7 @@
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType"/>
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
+        <treeStructureProvider implementation="com.demonwav.mcdev.MinecraftTreeStructureProvider"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
 
@@ -411,6 +412,11 @@
                                         implementationClass="com.demonwav.mcdev.nbt.lang.format.NbttParameterNameHints"/>
         <lang.fileViewProviderFactory language="NBTT"
                                       implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileViewProviderFactory"/>
+
+        <!-- Region files -->
+
+        <fileType name="MCA" implementationClass="com.demonwav.mcdev.region.RegionFileType" fieldName="INSTANCE" extensions="mca"/>
+        <virtualFileSystem id="MCA" key="mcdev-region" implementationClass="com.demonwav.mcdev.region.RegionFileSystem"/>
 
         <!-- Minecraft localization files -->
         <fileType name="MCLang" language="MCLang"
