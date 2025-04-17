@@ -1,42 +1,37 @@
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.0.20"
 coroutines = "1.9.0-RC.2"
 junit = "5.10.2"
 junit-platform = "1.10.2"
 asm = "9.6"
 fuel = "2.3.1"
-licenser = "0.7.5"
+licenser = "0.6.1"
 changelog = "2.2.0"
-intellij-plugin = "2.5.0"
-intellij-plugin-repository-rest-client = "2.0.46"
-intellij-ide = "2024.3.5"
-idea-ext = "1.1.10"
-psiPlugin = "243.7768"
+intellij-plugin = "2.4.0"
+intellij-ide = "2025.1"
+idea-ext = "1.1.8"
+psiPlugin = "251.175"
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-plugin" }
 idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "idea-ext" }
-licenser = { id = "net.neoforged.licenser", version.ref = "licenser" }
+licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
-sentry = "io.sentry.jvm.gradle:5.12.2"
 
 [libraries]
-intellij-plugin-repository-rest-client = { module = "org.jetbrains.intellij:plugin-repository-rest-client", version.ref = "intellij-plugin-repository-rest-client" }
-
 kotlin-plugin = { module = "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 intellij-plugin = { module = "org.jetbrains.intellij.platform:org.jetbrains.intellij.platform.gradle.plugin", version.ref = "intellij-plugin" }
-licenser-plugin = { module = "net.neoforged.licenser:net.neoforged.licenser.gradle.plugin", version.ref = "licenser" }
+licenser-plugin = { module = "org.cadixdev.licenser:org.cadixdev.licenser.gradle.plugin", version.ref = "licenser" }
 changelog-plugin = { module = "org.jetbrains.changelog:org.jetbrains.changelog.gradle.plugin", version.ref = "changelog" }
 
 coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 mappingIo = "net.fabricmc:mapping-io:0.2.1"
-mixinExtras-expressions = "io.github.llamalad7:mixinextras-expressions:0.0.6"
-jgraphx = "com.github.vlsi.mxgraph:jgraphx:4.2.2"
+mixinExtras-expressions = "io.github.llamalad7:mixinextras-expressions:0.0.4"
 
 # GrammarKit
 jflex-lib = "org.jetbrains.idea:jflex:1.7.0-b7f882a"
@@ -44,7 +39,7 @@ jflex-skeleton = "org.jetbrains.idea:jflex:1.7.0-c1fdf11"
 grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
-gradleToolingExtension = "com.jetbrains.intellij.gradle:gradle-tooling-extension:243-EAP-SNAPSHOT"
+gradleToolingExtension = { module = "com.jetbrains.intellij.gradle:gradle-tooling-extension", version = "251.23774.435" }
 annotations = "org.jetbrains:annotations:24.0.0"
 groovy = "org.codehaus.groovy:groovy:3.0.19"
 
@@ -58,12 +53,11 @@ gson = "com.google.code.gson:gson:2.10.1"
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
 fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
 
-sentry = "io.sentry:sentry:8.22.0"
-
 # Testing
+test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
 test-mixin = "org.spongepowered:mixin:0.8.5"
 test-spigotapi = "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
-test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.3"
+test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT"
 test-spongeapi = "org.spongepowered:spongeapi:7.4.0"
 test-fabricloader = "net.fabricmc:fabric-loader:0.15.11"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"
