@@ -22,7 +22,7 @@ package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.MemberReference
-import com.demonwav.mcdev.util.anonymousClasses
+import com.demonwav.mcdev.util.anonymousElements
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.childrenOfType
 import com.demonwav.mcdev.util.findField
@@ -39,6 +39,7 @@ import com.demonwav.mcdev.util.loggerForTopLevel
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.realName
 import com.demonwav.mcdev.util.toJavaIdentifier
+import com.intellij.byteCodeViewer.ByteCodeViewerManager
 import com.intellij.codeEditor.JavaEditorFileSwapper
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.module.Module
@@ -86,7 +87,6 @@ import com.llamalad7.mixinextras.expression.impl.utils.ExpressionASMUtils
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import org.objectweb.asm.ClassReader
@@ -183,18 +183,6 @@ fun internalNameToShortName(internalName: String) = internalName.substringAfterL
 val ClassNode.shortName
     get() = internalNameToShortName(name)
 
-val Type.shortName get() = className.substringAfterLast('.').replace('$', '.')
-
-fun shortDescString(desc: String) = Type.getArgumentTypes(desc).joinToString(prefix = "(", postfix = ")") {
-    it.shortName
-}
-
-private val LOAD_CLASS_FILE_BYTES: Method? = runCatching {
-    com.intellij.byteCodeViewer.ByteCodeViewerManager::class.java
-        .getDeclaredMethod("loadClassFileBytes", PsiClass::class.java)
-        .let { it.isAccessible = true; it }
-}.getOrNull()
-
 private val INNER_CLASS_NODES_KEY = Key.create<CachedValue<ConcurrentMap<String, ClassNode?>>>("mcdev.innerClassNodes")
 
 /**
@@ -230,7 +218,7 @@ private val NODE_BY_PSI_CLASS_KEY = Key.create<CachedValue<ClassNode?>>("mcdev.n
 fun findClassNodeByPsiClass(psiClass: PsiClass, module: Module? = psiClass.findModule()): ClassNode? {
     return psiClass.lockedCached(NODE_BY_PSI_CLASS_KEY) {
         try {
-            val bytes = LOAD_CLASS_FILE_BYTES?.invoke(null, psiClass) as? ByteArray
+            val bytes = ByteCodeViewerManager.loadClassFileBytes(psiClass)
             if (bytes == null) {
                 // find compiler output
                 if (module == null) return@lockedCached null
@@ -395,7 +383,7 @@ private fun ClassNode.constructClass(project: Project, body: String): PsiClass? 
     // find innermost PsiClass
     while (true) {
         clazz = clazz.innerClasses.firstOrNull()
-            ?: clazz.anonymousClasses.lastOrNull()
+            ?: clazz.anonymousElements.lastOrNull { it !== clazz && it is PsiClass } as? PsiClass
             ?: clazz.localClasses.lastOrNull()
             ?: break
     }
@@ -788,7 +776,7 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
                         // walk inside the reference first, visits the qualifier first (it's first in the bytecode)
                         super.visitMethodReferenceExpression(expression)
 
-                        if (expression.hasSyntheticMethod(clazz.version)) {
+                        if (expression.hasSyntheticMethod) {
                             if (matcher.accept(expression)) {
                                 stopWalking()
                             }
@@ -1105,26 +1093,6 @@ fun MethodInsnNode.fakeResolve(): ClassAndMethodNode {
     addConstructorToFakeClass(clazz)
     return ClassAndMethodNode(clazz, method)
 }
-
-// AbstractInsnNode
-
-val AbstractInsnNode.nextRealInsn: AbstractInsnNode?
-    get() {
-        var insn = next
-        while (insn != null && insn.opcode < 0) {
-            insn = insn.next
-        }
-        return insn
-    }
-
-val AbstractInsnNode.previousRealInsn: AbstractInsnNode?
-    get() {
-        var insn = previous
-        while (insn != null && insn.opcode < 0) {
-            insn = insn.previous
-        }
-        return insn
-    }
 
 // Textifier
 
