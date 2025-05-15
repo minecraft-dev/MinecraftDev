@@ -34,7 +34,7 @@ import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.hasImplicitReturnStatement
 import com.intellij.analysis.AnalysisScope
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationPsiFix
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInspection.CleanupLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
@@ -313,7 +313,11 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
             val newMethod = oldMethod.replace(templateMethod) as PsiMethod
 
             // add the @Overwrite annotation
-            AddAnnotationFix(MixinConstants.Annotations.OVERWRITE, newMethod).applyFix()
+            AddAnnotationPsiFix.addPhysicalAnnotationTo(
+                MixinConstants.Annotations.OVERWRITE,
+                emptyArray(),
+                newMethod.modifierList
+            )
 
             // if the old method includes the parameters of the target method, use those
             if (!newParameterList.isEmpty) {

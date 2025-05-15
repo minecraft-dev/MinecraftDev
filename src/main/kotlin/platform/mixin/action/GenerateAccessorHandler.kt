@@ -42,7 +42,7 @@ import com.intellij.codeInsight.generation.PsiElementClassMember
 import com.intellij.codeInsight.generation.PsiFieldMember
 import com.intellij.codeInsight.generation.PsiMethodMember
 import com.intellij.codeInsight.hint.HintManager
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationPsiFix
 import com.intellij.codeInsight.intention.impl.CreateClassDialog
 import com.intellij.ide.util.ChooseElementsDialog
 import com.intellij.ide.util.EditorHelper
@@ -310,8 +310,11 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                     "@${MixinConstants.Annotations.MIXIN}(targets=\"${targetClass.fullQualifiedName}\")"
                 }
                 val annotation = factory.createAnnotationFromText(annotationText, clazz)
-                AddAnnotationFix(MixinConstants.Annotations.MIXIN, clazz, annotation.parameterList.attributes)
-                    .applyFix()
+                AddAnnotationPsiFix.addPhysicalAnnotationTo(
+                    MixinConstants.Annotations.MIXIN,
+                    annotation.parameterList.attributes,
+                    clazz.modifierList
+                )
 
                 val module = clazz.findModule() ?: return@compute null
                 val configToWrite = MixinModule.getBestWritableConfigForMixinClass(
@@ -427,7 +430,11 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
             )
             target.typeElement?.let { method.parameterList.parameters[0].typeElement?.replace(it) }
             if (target.modifierList?.hasExplicitModifier(PsiModifier.FINAL) == true) {
-                AddAnnotationFix(MixinConstants.Annotations.MUTABLE, method).applyFix()
+                AddAnnotationPsiFix.addPhysicalAnnotationTo(
+                    MixinConstants.Annotations.MUTABLE,
+                    emptyArray(),
+                    method.modifierList
+                )
             }
             accessors.add(method)
         }

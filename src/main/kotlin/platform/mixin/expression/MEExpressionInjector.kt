@@ -23,8 +23,6 @@ package com.demonwav.mcdev.platform.mixin.expression
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findContainingNameValuePair
-import com.demonwav.mcdev.util.parseArray
-import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
 import com.intellij.openapi.util.Key
@@ -45,7 +43,6 @@ import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.SmartList
-import org.intellij.plugins.intelliLang.inject.InjectorUtils
 
 class MEExpressionInjector : MultiHostInjector {
     companion object {
@@ -118,28 +115,29 @@ class MEExpressionInjector : MultiHostInjector {
                     }
                 }
             } else if (annotation.hasQualifiedName(MixinConstants.MixinExtras.EXPRESSION)) {
-                for (valueExpr in annotation.findDeclaredAttributeValue("value")?.parseArray { it }.orEmpty()) {
-                    val places = mutableListOf<Pair<PsiLanguageInjectionHost, TextRange>>()
-                    iterateConcatenation(valueExpr) { op ->
-                        if (op is PsiLanguageInjectionHost) {
-                            for (textRange in getTextRanges(op)) {
-                                places += op to textRange
-                            }
-                        } else {
-                            isFrankenstein = true
+                val valueExpr = annotation.findDeclaredAttributeValue("value") ?: continue
+                val places = mutableListOf<Pair<PsiLanguageInjectionHost, TextRange>>()
+                iterateConcatenation(valueExpr) { op ->
+                    if (op is PsiLanguageInjectionHost) {
+                        for (textRange in getTextRanges(op)) {
+                            places += op to textRange
                         }
+                    } else {
+                        isFrankenstein = true
                     }
-                    if (places.isNotEmpty()) {
-                        for ((i, place) in places.withIndex()) {
-                            val (host, range) = place
-                            val prefix = "\ndo { ".takeIf { i == 0 }
-                            val suffix = " }".takeIf { i == places.size - 1 }
-                            registrar.addPlace(prefix, suffix, host, range)
-                        }
+                }
+                if (places.isNotEmpty()) {
+                    for ((i, place) in places.withIndex()) {
+                        val (host, range) = place
+                        val prefix = "\ndo { ".takeIf { i == 0 }
+                        val suffix = " }".takeIf { i == places.size - 1 }
+                        registrar.addPlace(prefix, suffix, host, range)
                     }
                 }
             }
         }
+
+        registrar.frankensteinInjection(isFrankenstein)
 
         registrar.doneInjecting()
 
@@ -147,15 +145,6 @@ class MEExpressionInjector : MultiHostInjector {
             ME_EXPRESSION_INJECTION,
             MEExpressionInjection(modCount, METHOD_GET_INJECTED_RESULT.invoke(registrar))
         )
-
-        if (isFrankenstein) {
-            InjectorUtils.putInjectedFileUserData(
-                context,
-                MEExpressionLanguage,
-                InjectedLanguageManager.FRANKENSTEIN_INJECTION,
-                true
-            )
-        }
     }
 
     private fun iterateConcatenation(element: PsiElement, consumer: (PsiElement) -> Unit) {

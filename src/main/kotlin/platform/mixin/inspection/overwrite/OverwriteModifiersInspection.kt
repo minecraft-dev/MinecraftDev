@@ -30,8 +30,9 @@ import com.demonwav.mcdev.platform.mixin.util.internalNameToShortName
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findKeyword
 import com.demonwav.mcdev.util.isAccessModifier
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInsight.intention.QuickFixFactory
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
@@ -114,7 +115,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                         nameIdentifier,
                         "Missing @${internalNameToShortName(internalName)} annotation",
                         ProblemHighlightType.WARNING,
-                        AddAnnotationFix(qualifiedName, method, targetAnnPsi.parameterList.attributes),
+                        LocalQuickFix.from(AddAnnotationModCommandAction(qualifiedName, method, targetAnnPsi.parameterList.attributes))!!,
                     )
                 } else {
                     holder.registerProblem(

@@ -24,7 +24,8 @@ import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MUTABLE
 import com.demonwav.mcdev.util.findContainingClass
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClass
@@ -61,7 +62,7 @@ class ShadowFinalInspection : MixinInspection() {
                     holder.registerProblem(
                         expression,
                         "@Final fields cannot be modified",
-                        AddAnnotationFix(MUTABLE, field),
+                        LocalQuickFix.from(AddAnnotationModCommandAction(MUTABLE, field))!!,
                     )
                 }
             }

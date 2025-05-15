@@ -29,8 +29,9 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
 import com.demonwav.mcdev.util.findKeyword
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInsight.intention.QuickFixFactory
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RemoveAnnotationQuickFix
@@ -118,7 +119,7 @@ class ShadowModifiersInspection : MixinInspection() {
                     holder.registerProblem(
                         annotation,
                         "@Shadow for final member should be annotated as @Final",
-                        AddAnnotationFix(FINAL, member),
+                        LocalQuickFix.from(AddAnnotationModCommandAction(FINAL, member))!!,
                     )
                 } else {
                     holder.registerProblem(

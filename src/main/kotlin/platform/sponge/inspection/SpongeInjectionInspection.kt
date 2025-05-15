@@ -29,7 +29,7 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.mapFirstNotNull
-import com.intellij.codeInsight.intention.AddAnnotationFix
+import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool
 import com.intellij.codeInspection.InspectionManager
@@ -165,7 +165,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     variable.nameIdentifier ?: variable,
                     "Injected Assets must be annotated with @AssetId.",
                     ProblemHighlightType.GENERIC_ERROR,
-                    AddAnnotationFix(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner),
+                    LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner))!!,
                 )
             } else {
                 variable.findModule()?.let { module ->
@@ -239,8 +239,8 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             variable.nameIdentifier ?: variable,
                             "An injected ${classType.name} must be annotated with either @ConfigDir or @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            AddAnnotationFix(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner),
-                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner),
+                            LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner))!!,
+                            LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner))!!,
                         )
                     }
                 }
@@ -252,7 +252,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             variable.nameIdentifier ?: variable,
                             "Injected ${classType.name} must be annotated with @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            AddAnnotationFix(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner),
+                            LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner))!!,
                         )
                     }
 
