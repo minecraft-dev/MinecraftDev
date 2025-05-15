@@ -107,6 +107,7 @@ val libs = the<LibrariesForLibs>()
 dependencies {
     compileOnly(libs.kotlin.stdlib)
     compileOnly(libs.kotlin.reflect)
+    compileOnly(libs.annotations)
     implementation(libs.bundles.coroutines) {
         exclude(module = "kotlinx-coroutines-core-jvm")
         exclude(group = "org.jetbrains.kotlin")
