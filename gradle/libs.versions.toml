@@ -1,15 +1,16 @@
 [versions]
-kotlin = "2.0.20"
-coroutines = "1.9.0-RC.2"
+kotlin = "2.1.21"
+coroutines = "1.10.2"
 junit = "5.10.2"
 junit-platform = "1.10.2"
 asm = "9.6"
 fuel = "2.3.1"
 licenser = "0.6.1"
 changelog = "2.2.0"
-intellij-plugin = "2.4.0"
-intellij-ide = "2025.1"
-idea-ext = "1.1.8"
+intellij-plugin = "2.6.0"
+intellij-plugin-repository-rest-client = "2.0.46"
+intellij-ide = "252.13776.59-EAP-SNAPSHOT"
+idea-ext = "1.1.10"
 psiPlugin = "251.175"
 
 [plugins]
@@ -20,6 +21,8 @@ licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
 
 [libraries]
+intellij-plugin-repository-rest-client = { module = "org.jetbrains.intellij:plugin-repository-rest-client", version.ref = "intellij-plugin-repository-rest-client" }
+
 kotlin-plugin = { module = "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -39,7 +42,7 @@ jflex-skeleton = "org.jetbrains.idea:jflex:1.7.0-c1fdf11"
 grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 
 # Gradle Tooling
-gradleToolingExtension = { module = "com.jetbrains.intellij.gradle:gradle-tooling-extension", version = "251.23774.435" }
+gradleToolingExtension = { module = "com.jetbrains.intellij.gradle:gradle-tooling-extension", version = "252.13776.59-EAP-SNAPSHOT" }
 annotations = "org.jetbrains:annotations:24.0.0"
 groovy = "org.codehaus.groovy:groovy:3.0.19"
 
@@ -57,7 +60,7 @@ fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", versio
 test-mockJdk = "org.jetbrains.idea:mock-jdk:1.7-4d76c50"
 test-mixin = "org.spongepowered:mixin:0.8.5"
 test-spigotapi = "org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT"
-test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT"
+test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.3-SNAPSHOT"
 test-spongeapi = "org.spongepowered:spongeapi:7.4.0"
 test-fabricloader = "net.fabricmc:fabric-loader:0.15.11"
 test-nbt = "com.demonwav.mcdev:all-types-nbt:1.0"

@@ -105,10 +105,11 @@ repositories {
 
 val libs = the<LibrariesForLibs>()
 dependencies {
-    implementation(libs.kotlin.stdlib)
-    implementation(libs.kotlin.reflect)
+    compileOnly(libs.kotlin.stdlib)
+    compileOnly(libs.kotlin.reflect)
     implementation(libs.bundles.coroutines) {
         exclude(module = "kotlinx-coroutines-core-jvm")
+        exclude(group = "org.jetbrains.kotlin")
     }
 
     testImplementation(libs.junit.api)

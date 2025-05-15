@@ -18,8 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import io.sentry.android.gradle.extensions.SentryPluginExtension
-import org.gradle.kotlin.dsl.configure
+import org.gradle.internal.jvm.Jvm
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
@@ -33,7 +32,6 @@ plugins {
     `mcdev-core`
     `mcdev-parsing`
     `mcdev-publishing`
-    alias(libs.plugins.sentry) apply (System.getenv("CI") == "true" && System.getenv("NO_SENTRY") != "true")
 }
 
 val coreVersion: String by project
@@ -45,32 +43,32 @@ val testLibs: Configuration by configurations.creating {
 
 group = "com.demonwav.mcdev"
 
-val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension", Action<SourceSet> {
+val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooling-extension") {
     configurations.named(compileOnlyConfigurationName) {
         extendsFrom(gradleToolingExtension)
     }
-})
+}
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
     from(gradleToolingExtensionSourceSet.output)
     archiveClassifier.set("gradle-tooling-extension")
     exclude("META-INF/plugin.xml")
 }
 
-val templatesSourceSet: SourceSet = sourceSets.create("templates", Action<SourceSet> {
+val templatesSourceSet: SourceSet = sourceSets.create("templates") {
     resources {
         srcDir("templates")
         compileClasspath += sourceSets.main.get().output
     }
-})
+}
 
 val templateSourceSets: List<SourceSet> = (file("templates").listFiles() ?: emptyArray()).mapNotNull { file ->
     if (file.isDirectory() && (file.listFiles() ?: emptyArray()).any { it.name.endsWith(".mcdev.template.json") }) {
-        sourceSets.create("templates-${file.name}", Action<SourceSet> {
+        sourceSets.create("templates-${file.name}") {
             resources {
                 srcDir(file)
                 compileClasspath += sourceSets.main.get().output
             }
-        })
+        }
     } else {
         null
     }
@@ -83,20 +81,22 @@ val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
 }
 
 dependencies {
+    // Add tools.jar for the JDI API
+    implementation(files(Jvm.current().toolsJar))
+
     implementation(files(gradleToolingExtensionJar))
 
     implementation(libs.mixinExtras.expressions) {
         exclude(group = "org.ow2.asm", module = "asm-debug-all")
     }
     testLibs(libs.mixinExtras.common)
-    implementation(libs.jgraphx)
 
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
-    implementation(libs.bundles.fuel)
-    implementation(libs.sentry) {
-        exclude(group = "org.slf4j")
+    implementation(libs.bundles.fuel) {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlinx")
     }
 
     intellijPlatform {
@@ -111,7 +111,7 @@ dependencies {
         bundledPlugin("org.intellij.intelliLang")
         bundledPlugin("com.intellij.properties")
         bundledPlugin("Git4Idea")
-        bundledPlugin("com.intellij.modules.json")
+        bundledPlugin("com.intellij.json")
 
         // Optional dependencies
         bundledPlugin("org.jetbrains.kotlin")
@@ -126,6 +126,7 @@ dependencies {
         pluginVerifier()
     }
 
+    testLibs(libs.test.mockJdk)
     testLibs(libs.test.mixin)
     testLibs(libs.test.spigotapi)
     testLibs(libs.test.bungeecord)
@@ -170,20 +171,28 @@ tasks.patchPluginXml {
     changeNotes = changelog.render(Changelog.OutputType.HTML)
 }
 
-// Compile classes to be loaded into the Gradle VM to Java 8
+// Compile classes to be loaded into the Gradle VM to Java 5 to match Groovy
 // This is for maximum compatibility, these classes will be loaded into every Gradle import on all
 // projects (not just Minecraft), so we don't want to break that with an incompatible class version.
 tasks.named(gradleToolingExtensionSourceSet.compileJavaTaskName, JavaCompile::class) {
-    options.release = 8
+    val java7Compiler = javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(11)) }
+    javaCompiler.set(java7Compiler)
+    options.release.set(6)
+    options.bootstrapClasspath = files(java7Compiler.map { it.metadata.installationPath.file("jre/lib/rt.jar") })
     options.compilerArgs = listOf("-Xlint:-options")
 }
 tasks.withType<GroovyCompile>().configureEach {
     options.compilerArgs = listOf("-proc:none")
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "1.5"
+    targetCompatibility = "1.5"
 }
 
 tasks.processResources {
+    for (lang in arrayOf("", "_en")) {
+        from("src/main/resources/messages.MinecraftDevelopment_en_US.properties") {
+            rename { "messages.MinecraftDevelopment$lang.properties" }
+        }
+    }
     // These templates aren't allowed to be in a directory structure in the output jar
     // But we have a lot of templates that would get real hard to deal with if we didn't have some structure
     // So this just flattens out the fileTemplates/j2ee directory in the jar, while still letting us have directories
@@ -217,7 +226,6 @@ idea {
 license {
     val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
     exclude("META-INF/plugin.xml") // https://youtrack.jetbrains.com/issue/IDEA-345026
-    exclude("sentry-debug-meta.properties", "sentry-external-modules.txt")
     include(endings.map { "**/*.$it" })
 
     val projectDir = layout.projectDirectory.asFile
@@ -264,8 +272,8 @@ license {
 val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
 val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/mcp/at/gen")
 
-val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/mcp/ct/gen")
-val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/mcp/ct/gen")
+val generateAwLexer by lexer("AwLexer", "com/demonwav/mcdev/platform/mcp/aw/gen")
+val generateAwParser by parser("AwParser", "com/demonwav/mcdev/platform/mcp/aw/gen")
 
 val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
 val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
@@ -288,8 +296,8 @@ val generate by tasks.registering {
     dependsOn(
         generateAtLexer,
         generateAtParser,
-        generateCtLexer,
-        generateCtParser,
+        generateAwLexer,
+        generateAwParser,
         generateNbttLexer,
         generateNbttParser,
         generateLangLexer,
@@ -333,30 +341,4 @@ tasks.runIde {
     // Set these properties to test different languages
     // systemProperty("user.language", "fr")
     // systemProperty("user.country", "FR")
-}
-
-if (System.getenv("CI") == "true" && System.getenv("NO_SENTRY") != "true") {
-    configure<SentryPluginExtension> {
-        includeSourceContext = true
-        includeDependenciesReport = true
-        autoInstallation {
-            enabled = false
-        }
-
-        url = "https://sentry.mcdev.io/"
-        org = "mcdev"
-        projectName = "mcdev"
-        authToken = providers.gradleProperty("mcdev.sentry.token")
-    }
-
-    // Wire together some tasks to make Gradle happy
-    tasks.named("generateSentryBundleIdJava") {
-        dependsOn(generate)
-    }
-    tasks.named("sentryCollectSourcesJava") {
-        dependsOn(generate)
-    }
-    tasks.checkLicenseMain {
-        dependsOn(tasks.named("generateSentryDebugMetaPropertiesjava"), tasks.named("collectExternalDependenciesForSentry"))
-    }
 }
