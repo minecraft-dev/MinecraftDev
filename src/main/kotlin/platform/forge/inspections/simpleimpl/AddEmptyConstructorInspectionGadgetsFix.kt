@@ -21,14 +21,14 @@
 package com.demonwav.mcdev.platform.forge.inspections.simpleimpl
 
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
-import com.siyeh.ig.InspectionGadgetsFix
 
-object AddEmptyConstructorInspectionGadgetsFix : InspectionGadgetsFix() {
+object AddEmptyConstructorInspectionGadgetsFix : LocalQuickFix {
 
-    override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val clazz = descriptor.psiElement.findContainingClass() ?: return
         clazz.addBefore(JavaPsiFacade.getElementFactory(project).createConstructor(), clazz.methods[0])
     }

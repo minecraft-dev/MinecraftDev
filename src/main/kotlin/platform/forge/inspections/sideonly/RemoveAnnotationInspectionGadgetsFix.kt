@@ -21,19 +21,19 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.util.findAnnotation
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.util.findParentOfType
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class RemoveAnnotationInspectionGadgetsFix(
     private val annotationName: String,
     private val name: String
-) : InspectionGadgetsFix() {
+) : LocalQuickFix {
 
-    override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+    override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val decl = descriptor.psiElement.findParentOfType<PsiModifierListOwner>() ?: return
         decl.findAnnotation(annotationName)?.delete()
     }

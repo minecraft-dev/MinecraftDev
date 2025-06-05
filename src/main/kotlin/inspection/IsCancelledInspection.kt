@@ -23,11 +23,11 @@ package com.demonwav.mcdev.inspection
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.mapFirstNotNull
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiMethodCallExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class IsCancelledInspection : BaseInspection() {
@@ -41,7 +41,7 @@ class IsCancelledInspection : BaseInspection() {
         return useless.errorString
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val useless = infos[0] as? IsCancelled
         return useless?.buildFix
     }

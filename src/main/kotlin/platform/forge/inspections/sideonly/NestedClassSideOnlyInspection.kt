@@ -20,11 +20,11 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class NestedClassSideOnlyInspection : BaseInspection() {
@@ -42,7 +42,7 @@ class NestedClassSideOnlyInspection : BaseInspection() {
             "brings everything with it, @SideOnly annotated nested classes are usually useless."
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[0] as PsiAnnotation
 
         return if (annotation.isWritable) {

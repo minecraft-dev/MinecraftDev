@@ -20,12 +20,12 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class FieldDeclarationSideOnlyInspection : BaseInspection() {
@@ -45,7 +45,7 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
             "everything with it, @SideOnly annotated fields are usually useless"
     }
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable) {

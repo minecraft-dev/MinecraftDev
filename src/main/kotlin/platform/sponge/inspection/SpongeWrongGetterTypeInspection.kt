@@ -43,7 +43,6 @@ import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiSubstitutor
 import com.intellij.psi.PsiType
 import com.intellij.psi.util.TypeConversionUtil
-import com.siyeh.ig.InspectionGadgetsFix
 import java.util.function.Supplier
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.getContainingUClass
@@ -148,17 +147,17 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
         val elementFactory = JavaPsiFacade.getElementFactory(project)
 
         val expectedClassType = expectedType as? PsiClassType
-            ?: return InspectionGadgetsFix.EMPTY_ARRAY
+            ?: return LocalQuickFix.EMPTY_ARRAY
         val fixedClassType = if (isOptional(expectedClassType)) {
             val wrappedType = expectedClassType.parameters.first()
             val resolveResult = (wrappedType as? PsiClassType)?.resolveGenerics()
-                ?: return InspectionGadgetsFix.EMPTY_ARRAY
+                ?: return LocalQuickFix.EMPTY_ARRAY
             val element = resolveResult.element
-                ?: return InspectionGadgetsFix.EMPTY_ARRAY
+                ?: return LocalQuickFix.EMPTY_ARRAY
             elementFactory.createType(element, resolveResult.substitutor)
         } else {
             val resolvedClass = expectedClassType.resolve()
-                ?: return InspectionGadgetsFix.EMPTY_ARRAY
+                ?: return LocalQuickFix.EMPTY_ARRAY
             elementFactory.createType(resolvedClass)
         }
 

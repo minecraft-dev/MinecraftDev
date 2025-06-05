@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
@@ -29,7 +30,6 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class MethodCallSideOnlyInspection : BaseInspection() {
@@ -47,7 +47,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         "Methods which are declared with a @SideOnly annotation can only be " +
             "used in matching @SideOnly classes and methods."
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable) {

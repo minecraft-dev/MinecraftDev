@@ -21,12 +21,12 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiNewExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class NewExpressionSideOnlyInspection : BaseInspection() {
@@ -44,7 +44,7 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
             "use @SideOnly annotated classes either."
     }
 
-    override fun buildFix(vararg infos: Any?): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any?): LocalQuickFix? {
         val annotation = infos[0] as? PsiAnnotation ?: return null
 
         return if (annotation.isWritable) {

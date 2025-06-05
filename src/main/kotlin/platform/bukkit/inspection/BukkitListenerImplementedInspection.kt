@@ -23,13 +23,13 @@ package com.demonwav.mcdev.platform.bukkit.inspection
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class BukkitListenerImplementedInspection : BaseInspection() {
@@ -44,10 +44,10 @@ class BukkitListenerImplementedInspection : BaseInspection() {
     override fun getStaticDescription() =
         "All Bukkit @EventHandler methods must reside in a class that implements Listener."
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
+    override fun buildFix(vararg infos: Any): LocalQuickFix {
         val classPointer = (infos[0] as PsiClass).createSmartPointer()
-        return object : InspectionGadgetsFix() {
-            override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+        return object : LocalQuickFix {
+            override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
                 classPointer.element?.addImplements(BukkitConstants.LISTENER_CLASS)
             }
 

@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mcp.mappings.getMappedField
 import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethod
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -38,7 +39,6 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class StackEmptyInspection : BaseInspection() {
@@ -59,13 +59,13 @@ class StackEmptyInspection : BaseInspection() {
             "When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but" +
             " the stack should still be considered empty. Instead, isEmpty() should be called."
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix {
+    override fun buildFix(vararg infos: Any): LocalQuickFix {
         val compareExpressionPointer = (infos[0] as PsiExpression).createSmartPointer()
         val binaryExpressionPointer = (infos[2] as PsiBinaryExpression).createSmartPointer()
-        return object : InspectionGadgetsFix() {
+        return object : LocalQuickFix {
             override fun getFamilyName() = "Replace with .isEmpty()"
 
-            override fun doFix(project: Project, descriptor: ProblemDescriptor) {
+            override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
                 val elementFactory = JavaPsiFacade.getElementFactory(project)
 
                 val compareExpression = compareExpressionPointer.element ?: return

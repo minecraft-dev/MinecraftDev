@@ -21,12 +21,12 @@
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiLocalVariable
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import com.siyeh.ig.InspectionGadgetsFix
 import org.jetbrains.annotations.Nls
 
 class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
@@ -43,7 +43,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
         "A variable whose class declaration is annotated with @SideOnly for one side cannot be declared in a class" +
             " or method that does not match the same side."
 
-    override fun buildFix(vararg infos: Any): InspectionGadgetsFix? {
+    override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[3] as PsiAnnotation
 
         return if (annotation.isWritable) {
