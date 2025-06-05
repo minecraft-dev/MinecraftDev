@@ -26,7 +26,7 @@
     <depends optional="true" config-file="mcdev-kotlin.xml">org.jetbrains.kotlin</depends>
     <depends>org.intellij.groovy</depends>
     <depends>com.intellij.properties</depends>
-    <depends>com.intellij.json</depends>
+    <depends>com.intellij.modules.json</depends>
     <depends>ByteCodeViewer</depends>
     <depends optional="true" config-file="mcdev-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="mcdev-yaml.xml">org.jetbrains.plugins.yaml</depends>
