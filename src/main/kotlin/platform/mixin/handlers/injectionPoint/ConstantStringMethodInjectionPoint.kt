@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
@@ -159,6 +160,10 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         private val ldc: String?,
     ) : NavigationVisitor() {
         private fun isConstantStringMethodCall(expression: PsiMethodCallExpression): Boolean {
+            if (DesugarUtil.isIndy(expression)) {
+                return false
+            }
+
             // Must return void
             if (expression.type != PsiTypes.voidType()) {
                 return false
@@ -182,6 +187,8 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         }
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+            super.visitMethodCallExpression(expression)
+
             if (isConstantStringMethodCall(expression)) {
                 expression.resolveMethod()?.let { method ->
                     val matches = selector.matchMethod(
@@ -193,8 +200,6 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
                     }
                 }
             }
-
-            super.visitMethodCallExpression(expression)
         }
     }
 

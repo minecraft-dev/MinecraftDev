@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.MemberReference
 import com.intellij.openapi.editor.Editor
@@ -133,6 +134,12 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
         }
 
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
+            super.visitMethodCallExpression(expression)
+
+            if (DesugarUtil.isIndy(expression)) {
+                return
+            }
+
             val method = expression.resolveMethod()
             if (method != null) {
                 val containingClass = method.containingClass
@@ -150,8 +157,6 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
 
                 visitMethodUsage(method, qualifier, expression)
             }
-
-            super.visitMethodCallExpression(expression)
         }
     }
 

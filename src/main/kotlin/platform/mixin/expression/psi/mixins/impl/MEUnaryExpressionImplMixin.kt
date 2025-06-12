@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEUnaryExpressionMixin
 import com.intellij.lang.ASTNode
 import com.intellij.psi.JavaTokenType
@@ -56,7 +57,8 @@ abstract class MEUnaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node
             return false
         }
 
-        return expression?.matchesJava(javaOperand, context) == true
+        val expression = this.expression ?: return false
+        return javaOperand.matchesFlow(expression, context)
     }
 
     override fun getInputExprs() = listOfNotNull(expression)

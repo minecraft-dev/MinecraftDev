@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEParenthesizedExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEPsiUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MECastExpressionMixin
@@ -32,7 +33,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInstanceOfExpression
 import com.intellij.psi.PsiTypeCastExpression
 import com.intellij.psi.PsiTypeTestPattern
-import com.intellij.psi.util.PsiUtil
 
 abstract class MECastExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MECastExpressionMixin {
     override val castType get() = castTypeExpr?.let(METypeUtil::convertExpressionToType)
@@ -41,12 +41,12 @@ abstract class MECastExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node)
     override val castedExpr get() = expressionList.lastOrNull()
 
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
+        val castedExpr = this.castedExpr ?: return false
         return when (java) {
             is PsiTypeCastExpression -> {
                 val javaType = java.castType?.type ?: return false
-                val javaOperand = PsiUtil.skipParenthesizedExprDown(java.operand) ?: return false
                 castType?.matchesJava(javaType, context) == true &&
-                    castedExpr?.matchesJava(javaOperand, context) == true
+                    java.operand?.matchesFlow(castedExpr, context) == true
             }
             is PsiInstanceOfExpression -> {
                 val pattern = java.pattern as? PsiTypeTestPattern

@@ -25,18 +25,23 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArguments
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
 import com.intellij.lang.ASTNode
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiModifier
-import com.intellij.psi.util.PsiUtil
 import com.siyeh.ig.psiutils.MethodCallUtils
 
 abstract class MEMethodCallExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         if (java !is PsiMethodCallExpression) {
+            return false
+        }
+
+        if (DesugarUtil.isIndy(java)) {
             return false
         }
 
@@ -58,10 +63,10 @@ abstract class MEMethodCallExpressionImplMixin(node: ASTNode) : MEExpressionImpl
             }
         }
 
-        val javaReceiver = PsiUtil.skipParenthesizedExprDown(java.methodExpression.qualifierExpression)
+        val javaReceiver = java.methodExpression.qualifierExpression
             ?: JavaPsiFacade.getElementFactory(context.project).createExpressionFromText("this", null)
         context.fakeElementScope(java.methodExpression.qualifierExpression == null, java.methodExpression) {
-            if (!receiverExpr.matchesJava(javaReceiver, context)) {
+            if (!javaReceiver.matchesFlow(receiverExpr, context)) {
                 return false
             }
         }

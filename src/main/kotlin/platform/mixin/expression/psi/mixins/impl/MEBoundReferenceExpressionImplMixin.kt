@@ -23,25 +23,31 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
-import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
+import com.demonwav.mcdev.platform.mixin.expression.lmfType
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiMethodReferenceExpression
-import com.intellij.psi.util.PsiUtil
+import com.intellij.psi.PsiMethodCallExpression
+import com.llamalad7.mixinextras.expression.impl.flow.postprocessing.LMFInfo
+import org.objectweb.asm.Handle
 
 abstract class MEBoundReferenceExpressionImplMixin(node: ASTNode) : MEExpressionImplMixin(node), MEExpression {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        if (java !is PsiMethodReferenceExpression) {
+        if (java !is PsiMethodCallExpression) {
             return false
         }
 
-        if (java.isConstructor) {
+        val indyData = DesugarUtil.getIndyData(java) ?: return false
+        if (indyData.bsm.owner != "java/lang/invoke/LambdaMetafactory") {
+            return false
+        }
+        if (indyData.lmfType(java) != LMFInfo.Type.BOUND_METHOD) {
             return false
         }
 
-        val qualifier = PsiUtil.skipParenthesizedExprDown(java.qualifierExpression) ?: return false
-        if (!receiverExpr.matchesJava(qualifier, context)) {
+        val javaReceiver = java.argumentList.expressions.firstOrNull() ?: return false
+        if (!javaReceiver.matchesFlow(receiverExpr, context)) {
             return false
         }
 
@@ -50,10 +56,9 @@ abstract class MEBoundReferenceExpressionImplMixin(node: ASTNode) : MEExpression
             return true
         }
 
-        val method = java.resolve() as? PsiMethod ?: return false
-        val qualifierClass = QualifiedMember.resolveQualifier(java) ?: method.containingClass ?: return false
+        val implMethod = indyData.bsmArgs.getOrNull(1) as? Handle ?: return false
         return context.getMethods(memberName.text).any { reference ->
-            reference.matchMethod(method, qualifierClass)
+            reference.matchMethod(implMethod.owner, implMethod.name, implMethod.desc)
         }
     }
 

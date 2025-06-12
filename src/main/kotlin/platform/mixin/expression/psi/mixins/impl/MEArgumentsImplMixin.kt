@@ -22,11 +22,11 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEArgumentsMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiExpression
-import com.intellij.psi.util.PsiUtil
 
 abstract class MEArgumentsImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), MEArgumentsMixin {
     override fun matchesJava(java: Array<PsiExpression>, context: MESourceMatchContext): Boolean {
@@ -35,8 +35,7 @@ abstract class MEArgumentsImplMixin(node: ASTNode) : ASTWrapperPsiElement(node),
             return false
         }
         return exprs.asSequence().zip(java.asSequence()).all { (expr, javaExpr) ->
-            val actualJavaExpr = PsiUtil.skipParenthesizedExprDown(javaExpr) ?: return@all false
-            expr.matchesJava(actualJavaExpr, context)
+            javaExpr.matchesFlow(expr, context)
         }
     }
 

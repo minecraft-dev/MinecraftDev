@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.psi.METypeUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEBinaryExpressionMixin
 import com.intellij.lang.ASTNode
@@ -33,7 +34,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiInstanceOfExpression
 import com.intellij.psi.PsiTypeTestPattern
 import com.intellij.psi.tree.TokenSet
-import com.intellij.psi.util.PsiUtil
 
 abstract class MEBinaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MEBinaryExpressionMixin {
     override val operator get() = node.findChildByType(operatorTokens)!!.elementType
@@ -83,9 +83,9 @@ abstract class MEBinaryExpressionImplMixin(node: ASTNode) : MEExpressionImpl(nod
                 return false
             }
 
-            val javaLeft = PsiUtil.skipParenthesizedExprDown(java.lOperand) ?: return false
-            val javaRight = PsiUtil.skipParenthesizedExprDown(java.rOperand) ?: return false
-            return leftExpr.matchesJava(javaLeft, context) && rightExpr?.matchesJava(javaRight, context) == true
+            val rightExpr = this.rightExpr ?: return false
+            return java.lOperand.matchesFlow(leftExpr, context) &&
+                java.rOperand?.matchesFlow(rightExpr, context) == true
         }
     }
 

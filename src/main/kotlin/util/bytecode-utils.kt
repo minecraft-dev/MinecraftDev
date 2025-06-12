@@ -25,12 +25,16 @@ import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassType
-import com.intellij.psi.PsiField
+import com.intellij.psi.PsiDisjunctionType
+import com.intellij.psi.PsiIntersectionType
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypeParameter
 import com.intellij.psi.PsiTypes
+import com.intellij.psi.PsiVariable
+import com.intellij.psi.PsiWildcardType
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.TypeConversionUtil
 import org.jetbrains.plugins.groovy.lang.resolve.processors.inference.type
@@ -91,8 +95,89 @@ private fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
         is PsiPrimitiveType -> builder.append(internalName)
         is PsiArrayType -> componentType.appendDescriptor(builder.append('['))
         is PsiClassType -> appendInternalName(builder.append('L')).append(';')
+        is PsiWildcardType -> extendsBound.appendDescriptor(builder)
+        is PsiIntersectionType -> conjuncts.first().appendDescriptor(builder)
+        is PsiDisjunctionType -> leastUpperBound.appendDescriptor(builder)
         else -> throw IllegalArgumentException("Unsupported PsiType: $this")
     }
+}
+
+val PsiType.signature
+    get() = appendSignature(StringBuilder()).toString()
+
+private fun PsiType.appendSignature(builder: StringBuilder): StringBuilder {
+    return when (this) {
+        is PsiPrimitiveType -> builder.append(internalName)
+        is PsiArrayType -> componentType.appendSignature(builder.append('['))
+        is PsiClassType -> {
+            val resolveResult = resolveGenerics()
+            val resolved = resolveResult.element ?: return builder
+            val substitutions = resolveResult.substitutor.substitutionMap
+            if (resolved is PsiTypeParameter) {
+                builder.append('T').append(resolved.name).append(';')
+            } else {
+                builder.append('L')
+                val classes = generateSequence(resolved) { it.containingClass }.toList()
+                var firstClass = true
+                var hadGenerics = false
+                for (clazz in classes.asReversed()) {
+                    if (firstClass) {
+                        clazz.appendInternalName(builder)
+                        firstClass = false
+                    } else {
+                        if (hadGenerics) {
+                            builder.append('.')
+                        } else {
+                            builder.append('$')
+                        }
+                        builder.append(clazz.name)
+                    }
+
+                    val typeArgs = clazz.typeParameterList?.typeParameters?.map(substitutions::get)
+                        ?: emptyList()
+                    if (typeArgs.isNotEmpty() && typeArgs.all { it != null }) {
+                        hadGenerics = true
+                        builder.append('<')
+                        for (typeArg in typeArgs) {
+                            typeArg!!.appendSignature(builder)
+                        }
+                        builder.append('>')
+                    }
+                }
+                builder.append(';')
+            }
+        }
+        is PsiIntersectionType -> conjuncts.first().appendSignature(builder)
+        is PsiDisjunctionType -> leastUpperBound.appendSignature(builder)
+        is PsiWildcardType -> when {
+            isExtends -> extendsBound.appendSignature(builder.append('+'))
+            isSuper -> superBound.appendSignature(builder.append('-'))
+            else -> builder.append('*')
+        }
+        else -> throw IllegalArgumentException("Unsupported PsiType: $this")
+    }
+}
+
+private fun PsiTypeParameter.appendSignature(builder: StringBuilder): StringBuilder {
+    builder.append(name)
+
+    val extendsList = this.extendsList.referencedTypes
+    if (extendsList.isEmpty()) {
+        return builder.append(":Ljava/lang/Object;")
+    }
+
+    val classBound = extendsList.first().takeIf { classBound ->
+        classBound.resolve()?.isInterface != true
+    }
+
+    builder.append(':')
+    classBound?.appendSignature(builder)
+
+    for (interfaceBound in extendsList.drop(if (classBound != null) 1 else 0)) {
+        interfaceBound.appendSignature(builder.append(':'))
+    }
+
+    return builder
 }
 
 fun parseClassDescriptor(descriptor: String): String {
@@ -132,6 +217,32 @@ val PsiClass.descriptor: String?
         }
     }
 
+val PsiClass.signature: String
+    get() {
+        val builder = StringBuilder()
+
+        val typeParams = typeParameterList?.typeParameters
+        if (!typeParams.isNullOrEmpty()) {
+            builder.append('<')
+            for (typeParam in typeParams) {
+                typeParam.appendSignature(builder)
+            }
+            builder.append('>')
+        }
+
+        val superType = this.extendsListTypes.singleOrNull()
+        if (superType == null || isInterface) {
+            builder.append("Ljava/lang/Object;")
+        } else {
+            superType.appendSignature(builder)
+        }
+        val interfaces = if (isInterface) this.extendsListTypes else this.implementsListTypes
+        for (itf in interfaces) {
+            itf.appendSignature(builder)
+        }
+        return builder.toString()
+    }
+
 fun PsiClass.findMethodsByInternalName(internalName: String, checkBases: Boolean = false): Array<PsiMethod> {
     return if (internalName == INTERNAL_CONSTRUCTOR_NAME) {
         constructors
@@ -161,6 +272,33 @@ val PsiMethod.descriptor: String?
         }
     }
 
+val PsiMethod.signature: String
+    get() {
+        val builder = StringBuilder()
+
+        val typeParams = typeParameterList?.typeParameters
+        if (!typeParams.isNullOrEmpty()) {
+            builder.append('<')
+            for (typeParam in typeParams) {
+                typeParam.appendSignature(builder)
+            }
+            builder.append('>')
+        }
+
+        builder.append('(')
+        for (parameter in parameterList.parameters) {
+            parameter.type.appendSignature(builder)
+        }
+        builder.append(')')
+        returnType?.appendSignature(builder)
+
+        for (exception in throwsList.referencedTypes) {
+            exception.appendSignature(builder.append('^'))
+        }
+
+        return builder.toString()
+    }
+
 @Throws(ClassNameResolutionFailedException::class)
 private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
@@ -179,7 +317,7 @@ private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
 }
 
 // Field
-val PsiField.descriptor: String?
+val PsiVariable.descriptor: String?
     get() {
         return try {
             appendDescriptor(StringBuilder()).toString()
@@ -188,5 +326,8 @@ val PsiField.descriptor: String?
         }
     }
 
+val PsiVariable.signature: String
+    get() = type.signature
+
 @Throws(ClassNameResolutionFailedException::class)
-private fun PsiField.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)
+private fun PsiVariable.appendDescriptor(builder: StringBuilder): StringBuilder = type.appendDescriptor(builder)

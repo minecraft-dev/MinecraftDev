@@ -938,53 +938,6 @@ class AnonymousAndLocalClassDesugarTest : AbstractDesugarTest() {
     }
 
     @Test
-    fun testLocalWithCaptureCreatedWithConstructorReference() {
-        doTest(
-            """
-                import java.util.function.Supplier;                
-
-                class Test {
-                    void test() {
-                        String hello = "Hello";
-                        
-                        class Local {
-                            void print() {
-                                System.out.println(hello);
-                            }
-                        }
-                        
-                        Supplier<Local> supplier = Local::new;
-                    }
-                }
-            """.trimIndent(),
-            """
-                import java.util.function.Supplier;
-                
-                class Test {
-                    void test() {
-                        String hello = "Hello";
-                
-                        Supplier<$1Local> supplier = () -> new $1Local(hello);
-                    }
-                
-                    class $1Local {
-                        final String val${'$'}hello;
-                
-                        $1Local(String hello) {
-                            this.val${'$'}hello = hello;
-                            super();
-                        }
-                
-                        void print() {
-                            System.out.println(val${'$'}hello);
-                        }
-                    }
-                }
-            """.trimIndent()
-        )
-    }
-
-    @Test
     fun testCaptureUsedInConstructor() {
         doTest(
             """

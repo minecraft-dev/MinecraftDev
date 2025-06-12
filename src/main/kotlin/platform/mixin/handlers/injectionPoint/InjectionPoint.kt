@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.platform.mixin.util.InjectionPointSpecifier
@@ -317,7 +318,9 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
     val result = mutableListOf<PsiElement>()
 
     protected fun addResult(element: PsiElement) {
-        result += element
+        if (!DesugarUtil.isFake(element)) {
+            result += element
+        }
     }
 
     open fun configureBytecodeTarget(classNode: ClassNode, methodNode: MethodNode) {

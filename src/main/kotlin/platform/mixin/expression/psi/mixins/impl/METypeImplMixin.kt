@@ -27,25 +27,28 @@ import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.METypeMixin
 import com.demonwav.mcdev.util.descriptor
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiType
+import org.objectweb.asm.Type
 
 abstract class METypeImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), METypeMixin {
     override val isArray get() = findChildByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET) != null
     override val dimensions get() = findChildrenByType<PsiElement>(MEExpressionTypes.TOKEN_LEFT_BRACKET).size
 
-    override fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean {
-        if (MEName.isWildcard) {
-            return java.arrayDimensions >= dimensions
+    override fun matches(type: Type, context: MESourceMatchContext): Boolean {
+        val inputDimensions = if (type.sort == Type.ARRAY) type.dimensions else 0
+        return if (MEName.isWildcard) {
+            inputDimensions >= dimensions
         } else {
-            var unwrappedElementType = java
-            repeat(dimensions) {
-                unwrappedElementType = (unwrappedElementType as? PsiArrayType)?.componentType ?: return false
+            context.getTypes(MEName.text).any { desc ->
+                val fullDesc = "[".repeat(dimensions) + desc
+                fullDesc == type.descriptor
             }
-            val descriptor = unwrappedElementType.descriptor
-            return context.getTypes(MEName.text).any { it == descriptor }
         }
+    }
+
+    override fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean {
+        return matches(Type.getType(java.descriptor), context)
     }
 
     @Suppress("PropertyName")

@@ -41,7 +41,6 @@ import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotations
 import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findModule
-import com.demonwav.mcdev.util.findMultiInjectionHost
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.parseArray
 import com.demonwav.mcdev.util.resolveType
@@ -262,6 +261,8 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
         private val matchContext: MESourceMatchContext
     ) : NavigationVisitor() {
         override fun visitElement(element: PsiElement) {
+            // TODO: preprocess Java tree to find and exclude synthetic elements (as mixin extras does in bytecode).
+            // Synthetic elements include, for example, the Objects.requireNonNull for method reference receivers.
             for (statement in statements) {
                 if (statement.matchesJava(element, matchContext)) {
                     if (matchContext.captures.isNotEmpty()) {

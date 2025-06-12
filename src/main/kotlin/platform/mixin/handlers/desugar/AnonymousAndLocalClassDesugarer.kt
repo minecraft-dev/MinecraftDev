@@ -47,7 +47,6 @@ import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNewExpression
 import com.intellij.psi.PsiReferenceExpression
@@ -96,7 +95,8 @@ object AnonymousAndLocalClassDesugarer : Desugarer() {
             collectUsedVariables(localClass)
         }
 
-        val typeParametersToCreate = calculateTypeParametersToCreate(targetClass, localClass, variableInfos)
+        val typeParametersToCreate =
+            DesugarUtil.getTypeParametersToCopy(localClass, targetClass, variableInfos.map { it.variable })
         ChangeContextUtil.encodeContextInfo(localClass, false)
         renameReferences(project, context, localClass, variableInfos)
         updateLocalClassConstructors(project, localClass, variableInfos)
@@ -177,35 +177,6 @@ object AnonymousAndLocalClassDesugarer : Desugarer() {
         }
     }
 
-    private fun calculateTypeParametersToCreate(
-        targetClass: PsiClass,
-        localClass: PsiClass,
-        variableInfos: Array<VariableInfo>
-    ): Collection<PsiTypeParameter> {
-        val typeParameters = linkedSetOf<PsiTypeParameter>()
-
-        val visitor = object : JavaRecursiveElementWalkingVisitor() {
-            override fun visitReferenceElement(reference: PsiJavaCodeReferenceElement) {
-                super.visitReferenceElement(reference)
-                val resolved = reference.resolve()
-                if (resolved is PsiTypeParameter) {
-                    val owner = resolved.owner
-                    if (owner != null && !PsiTreeUtil.isAncestor(localClass, owner, false) &&
-                        !PsiTreeUtil.isAncestor(owner, targetClass, false)) {
-                        typeParameters += resolved
-                    }
-                }
-            }
-        }
-
-        localClass.accept(visitor)
-        for (info in variableInfos) {
-            info.variable.typeElement?.accept(visitor)
-        }
-
-        return typeParameters
-    }
-
     private fun updateLocalClassConstructors(
         project: Project,
         localClass: PsiClass,
@@ -223,13 +194,6 @@ object AnonymousAndLocalClassDesugarer : Desugarer() {
         val constructorCalls = mutableMapOf<PsiMethod, MutableList<PsiElement>>()
 
         if (variableInfos.isNotEmpty()) {
-            for (reference in DesugarUtil.findReferencesInFile(localClass)) {
-                val methodRef = reference.element.parent as? PsiMethodReferenceExpression ?: continue
-                if (methodRef.isConstructor) {
-                    DesugarUtil.desugarMethodReferenceToLambda(methodRef)
-                }
-            }
-
             for (constructor in constructors) {
                 for (reference in DesugarUtil.findReferencesInFile(constructor)) {
                     var refElement = reference.element

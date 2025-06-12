@@ -20,8 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.platform.mixin.expression.psi.MEMatchableElement
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -30,6 +32,8 @@ import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotations
+import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.resolveType
 import com.demonwav.mcdev.util.resolveTypeArray
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -38,7 +42,10 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiModifierList
+import com.intellij.psi.util.PsiUtil
 import com.llamalad7.mixinextras.expression.impl.ExpressionParserFacade
 import com.llamalad7.mixinextras.expression.impl.ExpressionService
 import com.llamalad7.mixinextras.expression.impl.ast.expressions.Expression
@@ -46,6 +53,7 @@ import com.llamalad7.mixinextras.expression.impl.flow.ComplexDataException
 import com.llamalad7.mixinextras.expression.impl.flow.FlowInterpreter
 import com.llamalad7.mixinextras.expression.impl.flow.FlowValue
 import com.llamalad7.mixinextras.expression.impl.flow.expansion.InsnExpander
+import com.llamalad7.mixinextras.expression.impl.flow.postprocessing.LMFInfo
 import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import com.llamalad7.mixinextras.expression.impl.pool.IdentifierPool
 import com.llamalad7.mixinextras.expression.impl.pool.SimpleMemberDefinition
@@ -317,4 +325,37 @@ object MEExpressionMatchUtil {
         val startOffset: Int,
         val decorations: Map<String, Any?>,
     )
+}
+
+fun PsiExpression.matchesFlow(meMatchableElement: MEMatchableElement, context: MESourceMatchContext): Boolean {
+    val expr = PsiUtil.skipParenthesizedExprDown(this) ?: this
+    if (!DesugarUtil.isValuePopped(expr) && meMatchableElement.matchesJava(expr, context)) {
+        return true
+    }
+    for (other in DesugarUtil.getOtherFlowChildren(expr)) {
+        val actualOther = PsiUtil.skipParenthesizedExprDown(other) ?: other
+        if (!DesugarUtil.isValuePopped(actualOther) && meMatchableElement.matchesJava(actualOther, context)) {
+            return true
+        }
+    }
+
+    return false
+}
+
+fun DesugarUtil.IndyData.lmfType(methodCall: PsiMethodCallExpression): LMFInfo.Type? {
+    val impl = bsmArgs.getOrNull(1) as? Handle ?: return null
+    val bound = methodCall.argumentList.expressionCount != 0
+    val containingClass = methodCall.findContainingClass() ?: return null
+    when (impl.tag) {
+        Opcodes.H_NEWINVOKESPECIAL -> return if (bound) null else LMFInfo.Type.INSTANTIATION
+        Opcodes.H_INVOKESPECIAL -> {
+            if (impl.owner != containingClass.fullQualifiedName?.replace('.', '/')) {
+                return null
+            }
+            return if (bound) LMFInfo.Type.BOUND_METHOD else LMFInfo.Type.FREE_METHOD
+        }
+        Opcodes.H_INVOKEVIRTUAL, Opcodes.H_INVOKEINTERFACE -> return if (bound) LMFInfo.Type.BOUND_METHOD else LMFInfo.Type.FREE_METHOD
+        Opcodes.H_INVOKESTATIC -> return LMFInfo.Type.FREE_METHOD
+    }
+    return null
 }

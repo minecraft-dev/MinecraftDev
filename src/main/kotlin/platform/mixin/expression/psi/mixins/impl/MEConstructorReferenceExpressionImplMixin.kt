@@ -23,22 +23,31 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.METype
+import com.demonwav.mcdev.platform.mixin.expression.lmfType
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMethodReferenceExpression
+import com.intellij.psi.PsiMethodCallExpression
+import com.llamalad7.mixinextras.expression.impl.flow.postprocessing.LMFInfo
+import org.objectweb.asm.Handle
+import org.objectweb.asm.Type
 
 abstract class MEConstructorReferenceExpressionImplMixin(node: ASTNode) : MEExpressionImplMixin(node), MEExpression {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
-        if (java !is PsiMethodReferenceExpression) {
+        if (java !is PsiMethodCallExpression) {
             return false
         }
 
-        if (!java.isConstructor) {
+        val indyData = DesugarUtil.getIndyData(java) ?: return false
+        if (indyData.bsm.owner != "java/lang/invoke/LambdaMetafactory") {
+            return false
+        }
+        if (indyData.lmfType(java) != LMFInfo.Type.INSTANTIATION) {
             return false
         }
 
-        val qualifierType = java.qualifierType?.type ?: return false
-        return className.matchesJava(qualifierType, context)
+        val implMethod = indyData.bsmArgs.getOrNull(1) as? Handle ?: return false
+        return className.matches(Type.getObjectType(implMethod.owner), context)
     }
 
     override fun getInputExprs() = emptyList<MEExpression>()

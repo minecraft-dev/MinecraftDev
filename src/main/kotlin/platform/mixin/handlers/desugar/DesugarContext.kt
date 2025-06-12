@@ -20,4 +20,4 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.desugar
 
-class DesugarContext(val classVersion: Int)
+data class DesugarContext(val classVersion: Int)

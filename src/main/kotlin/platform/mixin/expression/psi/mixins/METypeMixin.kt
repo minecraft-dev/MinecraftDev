@@ -23,10 +23,12 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiType
+import org.objectweb.asm.Type
 
 interface METypeMixin : PsiElement {
     val isArray: Boolean
     val dimensions: Int
 
+    fun matches(type: Type, context: MESourceMatchContext): Boolean
     fun matchesJava(java: PsiType, context: MESourceMatchContext): Boolean
 }

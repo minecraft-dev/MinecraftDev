@@ -23,11 +23,11 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEStatementImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.intellij.lang.ASTNode
 import com.intellij.psi.JavaTokenType
 import com.intellij.psi.PsiAssignmentExpression
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiUtil
 import com.siyeh.ig.PsiReplacementUtil
 
 abstract class MEAssignStatementImplMixin(node: ASTNode) : MEStatementImpl(node) {
@@ -42,10 +42,10 @@ abstract class MEAssignStatementImplMixin(node: ASTNode) : MEStatementImpl(node)
             java
         }
 
-        val leftJava = PsiUtil.skipParenthesizedExprDown(expandedJava.lExpression) ?: return false
-        val rightJava = PsiUtil.skipParenthesizedExprDown(expandedJava.rExpression) ?: return false
+        val rightExpr = this.rightExpr ?: return false
         context.fakeElementScope(isOperatorAssignment, java) {
-            return targetExpr.matchesJava(leftJava, context) && rightExpr?.matchesJava(rightJava, context) == true
+            return expandedJava.lExpression.matchesFlow(targetExpr, context) &&
+                expandedJava.rExpression?.matchesFlow(rightExpr, context) == true
         }
     }
 

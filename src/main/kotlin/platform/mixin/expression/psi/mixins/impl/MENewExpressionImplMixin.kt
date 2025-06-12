@@ -26,13 +26,13 @@ import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.meExpressionElementFactory
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MENewExpressionMixin
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNewExpression
-import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.siblings
 
 abstract class MENewExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node), MENewExpressionMixin {
@@ -103,8 +103,7 @@ abstract class MENewExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node),
                 return false
             }
             if (!javaArrayDims.asSequence().zip(arrayDims.asSequence()).all { (javaArrayDim, arrayDim) ->
-                val actualJavaDim = PsiUtil.skipParenthesizedExprDown(javaArrayDim) ?: return@all false
-                arrayDim.matchesJava(actualJavaDim, context)
+                javaArrayDim.matchesFlow(arrayDim, context)
             }
             ) {
                 return false

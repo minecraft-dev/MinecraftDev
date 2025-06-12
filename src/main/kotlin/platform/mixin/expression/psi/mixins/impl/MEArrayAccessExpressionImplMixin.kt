@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpressionTypes
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.demonwav.mcdev.platform.mixin.expression.psi.MEPsiUtil
 import com.demonwav.mcdev.platform.mixin.expression.psi.mixins.MEArrayAccessExpressionMixin
 import com.intellij.lang.ASTNode
@@ -46,9 +47,9 @@ abstract class MEArrayAccessExpressionImplMixin(node: ASTNode) : MEExpressionImp
             return false
         }
 
-        val javaArray = PsiUtil.skipParenthesizedExprDown(java.arrayExpression) ?: return false
-        val javaIndex = PsiUtil.skipParenthesizedExprDown(java.indexExpression) ?: return false
-        return arrayExpr.matchesJava(javaArray, context) && indexExpr?.matchesJava(javaIndex, context) == true
+        val indexExpr = this.indexExpr ?: return false
+        return java.arrayExpression.matchesFlow(arrayExpr, context) &&
+            java.indexExpression?.matchesFlow(indexExpr, context) == true
     }
 
     override fun getInputExprs() = listOfNotNull(arrayExpr, indexExpr)

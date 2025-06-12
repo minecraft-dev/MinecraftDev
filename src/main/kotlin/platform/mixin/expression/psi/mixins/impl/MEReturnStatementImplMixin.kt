@@ -23,18 +23,18 @@ package com.demonwav.mcdev.platform.mixin.expression.psi.mixins.impl
 import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEExpression
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEStatementImpl
+import com.demonwav.mcdev.platform.mixin.expression.matchesFlow
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReturnStatement
-import com.intellij.psi.util.PsiUtil
 
 abstract class MEReturnStatementImplMixin(node: ASTNode) : MEStatementImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         if (java !is PsiReturnStatement) {
             return false
         }
-        val javaReturnValue = PsiUtil.skipParenthesizedExprDown(java.returnValue) ?: return false
-        return valueExpr?.matchesJava(javaReturnValue, context) == true
+        val valueExpr = this.valueExpr ?: return false
+        return java.returnValue?.matchesFlow(valueExpr, context) == true
     }
 
     override fun getInputExprs() = listOfNotNull(valueExpr)

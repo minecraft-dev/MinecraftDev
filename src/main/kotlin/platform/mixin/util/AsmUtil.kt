@@ -782,7 +782,7 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
                         // walk inside the reference first, visits the qualifier first (it's first in the bytecode)
                         super.visitMethodReferenceExpression(expression)
 
-                        if (expression.hasSyntheticMethod) {
+                        if (expression.hasSyntheticMethod(clazz.version)) {
                             if (matcher.accept(expression)) {
                                 stopWalking()
                             }

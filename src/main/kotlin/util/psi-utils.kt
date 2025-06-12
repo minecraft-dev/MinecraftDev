@@ -23,6 +23,7 @@ package com.demonwav.mcdev.util
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.mcp.McpModule
 import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.ide.highlighter.JavaClassFileType
@@ -42,9 +43,14 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.ElementManipulator
 import com.intellij.psi.ElementManipulators
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.LambdaUtil
 import com.intellij.psi.PsiAnnotation
+import com.intellij.psi.PsiArrayType
+import com.intellij.psi.PsiCapturedWildcardType
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiDisjunctionType
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementFactory
@@ -52,6 +58,7 @@ import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiIntersectionType
 import com.intellij.psi.PsiKeyword
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.PsiManager
@@ -67,7 +74,11 @@ import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.PsiSuperExpression
 import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypeElement
+import com.intellij.psi.PsiTypeParameter
+import com.intellij.psi.PsiWildcardType
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.filters.ElementFilter
 import com.intellij.psi.search.GlobalSearchScope
@@ -76,6 +87,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiTypesUtil
+import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.refactoring.changeSignature.ChangeSignatureUtil
@@ -278,7 +290,19 @@ fun PsiType.normalize(): PsiType {
     if (normalized is PsiEllipsisType) {
         normalized = normalized.toArrayType()
     }
+    normalized = normalized.removeWildcards()
+    if (normalized is PsiIntersectionType) {
+        normalized = normalized.conjuncts.first()
+    }
     return normalized
+}
+
+fun PsiType.removeWildcards(): PsiType {
+    return when (this) {
+        is PsiWildcardType -> extendsBound
+        is PsiCapturedWildcardType -> upperBound
+        else -> this
+    }
 }
 
 fun PsiType.toObjectType(project: Project): PsiType =
@@ -371,20 +395,103 @@ val PsiElement.mcVersion: SemanticVersion?
         }
     }
 
-@Suppress("PrivatePropertyName")
 private val REAL_NAME_KEY = Key<String>("mcdev.real_name")
 
 var PsiMember.realName: String?
     get() = getUserData(REAL_NAME_KEY)
     set(value) = putUserData(REAL_NAME_KEY, value)
 
-val PsiMethodReferenceExpression.hasSyntheticMethod: Boolean
+// see com.sun.tools.javac.comp.TransTypes.needsConversionToLambda
+fun PsiMethodReferenceExpression.hasSyntheticMethod(classVersion: Int): Boolean {
+    val qualifier = this.qualifier ?: return true
+
+    if (qualifier is PsiTypeElement && qualifier.type is PsiArrayType) {
+        return true
+    }
+
+    if (qualifier is PsiSuperExpression) {
+        return true
+    }
+
+    val referencedClass = when (qualifier) {
+        is PsiTypeElement -> (qualifier.type as? PsiClassType)?.resolve()
+        is PsiReferenceExpression -> qualifier.resolve() as? PsiClass
+        else -> null
+    }
+
+    if (isConstructor) {
+        if (referencedClass?.containingClass != null && !referencedClass.hasModifierProperty(PsiModifier.STATIC)) {
+            return true
+        }
+        if (referencedClass != null && PsiUtil.isLocalOrAnonymousClass(referencedClass)) {
+            return true
+        }
+    }
+
+    if (isVarArgsCall) {
+        return true
+    }
+
+    if (DesugarUtil.needsBridgeMethod(this, classVersion)) {
+        return true
+    }
+
+    // even if a bridge method isn't required, if the method is protected in a different package, a synthetic method is
+    // still required, because otherwise the synthetic class that LambdaMetafactory creates won't be able to access it
+    val resolved = resolve() ?: return true
+    when (resolved) {
+        is PsiClass -> return !isConstructor
+        !is PsiMethod -> return true
+    }
+    if (resolved.hasModifierProperty(PsiModifier.PROTECTED) && findContainingClass()?.packageName != referencedClass?.packageName) {
+        return true
+    }
+
+    val functionalInterfaceType = this.functionalInterfaceType ?: return true
+    val interfaceMethod = LambdaUtil.getFunctionalInterfaceMethod(functionalInterfaceType) ?: return true
+
+    return interfaceMethod.parameterList.parameters.any { param ->
+        var paramType = param.type
+        while (paramType is PsiClassType) {
+            val resolved = paramType.resolve()
+            if (resolved is PsiTypeParameter) {
+                val extendsList = resolved.extendsList.referencedTypes
+                when (extendsList.size) {
+                    0 -> break
+                    1 -> paramType = extendsList.single()
+                    else -> return@any true
+                }
+            }
+        }
+        paramType is PsiIntersectionType || paramType is PsiDisjunctionType
+    }
+}
+
+private val PsiMethodReferenceExpression.isVarArgsCall: Boolean
     get() {
-        // the only method reference that doesn't have a synthetic method is a direct reference to a method
-        if (referenceName == "new") return true
-        val qualifier = this.qualifier
-        if (qualifier !is PsiReferenceExpression) return true
-        return qualifier.resolve() !is PsiClass
+        val resolveResult = advancedResolve(false)
+        val resolvedMethod = resolveResult.element as? PsiMethod ?: return false
+        if (!resolvedMethod.isVarArgs) {
+            return false
+        }
+
+        val functionalInterfaceType = this.functionalInterfaceType ?: return true
+        val functionalResolveResult = PsiUtil.resolveGenericsClassInType(functionalInterfaceType)
+        val interfaceMethod = LambdaUtil.getFunctionalInterfaceMethod(functionalResolveResult) ?: return true
+
+        val interfaceSignature = interfaceMethod.getSignature(LambdaUtil.getSubstitutor(interfaceMethod, functionalResolveResult))
+        val interfaceParamTypes = interfaceSignature.parameterTypes
+
+        val resolvedParams = resolvedMethod.parameterList.parameters
+        val isStatic = resolvedMethod.hasModifierProperty(PsiModifier.STATIC)
+        val effectiveNumParams = if (isStatic) resolvedParams.size else resolvedParams.size + 1
+        if (effectiveNumParams != interfaceParamTypes.size) {
+            return true
+        }
+
+        val varArgsType = resolvedParams.lastOrNull()?.type as? PsiEllipsisType ?: return true
+        val arrayType = resolveResult.substitutor.substitute(varArgsType.toArrayType())
+        return !arrayType.isAssignableFrom(interfaceParamTypes.last())
     }
 
 val PsiClass.psiType: PsiType

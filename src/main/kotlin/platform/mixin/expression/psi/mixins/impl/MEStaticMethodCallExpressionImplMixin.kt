@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.expression.MESourceMatchContext
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEArguments
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEName
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.impl.MEExpressionImpl
+import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
@@ -33,6 +34,10 @@ import com.intellij.psi.PsiModifier
 abstract class MEStaticMethodCallExpressionImplMixin(node: ASTNode) : MEExpressionImpl(node) {
     override fun matchesJava(java: PsiElement, context: MESourceMatchContext): Boolean {
         if (java !is PsiMethodCallExpression) {
+            return false
+        }
+
+        if (DesugarUtil.isIndy(java)) {
             return false
         }
 
