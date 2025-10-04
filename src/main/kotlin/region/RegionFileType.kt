@@ -18,16 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.nbt.editor
+package com.demonwav.mcdev.region
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.vfs.VirtualFile
 
-enum class CompressionSelection(private val selectionNameFunc: () -> String, val regionFileOnly: Boolean = false) {
-    GZIP({ MCDevBundle("nbt.compression.gzip") }),
-    UNCOMPRESSED({ MCDevBundle("nbt.compression.uncompressed") }),
-    ZLIB({ MCDevBundle("nbt.compression.zlib") }, regionFileOnly = true),
-    LZ4({ MCDevBundle("nbt.compression.lz4") }, regionFileOnly = true),
-    ;
-
-    override fun toString(): String = selectionNameFunc()
+object RegionFileType : FileType {
+    override fun getDefaultExtension() = "mca"
+    override fun getIcon() = AllIcons.FileTypes.Archive
+    override fun getCharset(file: VirtualFile, content: ByteArray) = null
+    override fun getName() = "MCA"
+    override fun getDescription() = MCDevBundle("region.file_type.description")
+    override fun isBinary() = true
+    override fun isReadOnly() = true
 }
