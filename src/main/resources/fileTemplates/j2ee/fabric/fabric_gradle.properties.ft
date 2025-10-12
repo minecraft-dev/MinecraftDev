@@ -2,7 +2,7 @@
 org.gradle.jvmargs=-Xmx1G
 
 # Fabric Properties
-	# check these on https://modmuss50.me/fabric.html
+	# check these on https://fabricmc.net/develop
 	minecraft_version=${MC_VERSION}
 #if (!${OFFICIAL_MAPPINGS})
 	yarn_mappings=${YARN_MAPPINGS}
@@ -16,6 +16,6 @@ org.gradle.jvmargs=-Xmx1G
 
 #if (${API_VERSION})
 # Dependencies
-	# check this on https://modmuss50.me/fabric.html
+	# check this on https://fabricmc.net/develop
 	fabric_version=${API_VERSION}
 #end
