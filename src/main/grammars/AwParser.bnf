@@ -58,12 +58,12 @@ class_entry ::= access class_literal class_name {
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwClassEntryMixin"
 }
 
-method_entry ::= access method_literal class_name member_name method_desc{
+method_entry ::= access method_literal class_name member_name method_desc {
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwMethodEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwMethodEntryMixin"
 }
 
-field_entry ::= access field_literal class_name member_name field_desc{
+field_entry ::= access field_literal class_name member_name field_desc {
     mixin="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.impl.AwFieldEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.aw.psi.mixins.AwFieldEntryMixin"
 }
