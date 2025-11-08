@@ -24,7 +24,10 @@ import com.demonwav.mcdev.platform.mcp.McpModuleType
 import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
 import com.demonwav.mcdev.util.ActionData
+import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.getDataFromActionEvent
+import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -33,14 +36,19 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiReference
 import com.intellij.psi.createSmartPointer
 import com.intellij.ui.LightColors
 import com.intellij.ui.awt.RelativePoint
 import java.awt.Point
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import javax.swing.JComponent
 
 abstract class SrgActionBase : AnAction() {
@@ -72,10 +80,28 @@ abstract class SrgActionBase : AnAction() {
             withSrgTarget(parent, srgMap, e, data)
         }?.onError {
             showBalloon(it.message ?: "No MCP data available", e)
-        } ?: showBalloon("No mappings found", e)
+        } ?: withMojTarget(data, e)
     }
 
     abstract fun withSrgTarget(parent: PsiElement, srgMap: Mappings, e: AnActionEvent, data: ActionData)
+
+    fun withMojTarget(data: ActionData, e: AnActionEvent){
+        val editor = data.editor
+        val element = data.element
+
+        if (element !is PsiIdentifier) {
+            showBalloon("Invalid element", e)
+            return
+        }
+
+        val target = when (val parent = element.parent) {
+            is PsiMember -> parent
+            is PsiReference -> parent.resolve()
+            else -> null
+        } ?: return showBalloon("Invalid element", e)
+
+        doCopy(target, element, editor, e)
+    }
 
     companion object {
         fun showBalloon(message: String, e: AnActionEvent) {
@@ -135,6 +161,45 @@ abstract class SrgActionBase : AnAction() {
                 )
 
                 balloon.show(at, Balloon.Position.below)
+            }
+        }
+
+        fun doCopy(target: PsiElement, element: PsiElement, editor: Editor?, e: AnActionEvent?) {
+            when (target) {
+                is PsiClass -> {
+                    val text = "public ${target.fullQualifiedName}"
+                    copyToClipboard(editor, element, text)
+                }
+                is PsiField -> {
+                    val containing = target.containingClass?.fullQualifiedName
+                        ?: return maybeShow("Could not get owner of field", e)
+                    val desc = target.type.descriptor
+                    val text = "public $containing ${target.name}"
+                    copyToClipboard(editor, element, text)
+                }
+                is PsiMethod -> {
+                    val containing = target.containingClass?.fullQualifiedName
+                        ?: return maybeShow("Could not get owner of method", e)
+                    val desc = target.descriptor ?: return maybeShow("Could not get descriptor of method", e)
+                    val text = "public $containing ${target.internalName}$desc"
+                    copyToClipboard(editor, element, text)
+                }
+                else -> maybeShow("Invalid element", e)
+            }
+        }
+
+        private fun copyToClipboard(editor: Editor?, element: PsiElement, text: String) {
+            val stringSelection = StringSelection(text)
+            val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
+            clpbrd.setContents(stringSelection, null)
+            if (editor != null) {
+                showSuccessBalloon(editor, element, "Copied: \"$text\"")
+            }
+        }
+
+        private fun maybeShow(text: String, e: AnActionEvent?) {
+            if (e != null) {
+                showBalloon(text, e)
             }
         }
     }
