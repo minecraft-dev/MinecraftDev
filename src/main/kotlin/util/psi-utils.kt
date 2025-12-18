@@ -377,7 +377,7 @@ private fun Module.findMcpModule(): McpModule? {
 val PsiElement.mcVersion: SemanticVersion?
     get() = this.cached {
         findMcpModule()?.let {
-            SemanticVersion.parse(it.getSettings().minecraftVersion ?: return@let null)
+            SemanticVersion.tryParse(it.getSettings().minecraftVersion ?: return@let null)
         }
     }
 
