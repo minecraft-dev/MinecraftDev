@@ -54,7 +54,8 @@ import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.evaluateString
 import org.jetbrains.uast.getContainingUClass
-import org.jetbrains.uast.util.isArrayInitializer
+import org.jetbrains.uast.kotlin.psi.toEllipsisTypeIfNeeded
+import org.jetbrains.uast.util.isNewArrayWithInitializer
 
 object TranslationIdentifier {
     fun identify(
@@ -207,9 +208,9 @@ object TranslationIdentifier {
     }
 
     private fun extractVarArgs(type: PsiType, elements: List<UExpression>): Array<String>? {
-        return if (elements[0].getExpressionType() == type) {
+        return if (elements[0].getExpressionType()?.toEllipsisTypeIfNeeded(true) == type) {
             val initializer = elements[0]
-            if (initializer is UCallExpression && initializer.isArrayInitializer()) {
+            if (initializer is UCallExpression && initializer.isNewArrayWithInitializer()) {
                 // We're dealing with an array initializer, let's analyse it!
                 initializer.valueArguments
                     .asSequence()
