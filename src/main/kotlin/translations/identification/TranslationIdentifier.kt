@@ -31,8 +31,8 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.referencedMethod
-import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInsight.completion.CompletionUtilCore
 import com.intellij.codeInspection.dataFlow.CommonDataflow
@@ -40,11 +40,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEllipsisType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiType
+import com.intellij.psi.PsiPrimitiveType
 import java.util.IllegalFormatException
 import java.util.MissingFormatArgumentException
 import org.jetbrains.uast.UCallExpression
@@ -54,7 +55,6 @@ import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.evaluateString
 import org.jetbrains.uast.getContainingUClass
-import org.jetbrains.uast.kotlin.psi.toEllipsisTypeIfNeeded
 import org.jetbrains.uast.util.isNewArrayWithInitializer
 
 object TranslationIdentifier {
@@ -204,24 +204,19 @@ object TranslationIdentifier {
         }
 
         val elements = args.drop(index)
-        return extractVarArgs(psiParam.type, elements)
+        return extractVarArgs(elements)?.mapToArray { it.paramDisplayString() }
     }
 
-    private fun extractVarArgs(type: PsiType, elements: List<UExpression>): Array<String>? {
-        return if (elements[0].getExpressionType()?.toEllipsisTypeIfNeeded(true) == type) {
-            val initializer = elements[0]
-            if (initializer is UCallExpression && initializer.isNewArrayWithInitializer()) {
-                // We're dealing with an array initializer, let's analyse it!
-                initializer.valueArguments
-                    .asSequence()
-                    .map { it.paramDisplayString() }
-                    .toTypedArray()
-            } else {
-                // We're dealing with a more complex expression that results in an array, give up
-                return null
-            }
+    private fun extractVarArgs(elements: List<UExpression>): List<UExpression>? {
+        val arg = elements.singleOrNull() ?: return elements
+        val arrayType = arg.getExpressionType() as? PsiArrayType ?: return elements
+        if (arrayType.componentType is PsiPrimitiveType) return elements
+        return if (arg is UCallExpression && arg.isNewArrayWithInitializer()) {
+            // We're dealing with an array initializer, let's use its elements!
+            arg.valueArguments
         } else {
-            elements.asSequence().map { it.paramDisplayString() }.toTypedArray()
+            // We're dealing with a more complex expression that results in an array, give up
+            null
         }
     }
 
