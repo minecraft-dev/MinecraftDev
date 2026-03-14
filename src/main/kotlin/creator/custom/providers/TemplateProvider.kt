@@ -155,7 +155,7 @@ interface TemplateProvider {
 
             try {
                 return file.refreshSync(modalityState)
-                    ?.inputStream?.reader()?.use { TemplateResourceBundle(it, parent) }
+                    .inputStream.reader().use { TemplateResourceBundle(it, parent) }
             } catch (t: Throwable) {
                 if (t is ControlFlowException) {
                     return parent

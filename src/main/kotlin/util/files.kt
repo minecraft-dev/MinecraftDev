@@ -22,11 +22,9 @@ package com.demonwav.mcdev.util
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.newvfs.RefreshQueue
 import java.io.File
 import java.io.IOException
 import java.nio.file.Path
@@ -79,18 +77,13 @@ val VirtualFile.mcDomainAndPath: Pair<String, String>?
 operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(attribute)
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)
 
-suspend fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile? {
-    fun refresh() {
-        RefreshQueue.getInstance().refresh(false, this.isDirectory, null, modalityState, this)
-    }
-
-    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-        refresh()
-    } else {
-        writeAction {
-            refresh()
-        }
-    }
-
-    return this.parent?.findOrCreateChildData(this, this.name)
+suspend fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile {
+    val file = this
+    ApplicationManager.getApplication().invokeAndWait(
+        {
+            file.refresh(false, true)
+        },
+        modalityState
+    )
+    return file
 }
