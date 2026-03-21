@@ -49,22 +49,27 @@ final class NeoModDevGradleModelBuilderImpl implements ModelBuilderService {
             return null
         }
 
-        def neoforgeVersionProp = extension.version
-        def neoforgeVersion
-        if (neoforgeVersionProp instanceof String) {
-            neoforgeVersion = neoforgeVersionProp
-        } else if (neoforgeVersionProp instanceof Provider) {
-            neoforgeVersion = neoforgeVersionProp.getOrNull()
-        } else {
-            return null
-        }
-
         def neoFormVersion
         try {
             neoFormVersion = extension.neoFormVersion.getOrNull()
         } catch (InvalidUserCodeException ignore) {
             // Happens when the NeoForm version is not set
             neoFormVersion = null
+        }
+        
+        def neoforgeVersion
+        if (neoFormVersion != null) {
+            neoforgeVersion = null
+        } else {
+            def neoforgeVersionProp = extension.version
+        
+            if (neoforgeVersionProp instanceof String) {
+                neoforgeVersion = neoforgeVersionProp
+            } else if (neoforgeVersionProp instanceof Provider) {
+                neoforgeVersion = neoforgeVersionProp.getOrNull()
+            } else {
+                return null
+            }
         }
 
         def accessTransformersRaw = extension.accessTransformers
