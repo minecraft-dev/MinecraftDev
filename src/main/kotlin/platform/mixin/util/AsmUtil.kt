@@ -30,7 +30,6 @@ import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.hasSyntheticMethod
 import com.demonwav.mcdev.util.innerIndexAndName
 import com.demonwav.mcdev.util.isErasureEquivalentTo
 import com.demonwav.mcdev.util.localClasses
@@ -729,16 +728,19 @@ private fun findContainingMethod(clazz: ClassNode, lambdaMethod: MethodNode): Pa
                 else -> return@nextInsn
             }
 
-            // check if this lambda generated a synthetic method
+            // Count every LambdaMetafactory invokedynamic unconditionally so the index matches
+            // a PSI walk that counts all lambda expressions and method references without needing
+            // to call hasSyntheticMethod to filter them.
+            lambdaCount++
+            val lambdaCountThisLine =
+                lineNumber?.let { lambdaCountPerLine.merge(it, 1, Int::plus) } ?: lambdaCount
+
+            // Only record an entry when the lambda generated a synthetic method in this class.
             if (invokedMethod.owner != clazz.name) return@nextInsn
             val invokedMethodNode = clazz.findMethod(MemberReference(invokedMethod.name, invokedMethod.desc))
             if (invokedMethodNode == null || !invokedMethodNode.hasAccess(Opcodes.ACC_SYNTHETIC)) {
                 return@nextInsn
             }
-
-            lambdaCount++
-            val lambdaCountThisLine =
-                lineNumber?.let { lambdaCountPerLine.merge(it, 1, Int::plus) } ?: lambdaCount
 
             if (invokedMethod.name == lambdaMethod.name && invokedMethod.desc == lambdaMethod.desc) {
                 val locationInfo =
@@ -782,10 +784,8 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
                         // walk inside the reference first, visits the qualifier first (it's first in the bytecode)
                         super.visitMethodReferenceExpression(expression)
 
-                        if (expression.hasSyntheticMethod(clazz.version)) {
-                            if (matcher.accept(expression)) {
-                                stopWalking()
-                            }
+                        if (matcher.accept(expression)) {
+                            stopWalking()
                         }
                     }
                 },
