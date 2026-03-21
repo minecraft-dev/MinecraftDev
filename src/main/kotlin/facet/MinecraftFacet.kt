@@ -35,6 +35,7 @@ import com.intellij.facet.FacetManager
 import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.module.Module
@@ -77,7 +78,15 @@ class MinecraftFacet(
         roots.clear()
     }
 
-    fun refresh() = runWriteActionAndWait {
+    fun refresh() {
+        refreshWritePhase()
+        // Refresh the project view separately to not hold the write lock
+        ApplicationManager.getApplication().invokeLater {
+            ProjectView.getInstance(module.project).refresh()
+        }
+    }
+
+    private fun refreshWritePhase() = runWriteActionAndWait {
         if (module.isDisposed) {
             return@runWriteActionAndWait
         }
@@ -118,8 +127,6 @@ class MinecraftFacet(
 
         newlyEnabled.forEach(AbstractModule::init)
         modules.forEach(AbstractModule::refresh)
-
-        ProjectView.getInstance(module.project).refresh()
     }
 
     private fun updateRoots() = runWriteAction {
