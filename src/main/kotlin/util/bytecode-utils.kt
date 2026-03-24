@@ -172,9 +172,13 @@ private fun PsiMethod.appendDescriptor(builder: StringBuilder): StringBuilder {
     builder.append('(')
     if (isConstructor) {
         containingClass?.let { containingClass ->
-            if (containingClass.hasModifierProperty(PsiModifier.STATIC)) return@let
-            val outerClass = containingClass.containingClass
-            outerClass?.type()?.appendDescriptor(builder)
+            if (!containingClass.hasModifierProperty(PsiModifier.STATIC)) {
+                val outerClass = containingClass.containingClass
+                outerClass?.type()?.appendDescriptor(builder)
+            }
+            if (containingClass.isEnum) {
+                builder.append("Ljava/lang/String;I")
+            }
         }
     }
     for (parameter in parameterList.parameters) {

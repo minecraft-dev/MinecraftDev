@@ -48,7 +48,7 @@ class ShadowHandler : MixinMemberAnnotationHandler {
     override fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember> {
         if (hasAliases(annotation)) return emptyList()
         val member = annotation.parentOfType<PsiMember>() ?: return emptyList()
-        val name = stripPrefix(annotation, member) ?: return emptyList()
+        val name = getEffectiveName(annotation, member) ?: return emptyList()
         return when (member) {
             is PsiMethod -> listOfNotNull(
                 targetClass.findMethod(MemberReference(name, member.descriptor))
@@ -75,7 +75,7 @@ class ShadowHandler : MixinMemberAnnotationHandler {
             is PsiField -> "field"
             else -> return null
         }
-        return "Unresolved $type ${member.name} in target class"
+        return "Unresolved $type ${getEffectiveName(annotation, member)} in target class"
     }
 
     fun findFirstShadowTargetForNavigation(member: PsiMember): SmartPsiElementPointer<PsiElement>? {
@@ -94,7 +94,10 @@ class ShadowHandler : MixinMemberAnnotationHandler {
 
     private fun hasAliases(shadow: PsiAnnotation) = shadow.findDeclaredAttributeValue("aliases").isNotEmpty()
 
-    private fun stripPrefix(shadow: PsiAnnotation, member: PsiMember): String? {
+    private fun getEffectiveName(shadow: PsiAnnotation, member: PsiMember): String? {
+        if (member is PsiMethod && member.isConstructor) {
+            return "<init>"
+        }
         // Strip prefix
         val prefix = shadow.findDeclaredAttributeValue("prefix")?.constantStringValue
             ?: MixinConstants.DEFAULT_SHADOW_PREFIX
