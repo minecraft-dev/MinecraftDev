@@ -26,7 +26,7 @@ import com.intellij.codeInspection.InspectionProfileEntry
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -118,7 +118,7 @@ inline fun <T> PsiFile.applyWriteAction(crossinline func: PsiFile.() -> T): T {
 
 fun <T> runReadActionAsync(runnable: () -> T): Promise<T> {
     return runAsync {
-        runReadAction(runnable)
+        runReadActionBlocking(runnable)
     }
 }
 

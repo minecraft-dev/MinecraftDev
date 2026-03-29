@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -50,7 +50,7 @@ abstract class AbstractReformatFilesStep(parent: NewProjectWizardStep) : Abstrac
 
         val rootDir = VfsUtil.findFile(Path.of(context.projectFileDirectory), true) ?: return
         val psiManager = PsiManager.getInstance(project)
-        val files = ReadAction.compute<Array<PsiFile>, Throwable> {
+        val files = ReadAction.computeBlocking<Array<PsiFile>, Throwable> {
             filesToReformat.mapNotNull { path ->
                 VfsUtil.findRelativeFile(rootDir, *path.split('/').toTypedArray())?.let(psiManager::findFile)
             }.toTypedArray()

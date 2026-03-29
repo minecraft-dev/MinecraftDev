@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,7 @@ import com.demonwav.mcdev.util.manipulator
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.reference.InspectionReference
 import com.intellij.json.psi.JsonStringLiteral
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.module.ModuleUtilCore
@@ -98,7 +98,7 @@ class ResourceFileReference(
             }
 
             val variants = mutableListOf<Any>()
-            runReadAction {
+            runReadActionBlocking {
                 val relevantModules = getRelevantModules()
 
                 val relevantRootTypes = mutableSetOf(JavaResourceRootType.RESOURCE)

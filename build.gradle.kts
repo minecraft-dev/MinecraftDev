@@ -116,6 +116,7 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.idea.maven")
         bundledPlugin("com.intellij.gradle")
+        bundledPlugin("org.jetbrains.idea.reposearch")
         bundledPlugin("org.intellij.groovy")
         bundledPlugin("ByteCodeViewer")
         bundledModule("intellij.platform.langInjection")

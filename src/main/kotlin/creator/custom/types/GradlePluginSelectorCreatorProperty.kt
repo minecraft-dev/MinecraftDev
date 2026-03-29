@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -43,7 +43,7 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.ui.AsyncProcessIcon
-import fleet.multiplatform.shims.ConcurrentHashMap
+import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

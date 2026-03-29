@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mcp.vanillagradle
 
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.vanillagradle.VanillaGradleModel
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 import org.gradle.tooling.model.idea.IdeaModule
@@ -35,7 +35,7 @@ class VanillaGradleProjectResolverExtension : AbstractProjectResolverExtension()
     override fun getToolingExtensionsClasses() = extraProjectModelClasses
 
     override fun populateModuleExtraModels(gradleModule: IdeaModule, ideModule: DataNode<ModuleData>) {
-        val vgData = runReadAction {
+        val vgData = runReadActionBlocking {
             resolverCtx.getExtraProject(gradleModule, VanillaGradleModel::class.java)
         }
         if (vgData != null && vgData.hasVanillaGradle()) {

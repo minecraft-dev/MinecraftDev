@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,7 +33,7 @@ import com.intellij.debugger.engine.PositionManagerImpl.ClsSourcePosition
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.debugger.requests.ClassPrepareRequestor
 import com.intellij.ide.highlighter.JavaFileType
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -47,6 +47,7 @@ import com.sun.jdi.request.ClassPrepareRequest
 
 class MixinPositionManager(private val debugProcess: DebugProcess) : MultiRequestPositionManager {
 
+    @Deprecated("Deprecated in Java")
     override fun getAcceptedFileTypes(): Set<FileType> = setOf(JavaFileType.INSTANCE)
 
     @Throws(NoDataException::class)
@@ -106,7 +107,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
     }
 
     override fun getAllClasses(classPosition: SourcePosition): List<ReferenceType> {
-        return runReadAction {
+        return runReadActionBlocking {
             findMatchingClasses(classPosition)
                 .flatMap { name -> debugProcess.virtualMachineProxy.classesByName(name).asSequence() }
                 .toList()
@@ -137,7 +138,7 @@ class MixinPositionManager(private val debugProcess: DebugProcess) : MultiReques
         requestor: ClassPrepareRequestor,
         position: SourcePosition,
     ): List<ClassPrepareRequest> {
-        return runReadAction {
+        return runReadActionBlocking {
             findMatchingClasses(position)
                 .mapNotNull { name -> debugProcess.requestsManager.createClassPrepareRequest(requestor, name) }
                 .toList()

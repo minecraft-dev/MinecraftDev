@@ -1,6 +1,6 @@
 [versions]
 # https://github.com/JetBrains/intellij-community/blob/<version>/.idea/libraries/kotlin_stdlib.xml
-kotlin = "2.2.20"
+kotlin = "2.3.20-RC2"
 # https://github.com/JetBrains/intellij-community/blob/<version>/.idea/libraries/kotlinx_coroutines_core.xml
 coroutines = "1.10.2"
 junit = "6.0.3"
@@ -14,7 +14,7 @@ intellij-plugin = "2.13.1"
 intellij-plugin-repository-rest-client = "2.0.50"
 # https://www.jetbrains.com/intellij-repository/snapshots or https://www.jetbrains.com/intellij-repository/releases/
 # Search for com.jetbrains.intellij.idea
-intellij-ide = "253.29346.138"
+intellij-ide = "261.22158.277"
 # https://github.com/JetBrains/gradle-idea-ext-plugin
 idea-ext = "1.4.1"
 

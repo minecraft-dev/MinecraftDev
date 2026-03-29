@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.search
 
 import com.demonwav.mcdev.platform.mixin.util.forEachSoftImplementedMethods
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.searches.SuperMethodsSearch
@@ -46,7 +46,7 @@ class MixinSoftImplementMethodSuperSearcher :
         // This is very simple and probably doesn't handle all cases
         // Right now we simply check for @Implements annotation on the class and look
         // for a similar method in the interface
-        runReadAction run@{
+        runReadActionBlocking run@{
             if (!method.name.contains('$') || method.hasModifierProperty(PsiModifier.STATIC)) {
                 return@run true
             }

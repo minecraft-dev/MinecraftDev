@@ -33,7 +33,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys.CARET
 import com.intellij.openapi.actionSystem.CommonDataKeys.PROJECT
 import com.intellij.openapi.actionSystem.CommonDataKeys.PSI_FILE
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
@@ -89,13 +89,13 @@ class FindMixinsAction : AnAction() {
             runBackgroundableTask("Searching for Mixins", project, true) run@{ indicator ->
                 indicator.isIndeterminate = true
 
-                val classes = runReadAction {
+                val classes = runReadActionBlocking {
                     if (!targetClass.isValid) {
-                        return@runReadAction null
+                        return@runReadActionBlocking null
                     }
 
                     val classes = findMixins(targetClass, project, indicator)?.filter(filter)
-                        ?: return@runReadAction null
+                        ?: return@runReadActionBlocking null
 
                     when (classes.size) {
                         0 -> null

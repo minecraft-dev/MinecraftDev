@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -23,7 +23,7 @@ package com.demonwav.mcdev.translations.reference
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.find.FindModel
 import com.intellij.find.impl.FindInProjectUtil
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -41,7 +41,7 @@ class TranslationReferenceSearch : QueryExecutor<PsiReference, ReferencesSearch.
             return true
         }
 
-        val key = runReadAction {
+        val key = runReadActionBlocking {
             val searchElement = parameters.elementToSearch.takeIf(PsiElement::isValid)
             searchElement?.let(TranslationFiles::toTranslation)?.key
         } ?: return true

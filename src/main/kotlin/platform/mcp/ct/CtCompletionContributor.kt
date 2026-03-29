@@ -32,7 +32,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.TokenType
@@ -61,7 +61,7 @@ private fun insertWhitespace(context: InsertionContext) {
     context.document.insertString(context.editor.caretModel.offset, " ")
     context.editor.caretModel.moveCaretRelatively(1, 0, false, false, false)
     context.setLaterRunnable {
-        runReadAction {
+        runReadActionBlocking {
             CodeCompletionHandlerBase.createHandler(CompletionType.BASIC)
                 .invokeCompletion(context.project, context.editor)
         }

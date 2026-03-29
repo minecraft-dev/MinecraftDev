@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -195,7 +195,7 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
         val templateConfig = mavenConfigFactory.createTemplateConfiguration(project)
         val runConfiguration = mavenConfigFactory.createConfiguration(runConfigName, templateConfig)
             as MavenRunConfiguration
-        runConfiguration.runnerParameters.goals.add(task)
+        runConfiguration.runnerParameters.goals = listOf(task)
         runConfiguration.runnerParameters.workingDirPath = context.projectDirectory.toString()
 
         runConfiguration.isAllowRunningInParallel = false
