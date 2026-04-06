@@ -29,6 +29,7 @@ import com.demonwav.mcdev.platform.mcp.util.McpConstants
 import com.demonwav.mcdev.translations.TranslationFileListener
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.json.JsonFileType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.fileTypes.FileTypeManager
@@ -71,7 +72,10 @@ class McpModule(facet: MinecraftFacet) : AbstractModule(facet) {
             }
 
             if (requiresRefresh) {
-                ExternalSystemUtil.refreshProjects(ImportSpecBuilder(project, GradleConstants.SYSTEM_ID))
+                // Schedule Gradle project refresh outside write lock
+                ApplicationManager.getApplication().invokeLater {
+                    ExternalSystemUtil.refreshProjects(ImportSpecBuilder(project, GradleConstants.SYSTEM_ID))
+                }
             }
         }
     }

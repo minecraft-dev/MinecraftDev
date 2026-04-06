@@ -51,7 +51,14 @@ final class NeoModDevGradleModelBuilderImpl implements ModelBuilderService {
 
         def neoFormVersion
         try {
-            neoFormVersion = extension.neoFormVersion.getOrNull()
+            def neoFormVersionProp = extension.neoFormVersion
+            if (neoFormVersionProp instanceof String) {
+                neoFormVersion = neoFormVersionProp
+            } else if (neoFormVersionProp instanceof Provider) {
+                neoFormVersion = neoFormVersionProp.getOrNull()
+            } else {
+                neoFormVersion = null
+            }
         } catch (InvalidUserCodeException ignore) {
             // Happens when the NeoForm version is not set
             neoFormVersion = null

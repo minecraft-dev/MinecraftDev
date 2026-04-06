@@ -49,7 +49,7 @@ header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
     pin = 1
 }
 
-private entry ::= aw_entry | itf_entry {
+private entry ::= aw_entry | itf_entry | extend_enum_entry {
     mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryMixin"
     recoverWhile = line_recover
@@ -81,6 +81,12 @@ aw_field_entry ::= access field_literal class_name member_name field_desc {
 itf_entry ::= INJECT_INTERFACE_ELEMENT class_name signature {
     mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtItfEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtItfEntryMixin"
+    pin = 1
+}
+
+extend_enum_entry ::= EXTEND_ENUM_ELEMENT class_name member_name {
+    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtExtendEnumEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtExtendEnumEntryMixin"
     pin = 1
 }
 

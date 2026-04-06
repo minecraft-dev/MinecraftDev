@@ -22,8 +22,10 @@ package com.demonwav.mcdev.platform.mcp.ct
 
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtAccess
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtClassLiteral
+import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtExtendEnumEntry
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtFieldLiteral
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtHeader
+import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtItfEntry
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtMethodLiteral
 import com.demonwav.mcdev.util.childOfType
 import com.google.common.collect.HashMultimap
@@ -38,23 +40,40 @@ import com.intellij.psi.util.PsiTreeUtil
 class CtAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (element is CtAccess) {
-            val access = element.text
-            val target = PsiTreeUtil.skipSiblingsForward(element, PsiWhiteSpace::class.java)?.text
-            if (!TokenSets.compatibleByAccessMap.get(access).contains(target)) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "Access '$access' cannot be used on '$target'").create()
-            }
+        val effectiveVersion by lazy { element.containingFile?.childOfType<CtHeader>()?.effectiveVersion ?: 1 }
 
-            if (element.accessElement.text.startsWith("transitive-") &&
-                element.containingFile?.childOfType<CtHeader>()?.effectiveVersion == 1
-            ) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "Transitive accesses were introduced in v2").create()
+        when (element) {
+            is CtAccess -> {
+                val access = element.text
+                val target = PsiTreeUtil.skipSiblingsForward(element, PsiWhiteSpace::class.java)?.text
+                if (!TokenSets.compatibleByAccessMap.get(access).contains(target)) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Access '$access' cannot be used on '$target'").create()
+                }
+
+                if (element.accessElement.text.startsWith("transitive-") && effectiveVersion < 2) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Transitive accesses were introduced in v2").create()
+                }
             }
-        } else if (element is CtFieldLiteral || element is CtMethodLiteral || element is CtClassLiteral) {
-            val target = element.text
-            val access = PsiTreeUtil.skipSiblingsBackward(element, PsiWhiteSpace::class.java)?.text
-            if (!TokenSets.compatibleByTargetMap.get(target).contains(access)) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "'$target' cannot be used with '$access'").create()
+            is CtItfEntry -> {
+                if (effectiveVersion < 3) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Interface injection was introduced in ClassTweaker v1")
+                        .range(element.firstChild)
+                        .create()
+                }
+            }
+            is CtExtendEnumEntry -> {
+                if (effectiveVersion < 4) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "Enum extension was introduced in ClassTweaker v2")
+                        .range(element.firstChild)
+                        .create()
+                }
+            }
+            is CtFieldLiteral, is CtMethodLiteral, is CtClassLiteral -> {
+                val target = element.text
+                val access = PsiTreeUtil.skipSiblingsBackward(element, PsiWhiteSpace::class.java)?.text
+                if (!TokenSets.compatibleByTargetMap.get(target).contains(access)) {
+                    holder.newAnnotation(HighlightSeverity.ERROR, "'$target' cannot be used with '$access'").create()
+                }
             }
         }
     }

@@ -38,6 +38,7 @@ class CtSyntaxHighlighter : SyntaxHighlighterBase() {
             CtTypes.HEADER_NAMESPACE_ELEMENT -> HEADER_NAMESPACE_KEYS
             CtTypes.ACCESS_ELEMENT -> ACCESS_KEYS
             CtTypes.INJECT_INTERFACE_ELEMENT -> INJECT_INTERFACE_KEYS
+            CtTypes.EXTEND_ENUM_ELEMENT -> EXTEND_ENUM_KEYS
             CtTypes.CLASS_ELEMENT -> CLASS_ELEMENT_KEYS
             CtTypes.METHOD_ELEMENT -> METHOD_ELEMENT_KEYS
             CtTypes.FIELD_ELEMENT -> FIELD_ELEMENT_KEYS
@@ -60,6 +61,8 @@ class CtSyntaxHighlighter : SyntaxHighlighterBase() {
             TextAttributesKey.createTextAttributesKey("CT_ACCESS", DefaultLanguageHighlighterColors.KEYWORD)
         val INJECT_INTERFACE =
             TextAttributesKey.createTextAttributesKey("CT_INJECT_INTERFACE", DefaultLanguageHighlighterColors.KEYWORD)
+        val EXTEND_ENUM =
+            TextAttributesKey.createTextAttributesKey("CT_EXTEND_ENUM", DefaultLanguageHighlighterColors.KEYWORD)
         val CLASS_ELEMENT =
             TextAttributesKey.createTextAttributesKey("CT_CLASS_ELEMENT", DefaultLanguageHighlighterColors.KEYWORD)
         val METHOD_ELEMENT =
@@ -85,6 +88,7 @@ class CtSyntaxHighlighter : SyntaxHighlighterBase() {
         private val HEADER_NAMESPACE_KEYS = arrayOf(HEADER_NAMESPACE)
         private val ACCESS_KEYS = arrayOf(ACCESS)
         private val INJECT_INTERFACE_KEYS = arrayOf(INJECT_INTERFACE)
+        private val EXTEND_ENUM_KEYS = arrayOf(EXTEND_ENUM)
         private val CLASS_ELEMENT_KEYS = arrayOf(CLASS_ELEMENT)
         private val METHOD_ELEMENT_KEYS = arrayOf(METHOD_ELEMENT)
         private val FIELD_ELEMENT_KEYS = arrayOf(FIELD_ELEMENT)

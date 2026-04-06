@@ -111,7 +111,9 @@ object CtEntryStartCompletionProvider : CompletionProvider<CompletionParameters>
             "mutable",
             "transitive-mutable",
             "inject-interface",
-            "transitive-inject-interface"
+            "transitive-inject-interface",
+            "extend-enum",
+            "transitive-extend-enum",
         ).map { LookupElementBuilder.create(it).withInsertHandler { ctx, _ -> insertWhitespace(ctx) } }
         result.addAllElements(elements)
     }

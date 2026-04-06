@@ -46,6 +46,8 @@ import static com.intellij.psi.TokenType.*;
 %s AW_TYPES
 %s ITF_ENTRY_KEY
 %s ITF_ENTRY_VALUE
+%s ENUM_NAME
+%s ENUM_VALUE
 %s SIGNATURE
 
 %unicode
@@ -59,6 +61,7 @@ SIGNATURE_CLASS_VALUE_START=L[^;<\n]+
 TYPE_VARIABLE=T[^;\n]+;
 ACCESS_ELEMENT=accessible|transitive-accessible|extendable|transitive-extendable|mutable|transitive-mutable
 INJECT_INTERFACE_ELEMENT=inject-interface|transitive-inject-interface
+EXTEND_ENUM_ELEMENT=extend-enum|transitive-extend-enum
 CLASS_ELEMENT=class
 METHOD_ELEMENT=method
 FIELD_ELEMENT=field
@@ -74,6 +77,7 @@ WHITE_SPACE=\s
     {HEADER_NAME}                               { yybegin(HEADER); return HEADER_NAME; }
     {ACCESS_ELEMENT}                            { yybegin(AW_ENTRY); return ACCESS_ELEMENT; }
     {INJECT_INTERFACE_ELEMENT}                  { yybegin(ITF_ENTRY_KEY); return INJECT_INTERFACE_ELEMENT; }
+    {EXTEND_ENUM_ELEMENT}                       { yybegin(ENUM_NAME); return EXTEND_ENUM_ELEMENT; }
 }
 
 <HEADER> {
@@ -109,6 +113,14 @@ WHITE_SPACE=\s
 
 <ITF_ENTRY_VALUE> {
     {CLASS_NAME_ELEMENT}                        { yybegin(SIGNATURE); return CLASS_NAME_ELEMENT; }
+}
+
+<ENUM_NAME> {
+    {CLASS_NAME_ELEMENT}                        { yybegin(ENUM_VALUE); return CLASS_NAME_ELEMENT; }
+}
+
+<ENUM_VALUE> {
+    {NAME_ELEMENT}                              { return NAME_ELEMENT; }
 }
 
 <SIGNATURE> {

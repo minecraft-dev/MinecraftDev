@@ -32,9 +32,9 @@ class CtColorSettingsPage : ColorSettingsPage {
     override fun getHighlighter() = CtSyntaxHighlighter()
     override fun getDemoText() =
         $$"""
-        classTweaker	v1	named
+        classTweaker	v2	named
         
-        # https://www.fabricmc.net/wiki/tutorial:accesswideners
+        # https://docs.fabricmc.net/develop/class-tweakers/
         
         extendable class net/minecraft/world/item/crafting/Ingredient
         transitive-extendable class net/minecraft/world/item/crafting/Ingredient
@@ -45,6 +45,8 @@ class CtColorSettingsPage : ColorSettingsPage {
         accessible field net/minecraft/world/item/crafting/Ingredient values [Lnet/minecraft/world/item/crafting/Ingredient$Value;
         inject-interface net/minecraft/world/level/block/Block com/example/MyBlockInterface
         transitive-inject-interface net/minecraft/world/level/block/Block com/example/MyTransitiveBlockInterface<TT;>
+        extend-enum net/minecraft/client/gui/Gui$HeartType MYMOD_HEART_TYPE
+        transitive-extend-enum net/minecraft/client/gui/Gui$HeartType MYMOD_TRANSITIVE_HEART_TYPE
         """.trimIndent()
 
     override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
@@ -58,6 +60,7 @@ class CtColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor("Header namespace", CtSyntaxHighlighter.HEADER_NAMESPACE),
             AttributesDescriptor("Access", CtSyntaxHighlighter.ACCESS),
             AttributesDescriptor("Inject interface", CtSyntaxHighlighter.INJECT_INTERFACE),
+            AttributesDescriptor("Extend enum", CtSyntaxHighlighter.EXTEND_ENUM),
             AttributesDescriptor("Class element", CtSyntaxHighlighter.CLASS_ELEMENT),
             AttributesDescriptor("Method element", CtSyntaxHighlighter.METHOD_ELEMENT),
             AttributesDescriptor("Field element", CtSyntaxHighlighter.FIELD_ELEMENT),

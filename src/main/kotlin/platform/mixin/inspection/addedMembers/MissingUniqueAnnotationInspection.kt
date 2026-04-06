@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 
@@ -31,6 +32,9 @@ class MissingUniqueAnnotationInspection : AbstractAddedMembersInspection() {
     override fun getStaticDescription() = "Reports missing @Unique annotations"
 
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
+        if (field is PsiEnumConstant) {
+            return
+        }
         if (!field.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
             holder.registerProblem(
                 field.nameIdentifier,

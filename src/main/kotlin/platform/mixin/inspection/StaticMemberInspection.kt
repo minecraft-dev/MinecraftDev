@@ -30,6 +30,7 @@ import com.intellij.codeInsight.intention.QuickFixFactory
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
@@ -71,7 +72,7 @@ class StaticMemberInspection : MixinInspection() {
 
         private fun isProblematic(member: PsiMember): Boolean {
             val containingClass = member.containingClass ?: return false
-            if (!containingClass.isMixin) {
+            if (!containingClass.isMixin || member is PsiEnumConstant) {
                 return false
             }
 

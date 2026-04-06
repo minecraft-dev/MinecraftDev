@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
+import com.demonwav.mcdev.platform.mixin.util.isFabricMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.intellij.codeInspection.LocalQuickFix
@@ -68,7 +69,7 @@ class MixinClassTypeInspection : MixinInspection() {
                 }
             }
 
-            if (mixinClass.isEnum) {
+            if (mixinClass.isEnum && !mixinClass.isFabricMixin) {
                 holder.registerProblem(problemElement, "Mixins cannot be enums", *fixes.toTypedArray())
                 return
             }
