@@ -32,7 +32,7 @@ class MinecraftMissingLVTChecker : MissingLVTChecker {
             !className.startsWith("net.minecraft.") && !className.startsWith("com.mojang.blaze3d.") -> false
             else -> {
                 val mcVersion = context.mcVersion
-                mcVersion != null && mcVersion <= MinecraftVersions.MC25_4
+                mcVersion != null && mcVersion <= MinecraftVersions.MC1_21_11
             }
         }
     }

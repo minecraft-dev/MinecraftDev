@@ -25,6 +25,7 @@ import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
+import com.demonwav.mcdev.creator.custom.derivation.FetchPaperDependencyVersionForMcVersion
 import com.demonwav.mcdev.creator.custom.derivation.PreparedDerivation
 import com.demonwav.mcdev.creator.custom.derivation.ReplacePropertyDerivation
 import com.demonwav.mcdev.creator.custom.derivation.SelectPropertyDerivation
@@ -71,6 +72,11 @@ class StringCreatorProperty(
         "replace" -> {
             val parents = collectDerivationParents(reporter)
             ReplacePropertyDerivation.create(reporter, parents, derives)
+        }
+
+        "fetchPaperDependencyVersionForMcVersion" -> {
+            val parents = collectDerivationParents(reporter)
+            FetchPaperDependencyVersionForMcVersion.create(reporter, parents, derives)
         }
 
         null -> {

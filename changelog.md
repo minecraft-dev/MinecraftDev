@@ -1,5 +1,18 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.13]
+
+### Added
+
+- Added support for Mixin-based enum extensions.
+- Added support for ClassTweaker v2
+
+### Fixed
+
+- Fixed Paper and Velocity templates
+- Fixed `No signature of method: java.lang.String.getOrNull() is applicable for argument types: () values: []` when importing a NeoForm project
+- Fixed a possible deadlock when detecting Minecraft frameworks
+
 ## [1.8.12]
 
 ### Version Support

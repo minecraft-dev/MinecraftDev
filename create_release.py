@@ -145,7 +145,7 @@ def do_push(branch_name: str, dry_run: bool):
         sys.exit(1)
 
 def tag_and_push(branch: str, version: str, push: bool, dry_run: bool):
-    tag = f"{branch}-{version}"
+    tag = f"{version}-{branch}"
     # check tag does not already exist
     rc, _, _ = run_git(["rev-parse", "-q", "--verify", f"refs/tags/{tag}"])
     if rc == 0:
@@ -183,7 +183,7 @@ def fetch_origin(dry_run: bool):
 
 def parse_args():
     p = argparse.ArgumentParser(description="Merge release branches and create/push tags non-interactively.")
-    p.add_argument("version", help="version string to append to tags (used as <branch>-<version>)")
+    p.add_argument("version", help="version string to append to tags (used as <version>-<branch>)")
     p.add_argument("--branches", nargs="+",
                    default=BRANCHES,
                    help="space-separated list of branches in order (default: %(default)s)")
