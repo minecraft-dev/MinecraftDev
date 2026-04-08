@@ -25,6 +25,7 @@ import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.AbstractModuleType
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.bukkit.BukkitModule
 import com.demonwav.mcdev.platform.bukkit.BukkitModuleType
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
@@ -64,6 +65,8 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
     override val type: PlatformType = type.platformType
 
     override val moduleType: T = type
+
+    override fun computeModIds() = BukkitModule.getPluginNames(project, pluginYml)
 
     override val eventListenerGenSupport: EventListenerGenerationSupport = BungeeCordEventListenerGenerationSupport()
 

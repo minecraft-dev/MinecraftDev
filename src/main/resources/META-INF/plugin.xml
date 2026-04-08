@@ -1114,6 +1114,22 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
+        <localInspection displayName="Switch used on an enum mixin"
+                         shortName="SwitchOnEnumMixin"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.EnumMixinSwitchStatementInspection"/>
+        <localInspection displayName="Mixin instantiated within that same mixin using a constructor which doesn't exist"
+                         shortName="MixinConstructorDoesntExist"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInstantiationWithinMixinInspection"/>
         <localInspection displayName="Inner classes in Mixins"
                          shortName="MixinInnerClass"
                          groupName="Mixin"
@@ -1168,6 +1184,14 @@
                          level="WARNING"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
+        <localInspection displayName="Name does not match the pattern for added enum constants"
+                         shortName="AddedEnumConstantsNamePattern"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.EnumConstantNameFormatInspection"/>
         <!--endregion-->
 
         <!--region Implements Inspections -->

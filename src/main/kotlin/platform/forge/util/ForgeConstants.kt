@@ -37,6 +37,7 @@ object ForgeConstants {
     const val NETWORK_MESSAGE_HANDLER = "net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler"
     const val MCMOD_INFO = "mcmod.info"
     const val MODS_TOML = "mods.toml"
+    const val MODS_TOML_PATH = "META-INF/$MODS_TOML"
     const val PACK_MCMETA = "pack.mcmeta"
 
     const val JAR_VERSION_VAR = $$"${file.jarVersion}"

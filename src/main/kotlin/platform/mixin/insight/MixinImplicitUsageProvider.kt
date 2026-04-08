@@ -22,9 +22,11 @@ package com.demonwav.mcdev.platform.mixin.insight
 
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
+import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixinExtrasSugar
 import com.intellij.codeInsight.daemon.ImplicitUsageProvider
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifierListOwner
@@ -66,7 +68,12 @@ class MixinImplicitUsageProvider : ImplicitUsageProvider {
         return false
     }
 
-    override fun isImplicitUsage(element: PsiElement) = isParameterInShadow(element) || isHandlerImplicitlyUsed(element)
+    private fun isMixinAddedEnumConstant(element: PsiElement): Boolean {
+        return element is PsiEnumConstant && element.containingClass?.isMixin == true
+    }
+
+    override fun isImplicitUsage(element: PsiElement) =
+        isParameterInShadow(element) || isHandlerImplicitlyUsed(element) || isMixinAddedEnumConstant(element)
     override fun isImplicitRead(element: PsiElement) = isShadowField(element)
     override fun isImplicitWrite(element: PsiElement) = isShadowField(element)
 }

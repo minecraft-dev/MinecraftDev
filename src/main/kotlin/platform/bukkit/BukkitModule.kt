@@ -29,23 +29,26 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.platform.bukkit.util.PaperConstants
 import com.demonwav.mcdev.util.SourceType
-import com.demonwav.mcdev.util.createVoidMethodWithParameterType
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.util.application
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
+import org.jetbrains.yaml.YAMLUtil
+import org.jetbrains.yaml.psi.YAMLFile
 
 class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T) : AbstractModule(facet) {
 
@@ -65,6 +68,8 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         private set
 
     override val type: PlatformType = type.platformType
+
+    override fun computeModIds() = getPluginNames(project, pluginYml)
 
     override val moduleType: T = type
 
@@ -174,5 +179,13 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         super.dispose()
 
         pluginYml = null
+    }
+
+    companion object {
+        fun getPluginNames(project: Project, pluginYml: VirtualFile?): List<String> {
+            val yamlFile = PsiManager.getInstance(project).findFile(pluginYml ?: return emptyList()) as? YAMLFile
+                ?: return emptyList()
+            return listOfNotNull(YAMLUtil.getValue(yamlFile, "name")?.second)
+        }
     }
 }

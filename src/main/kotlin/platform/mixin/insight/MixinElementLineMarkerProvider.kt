@@ -33,6 +33,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
@@ -55,6 +56,19 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
         val containingClass = element.containingClass ?: return null
         if (!containingClass.isMixin) {
             return null
+        }
+
+        if (element is PsiEnumConstant) {
+            val identifier = element.nameIdentifier
+            return LineMarkerInfo(
+                identifier,
+                identifier.textRange,
+                MixinAssets.MIXIN_ENUM_CONSTANT_ICON,
+                { "Mixin-added enum constant" },
+                null,
+                GutterIconRenderer.Alignment.LEFT,
+                { "mixin enum constant indicator" },
+            )
         }
 
         val identifier = when (element) {

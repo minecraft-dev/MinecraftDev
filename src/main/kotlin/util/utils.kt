@@ -48,8 +48,10 @@ import com.intellij.psi.util.PsiUtil
 import java.lang.invoke.MethodHandles
 import java.util.Locale
 import java.util.concurrent.CancellationException
+import java.util.regex.PatternSyntaxException
 import kotlin.math.min
 import kotlin.reflect.KClass
+import org.intellij.lang.annotations.Language
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.runAsync
@@ -336,6 +338,18 @@ fun String.capitalize(): String =
     }
 
 fun String.decapitalize(): String = replaceFirstChar { it.lowercase(Locale.ENGLISH) }
+
+fun @receiver:Language("RegExp") String.toRegexOrNull(): Regex? {
+    return try {
+        this.toRegex()
+    } catch (_: PatternSyntaxException) {
+        null
+    }
+}
+
+fun String.toRegexOrDefault(@Language("RegExp") default: String): Regex {
+    return this.toRegexOrNull() ?: default.toRegex()
+}
 
 // Bit of a hack, but this allows us to get the class object for top level declarations without having to
 // put the whole class name in as a string (easier to refactor, etc.)

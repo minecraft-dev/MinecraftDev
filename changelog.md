@@ -1,5 +1,17 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.14]
+
+### Added
+
+- Enhancements to enum mixins:
+  - Warning for added enum constants not prefixed by the mod id
+  - Suppress unused warnings for added enum constants
+  - Line marker for added enum constants
+  - Error for when enum mixins target non-enum classes
+  - Error for when a switch statement or expression is used on an enum mixin
+  - Error for when a constructor is used that doesn't exist in the target class
+
 ## [1.8.13]
 
 ### Added

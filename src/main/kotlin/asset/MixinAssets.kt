@@ -40,6 +40,9 @@ object MixinAssets : Assets() {
     val MIXIN_SHADOW_ICON = loadIcon("/assets/icons/mixin/mixin_shadow.svg")
     val MIXIN_SHADOW_ICON_DARK = loadIcon("/assets/icons/mixin/mixin_shadow_dark_alt.svg")
 
+    val MIXIN_ENUM_CONSTANT_ICON = loadIcon("/assets/icons/mixin/mixin_enum_constant.svg")
+    val MIXIN_ENUM_CONSTANT_ICON_DARK = loadIcon("/assets/icons/mixin/mixin_enum_constant_dark.svg")
+
     val MIXIN_TARGET_ACCESSOR_MIXIN_ICON = loadIcon("/assets/icons/mixin/mixin_target_accessor_mixin.svg")
     val MIXIN_TARGET_ACCESSOR_MIXIN_ICON_DARK = loadIcon("/assets/icons/mixin/mixin_target_accessor_mixin_dark.svg")
 

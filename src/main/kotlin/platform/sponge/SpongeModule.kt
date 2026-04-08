@@ -27,6 +27,7 @@ import com.demonwav.mcdev.inspection.IsCancelled
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
+import com.demonwav.mcdev.platform.sponge.util.spongePluginClassId
 import com.demonwav.mcdev.util.extendsOrImplements
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
@@ -36,6 +37,8 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
@@ -45,6 +48,20 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
     override val moduleType = SpongeModuleType
     override val type = PlatformType.SPONGE
     override val icon = PlatformAssets.SPONGE_ICON
+
+    override fun computeModIds(): List<String> {
+        return findPluginsWithAnnotation(SpongeConstants.PLUGIN_ANNOTATION) + findPluginsWithAnnotation(SpongeConstants.JVM_PLUGIN_ANNOTATION)
+    }
+
+    private fun findPluginsWithAnnotation(annotation: String): List<String> {
+        val pluginAnnotation =
+            JavaPsiFacade.getInstance(project).findClass(annotation, GlobalSearchScope.allScope(project))
+                ?: return emptyList()
+        return AnnotatedElementsSearch.searchElements(pluginAnnotation, GlobalSearchScope.moduleScope(module), PsiClass::class.java)
+            .mapNotNull { pluginClass ->
+                pluginClass.spongePluginClassId()
+            }
+    }
 
     override val eventListenerGenSupport: EventListenerGenerationSupport = SpongeEventListenerGenerationSupport()
 

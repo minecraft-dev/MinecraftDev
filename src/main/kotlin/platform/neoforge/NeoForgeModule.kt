@@ -26,6 +26,7 @@ import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.inspection.IsCancelled
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.forge.ForgeModule
 import com.demonwav.mcdev.platform.neoforge.util.NeoForgeConstants
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
@@ -48,10 +49,14 @@ class NeoForgeModule internal constructor(facet: MinecraftFacet) : AbstractModul
 
     var mcmod by nullable { facet.findFile(NeoForgeConstants.MCMOD_INFO, SourceType.RESOURCE) }
         private set
+    var modsToml by nullable { facet.findFile(NeoForgeConstants.MODS_TOML_PATH, SourceType.RESOURCE) }
+        private set
 
     override val moduleType = NeoForgeModuleType
     override val type = PlatformType.NEOFORGE
     override val icon = PlatformAssets.NEOFORGE_ICON
+
+    override fun computeModIds() = ForgeModule.getModsFromModsToml(project, modsToml)
 
     override val eventListenerGenSupport: EventListenerGenerationSupport = NeoForgeEventListenerGenerationSupport()
 

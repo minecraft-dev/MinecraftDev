@@ -26,11 +26,16 @@ import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.velocity.util.VelocityConstants
+import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.jvm.JvmModifier
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
@@ -39,6 +44,16 @@ class VelocityModule(facet: MinecraftFacet) : AbstractModule(facet) {
     override val moduleType = VelocityModuleType
     override val type = PlatformType.VELOCITY
     override val icon = PlatformAssets.VELOCITY_ICON
+
+    override fun computeModIds(): List<String> {
+        val pluginAnnotation =
+            JavaPsiFacade.getInstance(project).findClass(VelocityConstants.PLUGIN_ANNOTATION, GlobalSearchScope.allScope(project))
+                ?: return emptyList()
+        return AnnotatedElementsSearch.searchElements(pluginAnnotation, GlobalSearchScope.moduleScope(module), PsiClass::class.java)
+            .mapNotNull { pluginClass ->
+                pluginClass.findAnnotation(VelocityConstants.PLUGIN_ANNOTATION)?.findAttributeValue("id")?.constantStringValue
+            }
+    }
 
     override val eventListenerGenSupport: EventListenerGenerationSupport = VelocityEventListenerGenerationSupport()
 

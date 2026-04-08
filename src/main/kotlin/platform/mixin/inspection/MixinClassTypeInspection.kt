@@ -59,6 +59,7 @@ class MixinClassTypeInspection : MixinInspection() {
 
             val needsToBeClass = mixinClass.mixinTargets.any { !it.hasAccess(Opcodes.ACC_INTERFACE) }
             val needsToBeInterface = mixinClass.mixinTargets.any { it.hasAccess(Opcodes.ACC_INTERFACE) }
+            val canBeEnum = mixinClass.mixinTargets.all { it.hasAccess(Opcodes.ACC_ENUM) }
 
             val fixes = mutableListOf<LocalQuickFix>()
             if (classKeywordElement != null) {
@@ -67,11 +68,20 @@ class MixinClassTypeInspection : MixinInspection() {
                 } else if (needsToBeInterface && !needsToBeClass) {
                     fixes += ChangeClassTypeFix(classKeywordElement, JavaKeywords.INTERFACE)
                 }
+                if (canBeEnum) {
+                    fixes += ChangeClassTypeFix(classKeywordElement, JavaKeywords.ENUM)
+                }
             }
 
-            if (mixinClass.isEnum && !mixinClass.isFabricMixin) {
-                holder.registerProblem(problemElement, "Mixins cannot be enums", *fixes.toTypedArray())
-                return
+            if (mixinClass.isEnum) {
+                if (!mixinClass.isFabricMixin) {
+                    holder.registerProblem(problemElement, "Enum Mixins are not supported on this platform", *fixes.toTypedArray())
+                    return
+                }
+                if (!canBeEnum) {
+                    holder.registerProblem(problemElement, "Enum Mixin targets a non-enum class", *fixes.toTypedArray())
+                    return
+                }
             }
 
             if (mixinClass.isAnnotationType) {

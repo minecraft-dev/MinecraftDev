@@ -29,6 +29,7 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.platform.mcp.McpModuleSettings
+import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
@@ -40,9 +41,12 @@ import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.search.GlobalSearchScope
@@ -52,15 +56,22 @@ import java.util.concurrent.Callable
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
+import org.toml.lang.psi.TomlArrayTable
+import org.toml.lang.psi.TomlFile
+import org.toml.lang.psi.ext.name
 
 class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
     var mcmod by nullable { facet.findFile(ForgeConstants.MCMOD_INFO, SourceType.RESOURCE) }
         private set
+    var modsToml by nullable { facet.findFile(ForgeConstants.MODS_TOML_PATH, SourceType.RESOURCE) }
+        private set
 
     override val moduleType = ForgeModuleType
     override val type = PlatformType.FORGE
     override val icon = PlatformAssets.FORGE_ICON
+
+    override fun computeModIds() = getModsFromModsToml(project, modsToml)
 
     override val eventListenerGenSupport: EventListenerGenerationSupport = ForgeEventListenerGenerationSupport()
 
@@ -168,6 +179,28 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
 
     override fun dispose() {
         mcmod = null
+        modsToml = null
         super.dispose()
+    }
+
+    companion object {
+        fun getModsFromModsToml(project: Project, modsToml: VirtualFile?): List<String> {
+            val tomlFile = PsiManager.getInstance(project).findFile(modsToml ?: return emptyList()) as? TomlFile
+                ?: return emptyList()
+
+            val result = mutableListOf<String>()
+
+            for (child in tomlFile.children) {
+                if (child is TomlArrayTable && child.header.key?.name == "mods") {
+                    for (entry in child.entries) {
+                        if (entry.key.name == "modId") {
+                            entry.value?.stringValue()?.let { result += it }
+                        }
+                    }
+                }
+            }
+
+            return result
+        }
     }
 }

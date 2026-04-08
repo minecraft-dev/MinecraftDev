@@ -33,8 +33,12 @@ import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
+import com.intellij.json.JsonUtil
+import com.intellij.json.psi.JsonFile
+import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.searches.ReferencesSearch
 import java.io.IOException
@@ -63,6 +67,13 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
     override val moduleType = FabricModuleType
     override val type = PlatformType.FABRIC
     override val icon = PlatformAssets.FABRIC_ICON
+
+    override fun computeModIds(): List<String> {
+        val jsonFile = PsiManager.getInstance(project).findFile(fabricJson ?: return emptyList()) as? JsonFile
+            ?: return emptyList()
+        val jsonObj = JsonUtil.getTopLevelObject(jsonFile) ?: return emptyList()
+        return listOfNotNull((jsonObj.findProperty("id")?.value as? JsonStringLiteral)?.value)
+    }
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) = true
 

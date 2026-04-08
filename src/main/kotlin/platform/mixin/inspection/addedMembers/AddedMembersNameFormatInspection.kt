@@ -22,11 +22,15 @@ package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.util.RegexConverter
 import com.demonwav.mcdev.util.decapitalize
+import com.demonwav.mcdev.util.doBindItem
+import com.demonwav.mcdev.util.doBindText
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findModule
-import com.demonwav.mcdev.util.onShown
+import com.demonwav.mcdev.util.regexValidator
 import com.demonwav.mcdev.util.toJavaIdentifier
+import com.demonwav.mcdev.util.toRegexOrDefault
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.codeInsight.FileModificationService
 import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo
@@ -37,11 +41,9 @@ import com.intellij.ide.util.SuperMethodWarningUtil
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
-import com.intellij.openapi.ui.ComponentValidator
-import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMethod
@@ -49,25 +51,14 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.rename.RenameProcessor
-import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
-import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.layout.ValidationInfoBuilder
-import com.intellij.util.xmlb.Converter
 import com.intellij.util.xmlb.annotations.Attribute
-import java.util.function.Supplier
-import java.util.regex.Pattern
-import java.util.regex.PatternSyntaxException
 import javax.swing.JComponent
-import javax.swing.event.DocumentEvent
-import kotlin.reflect.KMutableProperty0
-import org.intellij.lang.annotations.Language
 
 class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
     @Attribute(converter = RegexConverter::class)
@@ -91,7 +82,7 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
     override fun getStaticDescription() = "Reports added members not matching the correct name format"
 
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
-        if (reportFields.shouldReport(field.findModule())) {
+        if (field !is PsiEnumConstant && reportFields.shouldReport(field.findModule())) {
             visitAdded(holder, field)
         }
     }
@@ -131,7 +122,7 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
         val fixed = try {
             validNameFixSearch.replace(name, validNameFixReplace)
                 .replace("MOD_ID", getAppropriatePrefix(holder.project))
-        } catch (e: RuntimeException) {
+        } catch (_: RuntimeException) {
             null
         }
 
@@ -217,67 +208,6 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
             return (this == ON_FABRIC) == isFabric
         }
     }
-}
-
-private fun String.toRegexOrDefault(@Language("RegExp") default: String): Regex {
-    return try {
-        this.toRegex()
-    } catch (e: PatternSyntaxException) {
-        default.toRegex()
-    }
-}
-
-private fun Cell<JBTextField>.doBindText(property: KMutableProperty0<String>): Cell<JBTextField> {
-    return doBindText(property.getter, property.setter)
-}
-
-private fun Cell<JBTextField>.doBindText(getter: () -> String, setter: (String) -> Unit): Cell<JBTextField> {
-    component.text = getter()
-    component.document.addDocumentListener(object : DocumentAdapter() {
-        override fun textChanged(e: DocumentEvent) {
-            setter(component.text)
-        }
-    })
-    return this
-}
-
-private fun <T> Cell<ComboBox<T>>.doBindItem(property: KMutableProperty0<T>): Cell<ComboBox<T>> {
-    component.selectedItem = property.get()
-    component.addActionListener {
-        @Suppress("UNCHECKED_CAST")
-        val selectedItem = component.selectedItem as T?
-        if (selectedItem != null) {
-            property.set(selectedItem)
-        }
-    }
-    return this
-}
-
-private fun Cell<JBTextField>.regexValidator(): Cell<JBTextField> {
-    var hasRegisteredValidator = false
-    component.onShown {
-        if (!hasRegisteredValidator) {
-            hasRegisteredValidator = true
-            val disposable = DialogWrapper.findInstance(component)?.disposable ?: return@onShown
-            ComponentValidator(disposable).withValidator(
-                Supplier {
-                    try {
-                        Pattern.compile(component.text)
-                        null
-                    } catch (e: PatternSyntaxException) {
-                        ValidationInfoBuilder(component).error("Invalid regex")
-                    }
-                }
-            ).andRegisterOnDocumentListener(component).installOn(component)
-        }
-    }
-    return this
-}
-
-private class RegexConverter : Converter<Regex>() {
-    override fun toString(value: Regex) = value.pattern
-
-    override fun fromString(value: String) = runCatching { value.toRegex() }.getOrNull()
 }
 
 private class RenameWithInheritanceFix(
