@@ -38,7 +38,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -63,7 +63,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -100,7 +100,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -124,7 +124,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -149,7 +149,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -177,7 +177,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "BOOL",
@@ -206,7 +206,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -233,7 +233,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         val reporter = makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -260,7 +260,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",
@@ -302,7 +302,7 @@ class StringCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "STRING",

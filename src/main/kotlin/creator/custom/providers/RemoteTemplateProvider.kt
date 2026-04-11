@@ -100,7 +100,7 @@ open class RemoteTemplateProvider : TemplateProvider {
     ): Boolean {
         indicator.text2 = "Updating remote repository $repoName"
 
-        val repoUrl = replaceVariables(originalRepoUrl)
+        val repoUrl = replaceVariables(originalRepoUrl, TemplateDescriptor.LATEST_FORMAT_VERSION)
 
         val manager = FuelManager()
         manager.proxy = selectProxy(repoUrl)
@@ -147,7 +147,8 @@ open class RemoteTemplateProvider : TemplateProvider {
     protected suspend fun doLoadTemplates(
         context: WizardContext,
         repo: MinecraftSettings.TemplateRepo,
-        rawInnerPath: String
+        rawInnerPath: String,
+        version: Int? = null
     ): List<LoadedTemplate> {
         val remoteRootPath = RemoteTemplateRepo.getDestinationZip(repo.name)
         if (!remoteRootPath.exists()) {
@@ -162,7 +163,8 @@ open class RemoteTemplateProvider : TemplateProvider {
         val modalityState = context.modalityState
         rootFile.refreshSync(modalityState)
 
-        val innerPath = replaceVariables(rawInnerPath)
+        // Default to the latest version for unspecified version variable substitution
+        val innerPath = replaceVariables(rawInnerPath, version ?: TemplateDescriptor.LATEST_FORMAT_VERSION)
         val repoRoot = if (innerPath.isNotBlank()) {
             rootFile.findFileByRelativePath(innerPath)
         } else {
@@ -176,8 +178,8 @@ open class RemoteTemplateProvider : TemplateProvider {
         return TemplateProvider.findTemplates(modalityState, repoRoot)
     }
 
-    private fun replaceVariables(originalRepoUrl: String): String =
-        originalRepoUrl.replace($$"$version", TemplateDescriptor.FORMAT_VERSION.toString())
+    private fun replaceVariables(originalRepoUrl: String, version: Int): String =
+        originalRepoUrl.replace($$"$version", version.toString())
 
     override fun setupConfigUi(
         data: String,

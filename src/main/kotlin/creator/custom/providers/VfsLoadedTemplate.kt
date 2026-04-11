@@ -25,7 +25,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
 import java.io.FileNotFoundException
 
-class VfsLoadedTemplate(
+open class VfsLoadedTemplate(
     val templateRoot: VirtualFile,
     override val label: String,
     override val tooltip: String? = null,

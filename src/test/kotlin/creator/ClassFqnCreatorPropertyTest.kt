@@ -67,7 +67,7 @@ class ClassFqnCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
         makeTemplate(
             """
             {
-              "version": ${TemplateDescriptor.FORMAT_VERSION},
+              "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
               "properties": [
                 {
                   "name": "BUILD_COORDS",

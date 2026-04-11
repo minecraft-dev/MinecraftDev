@@ -174,9 +174,9 @@ interface TemplateProvider {
         ): VfsLoadedTemplate? {
             descriptorFile.refreshSync(modalityState)
             var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
-            if (descriptor.version != TemplateDescriptor.FORMAT_VERSION) {
+            if (!TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.contains(descriptor.version)) {
                 thisLogger().warn("Cannot handle template ${descriptorFile.path} of version ${descriptor.version}")
-                return null
+                return InvalidVersionTemplate(templateRoot, "Invalid Version", descriptor)
             }
 
             if (descriptor.hidden == true) {

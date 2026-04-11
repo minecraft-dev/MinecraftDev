@@ -37,7 +37,7 @@ class CreatorTemplateProcessorTest : CreatorTemplateProcessorTestBase() {
             makeTemplate(
                 """
                 {
-                  "version": ${TemplateDescriptor.FORMAT_VERSION},
+                  "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
                   "properties": [
                     {
                       "name": "PROP",
@@ -62,7 +62,7 @@ class CreatorTemplateProcessorTest : CreatorTemplateProcessorTestBase() {
             makeTemplate(
                 """
                 {
-                  "version": ${TemplateDescriptor.FORMAT_VERSION},
+                  "version": ${TemplateDescriptor.LATEST_FORMAT_VERSION},
                   "properties": [
                     {
                       "name": "PROP",
