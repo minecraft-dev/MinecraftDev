@@ -62,6 +62,7 @@ TYPE_VARIABLE=T[^;\n]+;
 ACCESS_ELEMENT=accessible|transitive-accessible|extendable|transitive-extendable|mutable|transitive-mutable
 INJECT_INTERFACE_ELEMENT=inject-interface|transitive-inject-interface
 EXTEND_ENUM_ELEMENT=extend-enum|transitive-extend-enum
+INCOMPLETE_ENTRY_START=[a-zA-Z-]+
 CLASS_ELEMENT=class
 METHOD_ELEMENT=method
 FIELD_ELEMENT=field
@@ -78,6 +79,9 @@ WHITE_SPACE=\s
     {ACCESS_ELEMENT}                            { yybegin(AW_ENTRY); return ACCESS_ELEMENT; }
     {INJECT_INTERFACE_ELEMENT}                  { yybegin(ITF_ENTRY_KEY); return INJECT_INTERFACE_ELEMENT; }
     {EXTEND_ENUM_ELEMENT}                       { yybegin(ENUM_NAME); return EXTEND_ENUM_ELEMENT; }
+    // Create tokens for incomplete or invalid inputs too if they look like real inputs (same characters)
+    // to prevent a bug where the entire file is erroring until reopened.
+    {INCOMPLETE_ENTRY_START}                    { return INCOMPLETE_ENTRY_START; }
 }
 
 <HEADER> {
