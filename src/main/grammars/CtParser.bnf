@@ -138,4 +138,4 @@ signature_element ::= OPEN_BRACKET* (PRIMITIVE | TYPE_VARIABLE | signature_class
 signature_class_element ::= ASTERISK | ( (PLUS | MINUS)? SIGNATURE_CLASS_VALUE_START (LESS_THAN signature_element GREATER_THAN)? SIGNATURE_CLASS_VALUE_END )
 
 // Unused rule to generate the INCOMPLETE_ENTRY_START token.
-incomplete_entry_start_holder ::= INCOMPLETE_ENTRY_START
+private incomplete_entry_start_holder ::= INCOMPLETE_ENTRY_START
