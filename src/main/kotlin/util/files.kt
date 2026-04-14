@@ -33,6 +33,8 @@ import java.nio.file.Path
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.Manifest
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 val VirtualFile.localFile: File
     get() = VfsUtilCore.virtualToIoFile(this)
@@ -80,17 +82,20 @@ operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)
 
 suspend fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile? {
-    fun refresh() {
-        RefreshQueue.getInstance().refresh(false, this.isDirectory, null, modalityState, this)
+    // RefreshSessionImpl asserts a write-safe context in its constructor, which fails when called
+    // from a modal dialog's dispatched coroutine. We schedule the refresh via invokeLater with
+    // the correct ModalityState so TransactionGuard sees a write-safe context.
+    suspendCancellableCoroutine { cont ->
+        ApplicationManager.getApplication().invokeLater(
+            {
+                RefreshQueue.getInstance().refresh(false, this.isDirectory, null, modalityState, this)
+                cont.resume(Unit)
+            },
+            modalityState,
+        )
     }
 
-    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-        refresh()
-    } else {
-        writeAction {
-            refresh()
-        }
+    return writeAction {
+        this@refreshSync.parent?.findOrCreateChildData(this@refreshSync, this@refreshSync.name)
     }
-
-    return this.parent?.findOrCreateChildData(this, this.name)
 }
