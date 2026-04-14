@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mcp.ct
 
+import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtAccess
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtClassLiteral
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtExtendEnumEntry
@@ -73,6 +74,22 @@ class CtAnnotator : Annotator {
                 val access = PsiTreeUtil.skipSiblingsBackward(element, PsiWhiteSpace::class.java)?.text
                 if (!TokenSets.compatibleByTargetMap.get(target).contains(access)) {
                     holder.newAnnotation(HighlightSeverity.ERROR, "'$target' cannot be used with '$access'").create()
+                }
+            }
+            is CtHeader -> {
+                val version = element.effectiveVersion
+                val versionElement = element.versionElement ?: return
+                when (element.nameString) {
+                    "accessWidener" -> {
+                        if (version == null || version < 1 || version > 2) {
+                            holder.newAnnotation(HighlightSeverity.ERROR, "Unrecognized access widener version").range(versionElement).create()
+                        }
+                    }
+                    "classTweaker" -> {
+                        if (version == null || version < 3 || version > FabricConstants.CLASS_TWEAKER_VERSION) {
+                            holder.newAnnotation(HighlightSeverity.ERROR, "Unrecognized class tweaker version").range(versionElement).create()
+                        }
+                    }
                 }
             }
         }

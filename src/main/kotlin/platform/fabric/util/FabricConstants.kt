@@ -40,4 +40,7 @@ object FabricConstants {
         "server" to SERVER_MOD_INITIALIZER,
         "preLaunch" to PRE_LAUNCH_ENTRYPOINT
     )
+
+    // Effective class tweaker version (see CtHeaderMixin.effectiveVersion)
+    const val CLASS_TWEAKER_VERSION = 4
 }

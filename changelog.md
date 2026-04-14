@@ -1,5 +1,26 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.15]
+
+### Added
+
+- Added an error for unrecognized class tweaker versions.
+- Added support for project template version ranges, meaning MinecraftDev can now once again load v1 and v2 project templates.
+  - Improved the error message for invalid template versions.
+- Inspection for missing abstract shadows in an enum mixin, for when the target enum has abstract methods.
+- Added a quick fix for missing constructor in enum mixin to add a shadow constructor.
+- Abstract shadows in enum mixins are no longer reported as unused.
+
+### Fixes
+
+- Fixed token errors in class tweaker files until file is reopened.
+- Fixed autocompletion for class tweaker headers.
+  - Now includes the `official` namespace, and only the namespaces available for the project.
+  - Now includes `classTweaker v2`.
+- `@Shadow` methods for static methods no longer generate as abstract.
+- `@Shadow` methods for methods in an enum mixin no longer generate as abstract.
+- The "Mixin instantiated within that same mixin using a constructor which doesn't exist" inspection no longer reports when the constructor is unresolved (generates a compile error).
+
 ## [1.8.14]
 
 ### Added

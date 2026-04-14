@@ -132,13 +132,14 @@ fun createShadowMembers(
     psiClass: PsiClass,
     members: Sequence<PsiMember>,
 ): List<PsiGenerationInfo<PsiMember>> {
-    var methodAdded = false
+    var shouldMakeAbstract = false
 
     val result = members.map { m ->
         val shadowMember: PsiMember = when (m) {
             is PsiMethod -> {
-                methodAdded = true
-                shadowMethod(psiClass, m)
+                val shadowMethod = shadowMethod(project, psiClass, m)
+                shouldMakeAbstract = shouldMakeAbstract || shadowMethod.hasModifierProperty(PsiModifier.ABSTRACT)
+                shadowMethod
             }
             is PsiField -> shadowField(project, m)
             else -> throw UnsupportedOperationException("Unsupported member type: ${m::class.java.name}")
@@ -150,7 +151,7 @@ fun createShadowMembers(
     }.toList()
 
     // Make the class abstract (if not already)
-    if (methodAdded && !psiClass.hasModifierProperty(PsiModifier.ABSTRACT)) {
+    if (shouldMakeAbstract && !psiClass.hasModifierProperty(PsiModifier.ABSTRACT) && !psiClass.isEnum) {
         val classModifiers = psiClass.modifierList!!
         if (classModifiers.hasModifierProperty(PsiModifier.FINAL)) {
             classModifiers.setModifierProperty(PsiModifier.FINAL, false)
@@ -161,8 +162,10 @@ fun createShadowMembers(
     return result
 }
 
-private fun shadowMethod(psiClass: PsiClass, method: PsiMethod): PsiMethod {
+private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod): PsiMethod {
     val newMethod = GenerateMembersUtil.substituteGenericMethod(method, PsiSubstitutor.EMPTY, psiClass)
+    newMethod.modifierList.setModifierProperty(PsiModifier.STATIC, method.hasModifierProperty(PsiModifier.STATIC))
+    newMethod.modifierList.setModifierProperty(PsiModifier.NATIVE, method.hasModifierProperty(PsiModifier.NATIVE))
 
     // Remove Javadocs
     OverrideImplementUtil.deleteDocComment(newMethod)
@@ -174,18 +177,53 @@ private fun shadowMethod(psiClass: PsiClass, method: PsiMethod): PsiMethod {
     // Copy annotations
     copyAnnotations(psiClass.containingFile, method.modifierList, newModifiers)
 
-    // If the method was original private, make it protected now
-    if (newModifiers.hasModifierProperty(PsiModifier.PRIVATE)) {
-        newModifiers.setModifierProperty(PsiModifier.PROTECTED, true)
+    if (canMakeAbstract(psiClass, method)) {
+        // If the method was original private, make it protected now
+        if (newModifiers.hasModifierProperty(PsiModifier.PRIVATE)) {
+            newModifiers.setModifierProperty(PsiModifier.PROTECTED, true)
+        }
+
+        // Make method abstract
+        newModifiers.setModifierProperty(PsiModifier.ABSTRACT, true)
+
+        // Remove code block
+        newMethod.body?.delete()
+    } else {
+        val newBody = if (method.isConstructor) {
+            JavaPsiFacade.getElementFactory(project).createCodeBlock()
+        } else {
+            JavaPsiFacade.getElementFactory(project).createCodeBlockFromText("{throw new UnsupportedOperationException(\"Implemented via mixin\");}", newMethod)
+        }
+        newMethod.body?.replace(newBody)
     }
 
-    // Make method abstract
-    newModifiers.setModifierProperty(PsiModifier.ABSTRACT, true)
-
-    // Remove code block
-    newMethod.body?.delete()
-
     return newMethod
+}
+
+private fun canMakeAbstract(psiClass: PsiClass, method: PsiMethod): Boolean {
+    // If the method to shadow is already abstract, then keep it abstract
+    if (method.hasModifierProperty(PsiModifier.ABSTRACT)) {
+        return true
+    }
+
+    // Static or native methods can't be abstract
+    if (method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.NATIVE)) {
+        return false
+    }
+
+    // Constructors can't be abstract
+    if (method.isConstructor) {
+        return false
+    }
+
+    // Don't generate abstract methods for enums if the method to shadow isn't already abstract. If the enum mixin isn't
+    // already abstract, it will require the enum to be abstract which is bad. If it is already abstract, then it will
+    // require all enum values to override this shadow method which we also don't want.
+    if (psiClass.isEnum) {
+        return false
+    }
+
+    return true
 }
 
 private fun shadowField(project: Project, field: PsiField): PsiField {

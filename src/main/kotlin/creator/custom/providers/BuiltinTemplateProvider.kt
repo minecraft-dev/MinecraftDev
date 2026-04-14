@@ -38,7 +38,6 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
 
     private val builtinRepoUrl = $$"https://github.com/minecraft-dev/templates/archive/refs/heads/v$version.zip"
     private val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates")
-    private val builtinTemplatesInnerPath = "templates-${TemplateDescriptor.FORMAT_VERSION}"
     private var repoUpdated: Boolean = false
 
     override val label: String = MCDevBundle("template.provider.builtin.label")
@@ -60,9 +59,11 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
         context: WizardContext,
         repo: MinecraftSettings.TemplateRepo
     ): Collection<LoadedTemplate> {
-        val remoteTemplates = doLoadTemplates(context, repo, builtinTemplatesInnerPath)
-        if (remoteTemplates.isNotEmpty()) {
-            return remoteTemplates
+        for (supportedVersion in TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS) {
+            val remoteTemplates = doLoadTemplates(context, repo, "templates-${supportedVersion}", supportedVersion)
+            if (remoteTemplates.isNotEmpty()) {
+                return remoteTemplates
+            }
         }
 
         val repoRoot = builtinTemplatesPath.virtualFile

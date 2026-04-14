@@ -50,6 +50,7 @@ header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
 }
 
 private entry ::= aw_entry | itf_entry | extend_enum_entry {
+    name="ClassTweaker Entry"
     mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryImplMixin"
     implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryMixin"
     recoverWhile = line_recover
@@ -136,3 +137,7 @@ desc_element ::= OPEN_BRACKET* (PRIMITIVE | CLASS_VALUE) {
 signature ::= CLASS_NAME_ELEMENT (LESS_THAN signature_element+ GREATER_THAN)?
 signature_element ::= OPEN_BRACKET* (PRIMITIVE | TYPE_VARIABLE | signature_class_element)
 signature_class_element ::= ASTERISK | ( (PLUS | MINUS)? SIGNATURE_CLASS_VALUE_START (LESS_THAN signature_element GREATER_THAN)? SIGNATURE_CLASS_VALUE_END )
+
+// Unused rule to generate the INCOMPLETE_WORD token type used in the lexer.
+//noinspection BnfUnusedRule
+private incomplete_word_holder ::= INCOMPLETE_WORD

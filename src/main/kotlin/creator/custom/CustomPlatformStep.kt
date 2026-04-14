@@ -23,6 +23,7 @@ package com.demonwav.mcdev.creator.custom
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.providers.EmptyLoadedTemplate
+import com.demonwav.mcdev.creator.custom.providers.InvalidVersionTemplate
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.providers.TemplateProvider
 import com.demonwav.mcdev.creator.modalityState
@@ -95,6 +96,7 @@ class CustomPlatformStep(
     val templateLoadingText2Property = propertyGraph.property<String>("")
     lateinit var templatePropertiesProcessIcon: Cell<AsyncProcessIcon>
     lateinit var noTemplatesAvailable: Cell<JLabel>
+    lateinit var invalidTemplateVersion: Cell<JLabel>
     var templateLoadingJob: Job? = null
 
     private val externalPropertyProvider = object : ExternalTemplatePropertyProvider {
@@ -200,6 +202,9 @@ class CustomPlatformStep(
             noTemplatesAvailable = label(MCDevBundle("creator.step.generic.no_templates_available.message"))
                 .visible(false)
                 .apply { component.foreground = JBColor.RED }
+            invalidTemplateVersion = label("Invalid template version.")
+                .visible(false)
+                .apply { component.foreground = JBColor.RED }
             templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
         }.topGap(TopGap.SMALL)
 
@@ -265,8 +270,23 @@ class CustomPlatformStep(
 
             templateLoadingProperty.set(false)
             noTemplatesAvailable.visible(newTemplates.isEmpty())
-            availableTemplates = newTemplates
+            if (newTemplates.any { checkInvalidVersionTemplate(it) }) {
+                availableTemplates = emptyList()
+                invalidTemplateVersion.visible(true)
+            } else {
+                availableTemplates = newTemplates
+                invalidTemplateVersion.visible(false)
+            }
         }
+    }
+
+    private fun checkInvalidVersionTemplate(template: LoadedTemplate): Boolean {
+        if (template is InvalidVersionTemplate) {
+            invalidTemplateVersion.component.text = "Invalid template version: ${template.descriptor.version}. Supported " +
+                "versions: [${TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.joinToString(", ")}]"
+            return true;
+        }
+        return false
     }
 
     override fun setupProject(project: Project) {

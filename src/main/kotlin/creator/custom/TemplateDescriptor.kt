@@ -40,7 +40,8 @@ data class TemplateDescriptor(
 
     companion object {
 
-        const val FORMAT_VERSION = 3
+        val SUPPORTED_FORMAT_VERSIONS = intArrayOf(3, 2, 1)
+        val LATEST_FORMAT_VERSION = SUPPORTED_FORMAT_VERSIONS[0];
     }
 }
 

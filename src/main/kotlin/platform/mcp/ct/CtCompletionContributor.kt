@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mcp.ct
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtTypes
 import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
@@ -31,6 +32,7 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.completion.InsertionContext
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.patterns.PlatformPatterns
@@ -68,6 +70,11 @@ private fun insertWhitespace(context: InsertionContext) {
     }
 }
 
+private val ADDITIONAL_NAMESPACE_PRIORITY = mapOf(
+    "named" to 0.2,
+    "official" to 0.1,
+)
+
 object CtHeaderCompletionProvider : CompletionProvider<CompletionParameters>() {
 
     override fun addCompletions(
@@ -76,9 +83,16 @@ object CtHeaderCompletionProvider : CompletionProvider<CompletionParameters>() {
         result: CompletionResultSet,
     ) {
         if (parameters.position.prevLeaf(true) == null) {
-            result.addElement(LookupElementBuilder.create("accessWidener v1 named"))
-            result.addElement(LookupElementBuilder.create("accessWidener v2 named"))
-            result.addElement(LookupElementBuilder.create("classTweaker v1 named"))
+            val module = parameters.originalFile.findModule() ?: return
+            val fabricModule = MinecraftFacet.getInstance(module, FabricModuleType) ?: return
+            for (mappingNamespace in fabricModule.mappingNamespaces) {
+                val additionalPriority = ADDITIONAL_NAMESPACE_PRIORITY[mappingNamespace] ?: 0.0
+                result.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder.create("accessWidener v1 $mappingNamespace"), 1.0 + additionalPriority))
+                result.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder.create("accessWidener v2 $mappingNamespace"), 2.0 + additionalPriority))
+                for (ctVersion in 1..FabricConstants.CLASS_TWEAKER_VERSION - 2) {
+                    result.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder.create("classTweaker v$ctVersion $mappingNamespace"), 2.0 + ctVersion + additionalPriority))
+                }
+            }
         }
     }
 }

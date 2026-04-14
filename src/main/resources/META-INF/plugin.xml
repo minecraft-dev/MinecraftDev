@@ -1503,6 +1503,14 @@
                          level="ERROR"
                          hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
+        <localInspection displayName="Missing abstract shadows in enum mixin"
+                         shortName="MissingAbstractShadowsInEnumMixin"
+                         groupName="Mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.MissingAbstractShadowsInEnumInspection"/>
         <!--endregion-->
 
         <!--region Mixin Extras -->

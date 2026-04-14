@@ -32,14 +32,23 @@ abstract class CtHeaderImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), Ct
         private val LOG = logger<CtHeaderImplMixin>()
     }
 
+    override val nameElement: PsiElement
+        get() = findNotNullChildByType(CtTypes.HEADER_NAME)
+
     override val nameString: String
-        get() = findNotNullChildByType<PsiElement>(CtTypes.HEADER_NAME).text
+        get() = nameElement.text
+
+    override val versionElement: PsiElement?
+        get() = findChildByType(CtTypes.HEADER_VERSION_ELEMENT)
 
     override val versionString: String?
-        get() = findChildByType<PsiElement>(CtTypes.HEADER_VERSION_ELEMENT)?.text
+        get() = versionElement?.text
+
+    override val namespaceElement: PsiElement?
+        get() = findChildByType(CtTypes.HEADER_NAMESPACE_ELEMENT)
 
     override val namespaceString: String?
-        get() = findChildByType<PsiElement>(CtTypes.HEADER_NAMESPACE_ELEMENT)?.text
+        get() = namespaceElement?.text
 
     override val effectiveVersion: Int?
         get() {

@@ -21,11 +21,16 @@
 package com.demonwav.mcdev.platform.mcp.ct.psi.mixins
 
 import com.demonwav.mcdev.platform.mcp.ct.psi.CtElement
+import com.intellij.psi.PsiElement
 
 interface CtHeaderMixin : CtElement {
 
+    val nameElement: PsiElement
     val nameString: String
+    val versionElement: PsiElement?
     val versionString: String?
+    val namespaceElement: PsiElement?
     val namespaceString: String?
+    // Effective version, AW is 1 and 2; CT starts with 3, so CT v1 has effective version 3.
     val effectiveVersion: Int?
 }
