@@ -532,6 +532,13 @@
         <library.presentationProvider
                 implementation="com.demonwav.mcdev.platform.bukkit.framework.ModernPaperPresentationProvider"/>
 
+        <!-- Bukkit Completion Contributor -->
+
+        <completion.contributor
+                language="JAVA"
+                implementationClass="com.demonwav.mcdev.platform.bukkit.completion.BukkitEventHandlerCompletionContributor"
+                order="first"/>
+
         <!--endregion-->
 
         <!--region SPONGE-->
