@@ -1,5 +1,8 @@
 package com.demonwav.mcdev.platform.bukkit.completion
 
+import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
+import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findContainingMethod
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -18,31 +21,33 @@ import com.intellij.util.ProcessingContext
 import org.jetbrains.annotations.NotNull
 
 class BukkitEventHandlerCompletionProvider : CompletionProvider<CompletionParameters>() {
-    companion object {
-        const val EVENT_LISTENER = "org.bukkit.event.Listener"
-        private const val BUKKIT_EVENT_FQN = "org.bukkit.event.Event"
-    }
 
     override fun addCompletions(
-        @NotNull completionParameters: CompletionParameters,
-        @NotNull processingContext: ProcessingContext,
-        @NotNull completionResultSet: CompletionResultSet
+        completionParameters: CompletionParameters,
+        processingContext: ProcessingContext,
+        completionResultSet: CompletionResultSet
     ) {
         val prefix = completionResultSet.prefixMatcher.prefix
-        if (!prefix.startsWith("on") || prefix.length == 2) return
+        if (!prefix.startsWith("on") || prefix.length == 2) {
+            return
+        }
 
         val position = completionParameters.position
-        val containingClass = PsiTreeUtil.getParentOfType(position, PsiClass::class.java) ?: return
-        val project: Project = position.project
-        val facade = JavaPsiFacadeEx.getInstanceEx(project)
+        val containingClass = position.findContainingClass() ?: return
+        val project = position.project
+        val facade = JavaPsiFacadeEx.getInstance(project)
 
-        val eventListenerClass = facade.findClass(EVENT_LISTENER, GlobalSearchScope.allScope(project)) ?: return
-        if (!containingClass.isInheritor(eventListenerClass, true)) return
-        if (PsiTreeUtil.getParentOfType(position, PsiMethod::class.java) != null) return
+        val eventListenerClass = facade.findClass(BukkitConstants.LISTENER_CLASS, GlobalSearchScope.allScope(project)) ?: return
+        if (!containingClass.isInheritor(eventListenerClass, true)) {
+            return
+        }
+
+        if (position.findContainingMethod() != null) {
+            return
+        }
 
         val scope = GlobalSearchScope.allScope(project)
-        val eventBaseClass = facade.findClass(BUKKIT_EVENT_FQN, scope) ?: return
-
+        val eventBaseClass = facade.findClass(BukkitConstants.EVENT_CLASS, scope) ?: return
         val eventNameFilter = prefix.substring(2).lowercase()
 
         ClassInheritorsSearch.search(eventBaseClass, scope, true)
@@ -57,7 +62,7 @@ class BukkitEventHandlerCompletionProvider : CompletionProvider<CompletionParame
                 }
 
                 val lookupString = "on$eventSimpleName"
-                val methodName = lookupString.replace("Event", "")
+                val methodName = lookupString.removeSuffix("Event")
                 val qualifiedName = psiClass.qualifiedName
 
                 val element = LookupElementBuilder

@@ -1,5 +1,6 @@
 package com.demonwav.mcdev.platform.bukkit.completion
 
+import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
@@ -13,11 +14,7 @@ class BukkitEventHandlerInsertHandler(
     private val qualifiedName: @NlsSafe String?
 ) : InsertHandler<LookupElement> {
 
-    companion object {
-        private const val EVENT_HANDLER_FQN = "org.bukkit.event.EventHandler"
-    }
-
-    override fun handleInsert(@NotNull insertionContext: InsertionContext, @NotNull lookupElement: LookupElement) {
+    override fun handleInsert(insertionContext: InsertionContext, lookupElement: LookupElement) {
         val project = insertionContext.project
         val editor = insertionContext.editor
 
@@ -25,7 +22,7 @@ class BukkitEventHandlerInsertHandler(
         val template = templateManager.createTemplate("", "")
         template.isToReformat = true
 
-        template.addTextSegment("@${EVENT_HANDLER_FQN}\n")
+        template.addTextSegment("@${BukkitConstants.HANDLER_ANNOTATION}\n")
         template.addTextSegment("public void ")
         template.addVariable("METHOD_NAME", TextExpression(methodName), true)
         template.addTextSegment("($qualifiedName ")
@@ -34,10 +31,10 @@ class BukkitEventHandlerInsertHandler(
         template.addEndVariable()
         template.addTextSegment("\n}")
 
-        insertionContext.getDocument().deleteString(
-            insertionContext.getStartOffset(),
-            insertionContext.getTailOffset()
-        );
+        insertionContext.document.deleteString(
+            insertionContext.startOffset,
+            insertionContext.tailOffset
+        )
 
         templateManager.startTemplate(editor, template)
 
