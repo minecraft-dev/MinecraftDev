@@ -1,0 +1,12 @@
+<templateSet group="Bukkit">
+    <template
+            name="event_handler"
+            value="@org.bukkit.event.EventHandler&#10;public void on$NAME$($EVENT_CLASS$ $PARAM_NAME$) {&#10;$END$&#10;}"
+            toReformat="true"
+            toShortenFQNames="true"
+            key="live.template.bukkit.event_handler.description"
+            resource-bundle="messages.MinecraftDevelopment">
+        <variable name="NAME" expression="bukkitEventName(EVENT_CLASS)" alwaysStopAt="true"/>
+        <variable name="PARAM_NAME" expression="&quot;event&quot;" alwaysStopAt="true"/>
+    </template>
+</templateSet>

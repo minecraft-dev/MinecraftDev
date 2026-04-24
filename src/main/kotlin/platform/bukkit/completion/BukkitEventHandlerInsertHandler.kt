@@ -20,43 +20,39 @@
 
 package com.demonwav.mcdev.platform.bukkit.completion
 
-import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
+import com.demonwav.mcdev.util.psiType
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
+import com.intellij.codeInsight.intention.impl.TypeExpression
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.template.TemplateManager
-import com.intellij.codeInsight.template.impl.TextExpression
-import com.intellij.openapi.util.NlsSafe
-import org.jetbrains.annotations.NotNull
+import com.intellij.codeInsight.template.impl.TemplateSettings
+import com.intellij.codeInsight.template.impl.Variable
+import com.intellij.psi.PsiClass
+import com.jetbrains.rd.util.string.printToString
 
 class BukkitEventHandlerInsertHandler(
-    private val methodName: String,
-    private val qualifiedName: @NlsSafe String?
+    private val psiClass: PsiClass
 ) : InsertHandler<LookupElement> {
 
     override fun handleInsert(insertionContext: InsertionContext, lookupElement: LookupElement) {
-        val project = insertionContext.project
-        val editor = insertionContext.editor
-
-        val templateManager = TemplateManager.getInstance(project)
-        val template = templateManager.createTemplate("", "")
-        template.isToReformat = true
-
-        template.addTextSegment("@${BukkitConstants.HANDLER_ANNOTATION}\n")
-        template.addTextSegment("public void ")
-        template.addVariable("METHOD_NAME", TextExpression(methodName), true)
-        template.addTextSegment("($qualifiedName ")
-        template.addVariable("EVENT_PARAM", TextExpression("event"), true)
-        template.addTextSegment(") { \n")
-        template.addEndVariable()
-        template.addTextSegment("\n}")
-
         insertionContext.document.deleteString(
             insertionContext.startOffset,
             insertionContext.tailOffset
         )
 
-        templateManager.startTemplate(editor, template)
+        val sourceTemplate = TemplateSettings.getInstance().getTemplate("event_handler", "Bukkit") ?: return
+        val template = sourceTemplate.copy()
 
+        val classTypeExpr = TypeExpression(insertionContext.project, listOf(psiClass.psiType))
+
+        val index = template.variables.indexOfFirst { it.name == "EVENT_CLASS" }
+        if (index != -1) {
+            template.removeVariable(index)
+        }
+
+        template.addVariable(Variable("EVENT_CLASS", classTypeExpr, classTypeExpr, false, false));
+
+        TemplateManager.getInstance(insertionContext.project).startTemplate(insertionContext.editor, template)
     }
 }

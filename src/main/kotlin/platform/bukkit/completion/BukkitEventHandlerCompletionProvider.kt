@@ -29,16 +29,11 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.impl.JavaPsiFacadeEx
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import org.jetbrains.annotations.NotNull
 
 class BukkitEventHandlerCompletionProvider : CompletionProvider<CompletionParameters>() {
 
@@ -82,7 +77,6 @@ class BukkitEventHandlerCompletionProvider : CompletionProvider<CompletionParame
                 }
 
                 val lookupString = "on$eventSimpleName"
-                val methodName = lookupString.removeSuffix("Event")
                 val qualifiedName = psiClass.qualifiedName
 
                 val element = LookupElementBuilder
@@ -93,7 +87,7 @@ class BukkitEventHandlerCompletionProvider : CompletionProvider<CompletionParame
                     .withIcon(AllIcons.Nodes.Method)
                     .withBaseLookupString(lookupString)
                     .withBoldness(true)
-                    .withInsertHandler(BukkitEventHandlerInsertHandler(methodName, qualifiedName))
+                    .withInsertHandler(BukkitEventHandlerInsertHandler(psiClass))
 
                 completionResultSet.addElement(
                     PrioritizedLookupElement.withPriority(element, 100.0)
