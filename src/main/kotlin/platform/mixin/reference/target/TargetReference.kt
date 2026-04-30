@@ -25,7 +25,9 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.ifEmpty
@@ -69,7 +71,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
      * Null is returned when no parent annotation handler could be found, in which case we shouldn't mark this
      * reference as unresolved.
      */
-    private fun getTargets(at: PsiAnnotation, forUnresolved: Boolean): List<ClassAndMethodNode>? {
+    private fun getTargetsAndSelectors(at: PsiAnnotation, forUnresolved: Boolean): List<Pair<ClassAndMethodNode, MixinSelector?>>? {
         val (handler, annotation) = generateSequence(at.parent) { it.parent }
             .filterIsInstance<PsiAnnotation>()
             .flatMap { it.owner?.annotations?.asSequence() ?: emptySequence() }
@@ -81,14 +83,17 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
             return null
         }
         return MixinAnnotationHandler.resolveTarget(annotation)
-            .mapNotNull { (it as? MethodTargetMember)?.classAndMethod }
+            .mapNotNull { target ->
+                val methodTarget = target as? MethodTargetMember ?: return@mapNotNull null
+                methodTarget.classAndMethod to (methodTarget as? ContextAwareMethodTargetMember)?.selector
+            }
     }
 
     override fun isUnresolved(context: PsiElement): Boolean {
         val at = context.parentOfType<PsiAnnotation>() ?: return true
-        val targets = getTargets(at, true)?.ifEmpty { return true } ?: return false
-        return targets.all {
-            val failure = AtResolver(at, it.clazz, it.method).isUnresolved()
+        val targets = getTargetsAndSelectors(at, true)?.ifEmpty { return true } ?: return false
+        return targets.all { (node, selector) ->
+            val failure = AtResolver(at, node.clazz, node.method, selector).isUnresolved()
             // leave it if there is a filter to blame, the target reference was at least resolved
             failure != null && failure.filterStats.isEmpty()
         }
@@ -96,8 +101,10 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     fun resolveNavigationTargets(context: PsiElement): Array<PsiElement>? {
         val at = context.parentOfType<PsiAnnotation>() ?: return null
-        val targets = getTargets(at, false) ?: return null
-        return targets.flatMap { AtResolver(at, it.clazz, it.method).resolveNavigationTargets() }.toTypedArray()
+        val targets = getTargetsAndSelectors(at, false) ?: return null
+        return targets.flatMap { (node, selector) ->
+            AtResolver(at, node.clazz, node.method, selector).resolveNavigationTargets()
+        }.toTypedArray()
     }
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {
@@ -107,11 +114,12 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     override fun collectVariants(context: PsiElement): Array<Any> {
         val at = context.parentOfType<PsiAnnotation>() ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
-        val targets = getTargets(at, false) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
-        return targets.flatMap { target ->
-            AtResolver(at, target.clazz, target.method).collectTargetVariants { builder ->
+        val targets = getTargetsAndSelectors(at, false) ?: return ArrayUtilRt.EMPTY_OBJECT_ARRAY
+        return targets.flatMap { (node, selector) ->
+            AtResolver(at, node.clazz, node.method, selector).collectTargetVariants { builder ->
                 builder.completeToLiteral(context)
             }
         }.toTypedArray()
     }
 }
+

@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.handlers
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.AsmDfaUtil
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
@@ -88,8 +89,9 @@ class RedirectInjectorHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature>? {
-        val insns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return emptyList() }
+        val insns = resolveInstructions(annotation, targetClass, targetMethod, enclosingSelector).ifEmpty { return emptyList() }
         return getRedirectType(insns[0].insn)?.expectedMethodSignature(
             annotation,
             targetClass,

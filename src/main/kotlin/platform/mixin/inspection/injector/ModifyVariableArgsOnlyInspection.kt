@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
@@ -87,24 +88,29 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
             val module = injectorAnnotation.findModule() ?: return false
 
             for (targetMember in MixinAnnotationHandler.resolveTarget(injectorAnnotation)) {
-                val (targetClass, targetMethod) = (targetMember as? MethodTargetMember)?.classAndMethod ?: continue
-                val resolvedInsns = injector.resolveInstructions(injectorAnnotation, targetClass, targetMethod)
+                val targetMethod = (targetMember as? MethodTargetMember)?.classAndMethod ?: continue
+                val resolvedInsns = injector.resolveInstructions(
+                    injectorAnnotation,
+                    targetMethod.clazz,
+                    targetMethod.method,
+                    (targetMember as? ContextAwareMethodTargetMember)?.selector
+                )
 
                 if (resolvedInsns.isEmpty()) {
                     // unresolved injection point, don't report that we can be argsOnly
                     return false
                 }
 
-                var argumentsSize = Type.getArgumentsAndReturnSizes(targetMethod.desc) shr 2
-                if (targetMethod.hasAccess(Opcodes.ACC_STATIC)) {
+                var argumentsSize = Type.getArgumentsAndReturnSizes(targetMethod.method.desc) shr 2
+                if (targetMethod.method.hasAccess(Opcodes.ACC_STATIC)) {
                     argumentsSize--
                 }
 
                 for (insn in resolvedInsns) {
                     val matchedLocals = localInfo.matchLocals(
                         module,
-                        targetClass,
-                        targetMethod,
+                        targetMethod.clazz,
+                        targetMethod.method,
                         insn.insn,
                         CollectVisitor.Mode.RESOLUTION
                     )

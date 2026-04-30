@@ -20,7 +20,9 @@
 
 package com.demonwav.mcdev.platform.mixin.util
 
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DYNAMIC
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findMethods
@@ -110,12 +112,7 @@ private fun findShadowTargetsDeep(psiClass: PsiClass, start: PsiClass): Sequence
                 .plus(findFields(mixin)?.map { FieldTargetMember(it, actualMixin) })
                 ?.filterAccessible(psiClass, mixin) ?: emptySequence()
         }
-        .distinctBy {
-            when (it) {
-                is MethodTargetMember -> it.classAndMethod.method.memberReference
-                is FieldTargetMember -> it.classAndField.field.memberReference
-            }
-        }
+        .distinctBy { it.getMemberReference() }
 }
 
 sealed class MixinTargetMember(val mixin: PsiClass?) {
@@ -133,9 +130,14 @@ sealed class MixinTargetMember(val mixin: PsiClass?) {
         scope: GlobalSearchScope,
         canDecompile: Boolean = false
     ): PsiMember
+
+    abstract fun getMemberReference(): MemberReference
 }
 
-class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+class FieldTargetMember(
+    val classAndField: ClassAndFieldNode,
+    mixin: PsiClass? = null
+) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, field: FieldNode) : this(ClassAndFieldNode(clazz, field))
 
     override val access = classAndField.field.access
@@ -149,9 +151,14 @@ class FieldTargetMember(val classAndField: ClassAndFieldNode, mixin: PsiClass? =
         scope: GlobalSearchScope,
         canDecompile: Boolean
     ) = classAndField.field.findOrConstructSourceField(classAndField.clazz, project, scope, canDecompile)
+
+    override fun getMemberReference(): MemberReference = classAndField.field.memberReference
 }
 
-class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass? = null) : MixinTargetMember(mixin) {
+open class MethodTargetMember(
+    val classAndMethod: ClassAndMethodNode,
+    mixin: PsiClass? = null
+) : MixinTargetMember(mixin) {
     constructor(clazz: ClassNode, method: MethodNode) : this(ClassAndMethodNode(clazz, method))
 
     override val access = classAndMethod.method.access
@@ -165,6 +172,16 @@ class MethodTargetMember(val classAndMethod: ClassAndMethodNode, mixin: PsiClass
         scope: GlobalSearchScope,
         canDecompile: Boolean
     ) = classAndMethod.method.findOrConstructSourceMethod(classAndMethod.clazz, project, scope, canDecompile)
+
+    override fun getMemberReference(): MemberReference = classAndMethod.method.memberReference
+}
+
+class ContextAwareMethodTargetMember(
+    classAndMethod: ClassAndMethodNode,
+    mixin: PsiClass? = null,
+    val selector: MixinSelector? = null
+) : MethodTargetMember(classAndMethod, mixin) {
+    constructor(clazz: ClassNode, method: MethodNode, selector: MixinSelector? = null) : this(ClassAndMethodNode(clazz, method), null, selector)
 }
 
 private fun Sequence<MixinTargetMember>.filterAccessible(

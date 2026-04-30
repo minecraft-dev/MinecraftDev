@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.LocalVariables
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoReturnableType
 import com.demonwav.mcdev.platform.mixin.util.callbackInfoType
@@ -49,6 +50,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature> {
         val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
@@ -85,7 +87,7 @@ class InjectAnnotationHandler : InjectorAnnotationHandler() {
         if (localCapture != "NO_CAPTURE") {
             annotation.findModule()?.let { module ->
                 var commonLocalsPrefix: MutableList<LocalVariables.LocalVariable>? = null
-                val resolvedInsns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return@let }
+                val resolvedInsns = resolveInstructions(annotation, targetClass, targetMethod, enclosingSelector).ifEmpty { return@let }
                 for (insn in resolvedInsns) {
                     val locals = LocalVariables.getLocals(module, targetClass, targetMethod, insn.insn)
                         ?.filterNotNull()

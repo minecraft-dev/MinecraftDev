@@ -134,6 +134,10 @@ interface MixinSelector {
         return owner
     }
 
+    fun transformTargetClass(targetClass: ClassNode): ClassNode {
+        return targetClass
+    }
+
     /**
      * Implement this to return false for early-out optimizations, so you don't need to resolve the member in the
      * navigation visitor

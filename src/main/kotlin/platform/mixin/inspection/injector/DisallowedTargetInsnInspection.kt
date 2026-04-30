@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
@@ -51,11 +52,13 @@ class DisallowedTargetInsnInspection : MixinInspection() {
                         return@any false
                     }
 
-                    AtResolver(annotation, targetMember.classAndMethod.clazz, targetMember.classAndMethod.method)
-                        .resolveInstructions()
-                        .any {
-                            !injector.isInsnAllowed(it.insn, it.decorations)
-                        }
+                    val targetMethod = targetMember.classAndMethod
+                    AtResolver(
+                        annotation,
+                        targetMethod.clazz,
+                        targetMethod.method,
+                        (targetMember as? ContextAwareMethodTargetMember)?.selector
+                    ).resolveInstructions().any { !injector.isInsnAllowed(it.insn, it.decorations) }
                 }
             }
 

@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.constantValue
@@ -77,13 +78,14 @@ class InjectorOpcodeInspection : MixinInspection() {
 
     private fun makeSpecifyOpcodeFix(project: Project, at: PsiAnnotation): LocalQuickFix? {
         val injector = AtResolver.findInjectorAnnotation(at) ?: return null
-        val targetMethods =
-            MixinAnnotationHandler.resolveTarget(injector).filterIsInstance<MethodTargetMember>()
+        val targets = MixinAnnotationHandler.resolveTarget(injector)
+            .filterIsInstance<ContextAwareMethodTargetMember>()
 
         val possibleOpcodes = mutableSetOf<Int>()
 
-        for (method in targetMethods) {
-            val instructions = AtResolver(at, method.classAndMethod.clazz, method.classAndMethod.method)
+        for (target in targets) {
+            val targetMethod = target.classAndMethod
+            val instructions = AtResolver(at, targetMethod.clazz, targetMethod.method, target.selector)
                 .resolveInstructions()
             for (insn in instructions) {
                 possibleOpcodes += insn.originalInsn.opcode

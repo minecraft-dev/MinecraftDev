@@ -23,6 +23,8 @@ package com.demonwav.mcdev.platform.mixin.reference
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -105,7 +107,7 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         return targets.any { it.findMethods(MemberReference(targetReference.name)).count() > 1 }
     }
 
-    fun resolve(context: PsiElement): Sequence<ClassAndMethodNode>? {
+    fun resolve(context: PsiElement): Sequence<MethodTargetMember>? {
         val targets = getTargets(context) ?: return null
         val targetedMethods = when (context) {
             is PsiArrayInitializerMemberValue -> context.initializers.mapNotNull { it.constantStringValue }
@@ -121,15 +123,21 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     private fun resolve(
         targets: Collection<ClassNode>,
         selector: MixinSelector,
-    ): Sequence<ClassAndMethodNode> {
+    ): Sequence<MethodTargetMember> {
         return targets.asSequence()
             .flatMap { target ->
                 val actualTarget = selector.getCustomOwner(target)
-                actualTarget.findMethods(selector).map { ClassAndMethodNode(actualTarget, it) }
+                actualTarget.findMethods(selector).map {
+                    ContextAwareMethodTargetMember(
+                        actualTarget,
+                        it,
+                        selector
+                    )
+                }
             }
     }
 
-    fun resolveAllIfNotAmbiguous(context: PsiElement): List<ClassAndMethodNode>? {
+    fun resolveAllIfNotAmbiguous(context: PsiElement): List<MethodTargetMember>? {
         val targets = getTargets(context) ?: return null
 
         val targetedMethods = when (context) {
@@ -152,8 +160,8 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
 
     fun resolveForNavigation(context: PsiElement): Array<PsiElement>? {
         return resolve(context)?.mapNotNull {
-            it.method.findSourceElement(
-                it.clazz,
+            it.classAndMethod.method.findSourceElement(
+                it.classAndMethod.clazz,
                 context.project,
                 scope = context.resolveScope,
                 canDecompile = true,
@@ -163,8 +171,8 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {
         return resolve(context)?.mapNotNull {
-            it.method.findSourceElement(
-                it.clazz,
+            it.classAndMethod.method.findSourceElement(
+                it.classAndMethod.clazz,
                 context.project,
                 scope = context.resolveScope,
                 canDecompile = false,

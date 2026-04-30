@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
@@ -115,9 +116,10 @@ abstract class MixinExtrasInjectorAnnotationHandler : InjectorAnnotationHandler(
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): List<MethodSignature>? {
-        val insns = resolveInstructions(annotation, targetClass, targetMethod)
+        val insns = resolveInstructions(annotation, targetClass, targetMethod, enclosingSelector)
             .ifEmpty { return emptyList() }
             .map { TargetInsn(it.insn, it.decorations) }
         val signatures = insns.map { insn ->

@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CtorHeadInjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
@@ -61,10 +62,14 @@ class CtorHeadPostInitInspection : MixinInspection() {
                 .filterIsInstance<MethodTargetMember>()
 
             if (targets.any {
-                it.classAndMethod.method.isConstructor &&
-                    AtResolver(annotation, it.classAndMethod.clazz, it.classAndMethod.method)
-                        .resolveInstructions()
-                        .any { insn -> insn.insn.previous?.opcode != Opcodes.PUTFIELD }
+                val targetMethod = it.classAndMethod
+                    targetMethod.method.isConstructor &&
+                    AtResolver(
+                        annotation,
+                        targetMethod.clazz,
+                        targetMethod.method,
+                        (it as? ContextAwareMethodTargetMember)?.selector
+                    ).resolveInstructions().any { insn -> insn.insn.previous?.opcode != Opcodes.PUTFIELD }
             }
             ) {
                 holder.registerProblem(

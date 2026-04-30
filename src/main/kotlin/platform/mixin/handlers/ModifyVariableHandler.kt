@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.constantStringValue
@@ -42,6 +43,7 @@ class ModifyVariableHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature>? {
         val module = annotation.findModule() ?: return null
 
@@ -49,7 +51,7 @@ class ModifyVariableHandler : InjectorAnnotationHandler() {
         val atCode = at?.findAttributeValue("value")?.constantStringValue
         val isLoadStore = atCode != null && InjectionPoint.byAtCode(atCode) is AbstractLoadInjectionPoint
         val mode = if (isLoadStore) CollectVisitor.Mode.COMPLETION else CollectVisitor.Mode.RESOLUTION
-        val targets = resolveInstructions(annotation, targetClass, targetMethod, mode)
+        val targets = resolveInstructions(annotation, targetClass, targetMethod, enclosingSelector, mode)
 
         val targetParamsGroup = ParameterGroup(
             collectTargetMethodParameters(annotation.project, targetClass, targetMethod),

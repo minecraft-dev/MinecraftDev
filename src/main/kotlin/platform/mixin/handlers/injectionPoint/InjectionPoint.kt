@@ -127,12 +127,13 @@ abstract class InjectionPoint<T : PsiElement> {
         at: PsiAnnotation,
         target: MixinSelector?,
         targetClass: ClassNode,
+        enclosingSelector: MixinSelector?,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<T>? {
         return doCreateCollectVisitor(at, target, targetClass, mode)?.also {
             val isInsideSlice = at.parentOfType<PsiAnnotation>()?.hasQualifiedName(SLICE) == true
             val defaultSpecifier = if (isInsideSlice) InjectionPointSpecifier.FIRST else InjectionPointSpecifier.ALL
-            addFilters(at, targetClass, it, defaultSpecifier, mode)
+            addFilters(at, targetClass, it, defaultSpecifier, enclosingSelector, mode)
         }
     }
 
@@ -141,9 +142,10 @@ abstract class InjectionPoint<T : PsiElement> {
         targetClass: ClassNode,
         collectVisitor: CollectVisitor<T>,
         defaultSpecifier: InjectionPointSpecifier,
+        enclosingSelector: MixinSelector?,
         mode: CollectVisitor.Mode,
     ) {
-        addStandardFilters(at, targetClass, collectVisitor, defaultSpecifier, mode)
+        addStandardFilters(at, targetClass, collectVisitor, defaultSpecifier, enclosingSelector, mode)
     }
 
     fun addStandardFilters(
@@ -151,10 +153,11 @@ abstract class InjectionPoint<T : PsiElement> {
         targetClass: ClassNode,
         collectVisitor: CollectVisitor<T>,
         defaultSpecifier: InjectionPointSpecifier,
+        enclosingSelector: MixinSelector?,
         mode: CollectVisitor.Mode,
     ) {
         addShiftSupport(at, targetClass, collectVisitor)
-        addSliceFilter(at, targetClass, collectVisitor)
+        addSliceFilter(at, targetClass, enclosingSelector, collectVisitor)
 
         // Make sure the ordinal and specifier filters are last, so that the ordinal only increments once the other
         // filters have passed, and the specifier acts on the result of them.
@@ -170,7 +173,7 @@ abstract class InjectionPoint<T : PsiElement> {
         collectVisitor.shiftBy = AtResolver.getShift(at)
     }
 
-    protected open fun addSliceFilter(at: PsiAnnotation, targetClass: ClassNode, collectVisitor: CollectVisitor<T>) {
+    protected open fun addSliceFilter(at: PsiAnnotation, targetClass: ClassNode, enclosingSelector: MixinSelector?, collectVisitor: CollectVisitor<T>) {
         // resolve slice annotation, take into account slice id if present
         val sliceId = at.findDeclaredAttributeValue("slice")?.constantStringValue
         val parentAnnotation = at.parentOfType<PsiAnnotation>() ?: return
@@ -194,10 +197,10 @@ abstract class InjectionPoint<T : PsiElement> {
 
         fun resolveSliceIndex(
             sliceAt: PsiAnnotation?,
-            method: MethodNode,
+            method: MethodNode
         ): Int? {
             return sliceAt?.let {
-                AtResolver(sliceAt, targetClass, method).resolveInstructions()
+                AtResolver(sliceAt, targetClass, method, enclosingSelector).resolveInstructions()
                     .singleOrNull()
                     ?.let { method.instructions.indexOf(it.insn) }
             }

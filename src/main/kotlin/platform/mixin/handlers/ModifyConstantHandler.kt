@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjecti
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.findAnnotations
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
@@ -84,6 +85,7 @@ class ModifyConstantHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature> {
         val constantInfos = getConstantInfos(annotation)
         if (constantInfos == null) {

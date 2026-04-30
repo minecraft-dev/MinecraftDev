@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.platform.mixin.util.findDelegateConstructorCall
@@ -98,20 +99,24 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, annotation.project)
                     as? InjectorAnnotationHandler ?: continue
                 val methodAttribute = annotation.findDeclaredAttributeValue("method") ?: continue
-                val targetMethods = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue
+                val targetMembers = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue
 
-                val hasDisallowedInsns = targetMethods.any { classAndMethod ->
+                val hasDisallowedInsns = targetMembers.any { targetMember ->
+                    val targetMethod = targetMember.classAndMethod
                     handler.resolveInstructions(
                         annotation,
-                        classAndMethod.clazz,
-                        classAndMethod.method
+                        targetMethod.clazz,
+                        targetMethod.method,
+                        (targetMember as? ContextAwareMethodTargetMember)?.selector
                     ).any { !handler.isInsnAllowed(it.insn, it.decorations) }
                 }
                 if (hasDisallowedInsns) {
                     continue
                 }
 
-                for (targetMethod in targetMethods) {
+                for (targetMember in targetMembers) {
+                    val targetMethod = targetMember.classAndMethod
+                    val selector = (targetMember as? ContextAwareMethodTargetMember)?.selector
                     if (!reportedStatic) {
                         var shouldBeStatic = targetMethod.method.hasAccess(Opcodes.ACC_STATIC)
 
@@ -124,6 +129,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                                     annotation,
                                     targetMethod.clazz,
                                     targetMethod.method,
+                                    selector
                                 )
                                 shouldBeStatic = insns.any {
                                     methodInsns.indexOf(it.insn) <= methodInsns.indexOf(delegateCtorCall)
@@ -167,6 +173,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             annotation,
                             targetMethod.clazz,
                             targetMethod.method,
+                            selector
                         ) ?: continue
 
                         val annotationName = annotation.nameReferenceElement?.referenceName

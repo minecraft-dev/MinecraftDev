@@ -91,6 +91,7 @@ class AtResolver(
     private val at: PsiAnnotation,
     private val targetClass: ClassNode,
     private val targetMethod: MethodNode,
+    private val enclosingSelector: MixinSelector?,
 ) {
     companion object {
         fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
@@ -186,6 +187,7 @@ class AtResolver(
             at,
             target,
             getTargetClass(target),
+            enclosingSelector,
             CollectVisitor.Mode.RESOLUTION,
         )
         if (collectVisitor == null) {
@@ -211,7 +213,13 @@ class AtResolver(
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
 
-        val collectVisitor = injectionPoint.createCollectVisitor(at, target, getTargetClass(target), mode)
+        val collectVisitor = injectionPoint.createCollectVisitor(
+            at,
+            target,
+            getTargetClass(target),
+            enclosingSelector,
+            mode
+        )
             ?: return InsnResolutionInfo.Failure()
 
         return collectVisitor.visit(targetMethod)
@@ -288,7 +296,10 @@ class AtResolver(
         // Collect all possible targets
         fun <T : PsiElement> doCollectVariants(injectionPoint: InjectionPoint<T>): List<Any> {
             val visitor = injectionPoint.createCollectVisitor(
-                at, target, getTargetClass(target),
+                at,
+                target,
+                getTargetClass(target),
+                enclosingSelector,
                 CollectVisitor.Mode.COMPLETION
             )
                 ?: return emptyList()
@@ -305,7 +316,8 @@ class AtResolver(
     }
 
     private fun getTargetClass(selector: MixinSelector?): ClassNode {
-        return selector?.getCustomOwner(targetClass) ?: targetClass
+        val owner = selector?.getCustomOwner(targetClass) ?: targetClass
+        return enclosingSelector?.transformTargetClass(owner) ?: owner
     }
 }
 

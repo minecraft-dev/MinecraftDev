@@ -26,9 +26,11 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.reference.DescSelectorParser
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.isMiscDynamicSelector
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.getGenericParameterTypes
@@ -72,7 +74,11 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
             val (clazz, methods) = pair
             methods.firstNotNullOfOrNull { method ->
                 if (selector.matchMethod(method, clazz)) {
-                    MethodTargetMember(clazz, method)
+                    ContextAwareMethodTargetMember(
+                        clazz,
+                        method,
+                        selector,
+                    )
                 } else {
                     null
                 }
@@ -88,8 +94,13 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         }
 
         return resolveTarget(annotation, targetClass).map { targetMember ->
-            val targetMethod = targetMember as? MethodTargetMember ?: return@map InsnResolutionInfo.Failure()
-            isUnresolved(annotation, targetClass, targetMethod.classAndMethod.method) ?: return@isUnresolved null
+            val targetMethod = (targetMember as? MethodTargetMember)?.classAndMethod ?: return@map InsnResolutionInfo.Failure()
+            isUnresolved(
+                annotation,
+                targetClass,
+                targetMethod.method,
+                (targetMember as? ContextAwareMethodTargetMember)?.selector
+            ) ?: return@isUnresolved null
         }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
     }
 
@@ -99,16 +110,22 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): InsnResolutionInfo.Failure? {
         return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
             .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
-            .firstNotNullOfOrNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
+            .firstNotNullOfOrNull { AtResolver(it, targetClass, targetMethod, enclosingSelector).isUnresolved() }
     }
 
     override fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement> {
         return resolveTarget(annotation, targetClass).flatMap { targetMember ->
-            val targetMethod = targetMember as? MethodTargetMember ?: return@flatMap emptyList()
-            resolveForNavigation(annotation, targetMethod.classAndMethod.clazz, targetMethod.classAndMethod.method)
+            val targetMethod = (targetMember as? MethodTargetMember)?.classAndMethod ?: return@flatMap emptyList()
+            resolveForNavigation(
+                annotation,
+                targetMethod.clazz,
+                targetMethod.method,
+                (targetMember as? ContextAwareMethodTargetMember)?.selector
+            )
         }
     }
 
@@ -116,10 +133,11 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): List<PsiElement> {
         return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
             .ifNullOrEmpty { return emptyList() }!!
-            .flatMap { AtResolver(it, targetClass, targetMethod).resolveNavigationTargets() }
+            .flatMap { AtResolver(it, targetClass, targetMethod, enclosingSelector).resolveNavigationTargets() }
     }
 
     fun resolveInstructions(annotation: PsiAnnotation) = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
@@ -131,7 +149,12 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         return resolveTarget(annotation, targetClass)
             .flatMap { targetMember ->
                 val targetMethod = (targetMember as? MethodTargetMember)?.classAndMethod ?: return@flatMap emptyList()
-                resolveInstructions(annotation, targetMethod.clazz, targetMethod.method).map { result ->
+                resolveInstructions(
+                    annotation,
+                    targetMethod.clazz,
+                    targetMethod.method,
+                    (targetMember as? ContextAwareMethodTargetMember)?.selector
+                ).map { result ->
                     InsnResult(targetMethod, result)
                 }
             }
@@ -141,6 +164,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
         mode: CollectVisitor.Mode = CollectVisitor.Mode.RESOLUTION,
     ): List<CollectVisitor.Result<*>> {
         val cache = annotation.cached(PsiModificationTracker.MODIFICATION_COUNT) {
@@ -149,7 +173,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         return cache.computeIfAbsent(ClassAndMethodNode(targetClass, targetMethod) to mode) {
             annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
                 .ifNullOrEmpty { return@computeIfAbsent emptyList() }!!
-                .flatMap { AtResolver(it, targetClass, targetMethod).resolveInstructions(mode) }
+                .flatMap { AtResolver(it, targetClass, targetMethod, enclosingSelector).resolveInstructions(mode) }
         }
     }
 
@@ -162,6 +186,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): List<MethodSignature>?
 
     open fun isInsnAllowed(insn: AbstractInsnNode, decorations: Map<String, Any?>): Boolean {
@@ -229,6 +254,7 @@ object DefaultInjectorAnnotationHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ) = null
 
     override val isSoft = true

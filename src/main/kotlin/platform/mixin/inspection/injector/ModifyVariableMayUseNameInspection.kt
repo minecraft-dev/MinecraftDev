@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
@@ -123,13 +124,18 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
                     return null
                 }
 
-                for (target in injector.resolveTarget(injectorAnnotation, targetClass)) {
-                    val (clazz, method) = (target as? MethodTargetMember)?.classAndMethod ?: continue
-                    for (insn in injector.resolveInstructions(injectorAnnotation, clazz, method)) {
+                for (targetMember in injector.resolveTarget(injectorAnnotation, targetClass)) {
+                    val targetMethod = (targetMember as? MethodTargetMember)?.classAndMethod ?: continue
+                    for (insn in injector.resolveInstructions(
+                        injectorAnnotation,
+                        targetMethod.clazz,
+                        targetMethod.method,
+                        (targetMember as? ContextAwareMethodTargetMember)?.selector
+                    )) {
                         val matchedLocals = localInfo.matchLocals(
                             module,
-                            clazz,
-                            method,
+                            targetMethod.clazz,
+                            targetMethod.method,
                             insn.insn,
                             CollectVisitor.Mode.RESOLUTION
                         ) ?: return null

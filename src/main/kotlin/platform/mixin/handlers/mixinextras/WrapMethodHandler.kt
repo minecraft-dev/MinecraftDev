@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
 import com.demonwav.mcdev.platform.mixin.util.mixinExtrasOperationType
@@ -42,6 +43,7 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature> {
         val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
@@ -64,7 +66,8 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
     override fun isUnresolved(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): InsnResolutionInfo.Failure? {
         // If we've got a target method that's good enough
         return null
@@ -73,7 +76,8 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
     override fun resolveForNavigation(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
-        targetMethod: MethodNode
+        targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?
     ): List<PsiElement> {
         val project = annotation.project
         return targetMethod.findSourceElement(

@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -127,7 +128,12 @@ class MixinParameterNameInspection : MixinInspection() {
 
         if (reportForMainSignature) {
             val expectedSignatures =
-                handler.expectedMethodSignature(annotation, target.classAndMethod.clazz, target.classAndMethod.method)
+                handler.expectedMethodSignature(
+                    annotation,
+                    target.classAndMethod.clazz,
+                    target.classAndMethod.method,
+                    (target as? ContextAwareMethodTargetMember)?.selector
+                )
                     ?: return false
             var anyValidSignatures = false
 
@@ -231,7 +237,8 @@ class MixinParameterNameInspection : MixinInspection() {
         for (insn in handler.resolveInstructions(
             annotation,
             target.classAndMethod.clazz,
-            target.classAndMethod.method
+            target.classAndMethod.method,
+            (target as? ContextAwareMethodTargetMember)?.selector
         )) {
             val matchedLocal = localInfo.matchLocals(
                 module,

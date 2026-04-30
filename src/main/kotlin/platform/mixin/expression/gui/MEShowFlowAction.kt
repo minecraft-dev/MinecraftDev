@@ -93,8 +93,8 @@ class MEShowFlowAction : AnAction() {
 
         fun resolveMixinMethodString(): Sequence<Resolved> {
             val string = element.parentOfType<PsiLiteralExpression>() ?: return emptySequence()
-            return MethodReference.resolve(string)?.map { (clazz, method) ->
-                Resolved(clazz, method)
+            return MethodReference.resolve(string)?.map { member ->
+                Resolved(member.classAndMethod.clazz, member.classAndMethod.method)
             }.orEmpty()
         }
 

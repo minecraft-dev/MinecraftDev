@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.ifEmpty
@@ -51,19 +52,22 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                     if (parentAnnotation == null) {
                         return
                     }
-                    val targets = MixinAnnotationHandler.resolveTarget(parentAnnotation).ifEmpty { return }
-                    val failure = targets.asSequence()
+                    val targetMembers = MixinAnnotationHandler.resolveTarget(parentAnnotation).ifEmpty { return }
+                    val failure = targetMembers.asSequence()
                         .mapNotNull {
-                            (it as? MethodTargetMember)?.classAndMethod
+                            val member = it as? MethodTargetMember
+                            val classAndMethod = member?.classAndMethod
+                            val selector = (it as? ContextAwareMethodTargetMember)?.selector
+                            if (classAndMethod != null) classAndMethod to selector else null
                         }
                         // group by class
-                        .groupBy { it.clazz.name }
+                        .groupBy { it.first.clazz.name }
                         .values.asSequence()
                         // for each class there must be at least one successful match
                         .mapNotNull classLoop@{ methods ->
                             methods
                                 .map {
-                                    AtResolver(annotation, it.clazz, it.method).isUnresolved() ?: return@classLoop null
+                                    AtResolver(annotation, it.first.clazz, it.first.method, it.second).isUnresolved() ?: return@classLoop null
                                 }
                                 .reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
                         }

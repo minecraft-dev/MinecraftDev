@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.handlers
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.getParameter
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
@@ -48,12 +49,13 @@ class ModifyArgHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
+        enclosingSelector: MixinSelector?,
     ): List<MethodSignature>? {
         val index = annotation.findDeclaredAttributeValue("index")?.constantValue as? Int
         val validSingleArgTypes = mutableSetOf<String>()
         var mayHaveValidFullSignature = true
         var validFullSignature: String? = null
-        val insns = resolveInstructions(annotation, targetClass, targetMethod).ifEmpty { return emptyList() }
+        val insns = resolveInstructions(annotation, targetClass, targetMethod, enclosingSelector).ifEmpty { return emptyList() }
         for (insn in insns) {
             if (insn.insn !is MethodInsnNode) return null
 

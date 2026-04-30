@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.injector
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findDelegateConstructorCall
@@ -63,17 +64,25 @@ class CancellableBeforeSuperCallInspection : MixinInspection() {
             val handler = MixinAnnotationHandler.forMixinAnnotation(MixinConstants.Annotations.INJECT)!!
                 as InjectorAnnotationHandler
 
-            for (target in MixinAnnotationHandler.resolveTarget(annotation)) {
-                if (target !is MethodTargetMember) {
+            for (targetMember in MixinAnnotationHandler.resolveTarget(annotation)) {
+                if (targetMember !is MethodTargetMember) {
                     continue
                 }
-                if (!target.classAndMethod.method.isConstructor) {
+                
+                val targetMethod = targetMember.classAndMethod
+                if (!targetMethod.method.isConstructor) {
                     continue
                 }
-                val methodInsns = target.classAndMethod.method.instructions ?: continue
-                val delegateCtorCall = target.classAndMethod.method.findDelegateConstructorCall() ?: continue
+                
+                val methodInsns = targetMethod.method.instructions ?: continue
+                val delegateCtorCall = targetMethod.method.findDelegateConstructorCall() ?: continue
                 val instructions =
-                    handler.resolveInstructions(annotation, target.classAndMethod.clazz, target.classAndMethod.method)
+                    handler.resolveInstructions(
+                        annotation,
+                        targetMethod.clazz,
+                        targetMethod.method,
+                        (targetMember as? ContextAwareMethodTargetMember)?.selector
+                    )
                 if (instructions.any { methodInsns.indexOf(it.insn) <= methodInsns.indexOf(delegateCtorCall) }) {
                     return true
                 }

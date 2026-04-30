@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
@@ -175,19 +176,25 @@ private fun WrapWithConditionHandler.getReplaceWithWrapOpInfo(annotation: PsiAnn
     var targetType: Type? = null
     var requiredParameterCount: Int? = null
 
-    for (target in MixinAnnotationHandler.resolveTarget(annotation)) {
-        if (target !is MethodTargetMember) {
+    for (targetMember in MixinAnnotationHandler.resolveTarget(annotation)) {
+        if (targetMember !is MethodTargetMember) {
             continue
         }
 
-        for (insn in resolveInstructions(annotation, target.classAndMethod.clazz, target.classAndMethod.method)) {
+        val targetMethod = targetMember.classAndMethod
+        for (insn in resolveInstructions(
+            annotation,
+            targetMethod.clazz,
+            targetMethod.method,
+            (targetMember as? ContextAwareMethodTargetMember)?.selector
+        )) {
             val newTargetType = getValidTargetType(insn.insn) ?: continue
             if (targetType != null && targetType != newTargetType) {
                 return null
             }
             targetType = newTargetType
 
-            val newRequiredParameterCount = getRequiredParameterCount(insn.insn, target.classAndMethod.clazz, annotation)
+            val newRequiredParameterCount = getRequiredParameterCount(insn.insn, targetMethod.clazz, annotation)
             if (requiredParameterCount != null && requiredParameterCount != newRequiredParameterCount) {
                 return null
             }

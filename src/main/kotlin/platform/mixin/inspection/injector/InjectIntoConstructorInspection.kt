@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
+import com.demonwav.mcdev.platform.mixin.util.ContextAwareMethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
@@ -72,13 +73,18 @@ class InjectIntoConstructorInspection : MixinInspection() {
                     if (target !is MethodTargetMember || !target.classAndMethod.method.isConstructor) {
                         continue
                     }
-                    val (targetClass, targetMethod) = target.classAndMethod
+                    val targetMethod = target.classAndMethod
 
                     for (at in ats) {
                         val isUnsafe = at.findDeclaredAttributeValue("unsafe")?.constantValue as? Boolean
                             ?: (isFabric && allowOnFabric)
 
-                        val instructions = AtResolver(at, targetClass, targetMethod).resolveInstructions()
+                        val instructions = AtResolver(
+                            at,
+                            targetMethod.clazz,
+                            targetMethod.method,
+                            (target as? ContextAwareMethodTargetMember)?.selector
+                        ).resolveInstructions()
                         if (!isUnsafe && instructions.any { it.insn.opcode != Opcodes.RETURN }) {
                             val atClass = at.nameReferenceElement?.resolve() as? PsiClass
                             val atHasUnsafe = !atClass?.findMethodsByName("unsafe", false).isNullOrEmpty()
