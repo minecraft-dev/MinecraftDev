@@ -189,7 +189,11 @@ private fun shadowMethod(project: Project, psiClass: PsiClass, method: PsiMethod
         // Remove code block
         newMethod.body?.delete()
     } else {
-        val newBody = JavaPsiFacade.getElementFactory(project).createCodeBlockFromText("{throw new UnsupportedOperationException(\"Implemented via mixin\");}", newMethod)
+        val newBody = if (method.isConstructor) {
+            JavaPsiFacade.getElementFactory(project).createCodeBlock()
+        } else {
+            JavaPsiFacade.getElementFactory(project).createCodeBlockFromText("{throw new UnsupportedOperationException(\"Implemented via mixin\");}", newMethod)
+        }
         newMethod.body?.replace(newBody)
     }
 
@@ -204,6 +208,11 @@ private fun canMakeAbstract(psiClass: PsiClass, method: PsiMethod): Boolean {
 
     // Static or native methods can't be abstract
     if (method.hasModifierProperty(PsiModifier.STATIC) || method.hasModifierProperty(PsiModifier.NATIVE)) {
+        return false
+    }
+
+    // Constructors can't be abstract
+    if (method.isConstructor) {
         return false
     }
 

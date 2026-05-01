@@ -29,6 +29,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiParameter
 
@@ -72,8 +73,12 @@ class MixinImplicitUsageProvider : ImplicitUsageProvider {
         return element is PsiEnumConstant && element.containingClass?.isMixin == true
     }
 
+    private fun isAbstractShadowInEnum(element: PsiElement): Boolean {
+        return element is PsiMethod && element.hasModifierProperty(PsiModifier.ABSTRACT) && element.hasAnnotation(SHADOW) && element.containingClass?.isEnum == true
+    }
+
     override fun isImplicitUsage(element: PsiElement) =
-        isParameterInShadow(element) || isHandlerImplicitlyUsed(element) || isMixinAddedEnumConstant(element)
+        isParameterInShadow(element) || isHandlerImplicitlyUsed(element) || isMixinAddedEnumConstant(element) || isAbstractShadowInEnum(element)
     override fun isImplicitRead(element: PsiElement) = isShadowField(element)
     override fun isImplicitWrite(element: PsiElement) = isShadowField(element)
 }
