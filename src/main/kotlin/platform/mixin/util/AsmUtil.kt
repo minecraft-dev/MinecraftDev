@@ -451,7 +451,8 @@ fun ClassNode.findSourceClass(project: Project, scope: GlobalSearchScope, canDec
             }
         }
         if (canDecompile) {
-            ((stubFile as? PsiCompiledFile)?.decompiledPsiFile as? PsiJavaFile)?.classes?.firstOrNull()
+            val javaFile = (stubFile as? PsiCompiledFile)?.decompiledPsiFile as? PsiJavaFile ?: stubFile as? PsiJavaFile
+            javaFile?.classes?.firstOrNull()
         } else {
             stubClass
         }

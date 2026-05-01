@@ -35,6 +35,7 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiNewExpression
+import com.intellij.psi.search.GlobalSearchScope
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
@@ -54,7 +55,14 @@ class InvokeInjectionPoint : AbstractMethodInjectionPoint() {
         target: MixinSelector?,
         targetClass: PsiClass,
     ): NavigationVisitor? {
-        return target?.let { MyNavigationVisitor(targetClass, it) }
+        if (target == null) return null
+        val ownerOrTarget = target.owner?.let { ownerName ->
+            JavaPsiFacade.getInstance(targetClass.project).findClass(
+                ownerName.replace('/', '.'),
+                GlobalSearchScope.allScope(targetClass.project)
+            )
+        } ?: targetClass
+        return MyNavigationVisitor(ownerOrTarget, target)
     }
 
     override fun doCreateCollectVisitor(
