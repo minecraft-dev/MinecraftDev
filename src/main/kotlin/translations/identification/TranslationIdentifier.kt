@@ -37,7 +37,6 @@ import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInsight.completion.CompletionUtilCore
 import com.intellij.codeInspection.dataFlow.CommonDataflow
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiArrayType
@@ -58,6 +57,8 @@ import org.jetbrains.uast.getContainingUClass
 import org.jetbrains.uast.util.isNewArrayWithInitializer
 
 object TranslationIdentifier {
+    private val isComputingValueWithDataflow = ThreadLocal.withInitial { false }
+
     fun identify(
         element: UExpression
     ): TranslationInstance? {
@@ -89,8 +90,15 @@ object TranslationIdentifier {
 
         val translationKey = when (val javaPsi = element.javaPsi) {
             is PsiExpression -> {
-                RecursionManager.doPreventingRecursion(javaPsi, false) {
-                    CommonDataflow.computeValue(javaPsi) as? String
+                if (isComputingValueWithDataflow.get()) {
+                    null
+                } else {
+                    isComputingValueWithDataflow.set(true)
+                    try {
+                        CommonDataflow.computeValue(javaPsi) as? String
+                    } finally {
+                        isComputingValueWithDataflow.set(false)
+                    }
                 }
             }
             else -> element.evaluateString()

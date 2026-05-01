@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.bytecode
@@ -39,6 +40,7 @@ import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -193,7 +195,16 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
             }
         }
 
-        return createLookup(context, methods.asSequence().map { ClassAndMethodNode(target, it) }, uniqueMethods)
+        val dynamicSelectors = MixinSelectorParser.EP_NAME.extensionList.asSequence()
+            .filterIsInstance<DynamicSelectorParser>()
+            .map { "@${it.id}" }
+
+        return createLookup(
+            context,
+            methods.asSequence().map { ClassAndMethodNode(target, it) },
+            uniqueMethods,
+            dynamicSelectors
+        )
     }
 
     private fun collectVariants(context: PsiElement, targets: Collection<ClassNode>): Array<Any> {
@@ -227,13 +238,18 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
             }
         }
 
-        return createLookup(context, allMethods.asSequence(), uniqueMethods)
+        val dynamicSelectors = MixinSelectorParser.EP_NAME.extensionList.asSequence()
+            .filterIsInstance<DynamicSelectorParser>()
+            .map { "@${it.id}" }
+
+        return createLookup(context, allMethods.asSequence(), uniqueMethods, dynamicSelectors)
     }
 
     private fun createLookup(
         context: PsiElement,
         methods: Sequence<ClassAndMethodNode>,
         uniqueMethods: Set<String>,
+        dynamicSelectors: Sequence<String>
     ): Array<Any> {
         return methods
             .map { m ->
@@ -256,8 +272,17 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                     null,
                 )
                     .withPresentableText(m.method.name)
-                addCompletionInfo(builder, context, targetMethodInfo)
-            }.toTypedArray()
+                PrioritizedLookupElement.withPriority(
+                    addCompletionInfo(builder, context, targetMethodInfo),
+                    1.0
+                )
+            }.plus(dynamicSelectors.map {
+                PrioritizedLookupElement.withPriority(
+                    LookupElementBuilder.create(it).completeDynamicSelector(context),
+                    0.0
+                )
+            })
+            .toTypedArray()
     }
 
     open val requireDescriptor = false
@@ -268,5 +293,16 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         targetMethodInfo: MemberReference,
     ): LookupElementBuilder {
         return builder.completeToLiteral(context)
+    }
+
+    private fun LookupElementBuilder.completeDynamicSelector(context: PsiElement): LookupElementBuilder {
+        val id = lookupString.removePrefix("@")
+        val parser = MixinSelectorParser.EP_NAME.extensionList.asSequence()
+            .filterIsInstance<DynamicSelectorParser>()
+            .firstOrNull { id in it.validIds } ?: return completeToLiteral(context)
+
+        return completeToLiteral(context) { editor, element ->
+            parser.onCompleted(editor, element)
+        }
     }
 }

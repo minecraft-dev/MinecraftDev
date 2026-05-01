@@ -1,5 +1,15 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.16]
+
+### Added
+
+- Added autocompletion for `@Desc` selector
+
+### Fixed
+
+- Fixed freeze of analysis in occasional classes caused by `TranslationIdentifier`
+
 ## [1.8.15]
 
 ### Added

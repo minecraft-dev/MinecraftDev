@@ -36,6 +36,7 @@ import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findField
 import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findQualifiedClass
@@ -45,6 +46,7 @@ import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.resolveClass
 import com.demonwav.mcdev.util.resolveType
 import com.demonwav.mcdev.util.resolveTypeArray
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.RecursionManager
@@ -55,10 +57,14 @@ import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.PsiTypes
+import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedMembersSearch
 import com.intellij.psi.search.searches.MethodReferencesSearch
@@ -418,7 +424,7 @@ private fun findNamespace(
 
 private val DYNAMIC_SELECTOR_PATTERN = "(?i)^@([a-z]+(:[a-z]+)?)(\\((.*)\\))?$".toRegex()
 
-abstract class DynamicSelectorParser(id: String, vararg aliases: String) : MixinSelectorParser {
+abstract class DynamicSelectorParser(val id: String, vararg aliases: String) : MixinSelectorParser {
     val validIds = aliases.toSet() + id
 
     final override fun parse(value: String, context: PsiElement): MixinSelector? {
@@ -431,6 +437,9 @@ abstract class DynamicSelectorParser(id: String, vararg aliases: String) : Mixin
     }
 
     abstract fun parseDynamic(args: String, context: PsiElement): MixinSelector?
+
+    open fun onCompleted(editor: Editor, reference: PsiLiteral) {
+    }
 }
 
 // @Desc
@@ -544,6 +553,32 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                 }
             }
         }
+    }
+
+    override fun onCompleted(editor: Editor, reference: PsiLiteral) {
+        val modifierList = reference.findContainingModifierList() ?: return
+        if (modifierList.hasAnnotation(DESC)) {
+            return
+        }
+
+        val project = reference.project
+
+        val descAnnotation = modifierList.addAfter(
+            JavaPsiFacade.getElementFactory(project)
+                .createAnnotationFromText("@${DESC}(\"\")", reference),
+            null
+        )
+
+        // add imports and reformat
+        JavaCodeStyleManager.getInstance(project).shortenClassReferences(descAnnotation)
+        JavaCodeStyleManager.getInstance(project).optimizeImports(modifierList.containingFile)
+        val formattedModifierList = CodeStyleManager.getInstance(project).reformat(modifierList) as PsiModifierList
+
+        // move the caret to @Desc("<caret>")
+        val formattedDescAnnotation = formattedModifierList.findAnnotation(DESC)
+            ?: return
+        val descLiteral = formattedDescAnnotation.findDeclaredAttributeValue(null) ?: return
+        editor.caretModel.moveToOffset(descLiteral.textRange.startOffset + 1)
     }
 
     object Util {
