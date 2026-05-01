@@ -28,6 +28,7 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiStatement
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
@@ -71,6 +72,9 @@ class HeadInjectionPoint : InjectionPoint<PsiElement>() {
 
     private class MyNavigationVisitor : NavigationVisitor() {
         private var firstStatement = true
+
+        override fun visitAnnotation(annotation: PsiAnnotation) {
+        }
 
         override fun visitStatement(statement: PsiStatement) {
             if (firstStatement) {

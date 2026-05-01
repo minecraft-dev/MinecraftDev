@@ -25,12 +25,14 @@ import com.demonwav.mcdev.util.MemberReference
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.ArrayUtilRt
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
@@ -91,7 +93,13 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
         target: MixinSelector?,
         targetClass: PsiClass,
     ): NavigationVisitor? {
-        return target?.let { MyNavigationVisitor(targetClass, it) }
+        val ownerOrTarget = target?.owner?.let { ownerName ->
+            JavaPsiFacade.getInstance(targetClass.project).findClass(
+                ownerName.replace('/', '.'),
+                GlobalSearchScope.allScope(targetClass.project)
+            )
+        } ?: targetClass
+        return target?.let { MyNavigationVisitor(ownerOrTarget, it) }
     }
 
     override fun doCreateCollectVisitor(

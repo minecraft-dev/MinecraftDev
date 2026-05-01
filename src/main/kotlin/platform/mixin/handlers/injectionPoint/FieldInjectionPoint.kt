@@ -29,6 +29,7 @@ import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayAccessExpression
 import com.intellij.psi.PsiClass
@@ -37,6 +38,7 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiUtil
 import com.intellij.util.ArrayUtilRt
 import org.objectweb.asm.Opcodes
@@ -87,7 +89,13 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
             ?.takeIf { it in Const.VALID_OPCODES } ?: -1
         val args = AtResolver.getArgs(at)
         val arrayAccess = getArrayAccessType(args)
-        return target?.let { MyNavigationVisitor(targetClass, it, opcode, arrayAccess) }
+        val ownerOrTarget = target?.owner?.let { ownerName ->
+            JavaPsiFacade.getInstance(targetClass.project).findClass(
+                ownerName.replace('/', '.'),
+                GlobalSearchScope.allScope(targetClass.project)
+            )
+        } ?: targetClass
+        return target?.let { MyNavigationVisitor(ownerOrTarget, it, opcode, arrayAccess) }
     }
 
     override fun doCreateCollectVisitor(
