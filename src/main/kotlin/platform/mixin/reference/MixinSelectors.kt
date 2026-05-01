@@ -575,10 +575,10 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
         val formattedModifierList = CodeStyleManager.getInstance(project).reformat(modifierList) as PsiModifierList
 
         // move the caret to @Desc("<caret>")
-        val formattedExprAnnotation = formattedModifierList.findAnnotation(DESC)
+        val formattedDescAnnotation = formattedModifierList.findAnnotation(DESC)
             ?: return
-        val exprLiteral = formattedExprAnnotation.findDeclaredAttributeValue(null) ?: return
-        editor.caretModel.moveToOffset(exprLiteral.textRange.startOffset + 1)
+        val descLiteral = formattedDescAnnotation.findDeclaredAttributeValue(null) ?: return
+        editor.caretModel.moveToOffset(descLiteral.textRange.startOffset + 1)
     }
 
     object Util {
