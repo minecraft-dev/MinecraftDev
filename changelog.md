@@ -1,5 +1,12 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.17]
+
+### Added
+
+- Added support for IntelliJ 2026.2
+- Added completion contributor for Bukkit event handlers
+
 ## [1.8.16]
 
 ### Added
