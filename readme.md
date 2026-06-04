@@ -55,10 +55,10 @@ box, simply search for `Minecraft`. You can install it from there and restart In
 Dependencies
 ------------
 
-Gradle will download all necessary dependencies to build the project, but you do need JDK 21 installed and available to
+Gradle will download all necessary dependencies to build the project, but you do need JDK 25 installed and available to
 Gradle in order to build.
 
-You can easily install JDK 21 from [Adoptium](https://adoptium.net/temurin/releases). 
+You can easily install JDK 25 from [Adoptium](https://adoptium.net/temurin/releases). 
 
 Building
 --------
