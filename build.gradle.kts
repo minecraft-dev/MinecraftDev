@@ -154,6 +154,7 @@ dependencies {
 
     // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
     // afterEvaluate { println(intellijPlatform.productInfo.buildNumber) }
+    gradleToolingExtension(gradleApi())
     gradleToolingExtension(libs.groovy)
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)

@@ -31,16 +31,29 @@ import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.util.ActionCallback
+import com.intellij.platform.workspace.jps.entities.LibraryEntity
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import java.nio.file.Paths
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
 class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
+    @Deprecated("Deprecated in AttachSourcesProvider")
     override fun getActions(
         orderEntries: List<LibraryOrderEntry>,
         psiFile: PsiFile,
     ): Collection<AttachSourcesProvider.AttachSourcesAction> {
+        return getDecompileActions(psiFile)
+    }
+
+    override fun getLibrariesActions(
+        libraryEntities: Collection<LibraryEntity?>,
+        psiFile: PsiFile
+    ): Collection<AttachSourcesProvider.AttachSourcesAction?> {
+        return getDecompileActions(psiFile)
+    }
+
+    private fun getDecompileActions(psiFile: PsiFile): Collection<AttachSourcesProvider.AttachSourcesAction> {
         if (psiFile !is PsiJavaFile || !psiFile.packageName.startsWith("net.minecraft")) {
             return emptyList()
         }

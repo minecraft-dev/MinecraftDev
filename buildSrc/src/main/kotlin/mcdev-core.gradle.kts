@@ -50,26 +50,26 @@ if (System.getenv("CI") != "true") {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs = listOf("-proc:none")
-    options.release.set(21)
+    options.release.set(25)
 }
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+        jvmTarget = JvmTarget.JVM_25
         languageVersion = KotlinVersion.KOTLIN_2_2
         apiVersion = KotlinVersion.KOTLIN_2_2
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
-        freeCompilerArgs = listOf("-Xjdk-release=21")
+        freeCompilerArgs = listOf("-Xjdk-release=25")
         optIn.add("kotlin.contracts.ExperimentalContracts")
     }
 }

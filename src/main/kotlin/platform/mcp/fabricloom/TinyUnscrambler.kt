@@ -26,8 +26,8 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.ComboBox
-import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.unscramble.UnscrambleSupport
@@ -55,10 +55,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
         val mappingsBox: ComboBox<String> = ComboBox(mappingsBoxModel as ComboBoxModel<String>)
 
         init {
-            mappingsBox.renderer = SimpleListCellRenderer.create { label, value, _ ->
-                val path = mappingsBoxModel.getValue(value)
-                label.text = "[$value] $path"
-            }
+            mappingsBox.renderer = textListCellRenderer { "[$it] ${mappingsBoxModel.getValue(it)}" }
             add(
                 JBLabel("Mappings: "),
                 GridConstraints(

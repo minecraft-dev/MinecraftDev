@@ -31,6 +31,7 @@ import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.util.ActionCallback
+import com.intellij.platform.workspace.jps.entities.LibraryEntity
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import java.nio.file.Paths
@@ -38,10 +39,22 @@ import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
 class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
+    @Deprecated("Deprecated in AttachSourcesProvider")
     override fun getActions(
         orderEntries: List<LibraryOrderEntry>,
+        psiFile: PsiFile
+    ): Collection<AttachSourcesProvider.AttachSourcesAction> {
+        return getDecompileActions(psiFile)
+    }
+
+    override fun getLibrariesActions(
+        orderEntries: Collection<LibraryEntity>,
         psiFile: PsiFile,
     ): Collection<AttachSourcesProvider.AttachSourcesAction> {
+        return getDecompileActions(psiFile)
+    }
+
+    private fun getDecompileActions(psiFile: PsiFile): Collection<AttachSourcesProvider.AttachSourcesAction> {
         if (psiFile !is PsiJavaFile || !psiFile.packageName.startsWith("net.minecraft")) {
             return emptyList()
         }

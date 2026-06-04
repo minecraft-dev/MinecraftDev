@@ -1,6 +1,6 @@
 [versions]
 # https://github.com/JetBrains/intellij-community/blob/<version>/.idea/libraries/kotlin_stdlib.xml
-kotlin = "2.3.20-RC2"
+kotlin = "2.4.0-RC"
 # https://github.com/JetBrains/intellij-community/blob/<version>/.idea/libraries/kotlinx_coroutines_core.xml
 coroutines = "1.10.2"
 junit = "6.0.3"
@@ -9,12 +9,12 @@ fuel = "2.3.1"
 licenser = "0.7.5"
 changelog = "2.5.0"
 # https://github.com/JetBrains/intellij-platform-gradle-plugin
-intellij-plugin = "2.13.1"
+intellij-plugin = "2.16.0"
 # https://central.sonatype.com/artifact/org.jetbrains.intellij/plugin-repository-rest-client
-intellij-plugin-repository-rest-client = "2.0.50"
+intellij-plugin-repository-rest-client = "2.0.51"
 # https://www.jetbrains.com/intellij-repository/snapshots or https://www.jetbrains.com/intellij-repository/releases/
 # Search for com.jetbrains.intellij.idea
-intellij-ide = "261.22158.277"
+intellij-ide = "262.7132-EAP-CANDIDATE-SNAPSHOT"
 # https://github.com/JetBrains/gradle-idea-ext-plugin
 idea-ext = "1.4.1"
 
@@ -51,7 +51,7 @@ grammarKit = "org.jetbrains.idea:grammar-kit:1.5.1"
 # Gradle Tooling
 # https://www.jetbrains.com/intellij-repository/snapshots or https://www.jetbrains.com/intellij-repository/releases/
 # Search for com.jetbrains.intellij.gradle
-gradleToolingExtension = { module = "com.jetbrains.intellij.gradle:gradle-tooling-extension", version = "253.29346.138" }
+gradleToolingExtension = { module = "com.jetbrains.intellij.gradle:gradle-tooling-extension", version = "262.7132.12" }
 annotations = "org.jetbrains:annotations:26.1.0"
 groovy = "org.codehaus.groovy:groovy:3.0.25"
 
