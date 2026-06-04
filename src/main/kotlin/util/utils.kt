@@ -47,6 +47,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtil
 import java.lang.invoke.MethodHandles
 import java.util.Locale
+import java.util.Locale.getDefault
 import java.util.concurrent.CancellationException
 import java.util.regex.PatternSyntaxException
 import kotlin.math.min
@@ -349,6 +350,13 @@ fun @receiver:Language("RegExp") String.toRegexOrNull(): Regex? {
 
 fun String.toRegexOrDefault(@Language("RegExp") default: String): Regex {
     return this.toRegexOrNull() ?: default.toRegex()
+}
+
+fun String?.toBooleanLenient(): Boolean? = when (this?.lowercase()) {
+    null -> false
+    in listOf("", "yes", "true", "on", "y") -> true
+    in listOf("no", "false", "off", "n") -> false
+    else -> null
 }
 
 // Bit of a hack, but this allows us to get the class object for top level declarations without having to

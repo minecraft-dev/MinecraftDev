@@ -30,6 +30,7 @@ import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.creator.custom.types.GradlePluginSelectorCreatorProperty.Holder
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.getOrLogException
+import com.demonwav.mcdev.util.toBooleanLenient
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.intellij.openapi.diagnostic.thisLogger
@@ -48,7 +49,6 @@ import java.util.function.Function
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.kotlin.cli.common.toBooleanLenient
 
 class GradlePluginSelectorCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
