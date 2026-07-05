@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,6 +27,7 @@ import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
+import com.demonwav.mcdev.platform.fabric.creator.FabricGradleWrapper
 import com.demonwav.mcdev.util.toTypedArray
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.codeInsight.CodeInsightSettings
@@ -288,6 +289,7 @@ class CreatorTemplateProcessor(
         val finalizeAction = suspend {
             WriteAction.runAndWait<Throwable> {
                 LocalFileSystem.getInstance().refresh(false)
+                FabricGradleWrapper.writeIfFabricProject(projectPath)
                 // Apparently a module root is required for the reformat to work
                 setupTempRootModule(project, projectPath)
 
