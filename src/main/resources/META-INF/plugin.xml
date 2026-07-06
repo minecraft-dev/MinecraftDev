@@ -368,6 +368,8 @@
                                         implementationClass="com.demonwav.mcdev.insight.ColorLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language=""
                                         implementationClass="com.demonwav.mcdev.insight.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language=""
+                                        implementationClass="com.demonwav.mcdev.insight.MapColorLineMarkerProvider"/>
 
         <!-- Project-independent Annotators-->
         <annotator language="UAST" implementationClass="com.demonwav.mcdev.insight.ListenerEventAnnotator"/>
