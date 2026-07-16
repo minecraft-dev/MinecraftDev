@@ -39,6 +39,7 @@ import com.intellij.openapi.roots.OrderEnumerator
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.intellij.psi.search.GlobalSearchScopes
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,10 +47,13 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
 @OptIn(FlowPreview::class)
@@ -58,16 +62,18 @@ class MinecraftFacetDetector(
     private val project: Project,
     scope: CoroutineScope,
 ) {
-    private val requests = MutableSharedFlow<Unit>(
+    private val requests = MutableSharedFlow<Long>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+    private val requestedGeneration = AtomicLong()
+    private val completedGeneration = MutableStateFlow(0L)
 
     init {
         scope.launch {
             requests
                 .debounce(300.milliseconds)
-                .collectLatest {
+                .collectLatest { generation ->
                     withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = true) {
                         val detections = smartReadAction(project) { detectModules() }
                         val needsReimport = withContext(Dispatchers.EDT) { applyDetections(detections) }
@@ -78,12 +84,19 @@ class MinecraftFacetDetector(
                             }
                         }
                     }
+                    completedGeneration.value = generation
                 }
         }
     }
 
     fun schedule() {
-        requests.tryEmit(Unit)
+        requests.tryEmit(requestedGeneration.incrementAndGet())
+    }
+
+    @TestOnly
+    suspend fun awaitLatestDetection() {
+        val generation = requestedGeneration.get()
+        completedGeneration.first { it >= generation }
     }
 
     private fun detectModules(): List<ModuleDetection> = buildList {

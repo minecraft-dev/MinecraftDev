@@ -20,14 +20,17 @@
 
 package com.demonwav.mcdev.platform.bukkit
 
+import com.demonwav.mcdev.facet.MinecraftFacetDetector
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.NoEdt
 import com.demonwav.mcdev.framework.createLibrary
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.runWriteTask
+import com.intellij.openapi.components.service
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
@@ -49,6 +52,13 @@ abstract class BaseSpigotTest : BaseMinecraftTest(PlatformType.SPIGOT) {
             System.arraycopy(orderEntries, 0, orderEntries, 1, orderEntries.size - 1)
             orderEntries[0] = last
             model.rearrangeOrderEntries(orderEntries)
+        }
+
+        runBlocking {
+            project.service<MinecraftFacetDetector>().run {
+                schedule()
+                awaitLatestDetection()
+            }
         }
     }
 
