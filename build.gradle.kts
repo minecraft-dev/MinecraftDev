@@ -19,9 +19,6 @@
  */
 
 import io.sentry.android.gradle.extensions.SentryPluginExtension
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.atomics.AtomicInt
-import org.gradle.kotlin.dsl.configure
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers

@@ -20,16 +20,11 @@
 
 package com.demonwav.mcdev.platform.bungeecord.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.facet.MavenLibraryPresentationProvider
-import com.intellij.framework.library.LibraryVersionProperties
+import com.demonwav.mcdev.facet.MavenMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 
-class BungeeCordPresentationProvider :
-    MavenLibraryPresentationProvider(BUNGEECORD_LIBRARY_KIND, "net.md-5", "bungeecord-api") {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.BUNGEECORD_ICON
-}
+class BungeeCordLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.BUNGEECORD, "net.md-5", "bungeecord-api")
 
-class WaterfallPresentationProvider :
-    MavenLibraryPresentationProvider(WATERFALL_LIBRARY_KIND, "io.github.waterfallmc", "waterfall-api") {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.WATERFALL_ICON
-}
+class WaterfallLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.WATERFALL, "io.github.waterfallmc", "waterfall-api")

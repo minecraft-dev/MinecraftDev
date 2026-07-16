@@ -20,32 +20,21 @@
 
 package com.demonwav.mcdev.platform.adventure.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryManifest
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.adventure.AdventureConstants
 import com.demonwav.mcdev.util.get
-import com.demonwav.mcdev.util.manifest
-import com.intellij.openapi.roots.libraries.DummyLibraryProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 import java.util.jar.Attributes.Name.SPECIFICATION_TITLE
-import java.util.jar.Manifest
 
-class AdventurePresentationProvider : LibraryPresentationProvider<DummyLibraryProperties>(ADVENTURE_LIBRARY_KIND) {
-    override fun getIcon(properties: DummyLibraryProperties?) = PlatformAssets.ADVENTURE_ICON
+class AdventureLibraryDetector : MinecraftLibraryDetector {
+    override val platformType = PlatformType.ADVENTURE
 
-    override fun detect(classesRoots: MutableList<VirtualFile>): DummyLibraryProperties? {
-        for (classesRoot in classesRoots) {
-            val manifest = classesRoot.manifest ?: continue
-
-            if (findUsingManifest(manifest)) {
-                return DummyLibraryProperties.INSTANCE
-            }
-        }
-
-        return null
-    }
-
-    private fun findUsingManifest(manifest: Manifest): Boolean =
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        hasLibraryManifest(scope) { manifest ->
         manifest[SPECIFICATION_TITLE] == AdventureConstants.API_SPECIFICATION_TITLE ||
             manifest["Automatic-Module-Name"] == AdventureConstants.API_MODULE_ID
+        }
 }

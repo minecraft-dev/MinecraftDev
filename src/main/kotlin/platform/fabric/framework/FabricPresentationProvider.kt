@@ -20,29 +20,10 @@
 
 package com.demonwav.mcdev.platform.fabric.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.util.localFile
-import com.intellij.framework.library.LibraryVersionProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.vfs.VirtualFile
-import java.util.jar.JarFile
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 
-class FabricPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(FABRIC_LIBRARY_KIND) {
-
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.FABRIC_ICON
-
-    override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            if (!classesRoot.name.endsWith(".jar")) {
-                continue
-            }
-            runCatching {
-                JarFile(classesRoot.localFile).use { jar ->
-                    jar.getEntry("net/fabricmc/loader/api/FabricLoader.class") ?: return@runCatching
-                    return LibraryVersionProperties()
-                }
-            }
-        }
-        return null
-    }
-}
+class FabricLibraryDetector : ClassMinecraftLibraryDetector(
+    PlatformType.FABRIC,
+    "net.fabricmc.loader.api.FabricLoader",
+)

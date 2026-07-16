@@ -20,30 +20,15 @@
 
 package com.demonwav.mcdev.platform.architectury.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.util.localFile
-import com.intellij.framework.library.LibraryVersionProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.vfs.VirtualFile
-import java.util.jar.JarFile
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryFile
+import com.demonwav.mcdev.platform.PlatformType
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 
-class ArchitecturyPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(
-    ARCHITECTURY_LIBRARY_KIND,
-) {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.ARCHITECTURY_ICON
+class ArchitecturyLibraryDetector : MinecraftLibraryDetector {
+    override val platformType = PlatformType.ARCHITECTURY
 
-    override fun detect(classesRoots: MutableList<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            if (!classesRoot.name.endsWith(".jar")) {
-                continue
-            }
-            runCatching {
-                JarFile(classesRoot.localFile).use { jar ->
-                    jar.getEntry("architectury.common.json") ?: return@runCatching
-                    return LibraryVersionProperties()
-                }
-            }
-        }
-        return null
-    }
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        hasLibraryFile("architectury.common.json", "architectury.common.json", scope)
 }

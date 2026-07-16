@@ -66,6 +66,8 @@
     </change-notes>
 
     <extensionPoints>
+        <extensionPoint name="minecraftLibraryDetector"
+                        interface="com.demonwav.mcdev.facet.MinecraftLibraryDetector" dynamic="true"/>
         <extensionPoint name="platformTypeWizard"
                         interface="com.demonwav.mcdev.creator.platformtype.PlatformTypeStep$Factory" dynamic="true"/>
         <extensionPoint name="modPlatformWizard"
@@ -332,6 +334,39 @@
         <missingLVTChecker implementation="com.demonwav.mcdev.platform.mixin.util.MinecraftMissingLVTChecker"/>
 
         <eventGenHelper language="JAVA" implementationClass="com.demonwav.mcdev.insight.generation.JavaEventGenHelper"/>
+
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.adventure.framework.AdventureLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bukkit.framework.SpigotLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bukkit.framework.OldPaperLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bukkit.framework.ModernPaperLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.sponge.framework.SpongeLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.forge.framework.ForgeLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.neoforge.framework.NeoForgeLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.fabric.framework.FabricLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.mcp.framework.McpLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.mixin.framework.MixinLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordLibraryDetector"/>
+        <minecraftLibraryDetector
+                implementation="com.demonwav.mcdev.platform.bungeecord.framework.WaterfallLibraryDetector"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -358,7 +393,7 @@
         <postStartupActivity implementation="com.demonwav.mcdev.creator.custom.TemplateProjectFinalizerActivity"/>
         <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType"/>
-        <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
+        <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetectorListener"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
 
@@ -509,9 +544,6 @@
 
         <dependencySupport coordinate="net.kyori:adventure-api" kind="java"/>
 
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.adventure.framework.AdventurePresentationProvider"/>
-
         <codeInsight.lineMarkerProvider language=""
                                         implementationClass="com.demonwav.mcdev.platform.adventure.color.AdventureColorLineMarkerProvider"/>
         <!--endregion-->
@@ -525,16 +557,6 @@
         <dependencySupport coordinate="io.papermc.paper:paper-api" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bukkit.BukkitFileIconProvider"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bukkit.framework.BukkitPresentationProvider"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bukkit.framework.SpigotPresentationProvider"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bukkit.framework.OldPaperPresentationProvider"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bukkit.framework.PaperPresentationProvider"/>
-        <library.presentationProvider
-                implementation="com.demonwav.mcdev.platform.bukkit.framework.ModernPaperPresentationProvider"/>
 
         <!-- Bukkit Completion Contributor -->
 
@@ -566,8 +588,6 @@
         <psi.referenceContributor language="UAST"
                                   implementation="com.demonwav.mcdev.platform.sponge.reference.SpongeReferenceContributor"/>
 
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.sponge.framework.SpongePresentationProvider"/>
         <importFilter implementation="com.demonwav.mcdev.platform.sponge.SpongeImportFilter"/>
 
         <lang.inspectionSuppressor language="JAVA"
@@ -587,9 +607,6 @@
         <annotator language="JAVA"
                    implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator"/>
 
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider"/>
-
         <externalProjectDataService
             implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService"/>
         <!--endregion-->
@@ -601,18 +618,12 @@
         <implicitUsageProvider
             implementation="com.demonwav.mcdev.platform.neoforge.insight.NeoForgeImplicitUsageProvider"/>
 
-        <!-- NeoForge Annotator -->
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.neoforge.framework.NeoForgePresentationProvider"/>
-
         <externalProjectDataService
             implementation="com.demonwav.mcdev.platform.neoforge.gradle.NeoForgeRunConfigDataService"/>
         <!--endregion-->
 
         <!--region FABRIC-->
         <dependencySupport coordinate="net.fabricmc:fabric-loader" kind="java"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.fabric.framework.FabricPresentationProvider"/>
         <fileIconProvider implementation="com.demonwav.mcdev.platform.fabric.FabricFileIconProvider"/>
         <psi.referenceContributor language="JSON"
                                   implementation="com.demonwav.mcdev.platform.fabric.reference.FabricReferenceContributor"/>
@@ -622,8 +633,6 @@
         <!--endregion-->
 
         <!--region ARCHITECTURY-->
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyPresentationProvider"/>
         <!--endregion-->
 
         <!--region MCP-->
@@ -633,9 +642,6 @@
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDataService"/>
         <externalProjectDataService
             implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDataService"/>
-
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider"/>
 
         <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
 
@@ -788,9 +794,6 @@
         <debuggerClassFilterProvider
             implementation="com.demonwav.mcdev.platform.mixin.debug.MixinDebuggerClassFilterProvider"/>
 
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.mixin.framework.MixinPresentationProvider"/>
-
         <iconLayerProvider implementation="com.demonwav.mcdev.platform.mixin.framework.MixinIconProvider"/>
 
         <!--region MixinExtras Expression Language-->
@@ -830,9 +833,6 @@
 
         <dependencySupport coordinate="com.velocitypowered:velocity-api" kind="java"/>
 
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.velocity.framework.VelocityPresentationProvider"/>
-
         <!--endregion-->
 
         <!--region BUNGEECORD-->
@@ -842,11 +842,6 @@
         <dependencySupport coordinate="io.github.waterfallmc:waterfall-api" kind="java"/>
 
         <fileIconProvider implementation="com.demonwav.mcdev.platform.bungeecord.BungeeCordFileIconProvider"/>
-
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bungeecord.framework.BungeeCordPresentationProvider"/>
-        <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.bungeecord.framework.WaterfallPresentationProvider"/>
         <!--endregion-->
 
         <!--region LOCAL INSPECTIONS-->
@@ -1662,7 +1657,7 @@
     </applicationListeners>
 
     <projectListeners>
-        <listener class="com.demonwav.mcdev.facet.MinecraftFacetDetector$MinecraftModuleRootListener"
+        <listener class="com.demonwav.mcdev.facet.MinecraftFacetDetectorListener"
                   topic="com.intellij.openapi.roots.ModuleRootListener"/>
     </projectListeners>
 

@@ -20,32 +20,21 @@
 
 package com.demonwav.mcdev.platform.mixin.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryFile
+import com.demonwav.mcdev.facet.hasLibraryManifest
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.get
-import com.demonwav.mcdev.util.manifest
-import com.intellij.framework.library.LibraryVersionProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.vfs.VirtualFile
-import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 
-class MixinPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(MIXIN_LIBRARY_KIND) {
+class MixinLibraryDetector : MinecraftLibraryDetector {
+    override val platformType = PlatformType.MIXIN
 
     private val hintFilePath = "META-INF/services/org.spongepowered.asm.service.IMixinService"
 
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.MIXIN_ICON
-
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val manifest = classesRoot.manifest
-            if (manifest?.get("Agent-Class") != MixinConstants.Classes.MIXIN_AGENT &&
-                classesRoot.findFileByRelativePath(hintFilePath) == null
-            ) {
-                continue
-            }
-
-            return LibraryVersionProperties(manifest?.get(IMPLEMENTATION_VERSION))
-        }
-        return null
-    }
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        hasLibraryManifest(scope) { it["Agent-Class"] == MixinConstants.Classes.MIXIN_AGENT } ||
+            hasLibraryFile("org.spongepowered.asm.service.IMixinService", hintFilePath, scope)
 }

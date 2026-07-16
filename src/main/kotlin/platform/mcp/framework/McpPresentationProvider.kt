@@ -20,26 +20,8 @@
 
 package com.demonwav.mcdev.platform.mcp.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.mcp.util.McpConstants
-import com.demonwav.mcdev.util.localFile
-import com.intellij.framework.library.LibraryVersionProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.util.io.JarUtil
-import com.intellij.openapi.vfs.VirtualFile
 
-class McpPresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(MCP_LIBRARY_KIND) {
-
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.MCP_ICON
-
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val file = classesRoot.localFile
-
-            if (JarUtil.containsClass(file, McpConstants.MINECRAFT_SERVER)) {
-                return LibraryVersionProperties()
-            }
-        }
-        return null
-    }
-}
+class McpLibraryDetector : ClassMinecraftLibraryDetector(PlatformType.MCP, McpConstants.MINECRAFT_SERVER)
