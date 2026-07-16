@@ -27,7 +27,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
-import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.jar.Manifest
 
@@ -101,10 +100,6 @@ fun hasLibraryManifest(scope: GlobalSearchScope, predicate: (Manifest) -> Boolea
             file.inputStream.use { input -> predicate(Manifest(input)) }
         }.getOrDefault(false)
     }
-
-fun VirtualFile.readLibraryText(): String? = runCatching {
-    inputStream.reader(StandardCharsets.UTF_8).use { it.readText() }
-}.getOrNull()
 
 private fun filesByName(name: String, scope: GlobalSearchScope): Collection<VirtualFile> =
     FilenameIndex.getVirtualFilesByName(name, scope)

@@ -22,9 +22,9 @@ package com.demonwav.mcdev.platform.velocity.framework
 
 import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
 import com.demonwav.mcdev.facet.hasLibraryFile
-import com.demonwav.mcdev.facet.readLibraryText
 import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.readText
 import com.intellij.psi.search.GlobalSearchScope
 
 class VelocityLibraryDetector : ClassMinecraftLibraryDetector(
@@ -36,8 +36,8 @@ class VelocityLibraryDetector : ClassMinecraftLibraryDetector(
     override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
         super.isLibraryPresent(project, scope) ||
             hasLibraryFile("javax.annotation.processing.Processor", annotationProcessorsPath, scope) { file ->
-                file.readLibraryText()?.lineSequence()?.any {
+                file.readText().lineSequence().any {
                     it.trim() == "com.velocitypowered.api.plugin.ap.PluginAnnotationProcessor"
-                } == true
+                }
             }
 }
