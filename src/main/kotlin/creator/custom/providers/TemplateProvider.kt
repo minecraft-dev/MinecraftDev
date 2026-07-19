@@ -34,6 +34,7 @@ import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.extensions.RequiredElement
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.util.KeyedExtensionCollector
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -45,6 +46,7 @@ import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.KeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import java.util.ResourceBundle
+import java.util.concurrent.CancellationException
 import javax.swing.JComponent
 
 /**
@@ -99,7 +101,7 @@ interface TemplateProvider {
                     createVfsLoadedTemplate(modalityState, file.parent, file, bundle = bundle)
                         ?.let(templates::add)
                 } catch (t: Throwable) {
-                    if (t is ControlFlowException) {
+                    if (t is ProcessCanceledException || t is ControlFlowException || t is CancellationException) {
                         throw t
                     }
 
@@ -134,7 +136,7 @@ interface TemplateProvider {
                 languageBundle
             )
         } catch (t: Throwable) {
-            if (t is ControlFlowException) {
+            if (t is ProcessCanceledException || t is ControlFlowException || t is CancellationException) {
                 throw t
             }
 
@@ -152,9 +154,14 @@ interface TemplateProvider {
             }
 
             try {
-                return file.refreshSync(modalityState)
-                    ?.inputStream?.reader()?.use { TemplateResourceBundle(it, parent) }
+                val refreshedFile = file.refreshSync(modalityState)
+                if (refreshedFile != null) {
+                    return refreshedFile.inputStream.reader().use { TemplateResourceBundle(it, parent) }
+                }
             } catch (t: Throwable) {
+                if (t is ProcessCanceledException || t is CancellationException) {
+                    throw t
+                }
                 if (t is ControlFlowException) {
                     return parent
                 }
@@ -194,7 +201,7 @@ interface TemplateProvider {
             if (descriptor.inherit != null) {
                 val parent = templateRoot.findFileByRelativePath(descriptor.inherit)
                 if (parent != null) {
-                    parent.refresh(false, false)
+                    parent.refreshSync(modalityState)
                     val parentDescriptor = Gson().fromJson<TemplateDescriptor>(parent.readText())
                     val mergedProperties = parentDescriptor.properties.orEmpty() + descriptor.properties.orEmpty()
                     val mergedFiles = parentDescriptor.files.orEmpty() + descriptor.files.orEmpty()

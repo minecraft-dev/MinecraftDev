@@ -230,7 +230,7 @@ class CreatorTemplateProcessor(
         val templateProperties = collectTemplateProperties()
         thisLogger().debug("Template properties: $templateProperties")
 
-        val generatedFiles = mutableListOf<Pair<TemplateFile, VirtualFile>>()
+        val generatedFiles = mutableListOf<Pair<TemplateFile, Path>>()
         for (file in template.descriptor.files.orEmpty()) {
             if (file.condition != null &&
                 !TemplateEvaluator.condition(templateProperties, file.condition).getOrElse { false }
@@ -270,12 +270,7 @@ class CreatorTemplateProcessor(
                 destPath.parent.createDirectories()
                 destPath.writeText(processedContent)
 
-                val virtualFile = destPath.refreshAndFindVirtualFile()
-                if (virtualFile != null) {
-                    generatedFiles.add(file to virtualFile)
-                } else {
-                    thisLogger().warn("Could not find VirtualFile for file generated at $destPath (descriptor: $file)")
-                }
+                generatedFiles.add(file to destPath)
             } catch (t: Throwable) {
                 if (t is ControlFlowException) {
                     throw t
@@ -291,8 +286,12 @@ class CreatorTemplateProcessor(
                 // Apparently a module root is required for the reformat to work
                 setupTempRootModule(project, projectPath)
 
-                reformatFiles(project, generatedFiles)
-                openFilesInEditor(project, generatedFiles)
+                val genVirtualFiles = generatedFiles
+                    .mapNotNullTo(mutableListOf()) {
+                        it.first to (it.second.refreshAndFindVirtualFile() ?: return@mapNotNullTo null)
+                    }
+                reformatFiles(project, genVirtualFiles)
+                openFilesInEditor(project, genVirtualFiles)
             }
 
             val finalizers = template.descriptor.finalizers

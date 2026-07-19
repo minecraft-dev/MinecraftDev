@@ -34,10 +34,8 @@ open class VfsLoadedTemplate(
 ) : LoadedTemplate {
 
     override fun loadTemplateContents(path: String): String {
-        templateRoot.refresh(false, true)
         val virtualFile = templateRoot.findFileByRelativePath(path)
             ?: throw FileNotFoundException("Could not find file $path in template root ${templateRoot.path}")
-        virtualFile.refresh(false, false)
         return virtualFile.readText()
     }
 }

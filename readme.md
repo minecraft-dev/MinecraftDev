@@ -12,10 +12,6 @@ Minecraft Development for IntelliJ
         <td colspan="2"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Build"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Build)/statusIcon.svg" alt="Teamcity Build Status" /></a></td>
     </tr>
     <tr>
-        <td align="left">2025.2</td>
-        <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20252"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20252)/statusIcon.svg" alt="2025.2 Nightly Status" /></a></td>
-    </tr>
-    <tr>
         <td align="left">2025.3</td>
         <td align="left"><a href="https://ci.mcdev.io/viewType.html?buildTypeId=MinecraftDev_Nightly_20253"><img src="https://ci.mcdev.io/app/rest/builds/buildType:(id:MinecraftDev_Nightly_20253)/statusIcon.svg" alt="2025.3 Nightly Status" /></a></td>
     </tr>

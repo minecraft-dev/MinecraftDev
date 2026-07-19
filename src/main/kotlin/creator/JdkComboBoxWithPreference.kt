@@ -41,6 +41,7 @@ import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.util.SlowOperations
 import javax.swing.JComponent
 
 internal class JdkPreferenceData(
@@ -176,7 +177,13 @@ fun Row.jdkComboBoxWithPreference(
     }
 
     val lastUsedSdk = stateComponent.getValue(selectedJdkProperty)
-    ProjectWizardUtil.preselectJdkForNewModule(project, lastUsedSdk, comboBox) { true }
+    // preselectJdkForNewModule -> setSelectedJdk -> combo renderer -> LocalFileSystem.findFileByPath
+    // triggers a SlowOperations violation since the combo renderer does VFS I/O on the EDT.
+    // This is entirely platform code we don't own, so allowSlowOperations is the only "solution".
+    @Suppress("UnstableApiUsage")
+    SlowOperations.knownIssue("IDEA-364789").use {
+        ProjectWizardUtil.preselectJdkForNewModule(project, lastUsedSdk, comboBox) { true }
+    }
 
     val windowChild = context.getUserData(AbstractWizard.KEY)!!.contentPanel
     comboBox.loadSuggestions(windowChild, context.disposable)
