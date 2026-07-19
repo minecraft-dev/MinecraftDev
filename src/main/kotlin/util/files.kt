@@ -20,9 +20,9 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.writeAction
+import com.intellij.openapi.application.TransactionGuard
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
@@ -33,6 +33,10 @@ import java.nio.file.Path
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 import java.util.jar.Manifest
+import kotlin.coroutines.resume
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 val VirtualFile.localFile: File
     get() = VfsUtilCore.virtualToIoFile(this)
@@ -80,17 +84,22 @@ operator fun Manifest.get(attribute: String): String? = mainAttributes.getValue(
 operator fun Manifest.get(attribute: Attributes.Name): String? = mainAttributes.getValue(attribute)
 
 suspend fun VirtualFile.refreshSync(modalityState: ModalityState): VirtualFile? {
-    fun refresh() {
-        RefreshQueue.getInstance().refresh(false, this.isDirectory, null, modalityState, this)
-    }
+    val file = this
+    return withContext(Dispatchers.EDT) {
+        val state = if (TransactionGuard.getInstance().isWriteSafeModality(modalityState)) {
+            modalityState
+        } else {
+            ModalityState.current()
+        }
 
-    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
-        refresh()
-    } else {
-        writeAction {
-            refresh()
+        return@withContext suspendCancellableCoroutine { continuation ->
+            try {
+                RefreshQueue.getInstance().refresh(true, file.isDirectory, {
+                    continuation.resume(file.parent?.findChild(file.name))
+                }, state, file)
+            } catch (t: Throwable) {
+                continuation.cancel(t)
+            }
         }
     }
-
-    return this.parent?.findOrCreateChildData(this, this.name)
 }

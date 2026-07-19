@@ -56,6 +56,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The step to select a custom template repo.
@@ -219,7 +220,7 @@ class CustomPlatformStep(
         val indicator = CreatorProgressIndicator(
             templateProvidersLoadingProperty,
             templateProvidersTextProperty,
-            templateProvidersText2Property
+            templateProvidersText2Property,
         )
 
         templateProvidersTextProperty.set(MCDevBundle("creator.step.generic.init_template_providers.message"))
@@ -233,18 +234,24 @@ class CustomPlatformStep(
 
         val dialogCoroutineContext = context.modalityState.asContextElement()
         val uiContext = dialogCoroutineContext + Dispatchers.EDT
-        creatorUiScope.launch(uiContext) {
-            for ((providerKey, repos) in templateRepos.groupBy { it.provider }) {
-                val provider = TemplateProvider.get(providerKey)
-                    ?: continue
-                indicator.text = provider.label
-                runCatching { provider.init(indicator, repos) }
-                    .getOrLogException(logger<CustomPlatformStep>())
+        creatorUiScope.launch(dialogCoroutineContext) {
+            // provider.init() downloads/reads files, so run in the background
+            withContext(Dispatchers.Default) {
+                for ((providerKey, repos) in templateRepos.groupBy { it.provider }) {
+                    val provider = TemplateProvider.get(providerKey)
+                        ?: continue
+                    // indicator.text is a PropertyGraph property, so set it on EDT.
+                    withContext(uiContext) { indicator.text = provider.label }
+                    runCatching { provider.init(indicator, repos) }
+                        .getOrLogException(logger<CustomPlatformStep>())
+                }
             }
 
-            templateProvidersLoadingProperty.set(false)
-            // Force refresh to trigger template loading
-            templateRepoProperty.set(templateRepo)
+            withContext(uiContext) {
+                templateProvidersLoadingProperty.set(false)
+                // Force refresh to trigger template loading
+                templateRepoProperty.set(templateRepo)
+            }
         }
     }
 
@@ -263,19 +270,25 @@ class CustomPlatformStep(
         val dialogCoroutineContext = context.modalityState.asContextElement()
         val uiContext = dialogCoroutineContext + Dispatchers.EDT
         templateLoadingJob?.cancel("Another template has been selected")
-        templateLoadingJob = creatorUiScope.launch(uiContext) {
-            val newTemplates = runCatching { provider() }
-                .getOrLogException(logger<CustomPlatformStep>())
-                ?: emptyList()
+        templateLoadingJob = creatorUiScope.launch(dialogCoroutineContext) {
+            // Run slow VFS/IO work on a background thread, not the EDT.
+            val newTemplates = withContext(Dispatchers.Default) {
+                runCatching { provider() }
+                    .getOrLogException(logger<CustomPlatformStep>())
+                    ?: emptyList()
+            }
 
-            templateLoadingProperty.set(false)
-            noTemplatesAvailable.visible(newTemplates.isEmpty())
-            if (newTemplates.any { checkInvalidVersionTemplate(it) }) {
-                availableTemplates = emptyList()
-                invalidTemplateVersion.visible(true)
-            } else {
-                availableTemplates = newTemplates
-                invalidTemplateVersion.visible(false)
+            // Switch to EDT only for UI property mutations.
+            withContext(uiContext) {
+                templateLoadingProperty.set(false)
+                noTemplatesAvailable.visible(newTemplates.isEmpty())
+                if (newTemplates.any { checkInvalidVersionTemplate(it) }) {
+                    availableTemplates = emptyList()
+                    invalidTemplateVersion.visible(true)
+                } else {
+                    availableTemplates = newTemplates
+                    invalidTemplateVersion.visible(false)
+                }
             }
         }
     }

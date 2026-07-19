@@ -91,7 +91,7 @@ class InvokerHandler : MixinMemberAnnotationHandler {
             return "<init>"
         }
         val name = result.groupValues[2]
-        if (name.uppercase(Locale.ENGLISH) != name) {
+        if (name.uppercase(Locale.ENGLISH) != name || name.length == 1) {
             return name.decapitalize()
         }
         return name

@@ -1,5 +1,11 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.18]
+
+### Fixed
+
+- Write-unsafe context errors during project creation
+
 ## [1.8.17]
 
 ### Added

@@ -20,14 +20,18 @@
 
 <idea-plugin require-restart="true">
 
-    <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.idea.maven</depends>
-    <depends>com.intellij.gradle</depends>
+    <dependencies>
+        <plugin id="com.intellij.modules.java" />
+        <plugin id="org.jetbrains.idea.maven" />
+        <plugin id="com.intellij.gradle" />
+        <plugin id="org.intellij.groovy" />
+        <plugin id="com.intellij.properties" />
+        <plugin id="com.intellij.modules.json" />
+        <plugin id="ByteCodeViewer" />
+        <module name="intellij.platform.collaborationTools"/>
+    </dependencies>
+
     <depends optional="true" config-file="mcdev-kotlin.xml">org.jetbrains.kotlin</depends>
-    <depends>org.intellij.groovy</depends>
-    <depends>com.intellij.properties</depends>
-    <depends>com.intellij.modules.json</depends>
-    <depends>ByteCodeViewer</depends>
     <depends optional="true" config-file="mcdev-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="mcdev-yaml.xml">org.jetbrains.plugins.yaml</depends>
 

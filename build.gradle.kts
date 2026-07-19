@@ -122,6 +122,7 @@ dependencies {
         bundledModule("intellij.platform.langInjection")
         bundledPlugin("com.intellij.properties")
         bundledPlugin("Git4Idea")
+        bundledModule("intellij.platform.collaborationTools")
         bundledPlugin("com.intellij.modules.json")
 
         // Optional dependencies
