@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,20 +18,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.gradle.tooling
+package com.demonwav.mcdev.platform.mcp.gradle.tooling;
 
-import groovy.transform.CompileStatic
+import java.util.Set;
 
-@CompileStatic
-final class McpModelFG2Impl implements McpModelFG2, Serializable {
+final class McpModelFG2Impl implements McpModelFG2, java.io.Serializable {
 
-    final String minecraftVersion
-    final String mcpVersion
-    final Set<String> mappingFiles
+    private final String minecraftVersion;
+    private final String mcpVersion;
+    private final Set<String> mappingFiles;
 
     McpModelFG2Impl(String minecraftVersion, String mcpVersion, Set<String> mappingFiles) {
-        this.minecraftVersion = minecraftVersion
-        this.mcpVersion = mcpVersion
-        this.mappingFiles = mappingFiles
+        this.minecraftVersion = minecraftVersion;
+        this.mcpVersion = mcpVersion;
+        this.mappingFiles = mappingFiles;
+    }
+
+    @Override
+    public String getMinecraftVersion() {
+        return minecraftVersion;
+    }
+
+    @Override
+    public String getMcpVersion() {
+        return mcpVersion;
+    }
+
+    @Override
+    public Set<String> getMappingFiles() {
+        return mappingFiles;
     }
 }

@@ -159,7 +159,7 @@ license {
     style["flex"] = HeaderStyle.BLOCK_COMMENT.format
     style["bnf"] = HeaderStyle.BLOCK_COMMENT.format
 
-    val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
+    val endings = listOf("java", "kt", "kts", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
     include(endings.map { "**/*.$it" })
 }
 
