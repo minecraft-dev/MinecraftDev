@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,26 +18,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.gradle.tooling.neogradle
+package com.demonwav.mcdev.platform.mcp.gradle.tooling.vanillagradle;
 
+import java.io.Serializable;
 
-import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelNG7
-import groovy.transform.CompileStatic
+final class VanillaGradleModelImpl implements VanillaGradleModel, Serializable {
 
-@CompileStatic
-final class NeoGradle7ModelImpl implements McpModelNG7, Serializable {
+    private final boolean hasVanillaGradle;
 
-    final String neoForgeVersion
-    final File mappingsFile
-    final List<File> accessTransformers
+    VanillaGradleModelImpl(boolean hasVanillaGradle) {
+        this.hasVanillaGradle = hasVanillaGradle;
+    }
 
-    NeoGradle7ModelImpl(
-            final String neoForgeVersion,
-            final File mappingsFile,
-            final List<File> accessTransformers
-    ) {
-        this.neoForgeVersion = neoForgeVersion
-        this.mappingsFile = mappingsFile
-        this.accessTransformers = accessTransformers
+    @Override
+    public boolean hasVanillaGradle() {
+        return hasVanillaGradle;
     }
 }

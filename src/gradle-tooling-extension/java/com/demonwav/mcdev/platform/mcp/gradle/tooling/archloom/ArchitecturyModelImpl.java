@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,16 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.gradle.tooling.neomoddev
+package com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom;
 
-import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelNMD
-import groovy.transform.Immutable
+import java.io.Serializable;
 
-@Immutable(knownImmutableClasses = [File])
-final class NeoModDevGradleModelImpl implements McpModelNMD, Serializable {
+final class ArchitecturyModelImpl implements ArchitecturyModel, Serializable {
+    private final ModuleType moduleType;
 
-    final String neoForgeVersion
-    final String neoFormVersion
-    final File mappingsFile
-    final List<File> accessTransformers
+    ArchitecturyModelImpl(ModuleType moduleType) {
+        this.moduleType = moduleType;
+    }
+
+    @Override
+    public ModuleType getModuleType() {
+        return moduleType;
+    }
 }

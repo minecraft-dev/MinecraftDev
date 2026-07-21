@@ -26,11 +26,9 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.gradle.ext.settings
 import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.intellij.platform.gradle.tasks.CleanSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 
 plugins {
-    groovy
     id(libs.plugins.changelog.get().pluginId)
     alias(libs.plugins.idea.ext)
     `mcdev-core`
@@ -153,9 +151,6 @@ dependencies {
     }
     testLibs(projects.mixinTestData)
 
-    // For non-SNAPSHOT versions (unless Jetbrains fixes this...) find the version with:
-    // afterEvaluate { println(intellijPlatform.productInfo.buildNumber) }
-    gradleToolingExtension(libs.groovy)
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)
 }
@@ -187,11 +182,6 @@ tasks.patchPluginXml {
 tasks.named(gradleToolingExtensionSourceSet.compileJavaTaskName, JavaCompile::class) {
     options.release = 8
     options.compilerArgs = listOf("-Xlint:-options")
-}
-tasks.withType<GroovyCompile>().configureEach {
-    options.compilerArgs = listOf("-proc:none")
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
 }
 
 tasks.processResources {
@@ -263,7 +253,7 @@ idea {
 }
 
 license {
-    val endings = listOf("java", "kt", "kts", "groovy", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
+    val endings = listOf("java", "kt", "kts", "gradle.kts", "xml", "properties", "html", "flex", "bnf")
     exclude("META-INF/plugin.xml") // https://youtrack.jetbrains.com/issue/IDEA-345026
     exclude("sentry-debug-meta.properties", "sentry-external-modules.txt")
     include(endings.map { "**/*.$it" })

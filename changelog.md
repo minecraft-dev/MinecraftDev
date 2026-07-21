@@ -1,5 +1,11 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.19]
+
+### Fixed
+
+- NeoForged ModDev Gradle sync failing on IntelliJ 2026.2
+
 ## [1.8.18]
 
 ### Fixed
