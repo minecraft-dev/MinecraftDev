@@ -72,5 +72,11 @@ class MixinReferenceContributor : PsiReferenceContributor() {
             MethodDefinitionReference.ELEMENT_PATTERN,
             MethodDefinitionReference,
         )
+
+        // Mixin targets references
+        registrar.registerReferenceProvider(
+            MixinTargetsReference.ELEMENT_PATTERN,
+            MixinTargetsReference,
+        )
     }
 }
