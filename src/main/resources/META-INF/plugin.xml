@@ -725,7 +725,7 @@
             implementation="com.demonwav.mcdev.platform.mixin.search.MixinSoftImplementMethodSuperSearcher"/>
         <completion.contributor language="JAVA"
                                 implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionContributor"
-                                order="last, before javaLegacy"/>
+                                order="first"/>
         <completion.contributor language="JAVA"
                                 implementationClass="com.demonwav.mcdev.platform.mixin.completion.AtArgsCompletionContributor"
                                 order="first"/>
@@ -747,6 +747,7 @@
                  implementationClass="com.demonwav.mcdev.platform.mixin.completion.MixinCompletionWeigher"
                  id="mcdev.mixin" order="first"/>
         <typedHandler implementation="com.demonwav.mcdev.platform.mixin.completion.InjectionPointTypedHandlerDelegate" />
+        <typedHandler implementation="com.demonwav.mcdev.platform.mixin.completion.MixinTargetsTypedHandlerDelegate" />
 
         <!-- Mixin configuration -->
         <fileType name="Mixin Json Configuration" language="JSON"

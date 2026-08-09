@@ -20,26 +20,34 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
+import com.demonwav.mcdev.platform.mixin.reference.MixinReferences
 import com.demonwav.mcdev.platform.mixin.util.findShadowTargets
 import com.demonwav.mcdev.platform.mixin.util.isMixin
+import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.filter
 import com.demonwav.mcdev.util.findContainingClass
+import com.intellij.codeInsight.completion.AllClassesGetter
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.completion.CompletionUtil
 import com.intellij.codeInsight.completion.JavaCompletionContributor
 import com.intellij.codeInsight.completion.JavaCompletionSorting
+import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.completion.LegacyCompletionContributor
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiExpression
 import com.intellij.psi.PsiJavaReference
+import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiQualifiedReference
 import com.intellij.psi.PsiSuperExpression
 import com.intellij.psi.PsiThisExpression
+import com.intellij.psi.util.PsiTreeUtil
 
 class MixinCompletionContributor : CompletionContributor() {
 
@@ -50,6 +58,12 @@ class MixinCompletionContributor : CompletionContributor() {
 
         val position = parameters.position
         if (!JavaCompletionContributor.isInJavaContext(position)) {
+            return
+        }
+
+        val literal = PsiTreeUtil.getParentOfType(position, PsiLiteral::class.java)
+        if (literal != null && MixinReferences.MIXIN_TARGETS.accepts(literal)) {
+            provideMixinTargetsCompletion(parameters, result, literal)
             return
         }
 
@@ -121,6 +135,37 @@ class MixinCompletionContributor : CompletionContributor() {
                 .toList()
 
             r.addAllElements(elements)
+        }
+    }
+
+    private fun provideMixinTargetsCompletion(
+        parameters: CompletionParameters,
+        result: CompletionResultSet,
+        literal: PsiLiteral,
+    ) {
+        val dummy = CompletionUtil.DUMMY_IDENTIFIER
+        val dummyTrimmed = CompletionUtil.DUMMY_IDENTIFIER_TRIMMED
+        val rawText = literal.constantStringValue ?: ""
+        val text = rawText.removeSuffix(dummy).removeSuffix(dummyTrimmed)
+
+        // If completing a bare class name (no package dot), run global class search
+        if (!text.contains('.')) {
+            AllClassesGetter.processJavaClasses(
+                parameters,
+                result.withPrefixMatcher(text).prefixMatcher,
+                true,
+            ) { cls ->
+                val fqn = cls.qualifiedName ?: return@processJavaClasses
+                val simpleName = cls.name ?: return@processJavaClasses
+                result.addElement(
+                    PrioritizedLookupElement.withPriority(
+                        JavaLookupElementBuilder.forClass(cls, fqn, true)
+                            .withLookupString(fqn)
+                            .withLookupString(simpleName),
+                        0.5,
+                    ),
+                )
+            }
         }
     }
 }

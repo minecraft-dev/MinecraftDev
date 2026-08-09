@@ -29,9 +29,11 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.FabricVersionsModel
 import com.demonwav.mcdev.platform.fabric.util.FabricApiVersions
 import com.demonwav.mcdev.platform.fabric.util.FabricVersions
+import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.intellij.openapi.observable.properties.GraphProperty
+import com.intellij.openapi.observable.util.and
 import com.intellij.openapi.observable.util.bindBooleanStorage
 import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
@@ -88,6 +90,7 @@ class FabricVersionsCreatorProperty(
         val mcVersionString = mcVersion.toString()
         versions.mappings.any { it.gameVersion == mcVersionString }
     }
+    val usesMappingsProperty = mcVersionProperty.transform { it < MinecraftVersions.MC26_1 }
 
     val fabricApiVersionProperty = graphProperty.transform({ it.fabricApi }, { model.copy(fabricApi = it) })
     val fabricApiVersionModel = DefaultComboBoxModel<SemanticVersion>()
@@ -183,7 +186,7 @@ class FabricVersionsCreatorProperty(
                 .visibleIf(yarnHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!loadingVersionsProperty and usesMappingsProperty)
 
         panel.row(MCDevBundle("creator.ui.fabricapi_version.label")) {
             comboBox(fabricApiVersionModel)

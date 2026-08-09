@@ -1,5 +1,19 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.20]
+
+### Added
+
+- Added reference provider and auto-complete for `@Mixin(target)`
+
+### Changed
+
+- Hide the Yarn version selector for Fabric 26.1+ project creation
+
+### Fixed
+
+- Fixed empty template repo list issues
+
 ## [1.8.19]
 
 ### Fixed

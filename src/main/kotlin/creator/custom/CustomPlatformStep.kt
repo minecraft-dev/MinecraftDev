@@ -215,7 +215,7 @@ class CustomPlatformStep(
     private fun initTemplates() {
         selectedTemplate = EmptyLoadedTemplate
 
-        templateRepoProperty.set(templateRepos.first())
+        templateRepoProperty.set(templateRepos.firstOrNull() ?: MinecraftSettings.TemplateRepo.makeBuiltinRepo())
 
         val indicator = CreatorProgressIndicator(
             templateProvidersLoadingProperty,
