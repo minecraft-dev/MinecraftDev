@@ -23,8 +23,20 @@ package com.demonwav.mcdev.platform.mixin.reference
 import com.demonwav.mcdev.platform.mixin.reference.target.FieldDefinitionReference
 import com.demonwav.mcdev.platform.mixin.reference.target.MethodDefinitionReference
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
+import com.intellij.codeInsight.AutoPopupController
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiPackage
+import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceRegistrar
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReference
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider
+import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceSet
+import com.intellij.util.PlatformIcons
 
 class MixinReferenceContributor : PsiReferenceContributor() {
 
@@ -72,5 +84,70 @@ class MixinReferenceContributor : PsiReferenceContributor() {
             MethodDefinitionReference.ELEMENT_PATTERN,
             MethodDefinitionReference,
         )
+
+        registrar.registerReferenceProvider(
+            MixinReferences.MIXIN_TARGETS,
+            MixinTargetsClassReferenceProvider(),
+        )
+    }
+}
+
+class MixinTargetsClassReferenceProvider : JavaClassReferenceProvider() {
+    init {
+        setOption(ALLOW_DOLLAR_NAMES, true)
+        setOption(JVM_FORMAT, true)
+        setOption(ADVANCED_RESOLVE, true)
+        setOption(RESOLVE_QUALIFIED_CLASS_NAME, true)
+    }
+
+    override fun getReferencesByString(
+        str: String,
+        position: PsiElement,
+        offsetInPosition: Int,
+    ): Array<out PsiReference?> {
+        return object : JavaClassReferenceSet(str, position, offsetInPosition, true, this) {
+            override fun isAllowDollarInNames(): Boolean = true
+
+            override fun createReference(
+                referenceIndex: Int,
+                referenceText: String,
+                textRange: TextRange,
+                staticImport: Boolean,
+            ): JavaClassReference {
+                return MixinTargetsClassReference(this, referenceIndex, referenceText, textRange, staticImport)
+            }
+        }.allReferences
+    }
+}
+
+class MixinTargetsClassReference(
+    referenceSet: JavaClassReferenceSet,
+    referenceIndex: Int,
+    referenceText: String,
+    textRange: TextRange,
+    staticImport: Boolean,
+) : JavaClassReference(referenceSet, textRange, referenceIndex, referenceText, staticImport) {
+
+    override fun getVariants(): Array<Any> {
+        val original = super.getVariants()
+        val list = ArrayList<Any>()
+        for (variant in original) {
+            val target = if (variant is LookupElement) variant.`object` else variant
+            if (target is PsiPackage) {
+                val lookupText = if (variant is LookupElement) variant.lookupString else (target.name ?: "")
+                val text = if (lookupText.endsWith(".")) lookupText else "$lookupText."
+                list.add(
+                    LookupElementBuilder.create(target, text)
+                        .withPresentableText(text)
+                        .withIcon(PlatformIcons.PACKAGE_ICON)
+                        .withInsertHandler { context, _ ->
+                            AutoPopupController.getInstance(context.project).scheduleAutoPopup(context.editor)
+                        },
+                )
+            } else if (target is PsiClass) {
+                list.add(variant)
+            }
+        }
+        return list.toArray()
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -90,7 +90,7 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
     override fun loadState(state: State) {
         this.state = state
         if (state.creatorTemplateRepos.isEmpty()) {
-            state.creatorTemplateRepos = listOf()
+            state.creatorTemplateRepos = listOf(TemplateRepo.makeBuiltinRepo())
         }
     }
 
@@ -140,7 +140,8 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
     var creatorTemplateRepos: List<TemplateRepo>
         get() = state.creatorTemplateRepos.map { it.copy() }
         set(creatorTemplateRepos) {
-            state.creatorTemplateRepos = creatorTemplateRepos.map { it.copy() }
+            state.creatorTemplateRepos = creatorTemplateRepos.ifEmpty { listOf(TemplateRepo.makeBuiltinRepo()) }
+                .map { it.copy() }
         }
 
     var creatorMavenRepos: List<MavenRepo>

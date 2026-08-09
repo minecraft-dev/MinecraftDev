@@ -97,6 +97,7 @@ fun Row.templateRepoTable(
 
     val decoratedTable = ToolbarDecorator.createDecorator(table)
         .setPreferredSize(Dimension(JBUI.scale(300), JBUI.scale(200)))
+        .setRemoveActionUpdater { table.rowCount > 1 }
         .setEditActionUpdater {
             val selectedRepo = table.selection.firstOrNull()
                 ?: return@setEditActionUpdater false
