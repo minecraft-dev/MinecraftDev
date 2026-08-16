@@ -69,18 +69,20 @@ class MinecraftClassCreateAction :
         val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
         val isNeoForge = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
-        val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
+        val forgeMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
             ?.minecraftVersion?.let(SemanticVersion::parse)
+        val fabricMcVersion =
+            MinecraftFacet.getInstance(module, FabricModuleType)?.computeVersion()//Qui mica è un FabricModule
 
-        if (isForge && mcVersion != null) {
+        if (isForge && forgeMcVersion != null) {
             val icon = PlatformAssets.FORGE_ICON
 
-            if (mcVersion < MinecraftVersions.MC1_17) {
+            if (forgeMcVersion < MinecraftVersions.MC1_17) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
-            } else if (mcVersion < MinecraftVersions.MC1_18) {
+            } else if (forgeMcVersion < MinecraftVersions.MC1_18) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
@@ -106,11 +108,19 @@ class MinecraftClassCreateAction :
 
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
+            if (fabricMcVersion != null && fabricMcVersion >= MinecraftVersions.MC26_1) {
+                builder.addKind("Block", icon, MinecraftTemplates.FABRIC_26_1_BLOCK_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_26_1_ENCHANTMENT_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FABRIC_26_1_ITEM_TEMPLATE)
+                builder.addKind("Mob effect", icon, MinecraftTemplates.FABRIC_26_1_MOB_EFFECT_TEMPLATE)
 
-            builder.addKind("Block", icon, MinecraftTemplates.FABRIC_BLOCK_TEMPLATE)
-            builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_ENCHANTMENT_TEMPLATE)
-            builder.addKind("Item", icon, MinecraftTemplates.FABRIC_ITEM_TEMPLATE)
-            builder.addKind("Status effect", icon, MinecraftTemplates.FABRIC_STATUS_EFFECT_TEMPLATE)
+            } else {
+                builder.addKind("Block", icon, MinecraftTemplates.FABRIC_1_21_11_BLOCK_TEMPLATE)
+                builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_1_21_11_ENCHANTMENT_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FABRIC_1_21_11_ITEM_TEMPLATE)
+                builder.addKind("Status effect", icon, MinecraftTemplates.FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE)
+
+            }
         }
     }
 

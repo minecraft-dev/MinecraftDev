@@ -161,10 +161,16 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
             }
             FileTemplateGroupDescriptor("Fabric", PlatformAssets.FABRIC_ICON).let { fabricSkeletonGroup ->
                 skeletonGroup.addTemplate(fabricSkeletonGroup)
-                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_BLOCK_TEMPLATE))
-                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ITEM_TEMPLATE))
-                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_ENCHANTMENT_TEMPLATE))
-                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_STATUS_EFFECT_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_1_21_11_BLOCK_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_1_21_11_ITEM_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_1_21_11_ENCHANTMENT_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE))
+
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_BLOCK_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_ITEM_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_ENCHANTMENT_TEMPLATE))
+                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_MOB_EFFECT_TEMPLATE))
+
             }
         }
 
@@ -268,10 +274,15 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val FORGE_1_18_PACKET_TEMPLATE = "ForgePacket (1.18+).java"
 
-        const val FABRIC_BLOCK_TEMPLATE = "FabricBlock.java"
-        const val FABRIC_ITEM_TEMPLATE = "FabricItem.java"
-        const val FABRIC_ENCHANTMENT_TEMPLATE = "FabricEnchantment.java"
-        const val FABRIC_STATUS_EFFECT_TEMPLATE = "FabricStatusEffect.java"
+        const val FABRIC_1_21_11_BLOCK_TEMPLATE = "FabricBlock (1.21.11-).java"
+        const val FABRIC_1_21_11_ITEM_TEMPLATE = "FabricItem (1.21.11-).java"
+        const val FABRIC_1_21_11_ENCHANTMENT_TEMPLATE = "FabricEnchantment (1.21.11-).java"
+        const val FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE = "FabricStatusEffect (1.21.11-).java"
+
+        const val FABRIC_26_1_BLOCK_TEMPLATE = "FabricBlock (26.1+).java"
+        const val FABRIC_26_1_ITEM_TEMPLATE = "FabricItem (26.1+).java"
+        const val FABRIC_26_1_ENCHANTMENT_TEMPLATE = "FabricEnchantment (26.1+).java"
+        const val FABRIC_26_1_MOB_EFFECT_TEMPLATE = "FabricMobEffect (26.1+).java"
 
         const val NEOFORGE_MIXINS_JSON_TEMPLATE = "NeoForge Mixins Config.json"
         const val NEOFORGE_MAIN_CLASS_TEMPLATE = "NeoForge Main Class.java"

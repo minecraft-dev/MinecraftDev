@@ -1,12 +1,15 @@
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
 #parse("File Header.java")
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentTarget;
-import net.minecraft.entity.EquipmentSlot;
+<#--
+        Not functional on 1.20.3+
+-->
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
 public class ${NAME} extends Enchantment {
-    public ${NAME}(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-		super(weight, type, slotTypes);
+    public ${NAME}(Rarity rarity, EnchantmentCategory category, EquipmentSlot[] slots) {
+        super(rarity, category, slots);
     }
 }
