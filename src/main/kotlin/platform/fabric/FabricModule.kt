@@ -30,11 +30,14 @@ import com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomData
 import com.demonwav.mcdev.platform.mcp.mappings.HardcodedYarnToMojmap
 import com.demonwav.mcdev.platform.mcp.mappings.HasCustomNamedMappings
 import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.json.JsonUtil
+import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonFile
+import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -67,12 +70,37 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
     override val moduleType = FabricModuleType
     override val type = PlatformType.FABRIC
     override val icon = PlatformAssets.FABRIC_ICON
+    var fabricMinecraftVersion: SemanticVersion? = null;
 
     override fun computeModIds(): List<String> {
         val jsonFile = PsiManager.getInstance(project).findFile(fabricJson ?: return emptyList()) as? JsonFile
             ?: return emptyList()
         val jsonObj = JsonUtil.getTopLevelObject(jsonFile) ?: return emptyList()
         return listOfNotNull((jsonObj.findProperty("id")?.value as? JsonStringLiteral)?.value)
+    }
+
+    fun computeVersion(): SemanticVersion? {
+        val jsonFile = PsiManager.getInstance(project).findFile(fabricJson ?: return null) as? JsonFile
+            ?: return null
+        val jsonObj = JsonUtil.getTopLevelObject(jsonFile) ?: return null;
+        val depends = jsonObj.findProperty("depends")?.value as? JsonObject
+        val range = depends?.findProperty("minecraft")
+        val value = (range?.value as? JsonStringLiteral)?.value;
+        val arrayValue = (range?.value as? JsonArray)
+        if (value != null) {
+            val end = value.trimStart { !it.isDigit() }
+            return SemanticVersion.parse(end)
+        } else if (arrayValue != null) {
+            var majorVersion: SemanticVersion? = null;
+            for (child in arrayValue.valueList) {
+                val string = (child as? JsonStringLiteral)?.value ?: "0.0"
+                val end = string.trimStart { !it.isDigit() }
+                val value = SemanticVersion.parse(end)
+                if (majorVersion == null || value > majorVersion) majorVersion = value;
+            }
+            return majorVersion
+        }
+        return null
     }
 
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) = true
@@ -107,6 +135,7 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
 
     private fun detectMappings(): MappingDetectionResult {
         val gradleData = GradleUtil.findGradleModuleData(facet.module) ?: return MappingDetectionResult.DEFAULT
+
         val loomData = gradleData.children.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
             ?: return MappingDetectionResult.DEFAULT
         val mappingsFile = loomData.tinyMappings ?: return MappingDetectionResult.DEFAULT
@@ -147,7 +176,8 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
 
         override fun visitMethodArg(argPosition: Int, lvIndex: Int, srcName: String?) = false
 
-        override fun visitMethodVar(lvtRowIndex: Int, lvIndex: Int, startOpIdx: Int, endOpIdx: Int, srcName: String?) = false
+        override fun visitMethodVar(lvtRowIndex: Int, lvIndex: Int, startOpIdx: Int, endOpIdx: Int, srcName: String?) =
+            false
 
         override fun visitDstName(targetKind: MappedElementKind?, namespace: Int, name: String) {
             if (namespace == namedIndex && name == "net/minecraft/client/MinecraftClient") {
