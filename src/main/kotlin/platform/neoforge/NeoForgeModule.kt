@@ -28,6 +28,8 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModule
 import com.demonwav.mcdev.platform.neoforge.util.NeoForgeConstants
+import com.demonwav.mcdev.toml.stringValue
+import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
@@ -35,15 +37,21 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
 import com.intellij.lang.jvm.JvmModifier
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
+import org.jetbrains.kotlin.util.removeSuffixIfPresent
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
+import org.toml.lang.psi.TomlArrayTable
+import org.toml.lang.psi.TomlFile
+import org.toml.lang.psi.ext.name
 
 class NeoForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
@@ -57,7 +65,39 @@ class NeoForgeModule internal constructor(facet: MinecraftFacet) : AbstractModul
     override val icon = PlatformAssets.NEOFORGE_ICON
 
     override fun computeModIds() = ForgeModule.getModsFromModsToml(project, modsToml)
+    fun computeVersion(): SemanticVersion? {
+        val tomlFile = PsiManager.getInstance(project).findFile(modsToml ?: return null) as? TomlFile
+            ?: return null
 
+        for (child in tomlFile.children) {
+            if (child is TomlArrayTable && child.header.key?.name == "dependencies."+ computeModIds()[0]) {
+                var founded = false
+                for (entry in child.entries) {
+                    if (entry.key.name == computeModIds()[0]) {
+                        founded = true
+                    }
+                }
+                if(!founded) continue
+                else{
+                    for (entry in child.entries) {
+                        if (entry.key.name == "versionRange") {
+                            val value = entry.value.toString()
+                            var valueParsed = value;
+                            if(value.contains("\${")) {
+                                    val varName = value.substring(value.indexOf("\${")+2, value.lastIndexOf("}"))
+                                    valueParsed = value.replace("\${${varName}}", detectMinecraftVersionInProps(varName)?: return null)
+                            }
+                            return SemanticVersion.parse(valueParsed.trim()
+                                .removeSuffixIfPresent(")")
+                                .removeSuffixIfPresent("]")
+                                .substringAfter(","))
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
     override val eventListenerGenSupport: EventListenerGenerationSupport = NeoForgeEventListenerGenerationSupport()
 
     override fun init() {

@@ -168,7 +168,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_BLOCK_TEMPLATE))
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_ITEM_TEMPLATE))
-                fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_ENCHANTMENT_TEMPLATE))
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_MOB_EFFECT_TEMPLATE))
 
             }
@@ -281,7 +280,6 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
 
         const val FABRIC_26_1_BLOCK_TEMPLATE = "FabricBlock (26.1+).java"
         const val FABRIC_26_1_ITEM_TEMPLATE = "FabricItem (26.1+).java"
-        const val FABRIC_26_1_ENCHANTMENT_TEMPLATE = "FabricEnchantment (26.1+).java"
         const val FABRIC_26_1_MOB_EFFECT_TEMPLATE = "FabricMobEffect (26.1+).java"
 
         const val NEOFORGE_MIXINS_JSON_TEMPLATE = "NeoForge Mixins Config.json"

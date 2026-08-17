@@ -24,10 +24,12 @@ import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.inspection.IsCancelled
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiExpression
+import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
@@ -36,6 +38,9 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import javax.swing.Icon
+import com.intellij.lang.properties.psi.PropertiesFile
+import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction.Companion.LOG
+
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {
 
@@ -107,4 +112,21 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
     open fun init() {}
     open fun dispose() {}
     open fun refresh() {}
+
+    fun detectMinecraftVersionInProps(keyname: String): String? {
+        val contentRoots = ModuleRootManager.getInstance(module).contentRoots
+        var dir = contentRoots.firstOrNull() ?: return null
+
+        val projectBase = project.basePath
+        while (true) {
+            val found = dir.findChild("gradle.properties")
+            if (found != null) {
+                val propsFile = PsiManager.getInstance(project).findFile(found) as? PropertiesFile ?: return null
+                return propsFile.findPropertyByKey(keyname)?.value
+            }
+            val parent = dir.parent ?: return null
+            if (dir.path == projectBase) return null
+            dir = parent
+        }
+    }
 }

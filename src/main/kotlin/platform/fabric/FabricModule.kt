@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.fabric
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
+import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.reference.EntryPointReference
@@ -53,6 +54,7 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.toUElementOfType
+import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction.Companion.LOG
 
 class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet), HasCustomNamedMappings {
 
@@ -85,19 +87,42 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
         val jsonObj = JsonUtil.getTopLevelObject(jsonFile) ?: return null;
         val depends = jsonObj.findProperty("depends")?.value as? JsonObject
         val range = depends?.findProperty("minecraft")
-        val value = (range?.value as? JsonStringLiteral)?.value;
+        var value = (range?.value as? JsonStringLiteral)?.value;
         val arrayValue = (range?.value as? JsonArray)
         if (value != null) {
+            if (value.contains("\${")) {
+                val varName = value.substring(value.indexOf("\${") + 2, value.lastIndexOf("}"))
+                value = value.replace("\${${varName}}", detectMinecraftVersionInProps(varName) ?: return null)
+            }
             val end = value.trimStart { !it.isDigit() }
-            return SemanticVersion.parse(end)
+            val parse = try {
+                SemanticVersion.parse(end)
+            } catch (_: NumberFormatException) {
+                null
+            }
+            fabricMinecraftVersion = parse
+            return parse
         } else if (arrayValue != null) {
             var majorVersion: SemanticVersion? = null;
             for (child in arrayValue.valueList) {
-                val string = (child as? JsonStringLiteral)?.value ?: "0.0"
+                var string = (child as? JsonStringLiteral)?.value.toString()
+                if (string.contains("\${")) {
+                    val varName = string.substring(string.indexOf("\${") + 2, string.lastIndexOf("}"))
+                    string = string.replace("\${${varName}}", detectMinecraftVersionInProps(varName) ?: return null)
+                }
+                LOG.info("Stringa Array: $string")
                 val end = string.trimStart { !it.isDigit() }
-                val value = SemanticVersion.parse(end)
-                if (majorVersion == null || value > majorVersion) majorVersion = value;
+                val value = try {
+                    SemanticVersion.parse(end)
+                } catch (_: NumberFormatException) {
+                    null
+                }
+                LOG.info("Valuta array:$value")
+                if (value != null) {
+                    if (majorVersion == null || value > majorVersion) majorVersion = value
+                };
             }
+            fabricMinecraftVersion = majorVersion
             return majorVersion
         }
         return null
@@ -133,7 +158,8 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
         mappingNamespacesField = mappingDetection.namespaces
     }
 
-    private fun detectMappings(): MappingDetectionResult {
+    private fun
+        detectMappings(): MappingDetectionResult {
         val gradleData = GradleUtil.findGradleModuleData(facet.module) ?: return MappingDetectionResult.DEFAULT
 
         val loomData = gradleData.children.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
