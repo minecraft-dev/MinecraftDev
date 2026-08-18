@@ -54,7 +54,6 @@ import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.toUElementOfType
-import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction.Companion.LOG
 
 class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet), HasCustomNamedMappings {
 
@@ -110,14 +109,12 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
                     val varName = string.substring(string.indexOf("\${") + 2, string.lastIndexOf("}"))
                     string = string.replace("\${${varName}}", detectMinecraftVersionInProps(varName) ?: return null)
                 }
-                LOG.info("Stringa Array: $string")
                 val end = string.trimStart { !it.isDigit() }
                 val value = try {
                     SemanticVersion.parse(end)
                 } catch (_: NumberFormatException) {
                     null
                 }
-                LOG.info("Valuta array:$value")
                 if (value != null) {
                     if (majorVersion == null || value > majorVersion) majorVersion = value
                 };

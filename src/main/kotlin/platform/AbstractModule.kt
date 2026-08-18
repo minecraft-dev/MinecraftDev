@@ -39,7 +39,6 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import javax.swing.Icon
 import com.intellij.lang.properties.psi.PropertiesFile
-import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction.Companion.LOG
 
 
 abstract class AbstractModule(protected val facet: MinecraftFacet) {

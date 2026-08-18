@@ -171,8 +171,12 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
                 fabricSkeletonGroup.addTemplate(FileTemplateDescriptor(FABRIC_26_1_MOB_EFFECT_TEMPLATE))
 
             }
-        }
 
+        }
+        FileTemplateGroupDescriptor("Json", PlatformAssets.MINECRAFT_ICON).let { jsonGroup ->
+            group.addTemplate(jsonGroup)
+            jsonGroup.addTemplate(JSON_ENCHANTMENT_TEMPLATE)
+        }
         FileTemplateGroupDescriptor("Licenses", null).let { licenseGroup ->
             group.addTemplate(licenseGroup)
             enumEntries<License>().forEach { license ->
@@ -303,6 +307,8 @@ class MinecraftTemplates : FileTemplateGroupDescriptorFactory {
         const val NEOFORGE_PACKET_TEMPLATE = "NeoForgePacket.java"
         const val NEOFORGE_ENCHANTMENT_TEMPLATE = "NeoForgeEnchantment.java"
         const val NEOFORGE_MOB_EFFECT_TEMPLATE = "NeoForgeMobEffect.java"
+
+        const val JSON_ENCHANTMENT_TEMPLATE = "JsonEnchantment.json"
     }
 
     private fun template(fileName: String, displayName: String? = null) = CustomDescriptor(fileName, displayName)

@@ -59,9 +59,6 @@ class MinecraftClassCreateAction :
         JavaModuleSourceRootTypes.SOURCES,
     ),
     DumbAware {
-    companion object {
-        val LOG = Logger.getInstance(MinecraftClassCreateAction::class.java)
-    }
 
     override fun getActionName(directory: PsiDirectory?, newName: String, templateName: String?): String = Const.CAPTION
 
@@ -73,21 +70,22 @@ class MinecraftClassCreateAction :
         val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
         val isNeoForge = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
-        val forgeMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
-            ?.minecraftVersion?.let(SemanticVersion::parse)
-        val fabricMcVersion =
-            MinecraftFacet.getInstance(module, FabricModuleType)?.computeVersion()
-        val neoforgeMcVersion = MinecraftFacet.getInstance(module, NeoForgeModuleType)?.computeVersion()
-        LOG.info("VERSIONI: $neoforgeMcVersion, $forgeMcVersion, $fabricMcVersion")
-        if (isForge && forgeMcVersion != null) {
+        
+        val mcVersion = MinecraftFacet.getInstance(module, NeoForgeModuleType)?.computeVersion()?:
+        MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
+            ?.minecraftVersion?.let(SemanticVersion::parse) ?:
+        MinecraftFacet.getInstance(module, FabricModuleType)?.computeVersion()
+
+      //  LOG.info("VERSIONI: $neomcVersion, $mcVersion, $fabricMcVersion")
+        if (isForge && mcVersion != null) {
             val icon = PlatformAssets.FORGE_ICON
 
-            if (forgeMcVersion < MinecraftVersions.MC1_17) {
+            if (mcVersion < MinecraftVersions.MC1_17) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_ITEM_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_PACKET_TEMPLATE)
-            } else if (forgeMcVersion < MinecraftVersions.MC1_18) {
+            } else if (mcVersion < MinecraftVersions.MC1_18) {
                 builder.addKind("Block", icon, MinecraftTemplates.FORGE_1_17_BLOCK_TEMPLATE)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FORGE_1_17_ITEM_TEMPLATE)
@@ -99,7 +97,7 @@ class MinecraftClassCreateAction :
                 builder.addKind("Mob effect", icon, MinecraftTemplates.FORGE_1_17_MOB_EFFECT_TEMPLATE)
                 builder.addKind("Packet", icon, MinecraftTemplates.FORGE_1_18_PACKET_TEMPLATE)
             }
-            if (forgeMcVersion < MinecraftVersions.MC1_21) {
+            if (mcVersion < MinecraftVersions.MC1_21) {
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FORGE_1_17_ENCHANTMENT_TEMPLATE)
             }
         }
@@ -110,13 +108,13 @@ class MinecraftClassCreateAction :
             builder.addKind("Item", icon, MinecraftTemplates.NEOFORGE_ITEM_TEMPLATE)
             builder.addKind("Mob effect", icon, MinecraftTemplates.NEOFORGE_MOB_EFFECT_TEMPLATE)
             builder.addKind("Packet", icon, MinecraftTemplates.NEOFORGE_PACKET_TEMPLATE)
-            if (neoforgeMcVersion == null || neoforgeMcVersion < MinecraftVersions.MC1_21)
+            if (mcVersion == null || mcVersion < MinecraftVersions.MC1_21)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.NEOFORGE_ENCHANTMENT_TEMPLATE)
         }
 
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
-            if (fabricMcVersion != null && fabricMcVersion >= MinecraftVersions.MC26_1) {
+            if (mcVersion != null && mcVersion >= MinecraftVersions.MC26_1) {
                 builder.addKind("Block", icon, MinecraftTemplates.FABRIC_26_1_BLOCK_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FABRIC_26_1_ITEM_TEMPLATE)
                 builder.addKind("Mob effect", icon, MinecraftTemplates.FABRIC_26_1_MOB_EFFECT_TEMPLATE)
@@ -126,7 +124,7 @@ class MinecraftClassCreateAction :
                 builder.addKind("Item", icon, MinecraftTemplates.FABRIC_1_21_11_ITEM_TEMPLATE)
                 builder.addKind("Status effect", icon, MinecraftTemplates.FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE)
             }
-            if (fabricMcVersion != null && fabricMcVersion < MinecraftVersions.MC1_21)
+            if (mcVersion != null && mcVersion < MinecraftVersions.MC1_21)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_1_21_11_ENCHANTMENT_TEMPLATE)
         }
     }
@@ -157,7 +155,7 @@ class MinecraftClassCreateAction :
         return JavaDirectoryService.getInstance().createClass(dir, className, templateName, false)
     }
 
-    private class ClassInputValidator(
+    class ClassInputValidator(
         private val project: Project,
         private val directory: PsiDirectory,
     ) : InputValidatorEx {
