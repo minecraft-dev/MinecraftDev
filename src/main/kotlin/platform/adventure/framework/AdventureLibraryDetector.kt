@@ -34,7 +34,7 @@ class AdventureLibraryDetector : MinecraftLibraryDetector {
 
     override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
         hasLibraryManifest(scope) { manifest ->
-        manifest[SPECIFICATION_TITLE] == AdventureConstants.API_SPECIFICATION_TITLE ||
-            manifest["Automatic-Module-Name"] == AdventureConstants.API_MODULE_ID
+            manifest[SPECIFICATION_TITLE] == AdventureConstants.API_SPECIFICATION_TITLE ||
+                manifest["Automatic-Module-Name"] == AdventureConstants.API_MODULE_ID
         }
 }
