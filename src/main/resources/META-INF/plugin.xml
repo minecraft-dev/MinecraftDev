@@ -1752,7 +1752,7 @@
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
         <action class="com.demonwav.mcdev.insight.generation.MinecraftResourceCreateAction" id="CreateMinecraftJson"
-                text="Minecraft Class" description="Create skeleton jsons used in Minecraft Mods and datapacks">
+                text="Minecraft Json" description="Create skeleton jsons used in Minecraft Mods and datapacks">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAwAction" id="CopyAWAction"
