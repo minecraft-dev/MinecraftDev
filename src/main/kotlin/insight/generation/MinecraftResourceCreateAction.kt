@@ -40,7 +40,6 @@ class MinecraftResourceCreateAction : CreateFileFromTemplateAction(
         val dir: PsiDirectory?
         if (psi is PsiFile) {
             dir = psi.containingDirectory
-            //   MinecraftFacet.getInstance(module)?.findFile(psi. SourceType.RESOURCE) ?: return false
         } else  if(psi is PsiDirectory){
             dir = psi
         }else{
@@ -75,17 +74,8 @@ class MinecraftResourceCreateAction : CreateFileFromTemplateAction(
     ) {
         builder.setTitle(Const.CAPTION)
         builder.setValidator(ClassInputValidator(project, directory))
-
-        //val module = directory.findModule() ?: return
-        //For a possible update
-        //  val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
-        //      ?.minecraftVersion?.let(SemanticVersion::parse) ?:
-        //  MinecraftFacet.getInstance(module, FabricModuleType)?.computeVersion() ?:
-        //  MinecraftFacet.getInstance(module, NeoForgeModuleType)?.computeVersion()
-        //if(mcVersion != null && mcVersion >= MinecraftVersions.MC1_21) {
         val icon = PlatformAssets.MINECRAFT_ICON
         builder.addKind("Enchantment", icon, MinecraftTemplates.JSON_ENCHANTMENT_TEMPLATE)
-        // }
     }
 
     override fun getActionName(
