@@ -27,7 +27,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
-import java.util.*
+import java.util.Properties
 import java.util.jar.Manifest
 
 interface MinecraftLibraryDetector {

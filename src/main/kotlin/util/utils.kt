@@ -44,7 +44,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtil
 import java.lang.invoke.MethodHandles
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.CancellationException
 import java.util.regex.PatternSyntaxException
 import kotlin.math.min
