@@ -24,10 +24,10 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
-import com.demonwav.mcdev.platform.mixin.util.bytecodeFriendlyAccessLevel
 import com.demonwav.mcdev.platform.mixin.util.findStubMethod
 import com.demonwav.mcdev.platform.mixin.util.hasModifier
 import com.demonwav.mcdev.platform.mixin.util.internalNameToShortName
+import com.demonwav.mcdev.platform.mixin.util.shouldDoMixinAccessChecks
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findKeyword
 import com.demonwav.mcdev.util.isAccessModifier
@@ -55,17 +55,19 @@ class OverwriteModifiersInspection : OverwriteInspection() {
         val modifierList = method.modifierList
 
         // Check access modifiers
-        val targetAccessLevel = target.method.accessLevel
-        val currentAccessLevel = modifierList.bytecodeFriendlyAccessLevel()
-        if (currentAccessLevel < targetAccessLevel) {
-            val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
-            val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)
-            holder.registerProblem(
-                modifierList.findKeyword(currentModifier) ?: nameIdentifier,
-                "$currentModifier @Overwrite cannot reduce visibility of " +
-                    "${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
-                QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false),
-            )
+        if (method.shouldDoMixinAccessChecks()) {
+            val targetAccessLevel = target.method.accessLevel
+            val currentAccessLevel = PsiUtil.getAccessLevel(modifierList)
+            if (currentAccessLevel < targetAccessLevel) {
+                val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
+                val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)
+                holder.registerProblem(
+                    modifierList.findKeyword(currentModifier) ?: nameIdentifier,
+                    "$currentModifier @Overwrite cannot reduce visibility of " +
+                        "${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
+                    QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false),
+                )
+            }
         }
 
         for (modifier in PsiModifier.MODIFIERS) {

@@ -1,5 +1,11 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.22]
+
+### Fixed
+
+- Fixed shadow warning on constructors on newer Minecraft versions
+
 ## [1.8.21]
 
 ### Fixed

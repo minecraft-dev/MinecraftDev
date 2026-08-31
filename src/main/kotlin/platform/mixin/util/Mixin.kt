@@ -46,8 +46,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIntersectionType
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiModifier
-import com.intellij.psi.PsiModifierList
+import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
@@ -56,7 +55,6 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTypesUtil
-import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
@@ -324,19 +322,10 @@ fun PsiElement.hasNamedLocalVariables(className: String): Boolean {
     return true
 }
 
-@PsiUtil.AccessLevel
-fun PsiModifierList.bytecodeFriendlyAccessLevel(): Int {
-    val originalLevel = PsiUtil.getAccessLevel(this)
-
-    val parent = this.parent
-
-    // Constructors are package-local in abstract enums in the bytecode, but not in source
-    if (parent is PsiMethod && parent.isConstructor) {
-        val containingClass = parent.containingClass
-        if (containingClass?.isEnum == true && containingClass.hasModifierProperty(PsiModifier.ABSTRACT)) {
-            return PsiUtil.ACCESS_LEVEL_PACKAGE_LOCAL
-        }
+fun PsiModifierListOwner.shouldDoMixinAccessChecks(): Boolean {
+    if (this is PsiMethod && isConstructor) {
+        return false
     }
 
-    return originalLevel
+    return true
 }
