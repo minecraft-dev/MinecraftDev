@@ -28,6 +28,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
+import com.demonwav.mcdev.platform.mixin.util.bytecodeFriendlyAccessLevel
 import com.demonwav.mcdev.util.findKeyword
 import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -88,7 +89,7 @@ class ShadowModifiersInspection : MixinInspection() {
 
             // Check access level
             val targetAccessLevel = getTargetAccessLevel(target, shadowModifierList)
-            val shadowAccessLevel = PsiUtil.getAccessLevel(shadowModifierList)
+            val shadowAccessLevel = shadowModifierList.bytecodeFriendlyAccessLevel()
             if (targetAccessLevel != shadowAccessLevel) {
                 val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
                 val shadowModifier = PsiUtil.getAccessModifier(shadowAccessLevel)

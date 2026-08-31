@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
 import com.demonwav.mcdev.platform.mixin.util.accessLevel
+import com.demonwav.mcdev.platform.mixin.util.bytecodeFriendlyAccessLevel
 import com.demonwav.mcdev.platform.mixin.util.findStubMethod
 import com.demonwav.mcdev.platform.mixin.util.hasModifier
 import com.demonwav.mcdev.platform.mixin.util.internalNameToShortName
@@ -55,7 +56,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
 
         // Check access modifiers
         val targetAccessLevel = target.method.accessLevel
-        val currentAccessLevel = PsiUtil.getAccessLevel(modifierList)
+        val currentAccessLevel = modifierList.bytecodeFriendlyAccessLevel()
         if (currentAccessLevel < targetAccessLevel) {
             val targetModifier = PsiUtil.getAccessModifier(targetAccessLevel)
             val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)

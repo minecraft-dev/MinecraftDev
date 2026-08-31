@@ -29,7 +29,7 @@ import com.intellij.openapi.progress.checkCanceled
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.Navigatable
-import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.SmartPointerManager
 import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
@@ -106,7 +106,7 @@ class FlowDiagram(
 
     fun populateMatchStatuses(
         module: Module,
-        currentStringLit: PsiLiteralExpression,
+        currentStringLit: PsiElement,
         currentModifierList: PsiModifierList
     ) {
         val stringRef = SmartPointerManager.getInstance(module.project).createSmartPsiElementPointer(currentStringLit)

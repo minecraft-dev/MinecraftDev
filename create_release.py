@@ -17,7 +17,7 @@ import subprocess
 import sys
 from typing import List, Tuple
 
-BRANCHES=["2025.2", "2025.3", "2026.1", "2026.2"]
+BRANCHES=["2025.3", "2026.1", "2026.2"]
 
 def check_file_contains_version(path: str, version: str) -> bool:
     try:

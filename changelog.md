@@ -1,5 +1,13 @@
 # Minecraft Development for IntelliJ
 
+## [1.8.21]
+
+### Fixed
+
+- Fixed decompile button not working for Fabric and VanillaGradle projects
+- Support debugging interpolated MixinExtras expression strings
+- Fixed shadow warning on abstract enum constructors
+
 ## [1.8.20]
 
 ### Added
