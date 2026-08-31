@@ -27,11 +27,16 @@ import com.demonwav.mcdev.util.runGradleTaskWithCallback
 import com.demonwav.mcdev.util.runWriteActionAndWait
 import com.intellij.codeInsight.AttachSourcesProvider
 import com.intellij.openapi.externalSystem.task.TaskCallback
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.util.ActionCallback
+import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.platform.workspace.jps.entities.LibraryEntity
+import com.intellij.platform.workspace.jps.entities.LibraryRoot
+import com.intellij.platform.workspace.jps.entities.LibraryRootTypeId
+import com.intellij.platform.workspace.jps.entities.modifyLibraryEntity
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import java.nio.file.Paths
@@ -88,16 +93,38 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
         @Suppress("DialogTitleCapitalization") // Minecraft is a proper noun
         override fun getBusyText(): String = "Decompiling Minecraft..."
 
+        @Deprecated("Deprecated in AttachSourcesAction")
         override fun perform(orderEntriesContainingFile: List<LibraryOrderEntry>): ActionCallback {
             val project = orderEntriesContainingFile.firstOrNull()?.ownerModule?.project
                 ?: return ActionCallback.REJECTED
+            return performInternal(project) {
+                attachSources(orderEntriesContainingFile, decompiler.sourcesPath)
+            }
+        }
+
+        override fun perform(
+            libraryEntities: Collection<LibraryEntity>,
+            project: Project
+        ): ActionCallback {
+            return performInternal(project) {
+                attachSources(project, libraryEntities, decompiler.sourcesPath)
+            }
+        }
+
+        private fun performInternal(project: Project, attachSources: () -> ActionCallback): ActionCallback {
             val projectPath = project.basePath ?: return ActionCallback.REJECTED
 
             val callback = ActionCallback()
             val taskCallback = object : TaskCallback {
                 override fun onSuccess() {
-                    attachSources(orderEntriesContainingFile, decompiler.sourcesPath)
-                    callback.setDone()
+                    val innerCallback = attachSources()
+                    innerCallback.doWhenProcessed {
+                        if (innerCallback.isDone) {
+                            callback.setDone()
+                        } else {
+                            callback.setRejected()
+                        }
+                    }
                 }
 
                 override fun onFailure() = callback.setRejected()
@@ -112,7 +139,7 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
             return callback
         }
 
-        private fun attachSources(libraryEntries: List<LibraryOrderEntry>, sourcePath: String): ActionCallback? {
+        private fun attachSources(libraryEntries: List<LibraryOrderEntry>, sourcePath: String): ActionCallback {
             // Distinct because for some reason the same library is in there twice
             for (libraryEntry in libraryEntries.distinctBy { it.libraryName }) {
                 val library = libraryEntry.library
@@ -129,6 +156,23 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
                 }
             }
 
+            return ActionCallback.DONE
+        }
+
+        private fun attachSources(project: Project, libraryEntities: Collection<LibraryEntity>, sourcePath: String): ActionCallback {
+            runWriteActionAndWait {
+                val model = WorkspaceModel.getInstance(project)
+                model.updateProjectModel("Attaching sources") { storage ->
+                    for (libraryEntity in libraryEntities.distinctBy { it.name }) {
+                        storage.modifyLibraryEntity(libraryEntity) {
+                            roots += LibraryRoot(
+                                model.getVirtualFileUrlManager().getOrCreateFromUrl("jar://$sourcePath!/"),
+                                LibraryRootTypeId.SOURCES
+                            )
+                        }
+                    }
+                }
+            }
             return ActionCallback.DONE
         }
     }

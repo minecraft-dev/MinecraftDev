@@ -29,6 +29,7 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.LibraryOrderEntry
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.platform.workspace.jps.entities.LibraryEntity
@@ -48,9 +49,9 @@ class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
     }
 
     override fun getLibrariesActions(
-        orderEntries: Collection<LibraryEntity>,
+        libraryEntities: Collection<LibraryEntity?>,
         psiFile: PsiFile,
-    ): Collection<AttachSourcesProvider.AttachSourcesAction> {
+    ): Collection<AttachSourcesProvider.AttachSourcesAction?> {
         return getDecompileActions(psiFile)
     }
 
@@ -72,9 +73,18 @@ class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
 
         override fun getBusyText(): String = @Suppress("DialogTitleCapitalization") "Decompiling Minecraft..."
 
+        @Deprecated("Deprecated in AttachSourcesAction")
         override fun perform(orderEntriesContainingFile: List<LibraryOrderEntry>): ActionCallback {
             val project = orderEntriesContainingFile.firstOrNull()?.ownerModule?.project
                 ?: return ActionCallback.REJECTED
+            return performInternal(project)
+        }
+
+        override fun perform(libraryEntities: Collection<LibraryEntity>, project: Project): ActionCallback {
+            return performInternal(project)
+        }
+
+        private fun performInternal(project: Project): ActionCallback {
             val projectPath = project.basePath ?: return ActionCallback.REJECTED
 
             val callback = ActionCallback()
