@@ -45,6 +45,8 @@ import com.intellij.psi.PsiDisjunctionType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIntersectionType
 import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
@@ -315,6 +317,14 @@ fun PsiElement.hasNamedLocalVariables(className: String): Boolean {
         if (checker.hasMissingLVT(this, className)) {
             return false
         }
+    }
+
+    return true
+}
+
+fun PsiModifierListOwner.shouldDoMixinAccessChecks(): Boolean {
+    if (this is PsiMethod && isConstructor) {
+        return false
     }
 
     return true

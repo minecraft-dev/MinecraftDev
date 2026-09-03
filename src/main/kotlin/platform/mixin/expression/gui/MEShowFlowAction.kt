@@ -20,11 +20,11 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
-import com.demonwav.mcdev.platform.mixin.expression.psi.MEExpressionFile
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
@@ -32,7 +32,6 @@ import com.demonwav.mcdev.platform.mixin.util.shortDescString
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.ifEmpty
-import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -43,11 +42,16 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiNameValuePair
+import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.parentOfType
+import com.intellij.psi.util.parents
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LineNumberNode
 import org.objectweb.asm.tree.MethodNode
@@ -125,13 +129,8 @@ class MEShowFlowAction : AnAction() {
 
         fun resolveExpressionTarget(): Sequence<Resolved> {
             val module = e.getData(LangDataKeys.MODULE) ?: return emptySequence()
-            val string = element.parentOfType<PsiLiteralExpression>() ?: return emptySequence()
+            val string = findExpressionString(element) ?: return emptySequence()
             val modifierList = string.parentOfType<PsiMethod>()?.modifierList ?: return emptySequence()
-            if (InjectedLanguageManager.getInstance(project).getInjectedPsiFiles(string).orEmpty()
-                    .none { it.first is MEExpressionFile }
-            ) {
-                return emptySequence()
-            }
             val (injectorAnnotation, injector) =
                 modifierList.annotations.firstNotNullOfOrNull { ann ->
                     (MixinAnnotationHandler.forMixinAnnotation(ann, project) as? InjectorAnnotationHandler)
@@ -155,6 +154,23 @@ class MEShowFlowAction : AnAction() {
                 addAll(resolvePsiMethod())
                 addAll(resolveMethodByLine())
             }
+        }
+    }
+
+    private fun findExpressionString(anchor: PsiElement): PsiElement? {
+        val nameValue = anchor.parentOfType<PsiNameValuePair>() ?: return null
+        if (nameValue.name != "value" && nameValue.name != null) {
+            // Wrong attribute
+            return null
+        }
+        if (anchor.parentOfType<PsiMethod>()?.modifierList?.hasAnnotation(MixinConstants.MixinExtras.EXPRESSION) != true) {
+            // Not an Expression
+            return null
+        }
+        return when (val value = nameValue.value) {
+            null -> null
+            is PsiArrayInitializerMemberValue -> value.initializers.firstOrNull { it.isAncestor(anchor) }
+            else -> value.takeIf { it.isAncestor(anchor) }
         }
     }
 
