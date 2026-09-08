@@ -22,7 +22,6 @@ package com.demonwav.mcdev.platform.fabric
 
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction
 import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.reference.EntryPointReference
@@ -31,14 +30,11 @@ import com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomData
 import com.demonwav.mcdev.platform.mcp.mappings.HardcodedYarnToMojmap
 import com.demonwav.mcdev.platform.mcp.mappings.HasCustomNamedMappings
 import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.json.JsonUtil
-import com.intellij.json.psi.JsonArray
 import com.intellij.json.psi.JsonFile
-import com.intellij.json.psi.JsonObject
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement

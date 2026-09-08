@@ -49,7 +49,6 @@ import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.PsiUtil
 import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes
-import com.intellij.openapi.diagnostic.Logger
 
 class MinecraftClassCreateAction :
     CreateTemplateInPackageAction<PsiClass>(

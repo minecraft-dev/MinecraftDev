@@ -28,8 +28,6 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.ForgeModule
 import com.demonwav.mcdev.platform.neoforge.util.NeoForgeConstants
-import com.demonwav.mcdev.toml.stringValue
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
@@ -37,21 +35,15 @@ import com.demonwav.mcdev.util.runWriteTaskLater
 import com.demonwav.mcdev.util.waitForAllSmart
 import com.intellij.json.JsonFileType
 import com.intellij.lang.jvm.JvmModifier
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
-import org.jetbrains.kotlin.util.removeSuffixIfPresent
 import org.jetbrains.uast.UClass
 import org.jetbrains.uast.UIdentifier
 import org.jetbrains.uast.toUElementOfType
-import org.toml.lang.psi.TomlArrayTable
-import org.toml.lang.psi.TomlFile
-import org.toml.lang.psi.ext.name
 
 class NeoForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(facet) {
 
