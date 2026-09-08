@@ -151,7 +151,7 @@ class MinecraftClassCreateAction :
         return JavaDirectoryService.getInstance().createClass(dir, className, templateName, false)
     }
 
-    class ClassInputValidator(
+    private class ClassInputValidator(
         private val project: Project,
         private val directory: PsiDirectory,
     ) : InputValidatorEx {

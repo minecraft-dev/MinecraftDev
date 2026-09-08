@@ -105,10 +105,8 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
         mappingNamespacesField = mappingDetection.namespaces
     }
 
-    private fun
-        detectMappings(): MappingDetectionResult {
+    private fun detectMappings(): MappingDetectionResult {
         val gradleData = GradleUtil.findGradleModuleData(facet.module) ?: return MappingDetectionResult.DEFAULT
-
         val loomData = gradleData.children.find { it.key == FabricLoomData.KEY }?.data as? FabricLoomData
             ?: return MappingDetectionResult.DEFAULT
         val mappingsFile = loomData.tinyMappings ?: return MappingDetectionResult.DEFAULT
@@ -149,8 +147,7 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
 
         override fun visitMethodArg(argPosition: Int, lvIndex: Int, srcName: String?) = false
 
-        override fun visitMethodVar(lvtRowIndex: Int, lvIndex: Int, startOpIdx: Int, endOpIdx: Int, srcName: String?) =
-            false
+        override fun visitMethodVar(lvtRowIndex: Int, lvIndex: Int, startOpIdx: Int, endOpIdx: Int, srcName: String?) = false
 
         override fun visitDstName(targetKind: MappedElementKind?, namespace: Int, name: String) {
             if (namespace == namedIndex && name == "net/minecraft/client/MinecraftClient") {

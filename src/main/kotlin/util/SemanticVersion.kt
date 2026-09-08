@@ -20,14 +20,11 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.PreReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
 import java.net.URLDecoder
-import com.intellij.notification.Notification
-import com.intellij.notification.NotificationType
 
 /**
  * Represents a comparable and generalised "semantic version".
@@ -169,32 +166,32 @@ class SemanticVersion(
                     listOf(mainPart),
                 )
             }
-                parseMinecraftSnapshot(value)?.let { return it }
 
-                val decodedValue = value.split('+').joinToString("+") { URLDecoder.decode(it, Charsets.UTF_8) }
-                val mainPartAndMetadata = decodedValue.split("+", limit = 2)
-                val mainPart = mainPartAndMetadata[0]
-                val metadata = mainPartAndMetadata.getOrNull(1) ?: ""
+            parseMinecraftSnapshot(value)?.let { return it }
 
-                val separator = SEPARATORS.find { it in mainPart }
-                val beforeSeparator = if (separator == null) mainPart else mainPart.substringBefore(separator)
-                val partCount = beforeSeparator.count { it == '.' } + 1
-                val parts = mainPart.split('.', limit = partCount).map { part ->
-                    if (separator != null && separator in part) {
-                        val subParts = part.split(separator, limit = 2)
-                        parsePreReleasePart(subParts[0], subParts[1], separator, part)
+            val decodedValue = value.split('+').joinToString("+") { URLDecoder.decode(it, Charsets.UTF_8) }
+            val mainPartAndMetadata = decodedValue.split("+", limit = 2)
+            val mainPart = mainPartAndMetadata[0]
+            val metadata = mainPartAndMetadata.getOrNull(1) ?: ""
+
+            val separator = SEPARATORS.find { it in mainPart }
+            val beforeSeparator = if (separator == null) mainPart else mainPart.substringBefore(separator)
+            val partCount = beforeSeparator.count { it == '.' } + 1
+            val parts = mainPart.split('.', limit = partCount).map { part ->
+                if (separator != null && separator in part) {
+                    val subParts = part.split(separator, limit = 2)
+                    parsePreReleasePart(subParts[0], subParts[1], separator, part)
+                } else {
+                    // Forge has a single version which should be 14.8.* but is actually 14.v8.*
+                    val numberPart = if (part.startsWith('v')) {
+                        part.substring(1)
                     } else {
-                        // Forge has a single version which should be 14.8.* but is actually 14.v8.*
-                        val numberPart = if (part.startsWith('v')) {
-                            part.substring(1)
-                        } else {
-                            part
-                        }
-                        ReleasePart(parseInt(numberPart), part)
+                        part
                     }
+                    ReleasePart(parseInt(numberPart), part)
                 }
-                return SemanticVersion(parts, metadata)
-
+            }
+            return SemanticVersion(parts, metadata)
         }
 
         sealed class VersionPart : Comparable<VersionPart> {
