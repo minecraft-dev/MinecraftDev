@@ -80,51 +80,6 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
         return listOfNotNull((jsonObj.findProperty("id")?.value as? JsonStringLiteral)?.value)
     }
 
-    fun computeVersion(): SemanticVersion? {
-        val jsonFile = PsiManager.getInstance(project).findFile(fabricJson ?: return null) as? JsonFile
-            ?: return null
-        val jsonObj = JsonUtil.getTopLevelObject(jsonFile) ?: return null;
-        val depends = jsonObj.findProperty("depends")?.value as? JsonObject
-        val range = depends?.findProperty("minecraft")
-        var value = (range?.value as? JsonStringLiteral)?.value;
-        val arrayValue = (range?.value as? JsonArray)
-        if (value != null) {
-            if (value.contains("\${")) {
-                val varName = value.substring(value.indexOf("\${") + 2, value.lastIndexOf("}"))
-                value = value.replace("\${${varName}}", detectMinecraftVersionInProps(varName) ?: return null)
-            }
-            val end = value.trimStart { !it.isDigit() }
-            val parse = try {
-                SemanticVersion.parse(end)
-            } catch (_: NumberFormatException) {
-                null
-            }
-            fabricMinecraftVersion = parse
-            return parse
-        } else if (arrayValue != null) {
-            var majorVersion: SemanticVersion? = null;
-            for (child in arrayValue.valueList) {
-                var string = (child as? JsonStringLiteral)?.value.toString()
-                if (string.contains("\${")) {
-                    val varName = string.substring(string.indexOf("\${") + 2, string.lastIndexOf("}"))
-                    string = string.replace("\${${varName}}", detectMinecraftVersionInProps(varName) ?: return null)
-                }
-                val end = string.trimStart { !it.isDigit() }
-                val value = try {
-                    SemanticVersion.parse(end)
-                } catch (_: NumberFormatException) {
-                    null
-                }
-                if (value != null) {
-                    if (majorVersion == null || value > majorVersion) majorVersion = value
-                };
-            }
-            fabricMinecraftVersion = majorVersion
-            return majorVersion
-        }
-        return null
-    }
-
     override fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) = true
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) = ""

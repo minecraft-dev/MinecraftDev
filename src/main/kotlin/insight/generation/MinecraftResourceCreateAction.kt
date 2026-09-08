@@ -52,8 +52,7 @@ class MinecraftResourceCreateAction : CreateFileFromTemplateAction(
             setOf(JavaResourceRootType.RESOURCE)
         )
         val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
-            ?.minecraftVersion?.let(SemanticVersion::parse) ?: MinecraftFacet.getInstance(module, FabricModuleType)
-            ?.computeVersion() ?: MinecraftFacet.getInstance(module, NeoForgeModuleType)?.computeVersion()
+            ?.minecraftVersion?.let(SemanticVersion::parse)
 
         return underSourceRootOfType && findModid(dir, module) != null && mcVersion != null && mcVersion >= MinecraftVersions.MC1_21
     }

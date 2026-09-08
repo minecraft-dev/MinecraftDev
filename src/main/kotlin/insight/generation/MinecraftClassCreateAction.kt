@@ -70,13 +70,10 @@ class MinecraftClassCreateAction :
         val isForge = MinecraftFacet.getInstance(module, ForgeModuleType) != null
         val isNeoForge = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
-        
-        val mcVersion = MinecraftFacet.getInstance(module, NeoForgeModuleType)?.computeVersion()?:
-        MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
-            ?.minecraftVersion?.let(SemanticVersion::parse) ?:
-        MinecraftFacet.getInstance(module, FabricModuleType)?.computeVersion()
 
-      //  LOG.info("VERSIONI: $neomcVersion, $mcVersion, $fabricMcVersion")
+        val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
+            ?.minecraftVersion?.let(SemanticVersion::parse)
+
         if (isForge && mcVersion != null) {
             val icon = PlatformAssets.FORGE_ICON
 

@@ -65,39 +65,7 @@ class NeoForgeModule internal constructor(facet: MinecraftFacet) : AbstractModul
     override val icon = PlatformAssets.NEOFORGE_ICON
 
     override fun computeModIds() = ForgeModule.getModsFromModsToml(project, modsToml)
-    fun computeVersion(): SemanticVersion? {
-        val tomlFile = PsiManager.getInstance(project).findFile(modsToml ?: return null) as? TomlFile
-            ?: return null
 
-        for (child in tomlFile.children) {
-            if (child is TomlArrayTable && child.header.key?.name == "dependencies."+ computeModIds()[0]) {
-                var founded = false
-                for (entry in child.entries) {
-                    if (entry.key.name == computeModIds()[0]) {
-                        founded = true
-                    }
-                }
-                if(!founded) continue
-                else{
-                    for (entry in child.entries) {
-                        if (entry.key.name == "versionRange") {
-                            val value = entry.value.toString()
-                            var valueParsed = value;
-                            if(value.contains("\${")) {
-                                    val varName = value.substring(value.indexOf("\${")+2, value.lastIndexOf("}"))
-                                    valueParsed = value.replace("\${${varName}}", detectMinecraftVersionInProps(varName)?: return null)
-                            }
-                            return SemanticVersion.parse(valueParsed.trim()
-                                .removeSuffixIfPresent(")")
-                                .removeSuffixIfPresent("]")
-                                .substringAfter(","))
-                        }
-                    }
-                }
-            }
-        }
-        return null
-    }
     override val eventListenerGenSupport: EventListenerGenerationSupport = NeoForgeEventListenerGenerationSupport()
 
     override fun init() {

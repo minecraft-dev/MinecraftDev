@@ -112,20 +112,4 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
     open fun dispose() {}
     open fun refresh() {}
 
-    fun detectMinecraftVersionInProps(keyname: String): String? {
-        val contentRoots = ModuleRootManager.getInstance(module).contentRoots
-        var dir = contentRoots.firstOrNull() ?: return null
-
-        val projectBase = project.basePath
-        while (true) {
-            val found = dir.findChild("gradle.properties")
-            if (found != null) {
-                val propsFile = PsiManager.getInstance(project).findFile(found) as? PropertiesFile ?: return null
-                return propsFile.findPropertyByKey(keyname)?.value
-            }
-            val parent = dir.parent ?: return null
-            if (dir.path == projectBase) return null
-            dir = parent
-        }
-    }
 }
