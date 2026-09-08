@@ -71,7 +71,6 @@ class FabricModule internal constructor(facet: MinecraftFacet) : AbstractModule(
     override val moduleType = FabricModuleType
     override val type = PlatformType.FABRIC
     override val icon = PlatformAssets.FABRIC_ICON
-    var fabricMinecraftVersion: SemanticVersion? = null;
 
     override fun computeModIds(): List<String> {
         val jsonFile = PsiManager.getInstance(project).findFile(fabricJson ?: return emptyList()) as? JsonFile
