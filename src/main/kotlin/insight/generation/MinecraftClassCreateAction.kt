@@ -110,15 +110,15 @@ class MinecraftClassCreateAction :
 
         if (isFabric) {
             val icon = PlatformAssets.FABRIC_ICON
-            if (mcVersion != null && mcVersion >= MinecraftVersions.MC26_1) {
+            if (mcVersion != null && mcVersion < MinecraftVersions.MC26_1) {
+                builder.addKind("Block", icon, MinecraftTemplates.FABRIC_1_21_11_BLOCK_TEMPLATE)
+                builder.addKind("Item", icon, MinecraftTemplates.FABRIC_1_21_11_ITEM_TEMPLATE)
+                builder.addKind("Status effect", icon, MinecraftTemplates.FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE)
+            } else {
                 builder.addKind("Block", icon, MinecraftTemplates.FABRIC_26_1_BLOCK_TEMPLATE)
                 builder.addKind("Item", icon, MinecraftTemplates.FABRIC_26_1_ITEM_TEMPLATE)
                 builder.addKind("Mob effect", icon, MinecraftTemplates.FABRIC_26_1_MOB_EFFECT_TEMPLATE)
 
-            } else {
-                builder.addKind("Block", icon, MinecraftTemplates.FABRIC_1_21_11_BLOCK_TEMPLATE)
-                builder.addKind("Item", icon, MinecraftTemplates.FABRIC_1_21_11_ITEM_TEMPLATE)
-                builder.addKind("Status effect", icon, MinecraftTemplates.FABRIC_1_21_11_STATUS_EFFECT_TEMPLATE)
             }
             if (mcVersion != null && mcVersion < MinecraftVersions.MC1_21)
                 builder.addKind("Enchantment", icon, MinecraftTemplates.FABRIC_1_21_11_ENCHANTMENT_TEMPLATE)
