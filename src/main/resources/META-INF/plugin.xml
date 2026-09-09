@@ -66,32 +66,6 @@
     </change-notes>
 
     <extensionPoints>
-        <extensionPoint name="platformTypeWizard"
-                        interface="com.demonwav.mcdev.creator.platformtype.PlatformTypeStep$Factory" dynamic="true"/>
-        <extensionPoint name="modPlatformWizard"
-                        interface="com.demonwav.mcdev.creator.platformtype.ModPlatformStep$Factory" dynamic="true"/>
-        <extensionPoint name="pluginPlatformWizard"
-                        interface="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$Factory" dynamic="true"/>
-        <extensionPoint name="bukkitPlatformWizard"
-                        interface="com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep$Factory"
-                        dynamic="true"/>
-        <extensionPoint name="bungeePlatformWizard"
-                        interface="com.demonwav.mcdev.platform.bungeecord.creator.BungeePlatformStep$Factory"
-                        dynamic="true"/>
-        <extensionPoint name="projectSetupFinalizer"
-                        interface="com.demonwav.mcdev.creator.ProjectSetupFinalizer$Factory" dynamic="true"/>
-
-        <extensionPoint name="buildSystemWizard"
-                        interface="com.demonwav.mcdev.creator.buildsystem.AbstractBuildSystemStep$Factory"
-                        dynamic="true"/>
-        <extensionPoint name="buildSystemSupport"
-                        beanClass="com.demonwav.mcdev.creator.buildsystem.BuildSystemSupportEntry" dynamic="true">
-            <with attribute="implementation" implements="com.demonwav.mcdev.creator.buildsystem.BuildSystemSupport"/>
-        </extensionPoint>
-
-        <extensionPoint name="gradleFileType" interface="com.demonwav.mcdev.creator.buildsystem.GradleFile$Type"
-                        dynamic="true"/>
-
         <extensionPoint name="creatorPropertyType"
                         beanClass="com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactoryBean" dynamic="true">
             <with attribute="implementation"
@@ -130,63 +104,6 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
-        <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.ModPlatformStep$TypeFactory"/>
-        <platformTypeWizard implementation="com.demonwav.mcdev.creator.platformtype.PluginPlatformStep$TypeFactory"/>
-
-        <modPlatformWizard implementation="com.demonwav.mcdev.platform.forge.creator.ForgePlatformStep$Factory"/>
-        <modPlatformWizard implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgePlatformStep$Factory"/>
-        <modPlatformWizard implementation="com.demonwav.mcdev.platform.fabric.creator.FabricPlatformStep$Factory"/>
-        <modPlatformWizard
-            implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyPlatformStep$Factory"/>
-
-        <pluginPlatformWizard implementation="com.demonwav.mcdev.platform.sponge.creator.SpongePlatformStep$Factory"/>
-        <pluginPlatformWizard
-            implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitPlatformStep$PlatformFactory"/>
-        <pluginPlatformWizard
-            implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityPlatformStep$Factory"/>
-        <pluginPlatformWizard
-            implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeePlatformStep$PlatformFactory"/>
-
-        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.PaperPlatformStep$Factory"/>
-        <bukkitPlatformWizard implementation="com.demonwav.mcdev.platform.bukkit.creator.SpigotPlatformStep$Factory"/>
-
-        <bungeePlatformWizard
-            implementation="com.demonwav.mcdev.platform.bungeecord.creator.WaterfallPlatformStep$Factory"/>
-        <bungeePlatformWizard
-            implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMainPlatformStep$Factory"/>
-
-        <projectSetupFinalizer implementation="com.demonwav.mcdev.creator.JdkProjectSetupFinalizer$Factory"/>
-
-        <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.GradleBuildSystem"/>
-        <buildSystemWizard implementation="com.demonwav.mcdev.creator.buildsystem.MavenBuildSystem"/>
-
-        <buildSystemSupport platform="Forge" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.forge.creator.ForgeGradleSupport"/>
-        <buildSystemSupport platform="NeoForge" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.neoforge.creator.NeoForgeGradleSupport"/>
-        <buildSystemSupport platform="Fabric" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.fabric.creator.FabricGradleSupport"/>
-        <buildSystemSupport platform="Architectury" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.architectury.creator.ArchitecturyGradleSupport"/>
-        <buildSystemSupport platform="Sponge" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeGradleSupport"/>
-        <buildSystemSupport platform="Sponge" buildSystem="Maven"
-                            implementation="com.demonwav.mcdev.platform.sponge.creator.SpongeMavenSupport"/>
-        <buildSystemSupport platform="Bukkit" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitGradleSupport"/>
-        <buildSystemSupport platform="Bukkit" buildSystem="Maven"
-                            implementation="com.demonwav.mcdev.platform.bukkit.creator.BukkitMavenSupport"/>
-        <buildSystemSupport platform="Velocity" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityGradleSupport"/>
-        <buildSystemSupport platform="Velocity" buildSystem="Maven"
-                            implementation="com.demonwav.mcdev.platform.velocity.creator.VelocityMavenSupport"/>
-        <buildSystemSupport platform="BungeeCord" buildSystem="Gradle"
-                            implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeGradleSupport"/>
-        <buildSystemSupport platform="BungeeCord" buildSystem="Maven"
-                            implementation="com.demonwav.mcdev.platform.bungeecord.creator.BungeeMavenSupport"/>
-
-        <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.GroovyGradleFile$Type"/>
-
         <creatorPropertyType
             implementation="com.demonwav.mcdev.creator.custom.types.ArchitecturyVersionsCreatorProperty$Factory"
             type="architectury_versions"/>
@@ -356,7 +273,6 @@
         <moduleBuilder id="CUSTOM_MINECRAFT_MODULE"
                        builderClass="com.demonwav.mcdev.creator.custom.CustomMinecraftModuleBuilder"/>
         <postStartupActivity implementation="com.demonwav.mcdev.creator.custom.TemplateProjectFinalizerActivity"/>
-        <moduleBuilder id="MINECRAFT_MODULE" builderClass="com.demonwav.mcdev.creator.MinecraftModuleBuilder"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType"/>
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
@@ -591,9 +507,6 @@
 
         <library.presentationProvider
             implementation="com.demonwav.mcdev.platform.forge.framework.ForgePresentationProvider"/>
-
-        <externalProjectDataService
-            implementation="com.demonwav.mcdev.platform.forge.gradle.ForgeRunConfigDataService"/>
         <!--endregion-->
 
         <!--region NEOFORGE-->
@@ -606,9 +519,6 @@
         <!-- NeoForge Annotator -->
         <library.presentationProvider
             implementation="com.demonwav.mcdev.platform.neoforge.framework.NeoForgePresentationProvider"/>
-
-        <externalProjectDataService
-            implementation="com.demonwav.mcdev.platform.neoforge.gradle.NeoForgeRunConfigDataService"/>
         <!--endregion-->
 
         <!--region FABRIC-->
@@ -632,7 +542,6 @@
         <!---->
 
         <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDataService"/>
         <externalProjectDataService
             implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDataService"/>
 
