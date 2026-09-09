@@ -36,9 +36,11 @@ import com.demonwav.mcdev.platform.mixin.util.findSourceClass
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.isClinit
 import com.demonwav.mcdev.platform.mixin.util.memberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.countIsAtLeast
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findMethods
@@ -174,6 +176,8 @@ class AtResolver(
                 else -> 0
             }
         }
+
+        const val DEFAULT_UNRESOLVED_MESSAGE = "Cannot resolve any instructions in target"
     }
 
     fun isUnresolved(): InsnResolutionInfo.Failure? {
@@ -190,14 +194,24 @@ class AtResolver(
         )
         if (collectVisitor == null) {
             // syntax error in target
-            val stringValue = targetAttr?.constantStringValue ?: return InsnResolutionInfo.Failure()
+            val stringValue = targetAttr?.constantStringValue ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
             return if (isMiscDynamicSelector(at.project, stringValue)) {
                 null
             } else {
-                InsnResolutionInfo.Failure()
+                InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
             }
         }
-        return collectVisitor.visit(targetMethod) as? InsnResolutionInfo.Failure
+        return when (val result = collectVisitor.visit(targetMethod)) {
+            is InsnResolutionInfo.Failure -> result
+            is InsnResolutionInfo.Success -> {
+                val minMatches = collectVisitor.quantifier.min(Quantifier.Context.INSTRUCTION).coerceAtLeast(1)
+                if (result.results.countIsAtLeast(minMatches)) {
+                    null
+                } else {
+                    InsnResolutionInfo.Failure("Quantifier requires at least $minMatches matches")
+                }
+            }
+        }
     }
 
     fun resolveInstructions(
@@ -207,12 +221,12 @@ class AtResolver(
     }
 
     fun getInstructionResolutionInfo(mode: CollectVisitor.Mode = CollectVisitor.Mode.RESOLUTION): InsnResolutionInfo<*> {
-        val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure()
+        val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
 
         val collectVisitor = injectionPoint.createCollectVisitor(at, target, getTargetClass(target), mode)
-            ?: return InsnResolutionInfo.Failure()
+            ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
 
         return collectVisitor.visit(targetMethod)
     }
@@ -311,13 +325,19 @@ class AtResolver(
 
 sealed class InsnResolutionInfo<out T : PsiElement>(val results: Sequence<CollectVisitor.Result<T>>) {
     class Success<T : PsiElement>(results: Sequence<CollectVisitor.Result<T>>) : InsnResolutionInfo<T>(results)
-    class Failure(val filterStats: Map<String, Int> = emptyMap()) : InsnResolutionInfo<Nothing>(emptySequence()) {
+    class Failure(val messages: Set<String>, val filterStats: Map<String, Int>) : InsnResolutionInfo<Nothing>(emptySequence()) {
+        constructor(message: String, filterStats: Map<String, Int> = emptyMap()) : this(linkedSetOf(message), filterStats)
+
         infix fun combine(other: Failure): Failure {
+            val messages = linkedSetOf<String>()
+            messages += this.messages
+            messages += other.messages
+
             val result = LinkedHashMap(this.filterStats)
             for ((key, value) in other.filterStats) {
                 result[key] = (result[key] ?: 0) + value
             }
-            return Failure(result)
+            return Failure(messages, result)
         }
     }
 }

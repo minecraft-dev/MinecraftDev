@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.folding.MixinFoldingSettings
 import com.demonwav.mcdev.platform.mixin.reference.target.FieldDefinitionReference
 import com.demonwav.mcdev.platform.mixin.reference.target.MethodDefinitionReference
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.MemberReference
 import com.intellij.lang.ASTNode
@@ -49,8 +50,8 @@ class MEDefinitionFoldingBuilder : CustomFoldingBuilder() {
         val psi = node.psi
         if (psi is PsiLiteralExpression) {
             val value = psi.value as? String ?: return "..."
-            val memberReference = MemberReference.parse(value) ?: return "..."
-            return memberReference.presentableText
+            val memberInfo = MemberInfo.parse(value) ?: return "..."
+            return MemberReference(memberInfo.name ?: "*", memberInfo.descriptor, memberInfo.owner).presentableText
         }
         return "..."
     }
@@ -108,7 +109,7 @@ class MEDefinitionFoldingBuilder : CustomFoldingBuilder() {
             if (FieldDefinitionReference.ELEMENT_PATTERN.accepts(expression) ||
                 MethodDefinitionReference.ELEMENT_PATTERN.accepts(expression)
             ) {
-                if (MemberReference.parse(expression.value as String) != null) {
+                if (MemberInfo.parse(expression.value as String) != null) {
                     descriptors.add(FoldingDescriptor(expression.node, expression.textRange))
                 }
             }

@@ -21,9 +21,9 @@
 package com.demonwav.mcdev.platform.mixin.reference
 
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
-import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.reference.target.TargetReference
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -32,7 +32,10 @@ import com.demonwav.mcdev.platform.mixin.util.findUpstreamMixin
 import com.demonwav.mcdev.platform.mixin.util.memberReference
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.countIsAtLeast
+import com.demonwav.mcdev.util.countIsLessThan
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
@@ -81,15 +84,18 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
 
         val stringValue = context.constantStringValue ?: return false
         val targetMethodInfo = parseSelector(stringValue, context) ?: return false
+        val minMatches = targetMethodInfo.quantifier.min(Quantifier.Context.MEMBER).coerceAtLeast(1)
         val targets = getTargets(context) ?: return false
-        return !targets.asSequence().flatMap {
-            targetMethodInfo.getCustomOwner(it).findMethods(targetMethodInfo)
-        }.any()
+
+        return targets.any {
+            targetMethodInfo.getCustomOwner(it).findMethods(targetMethodInfo).countIsLessThan(minMatches)
+        }
     }
 
-    fun getReferenceIfAmbiguous(context: PsiElement): MemberReference? {
-        val targetReference = parseSelector(context) as? MemberReference ?: return null
-        if (targetReference.descriptor != null) {
+    fun getReferenceIfAmbiguous(context: PsiElement): MemberInfo? {
+        val targetReference = parseSelector(context) as? MemberInfo ?: return null
+        if (targetReference.name != null && targetReference.descriptor != null) {
+            // Not ambiguous
             return null
         }
 
@@ -97,14 +103,8 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         return if (isAmbiguous(targets, targetReference)) targetReference else null
     }
 
-    private fun isAmbiguous(targets: Collection<ClassNode>, targetReference: MemberReference): Boolean {
-        if (targetReference.matchAllNames) {
-            return targets.any {
-                val methods = it.methods
-                methods != null && methods.size > 1
-            }
-        }
-        return targets.any { it.findMethods(MemberReference(targetReference.name)).count() > 1 }
+    private fun isAmbiguous(targets: Collection<ClassNode>, targetReference: MemberInfo): Boolean {
+        return targets.any { it.findMethods(targetReference.withQuantifier(Quantifier.Any)).countIsAtLeast(2) }
     }
 
     fun resolve(context: PsiElement): Sequence<ClassAndMethodNode>? {
@@ -129,27 +129,6 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
                 val actualTarget = selector.getCustomOwner(target)
                 actualTarget.findMethods(selector).map { ClassAndMethodNode(actualTarget, it) }
             }
-    }
-
-    fun resolveAllIfNotAmbiguous(context: PsiElement): List<ClassAndMethodNode>? {
-        val targets = getTargets(context) ?: return null
-
-        val targetedMethods = when (context) {
-            is PsiArrayInitializerMemberValue -> context.initializers.mapNotNull { it.constantStringValue }
-            else -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
-        }
-
-        return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = parseSelector(method, context) ?: return@flatMap emptySequence()
-            if (targetReference is MemberReference && targetReference.descriptor == null && isAmbiguous(
-                    targets,
-                    targetReference,
-                )
-            ) {
-                return@flatMap emptySequence()
-            }
-            return@flatMap resolve(targets, targetReference)
-        }.toList()
     }
 
     fun resolveForNavigation(context: PsiElement): Array<PsiElement>? {

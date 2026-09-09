@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.reference.target
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.MemberReference
@@ -55,7 +56,7 @@ import org.objectweb.asm.tree.FieldInsnNode
 import org.objectweb.asm.tree.MethodInsnNode
 
 abstract class AbstractDefinitionReference : PolyReferenceResolver(), MixinReference {
-    abstract fun getFullReferenceIfMatches(memberReference: MemberReference, node: FlowValue): MemberReference?
+    abstract fun getFullReferenceIfMatches(memberInfo: MemberInfo, node: FlowValue): MemberReference?
     abstract fun getMatchesInClass(memberReference: MemberReference, clazz: PsiClass): Sequence<PsiMember>
     abstract fun referenceToString(memberReference: MemberReference): String
 
@@ -82,7 +83,7 @@ abstract class AbstractDefinitionReference : PolyReferenceResolver(), MixinRefer
     override fun collectVariants(context: PsiElement) =
         resolveInBytecode(
             context,
-            MemberReference("*", null, null, matchAllNames = true, matchAllDescs = true)
+            MemberInfo()
         ).mapToArray<MemberReference, Any> {
             LookupElementBuilder.create(referenceToString(it))
                 .withPresentableText(it.presentableText)
@@ -90,11 +91,11 @@ abstract class AbstractDefinitionReference : PolyReferenceResolver(), MixinRefer
         }
 
     fun resolveInBytecode(context: PsiElement): List<MemberReference> {
-        val memberReference = context.constantStringValue?.let(MemberReference::parse) ?: return emptyList()
+        val memberReference = context.constantStringValue?.let(MemberInfo::parse) ?: return emptyList()
         return resolveInBytecode(context, memberReference)
     }
 
-    private fun resolveInBytecode(context: PsiElement, memberReference: MemberReference): List<MemberReference> {
+    private fun resolveInBytecode(context: PsiElement, memberInfo: MemberInfo): List<MemberReference> {
         val project = context.project
         val modifierList = context.findContainingModifierList() ?: return emptyList()
         val annotation = modifierList.annotations.firstOrNull {
@@ -119,7 +120,7 @@ abstract class AbstractDefinitionReference : PolyReferenceResolver(), MixinRefer
             ) ?: continue
 
             for (node in flow.values) {
-                val fullReference = getFullReferenceIfMatches(memberReference, node) ?: continue
+                val fullReference = getFullReferenceIfMatches(memberInfo, node) ?: continue
                 result += fullReference
             }
         }
@@ -132,9 +133,9 @@ object FieldDefinitionReference : AbstractDefinitionReference() {
     val ELEMENT_PATTERN: PsiJavaElementPattern.Capture<PsiLiteral> = PsiJavaPatterns.psiLiteral(StandardPatterns.string())
         .insideAnnotationAttribute(MixinConstants.MixinExtras.DEFINITION, "field")
 
-    override fun getFullReferenceIfMatches(memberReference: MemberReference, node: FlowValue): MemberReference? {
+    override fun getFullReferenceIfMatches(memberInfo: MemberInfo, node: FlowValue): MemberReference? {
         val insn = node.insn
-        if (insn !is FieldInsnNode || !memberReference.matchField(insn.owner, insn.name, insn.desc)) {
+        if (insn !is FieldInsnNode || !memberInfo.matchField(insn.owner, insn.name, insn.desc)) {
             return null
         }
 
@@ -154,7 +155,7 @@ object MethodDefinitionReference : AbstractDefinitionReference() {
     val ELEMENT_PATTERN: PsiJavaElementPattern.Capture<PsiLiteral> = PsiJavaPatterns.psiLiteral(StandardPatterns.string())
         .insideAnnotationAttribute(MixinConstants.MixinExtras.DEFINITION, "method")
 
-    override fun getFullReferenceIfMatches(memberReference: MemberReference, node: FlowValue): MemberReference? {
+    override fun getFullReferenceIfMatches(memberInfo: MemberInfo, node: FlowValue): MemberReference? {
         val info = node.getDecoration<LMFInfo>(FlowDecorations.LMF_INFO)
         val insn = node.insn
         val (owner, name, desc) = when {
@@ -164,7 +165,7 @@ object MethodDefinitionReference : AbstractDefinitionReference() {
             insn is MethodInsnNode -> Triple(insn.owner, insn.name, insn.desc)
             else -> return null
         }
-        if (!memberReference.matchMethod(owner, name, desc)) {
+        if (!memberInfo.matchMethod(owner, name, desc)) {
             return null
         }
 

@@ -98,20 +98,26 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, annotation.project)
                     as? InjectorAnnotationHandler ?: continue
                 val methodAttribute = annotation.findDeclaredAttributeValue("method") ?: continue
-                val targetMethods = MethodReference.resolveAllIfNotAmbiguous(methodAttribute) ?: continue
+                val targetMethods = MethodReference.resolve(methodAttribute) ?: continue
 
-                val hasDisallowedInsns = targetMethods.any { classAndMethod ->
+                val matchesByMethod = targetMethods.associateWith { classAndMethod ->
                     handler.resolveInstructions(
                         annotation,
                         classAndMethod.clazz,
                         classAndMethod.method
-                    ).any { !handler.isInsnAllowed(it.insn, it.decorations) }
+                    )
                 }
+                val hasDisallowedInsns = matchesByMethod.values.asSequence()
+                    .flatten().any { !handler.isInsnAllowed(it.insn, it.decorations) }
                 if (hasDisallowedInsns) {
                     continue
                 }
 
-                for (targetMethod in targetMethods) {
+                for ((targetMethod, matches) in matchesByMethod) {
+                    if (matches.isEmpty()) {
+                        // We will never inject
+                        continue
+                    }
                     if (!reportedStatic) {
                         var shouldBeStatic = targetMethod.method.hasAccess(Opcodes.ACC_STATIC)
 
@@ -120,12 +126,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                             val methodInsns = targetMethod.method.instructions
                             val delegateCtorCall = targetMethod.method.findDelegateConstructorCall()
                             if (methodInsns != null && delegateCtorCall != null) {
-                                val insns = handler.resolveInstructions(
-                                    annotation,
-                                    targetMethod.clazz,
-                                    targetMethod.method,
-                                )
-                                shouldBeStatic = insns.any {
+                                shouldBeStatic = matches.any {
                                     methodInsns.indexOf(it.insn) <= methodInsns.indexOf(delegateCtorCall)
                                 }
                             }

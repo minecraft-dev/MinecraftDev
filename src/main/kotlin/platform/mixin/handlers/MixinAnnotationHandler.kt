@@ -52,7 +52,7 @@ interface MixinAnnotationHandler {
     fun resolveTarget(annotation: PsiAnnotation, targetClass: ClassNode): List<MixinTargetMember>
 
     fun isUnresolved(annotation: PsiAnnotation): InsnResolutionInfo.Failure? {
-        val containingClass = annotation.findContainingClass() ?: return InsnResolutionInfo.Failure()
+        val containingClass = annotation.findContainingClass() ?: return null // no containing mixin, don't show unresolved error
         return containingClass.mixinTargets
             .mapNotNull { isUnresolved(annotation, it) }
             .reduceOrNull(InsnResolutionInfo.Failure::combine)
@@ -66,8 +66,6 @@ interface MixinAnnotationHandler {
     }
 
     fun resolveForNavigation(annotation: PsiAnnotation, targetClass: ClassNode): List<PsiElement>
-
-    fun createUnresolvedMessage(annotation: PsiAnnotation): String?
 
     /**
      * Returns true if we don't actually know the implementation of the annotation, and we're just making

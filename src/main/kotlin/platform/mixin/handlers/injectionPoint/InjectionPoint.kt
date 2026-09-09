@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,6 +26,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
 import com.demonwav.mcdev.platform.mixin.util.SourceCodeLocationInfo
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.createLiteralExpression
@@ -162,6 +163,7 @@ abstract class InjectionPoint<T : PsiElement> {
         // results are shown.
         if (mode != CollectVisitor.Mode.COMPLETION) {
             addOrdinalFilter(at, targetClass, collectVisitor)
+            addQuantifierFilter(at, targetClass, collectVisitor)
             addSpecifierFilter(at, targetClass, collectVisitor, defaultSpecifier)
         }
     }
@@ -216,6 +218,13 @@ abstract class InjectionPoint<T : PsiElement> {
         if (ordinal < 0) return
         collectVisitor.addResultFilter("ordinal") { results, _ ->
             results.drop(ordinal).take(1)
+        }
+    }
+
+    protected open fun addQuantifierFilter(at: PsiAnnotation, targetClass: ClassNode, collectVisitor: CollectVisitor<T>) {
+        val maxMatches = collectVisitor.quantifier.max(Quantifier.Context.INSTRUCTION)
+        collectVisitor.addResultFilter("quantifier") { results, _ ->
+            results.take(maxMatches)
         }
     }
 
@@ -356,6 +365,8 @@ abstract class NavigationVisitor : JavaRecursiveElementVisitor() {
 }
 
 abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
+    open val quantifier: Quantifier get() = Quantifier.Any
+
     fun visit(methodNode: MethodNode): InsnResolutionInfo<T> {
         val numRetained = IntArray(resultFilters.size + 1)
         var results = accept(methodNode).onEach { numRetained[0]++ }
@@ -370,7 +381,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
             .map { it.first }
             .zip(numRetained.asSequence().zipWithNext(Int::minus))
             .toMap()
-        return InsnResolutionInfo.Failure(filterStats)
+        return InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE, filterStats)
     }
 
     fun addResultFilter(name: String, filter: CollectResultFilter<T>) {

@@ -21,7 +21,8 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
+import com.demonwav.mcdev.util.Quantifier
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.CommonClassNames
@@ -105,7 +106,7 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
         val skip = args["skip"]?.let { parseSkip(it) } ?: Const.DEFAULT_SKIP
 
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""), fuzz, skip)
+            return MyCollectVisitor(mode, at.project, MemberInfo(), fuzz, skip)
         }
         return target?.let { MyCollectVisitor(mode, at.project, it, fuzz, skip) }
     }
@@ -162,6 +163,9 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
         private val fuzz: Int,
         private val skip: Set<Int>,
     ) : CollectVisitor<PsiMethod>(mode) {
+        override val quantifier: Quantifier
+            get() = selector.quantifier
+
         override fun accept(methodNode: MethodNode) = sequence {
             val insns = methodNode.instructions ?: return@sequence
             for (insn in insns) {

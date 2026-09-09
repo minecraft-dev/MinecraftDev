@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,26 +20,30 @@
 
 package com.demonwav.mcdev.util
 
-import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
-import com.intellij.openapi.util.text.StringUtil
+import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
+import com.demonwav.mcdev.platform.mixin.util.bytecode
+import com.demonwav.mcdev.platform.mixin.util.findField
+import com.demonwav.mcdev.platform.mixin.util.findMethod
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.RecursionManager
+import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import java.io.Serializable
+import com.intellij.psi.search.GlobalSearchScope
 import org.objectweb.asm.Type
 
 /**
- * Represents a reference to a class member (a method or a field). It may
- * resolve to multiple members if [matchAllNames] or [matchAllDescs] is set or if the member is
- * not full qualified.
+ * Represents a reference to a class member (a method or a field).
  */
 data class MemberReference(
     val name: String,
     val descriptor: String? = null,
     override val owner: String? = null,
-    val matchAllNames: Boolean = false,
-    val matchAllDescs: Boolean = false,
-) : Serializable, MixinSelector {
+) : MemberMatcher {
 
     init {
         assert(owner?.contains('/') != true)
@@ -61,7 +65,6 @@ data class MemberReference(
 
     override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
     override val fieldDescriptor = descriptor?.takeUnless { it.contains("(") }
-    override val displayName = name
 
     val presentableText: String get() = buildString {
         if (owner != null) {
@@ -77,7 +80,7 @@ data class MemberReference(
     }
 
     override fun canEverMatch(name: String): Boolean {
-        return matchAllNames || this.name == name
+        return this.name == name
     }
 
     private fun matchOwner(clazz: String): Boolean {
@@ -87,90 +90,92 @@ data class MemberReference(
 
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         assert(!owner.contains('.'))
-        return (this.matchAllNames || this.name == name) &&
+        return this.name == name &&
             matchOwner(owner) &&
             (this.descriptor == null || this.descriptor == desc)
     }
 
     override fun matchMethod(owner: String, name: String, desc: String): Boolean {
         assert(!owner.contains('.'))
-        return (this.matchAllNames || this.name == name) &&
+        return this.name == name &&
             matchOwner(owner) &&
             (this.descriptor == null || this.descriptor == desc)
     }
 
-    companion object {
-        fun parse(value: String): MemberReference? {
-            val reference = value.replace(" ", "")
-            val owner: String?
+    fun toMixinString() = buildString {
+        if (owner != null) {
+            append('L').append(owner.replace('.', '/')).append(';')
+        }
 
-            var pos = reference.lastIndexOf('.')
-            if (pos != -1) {
-                // Everything before the dot is the qualifier/owner
-                owner = reference.substring(0, pos).replace('/', '.')
-            } else {
-                pos = reference.indexOf(';')
-                if (pos != -1 && reference.startsWith('L')) {
-                    val internalOwner = reference.substring(1, pos)
-                    if (!StringUtil.isJavaIdentifier(internalOwner.replace('/', '_'))) {
-                        // Invalid: Qualifier should only contain slashes
-                        return null
-                    }
+        append(name)
 
-                    owner = internalOwner.replace('/', '.')
-
-                    // if owner is all there is to the selector, match anything with the owner
-                    if (pos == reference.length - 1) {
-                        return MemberReference("", null, owner, matchAllNames = true, matchAllDescs = true)
-                    }
-                } else {
-                    // No owner/qualifier specified
-                    pos = -1
-                    owner = null
-                }
+        descriptor?.let { descriptor ->
+            if (!descriptor.startsWith('(')) {
+                // Field descriptor
+                append(':')
             }
 
-            val descriptor: String?
-            val name: String
-            val matchAllNames = reference.getOrNull(pos + 1) == '*'
-            val matchAllDescs: Boolean
+            append(descriptor)
+        }
+    }
 
-            // Find descriptor separator
-            val methodDescPos = reference.indexOf('(', pos + 1)
-            if (methodDescPos != -1) {
-                // Method descriptor
-                descriptor = reference.substring(methodDescPos)
-                name = reference.substring(pos + 1, methodDescPos)
-                matchAllDescs = false
-            } else {
-                val fieldDescPos = reference.indexOf(':', pos + 1)
-                if (fieldDescPos != -1) {
-                    descriptor = reference.substring(fieldDescPos + 1)
-                    name = reference.substring(pos + 1, fieldDescPos)
-                    matchAllDescs = false
-                } else {
-                    descriptor = null
-                    matchAllDescs = reference.endsWith('*')
-                    name = if (matchAllDescs) {
-                        reference.substring(pos + 1, reference.lastIndex)
-                    } else {
-                        reference.substring(pos + 1)
-                    }
-                }
-            }
+    fun resolveMember(project: Project, scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiMember? {
+        return resolve(project, scope) { _, member -> member }
+    }
 
-            if (!matchAllNames && !StringUtil.isJavaIdentifier(name) && name != "<init>" && name != "<clinit>") {
+    fun resolveAsm(
+        project: Project,
+        scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
+    ): MixinTargetMember? {
+        val owner = this.owner ?: return null
+
+        fun doFind(owner: String): MixinTargetMember? {
+            if (owner == CommonClassNames.JAVA_LANG_OBJECT) {
                 return null
             }
+            return RecursionManager.doPreventingRecursion(owner, false) {
+                val classNode = findQualifiedClass(project, owner, scope)?.bytecode ?: return@doPreventingRecursion null
 
-            return MemberReference(if (matchAllNames) "*" else name, descriptor, owner, matchAllNames, matchAllDescs)
+                classNode.findMethod(this)?.let {
+                    return@doPreventingRecursion MethodTargetMember(classNode, it)
+                }
+
+                classNode.findField(this)?.let {
+                    return@doPreventingRecursion FieldTargetMember(classNode, it)
+                }
+
+                classNode.superName?.let { doFind(it.replace('/', '.')) }?.let { return@doPreventingRecursion it }
+
+                classNode.interfaces?.let { interfaces ->
+                    for (itf in interfaces) {
+                        doFind(itf.replace('/', '.'))?.let { return@doPreventingRecursion it }
+                    }
+                }
+
+                null
+            }
+        }
+
+        return doFind(owner)
+    }
+
+    private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
+        val owner = this.owner ?: return null
+
+        val psiClass = findQualifiedClass(project, owner, scope) ?: return null
+
+        val field = psiClass.findField(this, checkBases = true)
+        return if (field != null) {
+            ret(psiClass, field)
+        } else {
+            psiClass.findMethods(this, checkBases = true).firstOrNull()?.let { ret(psiClass, it) }
         }
     }
 }
 
 // Class
 
-fun PsiClass.findMethods(member: MixinSelector, checkBases: Boolean = false): Sequence<PsiMethod> {
+fun PsiClass.findMethods(member: MemberReference, checkBases: Boolean = false): Sequence<PsiMethod> {
     val methods = if (checkBases) {
         allMethods.asSequence()
     } else {
@@ -179,7 +184,7 @@ fun PsiClass.findMethods(member: MixinSelector, checkBases: Boolean = false): Se
     return methods.filter { member.matchMethod(it, this) }
 }
 
-fun PsiClass.findField(selector: MixinSelector, checkBases: Boolean = false): PsiField? {
+fun PsiClass.findField(selector: MemberReference, checkBases: Boolean = false): PsiField? {
     val fields = if (checkBases) {
         allFields.toList()
     } else {

@@ -24,8 +24,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
-import com.demonwav.mcdev.platform.mixin.reference.toMixinString
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
@@ -56,10 +55,10 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
 
     private fun checkMemberReference(value: PsiAnnotationMemberValue, holder: ProblemsHolder) {
         val selector = parseMixinSelector(value) ?: return
-        if (selector is MemberReference && selector.qualified) {
+        if (selector is MemberInfo && selector.qualified) {
             holder.registerProblem(
                 value,
-                "Unnecessary qualified reference to '${selector.displayName}' in target class",
+                "Unnecessary qualified reference to '${selector.name}' in target class",
                 QuickFix(selector.withoutOwner.toMixinString()),
             )
         }

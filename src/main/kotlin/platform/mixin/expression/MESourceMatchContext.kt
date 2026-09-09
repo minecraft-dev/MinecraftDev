@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 
@@ -32,8 +32,8 @@ class MESourceMatchContext(val project: Project) {
     val captures: List<PsiElement> get() = capturesInternal
 
     private val types = mutableMapOf<String, MutableList<String>>()
-    private val fields = mutableMapOf<String, MutableList<MemberReference>>()
-    private val methods = mutableMapOf<String, MutableList<MemberReference>>()
+    private val fields = mutableMapOf<String, MutableList<MemberInfo>>()
+    private val methods = mutableMapOf<String, MutableList<MemberInfo>>()
     private val localInfos = mutableMapOf<String, MutableList<LocalInfo>>()
 
     init {
@@ -57,15 +57,15 @@ class MESourceMatchContext(val project: Project) {
         types.getOrPut(key, ::mutableListOf) += desc
     }
 
-    fun getFields(key: String): List<MemberReference> = fields[key] ?: emptyList()
+    fun getFields(key: String): List<MemberInfo> = fields[key] ?: emptyList()
 
-    fun addField(key: String, field: MemberReference) {
+    fun addField(key: String, field: MemberInfo) {
         fields.getOrPut(key, ::mutableListOf) += field
     }
 
-    fun getMethods(key: String): List<MemberReference> = methods[key] ?: emptyList()
+    fun getMethods(key: String): List<MemberInfo> = methods[key] ?: emptyList()
 
-    fun addMethod(key: String, method: MemberReference) {
+    fun addMethod(key: String, method: MemberInfo) {
         methods.getOrPut(key, ::mutableListOf) += method
     }
 

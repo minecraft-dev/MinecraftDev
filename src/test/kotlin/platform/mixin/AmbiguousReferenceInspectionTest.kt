@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,7 +57,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = <warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, at = @At("HEAD"))
+                @Inject(method = <warning descr="Ambiguous reference to method in target class">"method"</warning>, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
@@ -103,7 +103,7 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             @Mixin(MixedIn.class)
             class AmbiguousReferenceMixin {
             
-                @Inject(method = {<warning descr="Ambiguous reference to method 'method' in target class">"method"</warning>, "uniqueMethod"}, at = @At("HEAD"))
+                @Inject(method = {<warning descr="Ambiguous reference to method in target class">"method"</warning>, "uniqueMethod"}, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }
@@ -150,6 +150,75 @@ class AmbiguousReferenceInspectionTest : BaseMixinTest() {
             class AmbiguousReferenceMixin {
             
                 @Inject(method = {"method(Ljava/lang/String;)V", "uniqueMethod"}, at = @At("HEAD"))
+                public void onMethod() {
+                }
+            }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Explicit single quantifier")
+    fun explicitSingleQuantifier() {
+        doTest(
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+
+            @Mixin(MixedIn.class)
+            class AmbiguousReferenceMixin {
+            
+                @Inject(method = {"method{1}", "uniqueMethod"}, at = @At("HEAD"))
+                public void onMethod() {
+                }
+            }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Ambiguous Reference Desc")
+    fun ambiguousReferenceDesc() {
+        doTest(
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+
+            @Mixin(MixedIn.class)
+            class AmbiguousReferenceMixin {
+            
+                @Inject(method = {<warning descr="Ambiguous reference to method in target class">"()V"</warning>, "uniqueMethod"}, at = @At("HEAD"))
+                public void onMethod() {
+                }
+            }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("No Ambiguous Reference Desc")
+    fun noAmbiguousReferenceDesc() {
+        doTest(
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.ambiguousReference.MixedIn;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+
+            @Mixin(MixedIn.class)
+            class AmbiguousReferenceMixin {
+            
+                @Inject(method = {"(I)V", "uniqueMethod"}, at = @At("HEAD"))
                 public void onMethod() {
                 }
             }

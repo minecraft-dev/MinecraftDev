@@ -21,7 +21,9 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.util.MemberMatcher
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.anonymousClasses
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.childrenOfType
@@ -462,20 +464,21 @@ fun ClassNode.findFieldByName(name: String): FieldNode? {
     return fields?.firstOrNull { it.name == name }
 }
 
-fun ClassNode.findFields(ref: MixinSelector): Sequence<FieldNode> {
+fun ClassNode.findFields(ref: MemberMatcher): Sequence<FieldNode> {
     return fields?.asSequence()?.filter { ref.matchField(it, this) } ?: emptySequence()
 }
 
-fun ClassNode.findField(ref: MixinSelector): FieldNode? {
+fun ClassNode.findField(ref: MemberMatcher): FieldNode? {
     return findFields(ref).firstOrNull()
 }
 
 fun ClassNode.findMethods(ref: MixinSelector): Sequence<MethodNode> {
-    return methods?.asSequence()?.filter { ref.matchMethod(it, this) } ?: emptySequence()
+    val maxMatches = ref.quantifier.max(Quantifier.Context.MEMBER)
+    return methods?.asSequence()?.filter { ref.matchMethod(it, this) }?.take(maxMatches).orEmpty()
 }
 
-fun ClassNode.findMethod(ref: MixinSelector): MethodNode? {
-    return findMethods(ref).firstOrNull()
+fun ClassNode.findMethod(ref: MemberReference): MethodNode? {
+    return methods?.asSequence()?.firstOrNull { ref.matchMethod(it, this) }
 }
 
 private fun makeFakeClass(name: String): ClassNode {

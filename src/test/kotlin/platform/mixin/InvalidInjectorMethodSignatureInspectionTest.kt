@@ -140,4 +140,27 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("Wildcard Inject with Single Target")
+    fun wildcardInInjectWithSingleTarget() {
+        doTest(
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspection.MixedInOuter;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+            @Mixin(MixedInOuter.class)
+            public class TestMixin {
+                @Inject(method = "*", at = @At(value = "INVOKE", target = "Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;method2()V"))
+                private void test(CallbackInfo ci) {
+                }
+            }
+            """,
+        )
+    }
 }

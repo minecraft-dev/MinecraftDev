@@ -20,28 +20,21 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
-import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
-import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
-import com.demonwav.mcdev.platform.mixin.util.bytecode
-import com.demonwav.mcdev.platform.mixin.util.findField
-import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.MemberMatcher
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.constantStringValue
+import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findAnnotation
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingModifierList
-import com.demonwav.mcdev.util.findField
-import com.demonwav.mcdev.util.findMethods
-import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.mapToArray
 import com.demonwav.mcdev.util.resolveClass
 import com.demonwav.mcdev.util.resolveType
@@ -49,16 +42,12 @@ import com.demonwav.mcdev.util.resolveTypeArray
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.RecursionManager
-import com.intellij.psi.CommonClassNames
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
 import com.intellij.psi.PsiLiteral
-import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiNameValuePair
@@ -75,9 +64,6 @@ import com.intellij.psi.util.parentOfType
 import java.util.Locale
 import java.util.regex.PatternSyntaxException
 import org.objectweb.asm.Type
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.FieldNode
-import org.objectweb.asm.tree.MethodNode
 
 fun parseMixinSelector(element: PsiElement): MixinSelector? {
     val stringValue = element.constantStringValue ?: return null
@@ -104,142 +90,16 @@ interface MixinSelectorParser {
 }
 
 /**
- * An interface which matches members, that's it really.
+ * An interface which represents Mixin target selectors.
  */
-interface MixinSelector {
-    fun matchField(owner: String, name: String, desc: String): Boolean
-    fun matchMethod(owner: String, name: String, desc: String): Boolean
+interface MixinSelector : MemberMatcher {
+    val quantifier: Quantifier
 
-    fun matchField(field: PsiField, qualifier: PsiClass): Boolean {
-        if (!canEverMatch(field.name)) {
-            return false
-        }
-        val fqn = qualifier.fullQualifiedName ?: return false
-        val desc = field.descriptor ?: return false
-        return matchField(fqn.replace('.', '/'), field.name, desc)
-    }
-
-    fun matchField(field: FieldNode, qualifier: ClassNode): Boolean {
-        return matchField(qualifier.name, field.name, field.desc)
-    }
-
-    fun matchMethod(method: PsiMethod, qualifier: PsiClass): Boolean {
-        if (!canEverMatch(method.internalName)) {
-            return false
-        }
-        val fqn = qualifier.fullQualifiedName ?: return false
-        val desc = method.descriptor ?: return false
-        return matchMethod(fqn.replace('.', '/'), method.internalName, desc)
-    }
-
-    fun matchMethod(method: MethodNode, qualifier: ClassNode): Boolean {
-        return matchMethod(qualifier.name, method.name, method.desc)
-    }
-
-    fun getCustomOwner(owner: ClassNode): ClassNode {
-        return owner
-    }
-
-    /**
-     * Implement this to return false for early-out optimizations, so you don't need to resolve the member in the
-     * navigation visitor
-     */
-    fun canEverMatch(name: String): Boolean {
-        return true
-    }
-
-    val owner: String?
-    val methodDescriptor: String?
-    val fieldDescriptor: String?
-    val qualified
-        get() = owner != null
-
-    val displayName: String
-
-    fun resolve(
-        project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
-    ): Pair<PsiClass, PsiMember>? {
-        return resolve(project, scope, ::Pair)
-    }
-
-    fun resolveMember(project: Project, scope: GlobalSearchScope = GlobalSearchScope.allScope(project)): PsiMember? {
-        return resolve(project, scope) { _, member -> member }
-    }
-
-    fun resolveAsm(
-        project: Project,
-        scope: GlobalSearchScope = GlobalSearchScope.allScope(project),
-    ): MixinTargetMember? {
-        val owner = this.owner ?: return null
-
-        fun doFind(owner: String): MixinTargetMember? {
-            if (owner == CommonClassNames.JAVA_LANG_OBJECT) {
-                return null
-            }
-            return RecursionManager.doPreventingRecursion(owner, false) {
-                val classNode = findQualifiedClass(project, owner, scope)?.bytecode ?: return@doPreventingRecursion null
-
-                classNode.findMethod(this)?.let {
-                    return@doPreventingRecursion MethodTargetMember(classNode, it)
-                }
-
-                classNode.findField(this)?.let {
-                    return@doPreventingRecursion FieldTargetMember(classNode, it)
-                }
-
-                classNode.superName?.let { doFind(it.replace('/', '.')) }?.let { return@doPreventingRecursion it }
-
-                classNode.interfaces?.let { interfaces ->
-                    for (itf in interfaces) {
-                        doFind(itf.replace('/', '.'))?.let { return@doPreventingRecursion it }
-                    }
-                }
-
-                null
-            }
-        }
-
-        return doFind(owner)
-    }
-
-    private inline fun <R> resolve(project: Project, scope: GlobalSearchScope, ret: (PsiClass, PsiMember) -> R): R? {
-        val owner = this.owner ?: return null
-
-        val psiClass = findQualifiedClass(project, owner, scope) ?: return null
-
-        val field = psiClass.findField(this, checkBases = true)
-        return if (field != null) {
-            ret(psiClass, field)
-        } else {
-            psiClass.findMethods(this, checkBases = true).firstOrNull()?.let { ret(psiClass, it) }
-        }
-    }
-}
-
-// Member reference
-
-fun MemberReference.toMixinString(): String {
-    return buildString {
-        if (owner != null) {
-            append('L').append(owner.replace('.', '/')).append(';')
-        }
-
-        append(if (matchAllNames) "*" else name)
-
-        descriptor?.let { descriptor ->
-            if (!descriptor.startsWith('(')) {
-                // Field descriptor
-                append(':')
-            }
-
-            append(descriptor)
-        }
-    }
+    fun withQuantifier(quantifier: Quantifier): MixinSelector
 }
 
 class MixinMemberParser : MixinSelectorParser {
-    override fun parse(value: String, context: PsiElement) = MemberReference.parse(value)
+    override fun parse(value: String, context: PsiElement) = MemberInfo.parse(value)
 }
 
 // Regex reference
@@ -314,6 +174,7 @@ private class MixinRegexSelector(
     val descPattern: Regex,
     override val owner: String?,
     descriptor: String?,
+    override val quantifier: Quantifier = Quantifier.Any
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         return ownerPattern.containsMatchIn(owner) &&
@@ -334,8 +195,9 @@ private class MixinRegexSelector(
     override val methodDescriptor = descriptor?.takeIf { it.contains("(") }
     override val fieldDescriptor = descriptor?.takeUnless { it.contains("(") }
 
-    override val displayName: String
-        get() = namePattern.pattern
+    override fun withQuantifier(quantifier: Quantifier) = MixinRegexSelector(
+        ownerPattern, namePattern, descPattern, owner, methodDescriptor ?: fieldDescriptor, quantifier
+    )
 }
 
 // Dynamic selectors
@@ -603,7 +465,15 @@ class DescSelectorParser : DynamicSelectorParser("Desc", "mixin:Desc") {
                 *argTypes.mapToArray { Type.getType(it.descriptor) },
             )
 
-            return DescSelector(owners, name, desc)
+            val min = descAnnotation.findAttributeValue("min")?.constantValue as? Int
+            val max = descAnnotation.findAttributeValue("max")?.constantValue as? Int
+            val quantifier = if (min == null && max == null) {
+                Quantifier.Default
+            } else {
+                Quantifier.Exact(min ?: 0, max ?: Int.MAX_VALUE)
+            }
+
+            return DescSelector(owners, name, desc, quantifier)
         }
     }
 }
@@ -612,6 +482,7 @@ data class DescSelector(
     val owners: Set<String>,
     val name: String,
     override val methodDescriptor: String,
+    override val quantifier: Quantifier,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean {
         return this.owners.contains(owner) && this.name == name && this.fieldDescriptor.substringBefore("(") == desc
@@ -627,5 +498,6 @@ data class DescSelector(
 
     override val owner = owners.singleOrNull()
     override val fieldDescriptor = methodDescriptor.substringBefore('(')
-    override val displayName = name
+
+    override fun withQuantifier(quantifier: Quantifier) = copy(quantifier = quantifier)
 }

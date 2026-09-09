@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,10 +28,12 @@ import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
+import com.demonwav.mcdev.util.findQualifiedClass
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.insideAnnotationAttribute
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
 import com.demonwav.mcdev.util.reference.completeToLiteral
+import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.openapi.project.Project
 import com.intellij.patterns.ElementPattern
 import com.intellij.patterns.PsiJavaPatterns
@@ -42,6 +44,7 @@ import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMember
 import com.intellij.psi.ResolveResult
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.ArrayUtilRt
 
@@ -60,9 +63,22 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
 
     override fun isValidAnnotation(name: String, project: Project) = name == AT
 
-    fun resolveTarget(context: PsiElement): PsiMember? {
-        val selector = parseMixinSelector(context) ?: return null
-        return selector.resolveMember(context.project)
+    fun resolveTargets(context: PsiElement): Sequence<PsiMember> {
+        val selector = parseMixinSelector(context) ?: return emptySequence()
+        val owner = selector.owner ?: return emptySequence()
+        val project = context.project
+        val psiClass = findQualifiedClass(project, owner, GlobalSearchScope.allScope(project))
+            ?: return emptySequence()
+
+        var result = emptySequence<PsiMember>()
+        if (selector.canMatchFields) {
+            result += psiClass.allFields.asSequence().filter { selector.matchField(it, psiClass) }
+        }
+        if (selector.canMatchMethods) {
+            result += psiClass.allMethods.asSequence().filter { selector.matchMethod(it, psiClass) }
+        }
+
+        return result
     }
 
     /**
@@ -87,10 +103,10 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     override fun isUnresolved(context: PsiElement): Boolean {
         val at = context.parentOfType<PsiAnnotation>() ?: return true
         val targets = getTargets(at, true)?.ifEmpty { return true } ?: return false
-        return targets.all {
-            val failure = AtResolver(at, it.clazz, it.method).isUnresolved()
+        return targets.all { target ->
+            val failure = AtResolver(at, target.clazz, target.method).isUnresolved()
             // leave it if there is a filter to blame, the target reference was at least resolved
-            failure != null && failure.filterStats.isEmpty()
+            failure != null && failure.filterStats.values.none { it > 0 }
         }
     }
 
@@ -101,8 +117,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     }
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {
-        val result = resolveTarget(context) ?: return ResolveResult.EMPTY_ARRAY
-        return arrayOf(PsiElementResolveResult(result))
+        return resolveTargets(context).map(::PsiElementResolveResult).toTypedArray()
     }
 
     override fun collectVariants(context: PsiElement): Array<Any> {

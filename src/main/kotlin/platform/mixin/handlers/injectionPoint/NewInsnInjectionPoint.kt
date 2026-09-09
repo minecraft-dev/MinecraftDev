@@ -23,11 +23,14 @@ package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelectorParser
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
 import com.demonwav.mcdev.platform.mixin.util.findMethod
+import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.internalName
@@ -84,7 +87,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
             return target
         }
         val clazz = AtResolver.getArgs(at)["class"] ?: return null
-        return classToMemberReference(clazz)
+        return classToMemberInfo(clazz)
     }
 
     override fun createNavigationVisitor(
@@ -102,7 +105,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMember>? {
         if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""))
+            return MyCollectVisitor(mode, at.project, MemberInfo())
         }
         return getTarget(at, target)?.let { MyCollectVisitor(mode, at.project, it) }
     }
@@ -139,8 +142,11 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
             val anonymousClass = expression.anonymousClass
             val anonymousName = anonymousClass?.fullQualifiedName?.replace('.', '/')
             if (anonymousName != null) {
-                val method = findClassNodeByPsiClass(anonymousClass)?.findMethod(selector)
-                if (method != null && selector.matchMethod(anonymousName, method.name, method.desc)) {
+                val methods = findClassNodeByPsiClass(anonymousClass)
+                    ?.findMethods(selector.withQuantifier(Quantifier.Default))
+                    .orEmpty()
+
+                if (methods.any { selector.matchMethod(anonymousName, it.name, it.desc) }) {
                     addResult(expression)
                 }
             } else {
@@ -215,17 +221,21 @@ class NewInsnSelectorParser : MixinSelectorParser {
         if (!at.hasQualifiedName(AT)) return null
         if (at.findAttributeValue("value")?.constantStringValue != "NEW") return null
 
-        val strippedValue = value.replace(" ", "")
-        return if (strippedValue.startsWith('(')) {
-            NewInsnDescriptorSelector(strippedValue)
+        val parsed = MemberInfo.parse(value) ?: return null
+        return if (parsed.owner == null && parsed.name == null) {
+            NewInsnDescriptorSelector(parsed.descriptor ?: return null, parsed.quantifier)
         } else {
-            NewInsnTypeSelector(strippedValue.removeSurrounding("L", ";"))
+            if (parsed.name != null || parsed.descriptor != null) {
+                return null
+            }
+            NewInsnTypeSelector(parsed.owner?.replace('.', '/') ?: return null, parsed.quantifier)
         }
     }
 }
 
-private class NewInsnTypeSelector(
+private data class NewInsnTypeSelector(
     override val owner: String,
+    override val quantifier: Quantifier,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String) = false
 
@@ -235,11 +245,13 @@ private class NewInsnTypeSelector(
 
     override val fieldDescriptor = null
     override val methodDescriptor = null
-    override val displayName = owner
+
+    override fun withQuantifier(quantifier: Quantifier) = copy(quantifier = quantifier)
 }
 
-private class NewInsnDescriptorSelector(
+private data class NewInsnDescriptorSelector(
     override val methodDescriptor: String,
+    override val quantifier: Quantifier,
 ) : MixinSelector {
     override fun matchField(owner: String, name: String, desc: String): Boolean = false
 
@@ -256,14 +268,15 @@ private class NewInsnDescriptorSelector(
 
     override val owner = null
     override val fieldDescriptor = null
-    override val displayName = methodDescriptor
+
+    override fun withQuantifier(quantifier: Quantifier) = copy(quantifier = quantifier)
 }
 
-private fun classToMemberReference(value: String): MemberReference? {
+private fun classToMemberInfo(value: String): MemberInfo? {
     val fqn = value.replace('/', '.')
     if (fqn.isNotEmpty() && !fqn.startsWith('.') && !fqn.endsWith('.') && !fqn.contains("..")) {
         if (StringUtil.isJavaIdentifier(fqn.replace('.', '_'))) {
-            return MemberReference("<init>", owner = fqn)
+            return MemberInfo("<init>", owner = fqn)
         }
     }
 

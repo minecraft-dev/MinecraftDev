@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,8 +34,8 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NavigationVisitor
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.childrenOfType
 import com.demonwav.mcdev.util.computeStringArray
@@ -154,13 +154,13 @@ class ExpressionInjectionPoint : InjectionPoint<PsiElement>() {
 
             val fields = annotation.findDeclaredAttributeValue("field")?.computeStringArray() ?: emptyList()
             for (field in fields) {
-                val fieldRef = MemberReference.parse(field) ?: continue
+                val fieldRef = MemberInfo.parse(field) ?: continue
                 matchContext.addField(definitionId, fieldRef)
             }
 
             val methods = annotation.findDeclaredAttributeValue("method")?.computeStringArray() ?: emptyList()
             for (method in methods) {
-                val methodRef = MemberReference.parse(method) ?: continue
+                val methodRef = MemberInfo.parse(method) ?: continue
                 matchContext.addMethod(definitionId, methodRef)
             }
 

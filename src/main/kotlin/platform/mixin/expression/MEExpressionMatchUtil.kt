@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -24,8 +24,8 @@ import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
-import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.descriptor
@@ -172,7 +172,7 @@ object MEExpressionMatchUtil {
 
             val fields = annotation.findDeclaredAttributeValue("field")?.computeStringArray() ?: emptyList()
             for (field in fields) {
-                val fieldRef = MemberReference.parse(field) ?: continue
+                val fieldRef = MemberInfo.parse(field) ?: continue
                 pool.addMember(
                     definitionId,
                     SimpleMemberDefinition {
@@ -183,7 +183,7 @@ object MEExpressionMatchUtil {
 
             val methods = annotation.findDeclaredAttributeValue("method")?.computeStringArray() ?: emptyList()
             for (method in methods) {
-                val methodRef = MemberReference.parse(method) ?: continue
+                val methodRef = MemberInfo.parse(method) ?: continue
                 pool.addMember(
                     definitionId,
                     object : SimpleMemberDefinition {
