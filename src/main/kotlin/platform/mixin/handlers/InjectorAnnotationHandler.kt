@@ -88,9 +88,9 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         }
 
         return resolveTarget(annotation, targetClass).map { targetMember ->
-            val targetMethod = targetMember as? MethodTargetMember ?: return@map InsnResolutionInfo.Failure()
+            val targetMethod = targetMember as? MethodTargetMember ?: return@map InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE)
             isUnresolved(annotation, targetClass, targetMethod.classAndMethod.method) ?: return@isUnresolved null
-        }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
+        }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE)
     }
 
     open fun getAtKey(annotation: PsiAnnotation): String = "at"
@@ -101,7 +101,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         targetMethod: MethodNode,
     ): InsnResolutionInfo.Failure? {
         return annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
-            .ifNullOrEmpty { return InsnResolutionInfo.Failure() }!!
+            .ifNullOrEmpty { return InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE) }!!
             .firstNotNullOfOrNull { AtResolver(it, targetClass, targetMethod).isUnresolved() }
     }
 
@@ -169,10 +169,6 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
     }
 
     open val allowedInsnDescription = "all instructions"
-
-    override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
-        return "Cannot resolve any target instructions in target class"
-    }
 
     open fun canAlwaysBeStatic(method: PsiMethod): Boolean {
         return true
