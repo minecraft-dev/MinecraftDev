@@ -33,8 +33,6 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.roots.libraries.LibraryKind
-import com.intellij.openapi.roots.libraries.LibraryKindRegistry
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
@@ -47,7 +45,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtil
 import java.lang.invoke.MethodHandles
 import java.util.Locale
-import java.util.Locale.getDefault
 import java.util.concurrent.CancellationException
 import java.util.regex.PatternSyntaxException
 import kotlin.math.min
@@ -325,9 +322,6 @@ fun String.toPackageName(): String {
 inline fun <reified T> Iterable<*>.firstOfType(): T? {
     return this.firstOrNull { it is T } as? T
 }
-
-fun libraryKind(id: String): Lazy<LibraryKind> =
-    lazy { LibraryKindRegistry.getInstance().findKindById(id) ?: LibraryKind.create(id) }
 
 fun String.capitalize(): String =
     replaceFirstChar {

@@ -18,9 +18,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.velocity.framework
+package com.demonwav.mcdev.platform.architectury.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryFile
+import com.demonwav.mcdev.platform.PlatformType
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 
-val VELOCITY_LIBRARY_KIND: LibraryKind by libraryKind("velocity-api")
+class ArchitecturyLibraryDetector : MinecraftLibraryDetector {
+    override val platformType = PlatformType.ARCHITECTURY
+
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        hasLibraryFile("architectury.common.json", "architectury.common.json", scope)
+}
