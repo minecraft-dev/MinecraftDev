@@ -47,7 +47,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtil
 import java.lang.invoke.MethodHandles
 import java.util.Locale
-import java.util.Locale.getDefault
 import java.util.concurrent.CancellationException
 import java.util.regex.PatternSyntaxException
 import kotlin.contracts.InvocationKind

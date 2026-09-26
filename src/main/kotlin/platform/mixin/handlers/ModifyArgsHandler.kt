@@ -50,7 +50,7 @@ class ModifyArgsHandler : InsnInjectorAnnotationHandler() {
         targetClass: ClassNode,
         targetMethod: MethodNode,
         targetInsn: TargetInsn,
-    ): ExpectedSignatures<*> {
+    ): ExpectedSignatures<BasicSignatures> {
         val argsType = JavaPsiFacade.getElementFactory(annotation.project)
             .createTypeByFQClassName(ARGS, annotation.resolveScope)
         val shortParams = listOf(Parameter("args", argsType))

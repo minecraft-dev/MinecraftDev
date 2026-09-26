@@ -41,7 +41,7 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targets: List<ClassAndMethodNode>,
         mode: CollectVisitor.Mode,
-    ): List<ExpectedSignatures<*>> {
+    ): List<ExpectedSignatures<OperationWrapperSignatures>> {
         return targets.map { (targetClass, targetMethod) ->
             val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 

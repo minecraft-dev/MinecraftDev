@@ -32,10 +32,6 @@ fun <T> emptySequencedSet(): SequencedSet<T> = EMPTY_SEQUENCED_SET
 
 fun <T> sequencedSetOf(vararg elements: T): SequencedSet<T> = SequencedSet(linkedSetOf(*elements))
 
-fun <T : Any> sequencedSetOfNotNull(vararg elements: T?): SequencedSet<T> {
-    return SequencedSet(elements.filterNotNullTo(linkedSetOf()))
-}
-
 inline fun <T> buildSequencedSet(action: MutableSequencedSet<T>.() -> Unit): SequencedSet<T> =
     SequencedSet(linkedSetOf<T>().apply(action))
 
