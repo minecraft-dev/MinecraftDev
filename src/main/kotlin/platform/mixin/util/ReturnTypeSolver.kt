@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedReturnType
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
+import com.demonwav.mcdev.util.MutableSequencedMap
 import com.demonwav.mcdev.util.PrioritySet
 import com.demonwav.mcdev.util.allEqual
 import com.demonwav.mcdev.util.normalize
@@ -31,6 +32,7 @@ import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiParameterList
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
 
@@ -39,7 +41,8 @@ import com.intellij.psi.PsiTypes
  */
 class ReturnTypeSolver(private val parameterList: PsiParameterList) {
     private val manager = PsiManager.getInstance(parameterList.project)
-    private val suggestionsByType = mutableMapOf<TypeKey, MutableMap<Int, SuggestedReturnType>>()
+    private val objectReturnOptionsCache = hashMapOf<PsiType, List<Prioritized<SuggestedReturnType>>>()
+    private val suggestionsByType = hashMapOf<TypeKey, MutableSequencedMap<Int, SuggestedReturnType>>()
     private val typeOptions = PrioritySet<TypeKey>()
     private var numExpected = 0
 
@@ -52,7 +55,7 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
             for ((option, priority) in signature.returnTypeOptions()) {
                 val key = TypeKey.of(option)
                 typeOptions.add(key, priority)
-                suggestionsByType.getOrPut(key, ::mutableMapOf).putIfAbsent(expectedIndex, option)
+                suggestionsByType.getOrPut(key, ::linkedMapOf).putIfAbsent(expectedIndex, option)
             }
         }
     }
@@ -135,7 +138,7 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
         }
         return when {
             returnType == PsiTypes.intType() -> intReturnOptions
-            TypeKind.of(returnType) == TypeKind.OBJECT -> objectReturnOptions(returnType).toList()
+            TypeKind.of(returnType) == TypeKind.OBJECT -> objectReturnOptions(returnType)
             else -> listOf(SuggestedReturnType(returnType) withPriority 0)
         }
     }
@@ -154,38 +157,49 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
 
     /**
      * Yields all supertypes (inclusive) of the given type, at most once per raw type, with priority equal to the number
-     * of traversal steps required to reach the supertype. [Object] is given maximum priority (unless [type] itself is
-     * [Object]) to express the fact that it is the least specific type.
+     * of traversal steps required to reach the supertype.
      */
-    private fun objectReturnOptions(type: PsiType): Sequence<Prioritized<SuggestedReturnType>> = sequence {
-        val queue = ArrayDeque(listOf(SuggestedReturnType(type) withPriority 0))
-        val visited = hashSetOf(type.normalize())
+    private fun objectReturnOptions(type: PsiType): List<Prioritized<SuggestedReturnType>> =
+        objectReturnOptionsCache.getOrPut(type) {
+            val result = mutableListOf<Prioritized<SuggestedReturnType>>()
 
-        while (queue.isNotEmpty()) {
-            val (next, priority) = queue.removeFirst().also { yield(it) }
-            for (directSuper in next.returnType.directSupertypes()) {
-                if (directSuper.equalsToText(CommonClassNames.JAVA_LANG_OBJECT)) {
-                    // Will handle at the end
-                    continue
-                }
-                if (visited.add(directSuper.normalize())) {
-                    queue.addLast(SuggestedReturnType(directSuper, coerceReturnType = true) withPriority priority + 1)
+            val queue = ArrayDeque(listOf(SuggestedReturnType(type) withPriority 0))
+            val visited = hashSetOf(type.normalize())
+
+            while (queue.isNotEmpty()) {
+                val (next, priority) = queue.removeFirst().also { result.add(it) }
+                for (directSuper in next.returnType.directSupertypes()) {
+                    if (visited.add(directSuper.normalize())) {
+                        queue.addLast(
+                            SuggestedReturnType(
+                                directSuper,
+                                coerceReturnType = true,
+                            ) withPriority priority + 1
+                        )
+                    }
                 }
             }
-        }
 
-        val javaLangObject = PsiType.getJavaLangObject(manager, parameterList.resolveScope)
-        if (visited.add(javaLangObject)) {
-            // Always the least specific option
-            yield(SuggestedReturnType(javaLangObject) withPriority Int.MAX_VALUE)
+            result
         }
-    }
 
     private fun PsiType.directSupertypes(): List<PsiType> = when (this) {
-        is PsiArrayType -> superTypes.asList() + arraySuperTypes.map {
-            PsiType.getTypeByName(it, manager.project, parameterList.resolveScope)
+        is PsiArrayType -> {
+            if (componentType is PsiPrimitiveType || componentType.equalsToText(CommonClassNames.JAVA_LANG_OBJECT)) {
+                arraySuperTypes.map { PsiType.getTypeByName(it, manager.project, parameterList.resolveScope) }
+            } else {
+                componentType.directSupertypes().map { it.createArrayType() }
+            }
         }
-        else -> superTypes.asList()
+        else -> {
+            val superTypeArray = superTypes
+            if (superTypeArray.size <= 1) {
+                superTypeArray.toList()
+            } else {
+                // Delay java.lang.Object since it is necessarily less specific than any other type
+                superTypeArray.filterNot { it.equalsToText(CommonClassNames.JAVA_LANG_OBJECT) }
+            }
+        }
     }
 
     private companion object {
@@ -206,7 +220,6 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
         }
 
         private val arraySuperTypes = listOf(
-            CommonClassNames.JAVA_LANG_OBJECT,
             CommonClassNames.JAVA_IO_SERIALIZABLE,
             CommonClassNames.JAVA_LANG_CLONEABLE,
         )
