@@ -81,8 +81,7 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
                 ?.let { params[it.index].type }
             return when (anchor) {
                 PsiTypes.intType() -> {
-                    // Can be coerced to any int-like type
-                    intReturnOptions
+                    intReturnOptions(allowCoerceRequired)
                 }
                 null -> {
                     // The return type itself is the anchor
@@ -113,7 +112,7 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
                             val results = mutableListOf(
                                 SuggestedReturnType(leaf) withPriority 0
                             )
-                            if (intLikeParams.values.single().all { it.hasAnnotation(COERCE) }) {
+                            if (allowCoerceRequired && intLikeParams.values.single().all { it.hasAnnotation(COERCE) }) {
                                 results.add(
                                     SuggestedReturnType(PsiTypes.intType()) withPriority 1
                                 )
@@ -122,9 +121,11 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
                         }
                         else -> {
                             // Only int can be coerced to multiple types
-                            for ((type, params) in intLikeParams) {
-                                // We double-check that the parameters are valid as the caller promised
-                                check(type == PsiTypes.intType() || params.all { it.hasAnnotation(COERCE) })
+                            check(allowCoerceRequired)
+                            for (params in intLikeParams.values) {
+                                // We double-check that the parameters are valid as the caller promised.
+                                // NB We know there are no int params, so all must be coerced.
+                                check(params.all { it.hasAnnotation(COERCE) })
                             }
                             listOf(SuggestedReturnType(PsiTypes.intType()) withPriority 0)
                         }
@@ -137,8 +138,8 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
             }
         }
         return when {
-            returnType == PsiTypes.intType() -> intReturnOptions
-            TypeKind.of(returnType) == TypeKind.OBJECT -> objectReturnOptions(returnType)
+            returnType == PsiTypes.intType() -> intReturnOptions(allowCoerceRequired)
+            TypeKind.of(returnType) == TypeKind.OBJECT -> objectReturnOptions(returnType, allowCoerceRequired)
             else -> listOf(SuggestedReturnType(returnType) withPriority 0)
         }
     }
@@ -164,31 +165,35 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
     }
 
     /**
-     * Yields all supertypes (inclusive) of the given type, at most once per raw type, with priority equal to the number
-     * of traversal steps required to reach the supertype.
+     * Yields all valid supertypes (inclusive) of the given type, at most once per raw type, with priority equal to the
+     * number of traversal steps required to reach the supertype.
      */
-    private fun objectReturnOptions(type: PsiType): List<Prioritized<SuggestedReturnType>> =
-        objectReturnOptionsCache.getOrPut(type) {
-            val result = mutableListOf<Prioritized<SuggestedReturnType>>()
+    private fun objectReturnOptions(type: PsiType, allowCoerce: Boolean): List<Prioritized<SuggestedReturnType>> =
+        if (!allowCoerce) {
+            listOf(SuggestedReturnType(type) withPriority 0)
+        } else {
+            objectReturnOptionsCache.getOrPut(type) {
+                val result = mutableListOf<Prioritized<SuggestedReturnType>>()
 
-            val queue = ArrayDeque(listOf(SuggestedReturnType(type) withPriority 0))
-            val visited = hashSetOf(type.normalize())
+                val queue = ArrayDeque(listOf(SuggestedReturnType(type) withPriority 0))
+                val visited = hashSetOf(type.normalize())
 
-            while (queue.isNotEmpty()) {
-                val (next, priority) = queue.removeFirst().also { result.add(it) }
-                for (directSuper in next.returnType.directSupertypes()) {
-                    if (visited.add(directSuper.normalize())) {
-                        queue.addLast(
-                            SuggestedReturnType(
-                                directSuper,
-                                coerceReturnType = true,
-                            ) withPriority priority + 1
-                        )
+                while (queue.isNotEmpty()) {
+                    val (next, priority) = queue.removeFirst().also { result.add(it) }
+                    for (directSuper in next.returnType.directSupertypes()) {
+                        if (visited.add(directSuper.normalize())) {
+                            queue.addLast(
+                                SuggestedReturnType(
+                                    directSuper,
+                                    coerceReturnType = true,
+                                ) withPriority priority + 1
+                            )
+                        }
                     }
                 }
-            }
 
-            result
+                result
+            }
         }
 
     private fun PsiType.directSupertypes(): List<PsiType> = when (this) {
@@ -231,6 +236,9 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
             CommonClassNames.JAVA_IO_SERIALIZABLE,
             CommonClassNames.JAVA_LANG_CLONEABLE,
         )
+
+        private fun intReturnOptions(allowCoerce: Boolean): List<Prioritized<SuggestedReturnType>> =
+            if (allowCoerce) intReturnOptions else listOf(SuggestedReturnType(PsiTypes.intType()) withPriority 0)
     }
 }
 

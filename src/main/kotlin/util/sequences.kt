@@ -67,7 +67,7 @@ fun <T> Sequence<T>.singleDistinct(): T {
     }
     val first = iter.next()
     for (element in iter) {
-        if (element != first) {
+        if (first != element) {
             throw IllegalArgumentException("Sequence has more than one distinct element.")
         }
     }
@@ -81,7 +81,7 @@ fun <T> Sequence<T>.singleDistinctOrNull(): T? {
     }
     val first = iter.next()
     for (element in iter) {
-        if (element != first) {
+        if (first != element) {
             return null
         }
     }

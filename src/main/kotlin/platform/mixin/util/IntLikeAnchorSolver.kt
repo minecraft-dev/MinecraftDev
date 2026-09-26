@@ -38,11 +38,11 @@ class IntLikeAnchorSolver {
     fun constrain(desiredType: PsiType, isAnchor: Boolean, isHard: Boolean): Boolean {
         val type = IntType.of(desiredType) ?: return false
         when {
-            isHard && (isAnchor || type == IntType.INT) -> candidates.retainAll(setOf(type))
+            isHard && (isAnchor || type == IntType.INT) -> candidates.retainAll(EnumSet.of(type))
             type == IntType.INT -> hasIntPreference = true
-            isAnchor -> candidates.retainAll(setOf(type))
+            isAnchor -> candidates.retainAll(EnumSet.of(type))
             else -> {
-                candidates.retainAll(setOf(type, IntType.INT))
+                candidates.retainAll(EnumSet.of(type, IntType.INT))
                 hasLeafPreference = true
             }
         }
