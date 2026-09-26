@@ -25,10 +25,10 @@ import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedReturnType
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
 import com.demonwav.mcdev.util.MutableSequencedMap
 import com.demonwav.mcdev.util.PrioritySet
-import com.demonwav.mcdev.util.allEqual
 import com.demonwav.mcdev.util.normalize
-import com.demonwav.mcdev.util.reduceFallible
+import com.demonwav.mcdev.util.singleDistinct
 import com.intellij.psi.CommonClassNames
+import com.intellij.psi.GenericsUtil
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiParameterList
@@ -66,7 +66,7 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
     fun solve(): SuggestedReturnType? {
         val suggestions = typeOptions.asSequence()
             .map { suggestionsByType.getValue(it) }.firstOrNull { it.size == numExpected }?.values
-        return suggestions?.let { intersectCoerce(it)!! }
+        return suggestions?.let { intersect(it) }
     }
 
     /**
@@ -144,15 +144,23 @@ class ReturnTypeSolver(private val parameterList: PsiParameterList) {
     }
 
     /**
-     * Returns the most specific suggested return type that satisfies all the constraints, or `null` if no such type
-     * exists.
+     * Returns a suggested return type which is the LUB of all the given types.
+     *
+     * **Precondition:** [suggestions] must be non-empty and every suggestion in [suggestions] must have the same type
+     * as considered by [TypeKey].
      */
-    private fun intersectCoerce(types: Iterable<SuggestedReturnType>): SuggestedReturnType? {
-        if (!types.asSequence().map { TypeKind.of(it.returnType) }.allEqual()) {
-            return null
+    private fun intersect(suggestions: Iterable<SuggestedReturnType>): SuggestedReturnType {
+        val types = suggestions.asSequence().map { it.returnType }
+        val kind = types.map { TypeKind.of(it) }.singleDistinct()
+        val mergedType = when (kind) {
+            TypeKind.OBJECT -> types.reduce { acc, it -> GenericsUtil.getLeastUpperBound(acc, it, manager)!! }
+            else -> types.singleDistinct()
         }
-
-        return types.asSequence().reduceFallible { acc, it -> acc.intersectCoerce(it, manager) }
+        return SuggestedReturnType(
+            mergedType,
+            returnTypeIsIntLike = suggestions.asSequence().map { it.returnTypeIsIntLike }.singleDistinct(),
+            coerceReturnType = suggestions.any { it.coerceReturnType },
+        )
     }
 
     /**

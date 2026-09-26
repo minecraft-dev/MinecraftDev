@@ -29,6 +29,8 @@ import com.demonwav.mcdev.util.emptySequencedSet
 import com.demonwav.mcdev.util.normalize
 import com.demonwav.mcdev.util.reduceFallible
 import com.demonwav.mcdev.util.sequencedSetOf
+import com.demonwav.mcdev.util.singleDistinct
+import com.demonwav.mcdev.util.singleDistinctOrNull
 import com.intellij.psi.GenericsUtil
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
@@ -57,22 +59,6 @@ data class SuggestedReturnType(
     override val intLikeTypes =
         if (returnTypeIsIntLike) sequencedSetOf(MethodSignature.TypePosition.Return) else emptySequencedSet()
     override val params get() = null
-
-    fun intersectCoerce(other: SuggestedReturnType, manager: PsiManager): SuggestedReturnType? {
-        val (returnType, returnTypeIsIntLike, coerceReturnType) = mergeTypes(
-            manager,
-            this.returnType,
-            other.returnType,
-            this.returnTypeIsIntLike,
-            other.returnTypeIsIntLike,
-        ) ?: return null
-
-        return SuggestedReturnType(
-            returnType,
-            returnTypeIsIntLike,
-            this.coerceReturnType || other.coerceReturnType || coerceReturnType,
-        )
-    }
 
     companion object {
         /**
@@ -187,7 +173,7 @@ data class SuggestedSignature(
             val chosenParams = forExistingReturnType?.takeIf { it.size == parameterOptions.size }
                 ?: optionsByType.values.firstOrNull { it.size == parameterOptions.size } ?: return null
 
-            val name = chosenParams.asSequence().map { it.name }.distinct().singleOrNull() ?: "original"
+            val name = chosenParams.asSequence().map { it.name }.singleDistinctOrNull() ?: "original"
             val type = chosenParams.asSequence().map { it.type }
                 .reduce { a, b -> GenericsUtil.getLeastUpperBound(a, b, psiManager) ?: a }
 
@@ -288,18 +274,16 @@ data class SuggestedSignature(
                     }
                 }
                 .asSequence()
-                .distinct()
-                .singleOrNull()
+                .singleDistinctOrNull()
                 ?: return null
 
             val intLikeAnchor = run {
                 signatures.mapNotNull { it.intLikePositions.firstOrNull() }.toList()
                     .ifEmpty { return@run null }
                     .asSequence()
-                    .distinct()
                     // With the currently available signature shapes, there can only ever be 1 anchor.
                     // This logic will need revisiting if that changes.
-                    .single()
+                    .singleDistinct()
             }
             val intLikeAssignment = intLikeAnchor?.let {
                 val solver = IntLikeAnchorSolver()
@@ -346,45 +330,45 @@ data class SuggestedSignature(
                 }
             }
         }
+    }
+}
 
-        private fun kindsMatch(a: SuggestedSignature, b: SuggestedSignature) =
-            TypeKind.of(a.returnType) == TypeKind.of(b.returnType)
-                && a.params.size == b.params.size
-                && a.params.indices.all { TypeKind.of(a.params[it].type) == TypeKind.of(b.params[it].type) }
+private fun kindsMatch(a: SuggestedSignature, b: SuggestedSignature) =
+    TypeKind.of(a.returnType) == TypeKind.of(b.returnType)
+        && a.params.size == b.params.size
+        && a.params.indices.all { TypeKind.of(a.params[it].type) == TypeKind.of(b.params[it].type) }
 
-        /**
-         * Returns the largest N such that the sequences' first N types can be merged element-wise.
-         */
-        private fun coerciblePrefixLength(types: Sequence<Sequence<PsiType>>): Int {
-            val iterators = types.map { it.iterator() }.toList()
-            var i = 0
+/**
+ * Returns the largest N such that the sequences' first N types can be merged element-wise.
+ */
+private fun coerciblePrefixLength(types: Sequence<Sequence<PsiType>>): Int {
+    val iterators = types.map { it.iterator() }.toList()
+    var i = 0
 
-            while (true) {
-                var kind: TypeKind? = null
-                var forcedIntType: PsiType? = null
+    while (true) {
+        var kind: TypeKind? = null
+        var forcedIntType: PsiType? = null
 
-                for (iterator in iterators) {
-                    val candidate = if (iterator.hasNext()) iterator.next() else return i
-                    val candidateKind = TypeKind.of(candidate)
+        for (iterator in iterators) {
+            val candidate = if (iterator.hasNext()) iterator.next() else return i
+            val candidateKind = TypeKind.of(candidate)
 
-                    when (kind) {
-                        null -> kind = candidateKind
-                        candidateKind -> {}
-                        else -> return i
-                    }
+            when (kind) {
+                null -> kind = candidateKind
+                candidateKind -> {}
+                else -> return i
+            }
 
-                    if (candidateKind == TypeKind.INT_LIKE && candidate != PsiTypes.intType()) {
-                        when (forcedIntType) {
-                            null -> forcedIntType = candidate
-                            candidate -> {}
-                            else -> return i
-                        }
-                    }
+            if (candidateKind == TypeKind.INT_LIKE && candidate != PsiTypes.intType()) {
+                when (forcedIntType) {
+                    null -> forcedIntType = candidate
+                    candidate -> {}
+                    else -> return i
                 }
-
-                i++
             }
         }
+
+        i++
     }
 }
 
