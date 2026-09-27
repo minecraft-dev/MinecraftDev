@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
@@ -126,5 +127,34 @@ fun testInspectionFix(fixture: JavaCodeInsightTestFixture, basePath: String, fix
     fixture.configureByText(JavaFileType.INSTANCE, original)
     val intention = fixture.findSingleIntention(fixName)
     fixture.launchAction(intention)
+    fixture.checkResult(expected)
+}
+
+fun testAllInspectionFixes(fixture: JavaCodeInsightTestFixture, basePath: String, fixName: String) {
+    val caller = ReflectionUtil.getCallerClass(4)!!
+    val original =
+        caller.getResource("$basePath.java")?.readText()?.trim()?.lineSequence()?.joinToString("\n")
+            ?: Assertions.fail("no test data")
+    val expected = caller.getResource("$basePath.after.java")?.readText()?.trim()?.lineSequence()
+        ?.joinToString("\n") ?: Assertions.fail("no expected data")
+
+    fixture.configureByText(JavaFileType.INSTANCE, original)
+
+    var lastFixedRange: TextRange? = null
+    while (true) {
+        val (fix, range) = fixture.doHighlighting().firstNotNullOfOrNull { info ->
+            info.findRegisteredQuickFix { descriptor, range ->
+                descriptor.action.takeIf { it.familyName == fixName }?.let { it to range }
+            }
+        } ?: break
+
+        Assertions.assertNotEquals(lastFixedRange, range, "Fix loop")
+        lastFixedRange = range
+
+        fixture.launchAction(fix)
+    }
+
+    Assertions.assertTrue(lastFixedRange != null, "No fixes applied")
+
     fixture.checkResult(expected)
 }

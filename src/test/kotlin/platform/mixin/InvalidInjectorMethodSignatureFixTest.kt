@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin
 
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.framework.testAllInspectionFixes
 import com.demonwav.mcdev.framework.testInspectionFix
 import com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection
 import org.junit.jupiter.api.DisplayName
@@ -31,48 +32,69 @@ import org.junit.jupiter.api.extension.ExtendWith
 @DisplayName("Invalid Injector Method Signature Inspection Test")
 class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
 
-    private fun doTest(testName: String) {
+    private fun doSingleTest(testName: String) {
         fixture.enableInspections(InvalidInjectorMethodSignatureInspection::class)
         testInspectionFix(fixture, "invalidInjectorMethodSignature/$testName", "Fix method signature")
     }
 
-    @Test
-    @DisplayName("Simple case")
-    fun simpleCase() = doTest("simpleCase")
+    private fun doMultiTest(testName: String) {
+        fixture.enableInspections(InvalidInjectorMethodSignatureInspection::class)
+        testAllInspectionFixes(fixture, "invalidInjectorMethodSignature/$testName", "Fix method signature")
+    }
 
     @Test
-    @DisplayName("Simple case with MixinExtras Sugar")
-    fun simpleCaseWithMixinExtrasSugar() = doTest("simpleCaseWithMixinExtrasSugar")
+    @DisplayName("Inject simple case")
+    fun injectSimpleCase() = doSingleTest("inject/simpleCase")
 
     @Test
-    @DisplayName("With captured locals")
-    fun withCapturedLocals() = doTest("withCapturedLocals")
+    @DisplayName("Inject simple case with MixinExtras Sugar")
+    fun injectSimpleCaseWithMixinExtrasSugar() = doSingleTest("inject/simpleCaseWithMixinExtrasSugar")
 
     @Test
-    @DisplayName("Simple inner ctor")
-    fun simpleInnerCtor() = doTest("simpleInnerCtor")
+    @DisplayName("Inject with captured locals")
+    fun injectWithCapturedLocals() = doSingleTest("inject/withCapturedLocals")
 
     @Test
-    @DisplayName("Inner ctor with locals")
-    fun innerCtorWithLocals() = doTest("innerCtorWithLocals")
+    @DisplayName("Inject simple inner ctor")
+    fun injectSimpleInnerCtor() = doSingleTest("inject/simpleInnerCtor")
+
+    @Test
+    @DisplayName("Inject inner ctor with locals")
+    fun injectInnerCtorWithLocals() = doSingleTest("inject/innerCtorWithLocals")
 
     @Test
     @DisplayName("Inject without CallbackInfo")
-    fun injectWithoutCI() = doTest("injectWithoutCI")
+    fun injectWithoutCI() = doSingleTest("inject/withoutCI")
 
     @Test
-    @DisplayName("ModifyArgs")
-    fun modifyArgs() = doTest("modifyArgs")
+    @DisplayName("Inject generic method")
+    fun injectGenericCase() = doSingleTest("inject/genericCase")
 
     @Test
-    @DisplayName("Generic method")
-    fun genericCase() = doTest("genericCase")
+    @DisplayName("Inject generic method complex return type")
+    fun injectGenericCaseComplexReturnType() = doSingleTest("inject/genericCaseComplexReturnType")
 
     @Test
-    @DisplayName("Generic method complex return type")
-    fun genericCaseComplexReturnType() = doTest("genericCaseComplexReturnType")
+    @DisplayName("Inject simple method with inner type")
+    fun injectSimpleMethodWithInnerType() = doSingleTest("inject/simpleMethodWithInnerType")
 
     @Test
-    @DisplayName("Simple method with inner type")
-    fun simpleMethodWithInnerType() = doTest("simpleMethodWithInnerType")
+    @DisplayName("ModifyArgs simple")
+    fun modifyArgsSimple() = doSingleTest("modifyargs/simple")
+
+    @Test
+    @DisplayName("ModifyArgs return type only")
+    fun modifyArgsReturnTypeOnly() = doSingleTest("modifyargs/returnTypeOnly")
+
+    @Test
+    @DisplayName("Inject multi-target")
+    fun injectMultiTarget() = doMultiTest("inject/multiTarget")
+
+    @Test
+    @DisplayName("ModifyArg")
+    fun modifyArg() = doMultiTest("modifyArg")
+
+    @Test
+    @DisplayName("ModifyVariable")
+    fun modifyVariable() = doMultiTest("modifyVariable")
 }

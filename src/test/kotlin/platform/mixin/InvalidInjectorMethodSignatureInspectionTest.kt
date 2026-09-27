@@ -163,4 +163,160 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("ModifyArgs")
+    fun modifyArgs() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInSimple;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyArgs;
+                import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+                
+                @Mixin(MixedInSimple.class)
+                public class TestMixin {
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private void correct(Args args) {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private void correctWithTrailing(Args args, String string, int i) {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void prefixOfTrailing(Args args, String string)</error> {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void coerceTrailing(Args args, @Coerce Object string, int i)</error> {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void coerceArgs(@Coerce Object args)</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyArg")
+    fun modifyArg() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyArg;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyArg;
+                
+                @Mixin(MixedInModifyArg.class)
+                public class TestMixin {
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private String correct(String original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private int correct(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private String correctFull(String x, int y) {
+                        return x;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private int correctIndex(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private <error descr="Method signature does not match expected signature for ModifyArg">int captureOuter(int original, Object obj)</error> {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private <error descr="Method signature does not match expected signature for ModifyArg">int captureOuter(int a, int b, int c, Object obj)</error> {
+                        return c;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"))
+                    private <error descr="There are no possible signatures for this injector">void implicit()</error> {
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"), index = 1)
+                    private @Coerce <error descr="Method signature does not match expected signature for ModifyArg">Object coerce(@Coerce Object x)</error> {
+                        return x;
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyVariable")
+    fun modifyVariable() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyVariable;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyVariable;
+                
+                @Mixin(MixedInModifyVariable.class)
+                public class TestMixin {
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private Integer correct(Integer original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correct(char original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctPartialCapture(char original, String arg) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctFullCapture(char original, String arg, Object arg2) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctCoerceTrailing(char original, @Coerce Object arg) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method3", at = @At("RETURN"), ordinal = 2)
+                    private int correctOrdinal(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method2", at = @At("RETURN"))
+                    private <error descr="There are no possible signatures for this injector">void implicit()</error> {
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"), index = 1)
+                    private @Coerce <error descr="Method signature does not match expected signature for ModifyVariable">Object coerce(@Coerce Object x)</error> {
+                        return x;
+                    }
+                }
+            """,
+        )
+    }
 }
