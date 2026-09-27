@@ -27,6 +27,7 @@ import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.COERCE
+import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
 import com.demonwav.mcdev.platform.mixin.util.findDelegateConstructorCall
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isConstructor
@@ -68,6 +69,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.PsiParameterList
+import com.intellij.psi.PsiType
 import com.intellij.psi.codeStyle.VariableKind
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
@@ -268,8 +270,9 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             val languageLevel = PsiUtil.getLanguageLevel(parameters)
 
             val usedNames = mutableSetOf<String>()
-            val newParams = suggestedParams.mapIndexedTo(mutableListOf()) { i, p ->
+            val newParams = suggestedParams.mapTo(mutableListOf()) { p ->
                 val paramName = p.name?.takeIf { name -> nameHelper.isIdentifier(name, languageLevel) }
+                    ?: suggestedParamNames(p.type).firstOrNull { it !in usedNames }
                     ?: VariableNameGenerator(parameters, VariableKind.PARAMETER)
                         .byType(p.type)
                         .skipNames(usedNames)
@@ -363,6 +366,13 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 )
             }
             return builder.buildInlineTemplate()
+        }
+
+        private companion object {
+            fun suggestedParamNames(type: PsiType): List<String> = when {
+                type.equalsToText(CALLBACK_INFO) -> listOf("ci")
+                else -> emptyList()
+            }
         }
     }
 }
