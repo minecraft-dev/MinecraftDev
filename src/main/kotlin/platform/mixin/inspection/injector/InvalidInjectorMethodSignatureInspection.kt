@@ -188,24 +188,28 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             val signatureSuggestion = signatureOptions?.let { SuggestedReturnType.forParams(parameters, it) }
                 ?: handler.suggestedMethodSignature(annotation, targetMethods)
 
+            val declarationStart = (method.returnTypeElement ?: identifier).startOffsetInParent
+            val declarationEnd = method.parameterList.textRangeInParent.endOffset
+
             if (signatureSuggestion == null) {
                 holder.registerProblem(
-                    parameters,
+                    method,
                     "There are no possible signatures for this injector",
+                    ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                    TextRange.create(declarationStart, declarationEnd),
                 )
             } else {
                 val annotationName = annotation.nameReferenceElement?.referenceName
                 val description =
                     "Method signature does not match expected signature for $annotationName"
                 val quickFix = SignatureQuickFix(method, signatureSuggestion)
-                val declarationStart = (method.returnTypeElement ?: identifier).startOffsetInParent
-                val declarationEnd = method.parameterList.textRangeInParent.endOffset
+
                 holder.registerProblem(
                     method,
                     description,
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     TextRange.create(declarationStart, declarationEnd),
-                    quickFix
+                    quickFix,
                 )
             }
         }
