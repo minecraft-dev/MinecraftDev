@@ -450,4 +450,28 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("ModifyReceiver")
+    fun modifyReceiver() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyReceiver;
+                import com.llamalad7.mixinextras.injector.ModifyReceiver;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyReceiver.class)
+                class TestMixin {
+                    @ModifyReceiver(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }
