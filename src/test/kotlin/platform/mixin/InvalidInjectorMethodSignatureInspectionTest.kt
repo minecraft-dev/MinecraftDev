@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -523,6 +523,54 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                         method = "caller", at = {@At(value = "CONSTANT", args = "classValue=java/lang/Integer"), @At(value = "INVOKE", target = "callee5")}
                     )
                     private <error descr="There are no possible signatures for this injector">void compatibleShapesButCannotCoerce()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("WrapOperation")
+    fun wrapOperation() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapOperation;
+                import com.llamalad7.mixinextras.expression.Definition;
+                import com.llamalad7.mixinextras.expression.Expression;
+                import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+                import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                
+                @Mixin(MixedInWrapOperation.class)
+                class TestMixin {
+                    @WrapOperation(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Definition(id = "callee7", method = "callee7")
+                    @Expression({"? == 3", "callee7(?, ?)"})
+                    @WrapOperation(method = "caller2", at = @At("MIXINEXTRAS:EXPRESSION"))
+                    private <error descr="There are no possible signatures for this injector">void noWorkingIntLikeAnchor()</error> {
+                    }
+                    
+                    @WrapOperation(
+                        method = "caller3", 
+                        at = {@At(value = "INVOKE", target = "callee8"), @At(value = "INVOKE", target = "callee9")}
+                    )            
+                    private <error descr="There are no possible signatures for this injector">void doesNotTryToCoerceOperationToReconcileDifferingParamCounts()</error> {
+                    }
+                    
+                    @WrapOperation(
+                        method = "caller3", 
+                        at = {@At(value = "INVOKE", target = "callee8"), @At(value = "INVOKE", target = "callee9")}
+                    )            
+                    private void coercingTheOperationIsAllowedIfTheUserReallyWantsTo(Object arg, @Coerce Object arg2, @Coerce Object arg3) {
                     }
                 }
             """,
