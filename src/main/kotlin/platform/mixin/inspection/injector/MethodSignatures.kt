@@ -160,7 +160,7 @@ data class GeneralSignatures(
     )
 }
 
-class InjectSignatures(
+class InjectSignatures private constructor(
     val params: List<Parameter>,
     val locals: List<Parameter>,
     ciParam: Parameter,
