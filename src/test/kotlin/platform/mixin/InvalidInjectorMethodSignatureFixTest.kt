@@ -121,4 +121,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("WrapWithCondition")
     fun wrapWithCondition() = doMultiTest("wrapWithCondition")
+
+    @Test
+    @DisplayName("Redirect")
+    fun redirect() = doMultiTest("redirect")
 }

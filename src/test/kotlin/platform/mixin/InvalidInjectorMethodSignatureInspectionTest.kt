@@ -498,4 +498,34 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("Redirect")
+    fun redirect() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInRedirect;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Redirect;
+                
+                @Mixin(MixedInRedirect.class)
+                class TestMixin {
+                    @Redirect(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Redirect(
+                        method = "caller", at = {@At(value = "CONSTANT", args = "classValue=java/lang/Integer"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void compatibleShapesButCannotCoerce()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }
