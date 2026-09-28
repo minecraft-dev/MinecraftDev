@@ -97,4 +97,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("ModifyVariable")
     fun modifyVariable() = doMultiTest("modifyVariable")
+
+    @Test
+    @DisplayName("WrapMethod")
+    fun wrapMethod() = doMultiTest("wrapMethod")
 }

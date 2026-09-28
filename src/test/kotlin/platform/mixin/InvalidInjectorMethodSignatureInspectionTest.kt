@@ -319,4 +319,30 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("WrapMethod")
+    fun wrapMethod() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapMethod;
+                import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+                import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+                import org.spongepowered.asm.mixin.Mixin;
+                
+                @Mixin(MixedInWrapMethod.class)
+                class TestMixin {
+                    @WrapMethod(method = {"method1", "method7"})
+                    private void <error descr="Impossible combination of targets: some require a static handler and others a non-static handler">mustBeStaticAndNonStatic</error>(String arg, Operation<Void> original) {
+                    }
+                    
+                    @WrapMethod(method = {"method7", "method8"})
+                    private static <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }
