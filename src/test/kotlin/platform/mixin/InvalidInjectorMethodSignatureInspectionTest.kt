@@ -474,4 +474,28 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("WrapWithCondition")
+    fun wrapWithCondition() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapWithCondition;
+                import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInWrapWithCondition.class)
+                class TestMixin {
+                    @WrapWithCondition(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }

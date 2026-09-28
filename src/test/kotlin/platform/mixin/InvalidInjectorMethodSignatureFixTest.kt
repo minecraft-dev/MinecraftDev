@@ -117,4 +117,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("ModifyReceiver")
     fun modifyReceiver() = doMultiTest("modifyReceiver")
+
+    @Test
+    @DisplayName("WrapWithCondition")
+    fun wrapWithCondition() = doMultiTest("wrapWithCondition")
 }
