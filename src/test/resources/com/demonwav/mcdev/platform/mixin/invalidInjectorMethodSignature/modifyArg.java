@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(MixedInModifyArg.class)
-public class TestMixin {
+class TestMixin {
     @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
     private void test1() {
     }

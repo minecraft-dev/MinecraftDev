@@ -23,6 +23,7 @@
 package com.demonwav.mcdev.framework
 
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
@@ -153,6 +154,9 @@ fun testAllInspectionFixes(fixture: JavaCodeInsightTestFixture, basePath: String
 
         fixture.launchAction(fix)
     }
+
+    val remainingIssues = fixture.doHighlighting().filter { it.severity >= HighlightSeverity.WARNING }
+    Assertions.assertEquals(emptyList<Nothing>(), remainingIssues)
 
     Assertions.assertTrue(lastFixedRange != null, "No fixes applied")
 

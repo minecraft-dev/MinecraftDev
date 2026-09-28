@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(MixedInModifyVariable.class)
-public class TestMixin {
+class TestMixin {
     @ModifyVariable(method = "method1", at = @At("RETURN"))
     private String test1(String arg) {
         return arg;

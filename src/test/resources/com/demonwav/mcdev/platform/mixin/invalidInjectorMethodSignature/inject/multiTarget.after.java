@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.io.Serializable;
 
 @Mixin(MixedInComplex.class)
-public class TestMixin {
+class TestMixin {
     @Inject(method = {"method1", "method2"}, at = @At("RETURN"))
     private void inject1(CallbackInfo ci) {
     }
