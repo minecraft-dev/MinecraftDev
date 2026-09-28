@@ -287,9 +287,13 @@ data class SuggestedSignature(
             }
             val intLikeAssignment = intLikeAnchor?.let {
                 val solver = IntLikeAnchorSolver()
+
+                val allIntLikePositions = signatures.asSequence()
+                    .flatMap { it.intLikePositions }
+                    .toHashSet()
                 for (signature in signatures) {
                     for (pos in signature.allPositions(paramsToUse)) {
-                        if (pos in signature.intLikePositions) {
+                        if (pos in signature.intLikePositions || pos !in allIntLikePositions) {
                             continue
                         }
                         val isTrailingParam = pos is MethodSignature.TypePosition.Param &&
@@ -305,6 +309,7 @@ data class SuggestedSignature(
                         }
                     }
                 }
+
                 solver.solve()
             }
 
