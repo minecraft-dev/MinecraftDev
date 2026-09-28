@@ -109,4 +109,8 @@ class InvalidInjectorMethodSignatureFixTest : BaseMixinTest() {
     @Test
     @DisplayName("ModifyExpressionValue")
     fun modifyExpressionValue() = doMultiTest("modifyExpressionValue")
+
+    @Test
+    @DisplayName("ModifyConstant")
+    fun modifyConstant() = doMultiTest("modifyConstant")
 }

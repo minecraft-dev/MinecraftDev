@@ -399,4 +399,55 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("ModifyConstant")
+    fun modifyConstant() {
+        doTest(
+            """
+                package test;
+
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyConstant;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.Constant;
+                import org.spongepowered.asm.mixin.injection.ModifyConstant;
+                
+                import java.io.Serializable;
+                
+                @Mixin(MixedInModifyConstant.class)
+                class TestMixin {
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Integer.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">Class<?> wrongShape(Class<?> original)</error> {
+                        return null;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Long.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">boolean wrongShape(Object obj, Class<?> clazz)</error> {
+                        return true;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Integer.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">boolean coerceInstanceof(Object obj, @Coerce Object clazz)</error> {
+                        return true;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = {@Constant(intValue = 42), @Constant(stringValue = "hello")})
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @ModifyConstant(
+                            method = "method2",
+                            constant = {@Constant(classValue = Integer.class), @Constant(classValue = Long.class)}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void differentShapesAndTrailingParamIsUnhelpful()</error> {
+                    }
+                    
+                    @ModifyConstant(method = "method2", constant = @Constant(nullValue = true))
+                    private <error descr="There are no possible signatures for this injector">void cannotModifyNull()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }
