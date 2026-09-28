@@ -367,4 +367,36 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("ModifyExpressionValue")
+    fun modifyExpressionValue() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyExpressionValue;
+                import com.llamalad7.mixinextras.expression.Expression;
+                import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyExpressionValue.class)
+                class TestMixin {
+                    @ModifyExpressionValue(
+                        method = "method1", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Expression("42")
+                    @ModifyExpressionValue(
+                        method = "method1", at = {@At("MIXINEXTRAS:EXPRESSION"), @At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapesWithIntLike()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }

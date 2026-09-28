@@ -22,9 +22,12 @@
 
 package com.demonwav.mcdev.framework
 
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
@@ -140,6 +143,7 @@ fun testAllInspectionFixes(fixture: JavaCodeInsightTestFixture, basePath: String
         ?.joinToString("\n") ?: Assertions.fail("no expected data")
 
     fixture.configureByText(JavaFileType.INSTANCE, original)
+    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
 
     var lastFixedRange: TextRange? = null
     while (true) {
@@ -152,7 +156,23 @@ fun testAllInspectionFixes(fixture: JavaCodeInsightTestFixture, basePath: String
         Assertions.assertNotEquals(lastFixedRange, range, "Fix loop")
         lastFixedRange = range
 
+        val document = fixture.file.fileDocument
+        val lineNumber = document.getLineNumber(range.endOffset)
+        val expectTemplate = document.getText(
+            TextRange(
+                document.getLineStartOffset(lineNumber),
+                document.getLineEndOffset(lineNumber),
+            )
+        ).trimEnd().endsWith("expect-template")
+
         fixture.launchAction(fix)
+
+        val hadTemplate = TemplateManager.getInstance(fixture.project).finishTemplate(fixture.editor)
+        if (expectTemplate) {
+            Assertions.assertTrue(hadTemplate, "No live template but one was expected")
+        } else {
+            Assertions.assertFalse(hadTemplate, "Had live template but one was not expected")
+        }
     }
 
     val remainingIssues = fixture.doHighlighting().filter { it.severity >= HighlightSeverity.WARNING }
