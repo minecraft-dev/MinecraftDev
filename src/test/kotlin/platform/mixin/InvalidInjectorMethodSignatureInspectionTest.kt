@@ -345,4 +345,26 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
             """,
         )
     }
+
+    @Test
+    @DisplayName("ModifyReturnValue")
+    fun modifyReturnValue() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyReturnValue;
+                import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyReturnValue.class)
+                class TestMixin {
+                    @ModifyReturnValue(method = {"method1", "method4"}, at = @At("RETURN"))
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
 }
