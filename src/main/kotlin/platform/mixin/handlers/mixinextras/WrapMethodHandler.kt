@@ -32,6 +32,7 @@ import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
@@ -87,4 +88,6 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
             canDecompile = true
         )?.let(::listOf).orEmpty()
     }
+
+    override fun canAlwaysBeStatic(method: PsiMethod) = false
 }
