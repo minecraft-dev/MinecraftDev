@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,6 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lexer.Lexer
-import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library

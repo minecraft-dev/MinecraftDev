@@ -9,8 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
 
-import java.io.Serializable;
-
 @Mixin(MixedInWrapOperation.class)
 class TestMixin {
     @WrapOperation(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
