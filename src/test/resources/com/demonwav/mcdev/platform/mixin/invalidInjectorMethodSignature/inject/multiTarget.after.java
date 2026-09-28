@@ -37,7 +37,15 @@ class TestMixin {
     private void inject6(@Coerce CharSequence arg, CallbackInfo ci, int local1, @Coerce CharSequence local2, @Coerce char local3) {
     }
 
+    @Inject(method = {"method5", "method6"}, at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void inject7(CharSequence arg, CallbackInfo ci, int local1, String local2, int local3, int local4, char local5) {
+    }
+
     @Inject(method = {"method1", "method3"}, at = @At("RETURN"))
-    private void inject7(@Coerce Object arg, @Coerce CallbackInfo ci) {
+    private void inject8(@Coerce Object arg, @Coerce CallbackInfo ci) {
+    }
+
+    @Inject(method = {"method7", "method8"}, at = @At("HEAD"))
+    private void inject9(CallbackInfo ci) {
     }
 }

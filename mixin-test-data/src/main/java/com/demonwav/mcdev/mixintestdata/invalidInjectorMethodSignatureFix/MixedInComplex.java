@@ -45,5 +45,22 @@ public class MixedInComplex {
         String local2 = null;
         int local3 = 0;
         int local4 = 0;
+        char local5 = 0;
+        char local6 = 0;
+    }
+
+    public void method6(CharSequence arg) {
+        int local1 = 0;
+        String local2 = null;
+        int local3 = 0;
+        int local4 = 0;
+        char local5 = 0;
+        short local6 = 0;
+    }
+
+    public void method7(char a) {
+    }
+
+    public void method8(short a) {
     }
 }

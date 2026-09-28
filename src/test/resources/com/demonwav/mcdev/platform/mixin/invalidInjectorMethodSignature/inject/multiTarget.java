@@ -35,7 +35,15 @@ class TestMixin {
     private void inject6() {
     }
 
+    @Inject(method = {"method5", "method6"}, at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void inject7() {
+    }
+
     @Inject(method = {"method1", "method3"}, at = @At("RETURN"))
-    private String inject7(@Coerce Object arg, @Coerce CallbackInfo ci) {
+    private String inject8(@Coerce Object arg, @Coerce CallbackInfo ci) {
+    }
+
+    @Inject(method = {"method7", "method8"}, at = @At("HEAD"))
+    private void inject9(@Coerce int a, CallbackInfo ci) {
     }
 }
