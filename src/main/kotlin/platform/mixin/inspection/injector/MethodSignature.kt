@@ -186,10 +186,7 @@ data class MethodSignature(
             }
         }
 
-        return intLikePositions.asSequence().filterIsInstance<TypePosition.Param>().mapNotNull { (index) ->
-                    params.getOrNull(index)?.let(paramType)
-               }.allEqual()
-            && matchParams(transformedRequiredParams, allowCoerceRequired, 0)
+        return matchParams(transformedRequiredParams, allowCoerceRequired, 0)
             && matchParams(trailingParams, true, requiredParams.size)
     }
 
