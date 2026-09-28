@@ -294,8 +294,7 @@ data class SuggestedSignature(
                         }
                         val isTrailingParam = pos is MethodSignature.TypePosition.Param &&
                             pos.index > signature.requiredParams.lastIndex
-                        val allowCoerce =
-                            if (isTrailingParam) signature.allowCoerceTrailing else signature.allowCoerceRequired
+                        val allowCoerce = isTrailingParam || signature.allowCoerceRequired
                         val isValid = solver.constrain(
                             pos.getType(signature),
                             isAnchor = pos == intLikeAnchor,
@@ -327,8 +326,7 @@ data class SuggestedSignature(
             // check will fail:
             return intersected.takeIf {
                 signatures.all {
-                    it.allowCoerceRequired && (intersected.params.size <= it.requiredParams.size || it.allowCoerceTrailing)
-                        || it.matches(intersected)
+                    it.allowCoerceRequired || it.matches(intersected)
                 }
             }
         }

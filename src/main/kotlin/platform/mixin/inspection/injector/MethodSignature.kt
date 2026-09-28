@@ -39,7 +39,6 @@ data class MethodSignature(
     val returnType: PsiType,
     val allowCoerceRequired: Boolean,
     val trailingParams: List<Parameter> = emptyList(),
-    val allowCoerceTrailing: Boolean = true,
     val intLikePositions: SequencedSet<TypePosition> = emptySequencedSet(),
 ) {
     sealed interface TypePosition {
@@ -191,7 +190,7 @@ data class MethodSignature(
                     params.getOrNull(index)?.let(paramType)
                }.allEqual()
             && matchParams(transformedRequiredParams, allowCoerceRequired, 0)
-            && matchParams(trailingParams, allowCoerceTrailing, requiredParams.size)
+            && matchParams(trailingParams, true, requiredParams.size)
     }
 
     private companion object {
