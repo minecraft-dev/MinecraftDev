@@ -322,7 +322,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 existingCoerce == null && needsCoerce -> {
                     val annotation = JavaPsiFacade.getElementFactory(project)
                         .createAnnotationFromText("@$COERCE", returnTypeElement);
-                    { returnTypeElement.addBefore(annotation, returnTypeElement.firstChild) }
+                    { method.modifierList.add(annotation) }
                 }
 
                 else -> return
