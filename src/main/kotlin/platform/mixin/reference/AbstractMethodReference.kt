@@ -87,11 +87,15 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         val allowStatic = context.parentOfType<PsiMethod>()?.hasModifierProperty(PsiModifier.STATIC) ?: true
         val stringValue = context.constantStringValue ?: return false
         val targetMethodInfo = parseSelector(stringValue, context) ?: return false
-        val minMatches = targetMethodInfo.quantifier.min(Quantifier.Context.MEMBER).coerceAtLeast(1)
+        val minMatches = generateSequence(targetMethodInfo) { it.next }
+            .last()
+            .quantifier
+            .min(Quantifier.Context.MEMBER)
+            .coerceAtLeast(1)
         val targets = getTargets(context) ?: return false
 
         return targets.any {
-            targetMethodInfo.getCustomOwner(it).findMethods(targetMethodInfo, allowStatic)
+            targetMethodInfo.getCustomOwner(it).findMethods(listOf(targetMethodInfo), allowStatic)
                 .countIsLessThan(minMatches)
         }
     }
@@ -108,8 +112,9 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     }
 
     private fun isAmbiguous(targets: Collection<ClassNode>, targetReference: MemberInfo): Boolean {
+        val selector = targetReference.copy(quantifier = Quantifier.Any, next = null)
         return targets.any {
-            it.findMethods(targetReference.withQuantifier(Quantifier.Any), allowStatic = true).countIsAtLeast(2)
+            it.findMethods(listOf(selector), allowStatic = true).countIsAtLeast(2)
         }
     }
 
@@ -120,22 +125,25 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
             is PsiArrayInitializerMemberValue -> context.initializers.mapNotNull { it.constantStringValue }
             else -> context.constantStringValue?.let { listOf(it) } ?: emptyList()
         }
+        val selectors = targetedMethods.mapNotNull { parseSelector(it, context) }
 
-        return targetedMethods.asSequence().flatMap { method ->
-            val targetReference = parseSelector(method, context) ?: return@flatMap emptySequence()
-            return@flatMap resolve(targets, targetReference, allowStatic)
-        }
+        return resolve(targets, selectors, allowStatic)
     }
 
     private fun resolve(
         targets: Collection<ClassNode>,
-        selector: MixinSelector,
+        selectors: List<MixinSelector>,
         allowStatic: Boolean,
     ): Sequence<ClassAndMethodNode> {
         return targets.asSequence()
             .flatMap { target ->
-                val actualTarget = selector.getCustomOwner(target)
-                actualTarget.findMethods(selector, allowStatic).map { ClassAndMethodNode(actualTarget, it) }
+                selectors.asSequence().map { it.getCustomOwner(target) to it }
+            }
+            .groupBy({ it.first }, { it.second })
+            .asSequence()
+            .flatMap { (target, selectors) ->
+                target.findMethods(selectors, allowStatic)
+                    .map { ClassAndMethodNode(target, it) }
             }
     }
 

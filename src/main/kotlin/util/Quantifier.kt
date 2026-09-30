@@ -27,12 +27,13 @@ sealed interface Quantifier {
 
     data object Default : Quantifier {
         override fun min(ctx: Context) = when (ctx) {
-            Context.MEMBER, Context.INSTRUCTION -> 0
+            Context.MEMBER, Context.INSTRUCTION, Context.LAMBDA -> 0
+            Context.LAMBDA_DEPTH -> 1
         }
 
         override fun max(ctx: Context) = when (ctx) {
-            Context.MEMBER -> 1
-            Context.INSTRUCTION -> Int.MAX_VALUE
+            Context.MEMBER, Context.LAMBDA_DEPTH -> 1
+            Context.INSTRUCTION, Context.LAMBDA -> Int.MAX_VALUE
         }
 
         override fun toString() = ""
@@ -65,7 +66,7 @@ sealed interface Quantifier {
     }
 
     enum class Context {
-        MEMBER, INSTRUCTION
+        MEMBER, INSTRUCTION, LAMBDA_DEPTH, LAMBDA
     }
 
     companion object {

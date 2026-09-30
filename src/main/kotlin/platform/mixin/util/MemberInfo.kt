@@ -23,7 +23,6 @@ package com.demonwav.mcdev.platform.mixin.util
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.util.Quantifier
 import com.intellij.openapi.util.text.StringUtil
-import org.objectweb.asm.Type
 
 /**
  * Represents a Mixin MemberInfo.
@@ -33,6 +32,8 @@ data class MemberInfo(
     val descriptor: String? = null,
     override val owner: String? = null,
     override val quantifier: Quantifier = Quantifier.Default,
+    override val nextDepth: Quantifier = Quantifier.Default,
+    override val next: MemberInfo? = null,
 ) : MixinSelector {
 
     init {
@@ -85,7 +86,7 @@ data class MemberInfo(
             name?.let(::append)
             append(quantifier)
 
-            descriptor?.let { descriptor ->
+            if (descriptor != null) {
                 if (!descriptor.startsWith('(')) {
                     // Field descriptor
                     append(':')
@@ -93,16 +94,30 @@ data class MemberInfo(
 
                 append(descriptor)
             }
+
+            if (next != null) {
+                append(" ->").append(nextDepth).append(' ').append(next.toMixinString())
+            }
         }
     }
 
     override fun withQuantifier(quantifier: Quantifier) = copy(quantifier = quantifier)
 
     companion object {
+        private val NESTING_REGEX = "(?<root>.*?\\S)\\s+->(?<nextDepth>\\{.*?}|\\S*)\\s+(?<next>\\S.*)".toRegex()
+
         fun parse(input: String): MemberInfo? {
             var desc: String? = null
             var owner: String? = null
             var name: String = input.trim()
+
+            var next: MemberInfo? = null
+            var nextDepth: Quantifier = Quantifier.Default
+            NESTING_REGEX.matchEntire(name)?.let { match ->
+                name = match.groups["root"]!!.value.trim()
+                nextDepth = Quantifier.parse(match.groups["nextDepth"]!!.value) ?: return null
+                next = parse(match.groups["next"]!!.value) ?: return null
+            }
 
             val parenPos = name.indexOf('(')
             val colonPos = name.indexOf(':')
@@ -153,7 +168,7 @@ data class MemberInfo(
                 return null
             }
 
-            return MemberInfo(name.takeIf { it.isNotEmpty() }, desc, owner, quantifier)
+            return MemberInfo(name.takeIf { it.isNotEmpty() }, desc, owner, quantifier, nextDepth, next)
         }
     }
 }

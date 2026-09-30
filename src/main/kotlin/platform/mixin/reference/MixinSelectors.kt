@@ -94,6 +94,8 @@ interface MixinSelectorParser {
  */
 interface MixinSelector : MemberMatcher {
     val quantifier: Quantifier
+    val nextDepth: Quantifier get() = Quantifier.Default
+    val next: MixinSelector? get() = null
 
     fun withQuantifier(quantifier: Quantifier): MixinSelector
 }
