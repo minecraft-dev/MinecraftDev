@@ -57,6 +57,7 @@ import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassInitializer
+import com.intellij.psi.PsiClassOwner
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiCompiledFile
@@ -439,7 +440,10 @@ fun ClassNode.findStubClass(project: Project): PsiClass? {
 fun ClassNode.findSourceClass(project: Project, scope: GlobalSearchScope, canDecompile: Boolean = false): PsiClass? {
     return findQualifiedClass(name.replace('/', '.')) { name ->
         val stubClass = JavaPsiFacade.getInstance(project).findClass(name, scope) ?: return@findQualifiedClass null
-        val stubFile = stubClass.containingFile ?: return@findQualifiedClass null
+        val stubFile = stubClass.containingFile as PsiClassOwner? ?: return@findQualifiedClass null
+        if (stubFile !is PsiCompiledFile) {
+            return@findQualifiedClass stubFile.classes.firstOrNull()
+        }
         val classFile = stubFile.virtualFile
         if (classFile != null) {
             val sourceFile = JavaEditorFileSwapper.findSourceFile(project, classFile)
