@@ -759,8 +759,10 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
     return RecursionManager.doPreventingRecursion(lambdaMethod, false) {
         val pair = findContainingMethod(clazz, lambdaMethod) ?: return@doPreventingRecursion null
         val (containingMethod, locationInfo) = pair
-        val containingBodyElements = findAssociatedLambda(project, scope, clazz, containingMethod)?.let(::listOf)
-            ?: containingMethod.findBodyElements(clazz, project, scope).ifEmpty { return@doPreventingRecursion null }
+        val containingBodyElements =
+            (findAssociatedLambda(project, scope, clazz, containingMethod) as? PsiLambdaExpression)?.body?.let(::listOf)
+                ?: containingMethod.findBodyElements(clazz, project, scope)
+                    .ifEmpty { return@doPreventingRecursion null }
 
         val psiFile = containingBodyElements.first().containingFile ?: return@doPreventingRecursion null
         val matcher = locationInfo.createMatcher<PsiElement>(psiFile)
