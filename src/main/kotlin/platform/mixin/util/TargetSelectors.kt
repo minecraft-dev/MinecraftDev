@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.mapToArray
 import java.lang.invoke.CallSite
@@ -35,7 +36,10 @@ import org.objectweb.asm.tree.InvokeDynamicInsnNode
 import org.objectweb.asm.tree.MethodNode
 
 fun ClassNode.findMethods(refs: List<MixinSelector>, allowStatic: Boolean): Sequence<MethodNode> =
-    TargetSelectors(this, refs, allowStatic).find()
+    TargetSelectors(this, refs, allowStatic).findMethods()
+
+fun ClassNode.findReferences(refs: List<MixinSelector>, allowStatic: Boolean): Sequence<MemberReference> =
+    TargetSelectors(this, refs, allowStatic).findReferences()
 
 private class TargetSelectors(
     private val classNode: ClassNode,
@@ -59,11 +63,17 @@ private class TargetSelectors(
             .mapTo(hashSetOf()) { findMethod(it) }
     }
 
-    fun find(): Sequence<MethodNode> = sequence {
+    fun findMethods(): Sequence<MethodNode> = findElements().map { findMethod(it) }
+
+    fun findReferences(): Sequence<MemberReference> = findElements().map {
+        MemberReference(it.name, it.desc, it.owner.replace('/', '.'))
+    }
+
+    private fun findElements(): Sequence<ElementNode> = sequence {
         for (selector in selectors) {
             val roots = findRootTargets(selector)
             if (selector.next == null) {
-                yieldAll(roots)
+                yieldAll(roots.map { ElementNodeMethod(classNode, it) })
                 continue
             }
 
@@ -80,7 +90,7 @@ private class TargetSelectors(
                 working = findNested(currentSelector, working, minDepth, maxDepth)
             }
 
-            yieldAll(working.map { findMethod(it) })
+            yieldAll(working)
         }
     }
 

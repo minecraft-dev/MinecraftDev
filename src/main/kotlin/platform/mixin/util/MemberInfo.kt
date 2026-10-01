@@ -77,29 +77,29 @@ data class MemberInfo(
             (this.descriptor == null || this.descriptor == desc)
     }
 
-    fun toMixinString(): String {
-        return buildString {
-            if (owner != null) {
-                append('L').append(owner.replace('.', '/')).append(';')
+    fun toMixinString(): String = headToString() + tailToString()
+
+    fun headToString(): String = buildString {
+        if (owner != null) {
+            append('L').append(owner.replace('.', '/')).append(';')
+        }
+
+        name?.let(::append)
+        append(quantifier)
+
+        if (descriptor != null) {
+            if (!descriptor.startsWith('(')) {
+                // Field descriptor
+                append(':')
             }
 
-            name?.let(::append)
-            append(quantifier)
-
-            if (descriptor != null) {
-                if (!descriptor.startsWith('(')) {
-                    // Field descriptor
-                    append(':')
-                }
-
-                append(descriptor)
-            }
-
-            if (next != null) {
-                append(" ->").append(nextDepth).append(' ').append(next.toMixinString())
-            }
+            append(descriptor)
         }
     }
+
+    fun tailToString(): String = next?.let {
+        " ->$nextDepth ${next.toMixinString()}"
+    }.orEmpty()
 
     override fun withQuantifier(quantifier: Quantifier) = copy(quantifier = quantifier)
 

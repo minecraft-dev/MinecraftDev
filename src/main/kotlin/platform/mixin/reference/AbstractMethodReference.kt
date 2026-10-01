@@ -29,7 +29,6 @@ import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.findUpstreamMixin
-import com.demonwav.mcdev.platform.mixin.util.memberReference
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Quantifier
@@ -39,11 +38,9 @@ import com.demonwav.mcdev.util.countIsLessThan
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
-import com.demonwav.mcdev.util.reference.completeToLiteral
 import com.demonwav.mcdev.util.toResolveResults
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
-import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiArrayInitializerMemberValue
@@ -169,135 +166,30 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         }?.toResolveResults() ?: ResolveResult.EMPTY_ARRAY
     }
 
-    override fun collectVariants(context: PsiElement): Array<Any> {
+    final override fun collectVariants(context: PsiElement): Array<Any> {
         val targets = getTargets(context) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-        return targets.singleOrNull()?.let { collectVariants(context, it) } ?: collectVariants(context, targets)
+        return getSuggestions(context, targets)
     }
 
-    private fun collectVariants(context: PsiElement, target: ClassNode): Array<Any> {
-        val methods = target.methods ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+    abstract fun getSuggestions(context: PsiElement, targets: Collection<ClassNode>): Array<Any>
 
-        // All methods which are not unique by their name need to be qualified with the descriptor
-        val visitedMethods = HashSet<String>()
-        val uniqueMethods = HashSet<String>()
-
-        for (method in methods) {
-            val name = method.name
-            if (visitedMethods.add(name)) {
-                uniqueMethods.add(name)
-            } else {
-                uniqueMethods.remove(name)
-            }
-        }
-
-        val dynamicSelectors = MixinSelectorParser.EP_NAME.extensionList.asSequence()
-            .filterIsInstance<DynamicSelectorParser>()
-            .map { "@${it.id}" }
-
-        return createLookup(
-            context,
-            methods.asSequence().map { ClassAndMethodNode(target, it) },
-            uniqueMethods,
-            dynamicSelectors
-        )
-    }
-
-    private fun collectVariants(context: PsiElement, targets: Collection<ClassNode>): Array<Any> {
-        val groupedMethods = targets.asSequence()
-            .flatMap { target ->
-                target.methods?.asSequence()?.map { ClassAndMethodNode(target, it) } ?: emptySequence()
-            }
-            .groupBy { it.method.memberReference }
-            .values
-
-        // All methods which are not unique by their name need to be qualified with the descriptor
-        val visitedMethods = HashSet<String>()
-        val uniqueMethods = HashSet<String>()
-
-        val allMethods = ArrayList<ClassAndMethodNode>(groupedMethods.size)
-
-        for (methods in groupedMethods) {
-            val firstMethod = methods.first()
-            val name = firstMethod.method.name
-            if (visitedMethods.add(name)) {
-                uniqueMethods.add(name)
-            } else {
-                uniqueMethods.remove(name)
-            }
-
-            // If we have a method with the same name and descriptor in at least
-            // as many classes as targets it should be present in all of them.
-            // Not sure how you would have more methods than targets but who cares.
-            if (methods.size >= targets.size) {
-                allMethods.add(firstMethod)
-            }
-        }
-
-        val dynamicSelectors = MixinSelectorParser.EP_NAME.extensionList.asSequence()
-            .filterIsInstance<DynamicSelectorParser>()
-            .map { "@${it.id}" }
-
-        return createLookup(context, allMethods.asSequence(), uniqueMethods, dynamicSelectors)
-    }
-
-    private fun createLookup(
-        context: PsiElement,
-        methods: Sequence<ClassAndMethodNode>,
-        uniqueMethods: Set<String>,
-        dynamicSelectors: Sequence<String>
-    ): Array<Any> {
-        return methods
-            .map { m ->
-                val targetMethodInfo = if (!requireDescriptor && m.method.name in uniqueMethods) {
-                    MemberReference(m.method.name)
-                } else {
-                    m.method.memberReference
-                }
-
-                val sourceMethod = m.method.findOrConstructSourceMethod(
-                    m.clazz,
-                    context.project,
-                    scope = context.resolveScope,
-                    canDecompile = false,
-                )
-                val builder = JavaLookupElementBuilder.forMethod(
-                    sourceMethod,
-                    targetMethodInfo.toMixinString(),
-                    PsiSubstitutor.EMPTY,
-                    null,
-                )
-                    .withPresentableText(m.method.name)
-                PrioritizedLookupElement.withPriority(
-                    addCompletionInfo(builder, context, targetMethodInfo),
-                    1.0
-                )
-            }.plus(dynamicSelectors.map {
-                PrioritizedLookupElement.withPriority(
-                    LookupElementBuilder.create(it).completeDynamicSelector(context),
-                    0.0
-                )
-            })
-            .toTypedArray()
-    }
-
-    open val requireDescriptor = false
-
-    open fun addCompletionInfo(
-        builder: LookupElementBuilder,
-        context: PsiElement,
+    protected fun methodLookupBuilder(
+        m: ClassAndMethodNode,
         targetMethodInfo: MemberReference,
+        context: PsiElement,
     ): LookupElementBuilder {
-        return builder.completeToLiteral(context)
-    }
-
-    private fun LookupElementBuilder.completeDynamicSelector(context: PsiElement): LookupElementBuilder {
-        val id = lookupString.removePrefix("@")
-        val parser = MixinSelectorParser.EP_NAME.extensionList.asSequence()
-            .filterIsInstance<DynamicSelectorParser>()
-            .firstOrNull { id in it.validIds } ?: return completeToLiteral(context)
-
-        return completeToLiteral(context) { editor, element ->
-            parser.onCompleted(editor, element)
-        }
+        val sourceMethod = m.method.findOrConstructSourceMethod(
+            m.clazz,
+            context.project,
+            scope = context.resolveScope,
+            canDecompile = false,
+        )
+        return JavaLookupElementBuilder.forMethod(
+            sourceMethod,
+            targetMethodInfo.toMixinString(),
+            PsiSubstitutor.EMPTY,
+            null,
+        )
+            .withPresentableText(m.method.name)
     }
 }

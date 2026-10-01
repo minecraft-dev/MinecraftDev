@@ -20,11 +20,14 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
 import com.demonwav.mcdev.platform.mixin.util.canonicalName
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByQualifiedName
+import com.demonwav.mcdev.platform.mixin.util.memberReference
 import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.findModule
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.command.CommandProcessor
@@ -45,6 +48,7 @@ import com.intellij.psi.PsiLiteral
 import com.intellij.psi.util.parentOfType
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodNode
 
 object DescReference : AbstractMethodReference() {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> =
@@ -67,23 +71,41 @@ object DescReference : AbstractMethodReference() {
         }
     }
 
-    override fun addCompletionInfo(
+    override fun getSuggestions(context: PsiElement, targets: Collection<ClassNode>): Array<Any> {
+        val result = mutableListOf<LookupElement>()
+
+        val allMethods = targets.asSequence()
+            .flatMap { target ->
+                target.methods.asSequence().map { ClassAndMethodNode(target, it) }
+            }
+            .groupBy { it.method.memberReference }
+            .asSequence()
+            .filter { it.value.size >= targets.size }
+            .map { it.value.first() }
+            .toList()
+
+        for (m in allMethods) {
+            val builder = methodLookupBuilder(m, MemberReference(m.method.name), context)
+            result.add(addCompletionInfo(builder, m.method))
+        }
+
+        return result.toTypedArray()
+    }
+
+    private fun addCompletionInfo(
         builder: LookupElementBuilder,
-        context: PsiElement,
-        targetMethodInfo: MemberReference,
+        targetMethod: MethodNode,
     ): LookupElementBuilder {
         return builder.withInsertHandler { insertionContext, _ ->
             insertionContext.laterRunnable =
-                CompleteDescReference(insertionContext.editor, insertionContext.file, targetMethodInfo)
+                CompleteDescReference(insertionContext.editor, insertionContext.file, targetMethod)
         }
     }
-
-    override val requireDescriptor = true
 
     private class CompleteDescReference(
         private val editor: Editor,
         private val file: PsiFile,
-        private val targetMethodInfo: MemberReference,
+        private val targetMethod: MethodNode,
     ) : Runnable {
         private fun PsiElementFactory.createAnnotationMemberValueFromText(
             text: String,
@@ -107,11 +129,11 @@ object DescReference : AbstractMethodReference() {
                     descAnnotation.setDeclaredAttributeValue(
                         "value",
                         elementFactory.createExpressionFromText(
-                            "\"${StringUtil.escapeStringCharacters(targetMethodInfo.name)}\"",
+                            "\"${StringUtil.escapeStringCharacters(targetMethod.name)}\"",
                             descAnnotation,
                         ),
                     )
-                    val desc = targetMethodInfo.descriptor ?: return@runWriteAction
+                    val desc = targetMethod.desc
                     val argTypes = Type.getArgumentTypes(desc)
                     if (argTypes.isNotEmpty()) {
                         val argsText = if (argTypes.size == 1) {
