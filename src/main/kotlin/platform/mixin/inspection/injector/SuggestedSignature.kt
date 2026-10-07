@@ -378,7 +378,7 @@ private fun coerciblePrefixLength(types: Sequence<Sequence<PsiType>>): Int {
 }
 
 /**
- * Merges the two types with regards to `@Coerce` behaviour. Returns the merged type, whether the merged type is a
+ * Merges the two types with regards to `@Coerce` behavior. Returns the merged type, whether the merged type is a
  * free int-like type, and whether the merge **newly** requires `@Coerce`.
  *
  * **Preconditions:** The types must be of the same kind, and if either type is a free int-like type, the other must be

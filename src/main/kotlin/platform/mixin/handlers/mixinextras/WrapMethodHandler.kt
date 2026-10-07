@@ -47,7 +47,7 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
             val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
             ExpectedSignatures.Valid(
-                OperationWrapperSignatures(
+                OperationWrapperSignatures.create(
                     annotation,
                     collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
                     returnType,

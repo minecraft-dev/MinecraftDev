@@ -112,7 +112,7 @@ class OperationWrapperSignatures private constructor(
     override val options = listOf(signature)
 
     companion object {
-        operator fun invoke(
+        fun create(
             context: PsiElement,
             params: List<Parameter>,
             returnType: PsiType,
@@ -185,7 +185,7 @@ class InjectSignatures private constructor(
     override val options = listOfNotNull(shortSignature, longSignature)
 
     companion object {
-        operator fun invoke(
+        fun create(
             context: PsiElement,
             params: List<Parameter>,
             returnType: PsiType,

@@ -58,7 +58,7 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
     ): OperationWrapperSignatures? {
         val params = getParameterTypes(target, targetClass, annotation) ?: return null
         val returnType = getReturnType(target, annotation) ?: return null
-        return OperationWrapperSignatures(
+        return OperationWrapperSignatures.create(
             annotation,
             params,
             returnType,

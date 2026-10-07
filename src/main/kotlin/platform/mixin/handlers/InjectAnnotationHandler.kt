@@ -82,7 +82,7 @@ class InjectAnnotationHandler : InsnInjectorAnnotationHandler() {
         }
 
         return ExpectedSignatures.Valid(
-            InjectSignatures(
+            InjectSignatures.create(
                 annotation,
                 targetParams,
                 returnType,
