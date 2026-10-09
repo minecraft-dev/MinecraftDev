@@ -64,7 +64,7 @@ class InvokeInjectionPoint : AbstractMethodInjectionPoint() {
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMethod>? {
-        if (mode == CollectVisitor.Mode.COMPLETION) {
+        if (!mode.assumeCorrectAt) {
             return MyCollectVisitor(mode, at.project, MemberInfo())
         }
         return target?.let { MyCollectVisitor(mode, at.project, it) }

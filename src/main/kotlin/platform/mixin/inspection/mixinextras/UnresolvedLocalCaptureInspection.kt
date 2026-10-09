@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -50,7 +50,7 @@ class UnresolvedLocalCaptureInspection : MixinInspection() {
             val method = parameter.findContainingMethod() ?: return
             val targets = method.annotations.mapFirstNotNull { annotation ->
                 val handler =
-                    MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InjectorAnnotationHandler
+                    MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InsnInjectorAnnotationHandler
                         ?: return@mapFirstNotNull null
                 handler.resolveInstructions(annotation)
             } ?: return

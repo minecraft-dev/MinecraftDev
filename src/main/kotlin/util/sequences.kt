@@ -54,3 +54,36 @@ fun <T> Sequence<T>.memoized(): Sequence<T> {
 fun Sequence<*>.countIsAtLeast(n: Int) = n <= 0 || drop(n - 1).any()
 
 fun Sequence<*>.countIsLessThan(n: Int) = n > 0 && drop(n - 1).none()
+
+fun Sequence<*>.allEqual() = zipWithNext().all { (a, b) -> a == b }
+
+inline fun <S : Any, T : S> Sequence<T>.reduceFallible(operation: (acc: S, T) -> S?): S? =
+    reduceOrNull<S, _> { acc, it -> operation(acc, it) ?: return null }
+
+fun <T> Sequence<T>.singleDistinct(): T {
+    val iter = iterator()
+    if (!iter.hasNext()) {
+        throw NoSuchElementException("Sequence is empty.")
+    }
+    val first = iter.next()
+    for (element in iter) {
+        if (first != element) {
+            throw IllegalArgumentException("Sequence has more than one distinct element.")
+        }
+    }
+    return first
+}
+
+fun <T> Sequence<T>.singleDistinctOrNull(): T? {
+    val iter = iterator()
+    if (!iter.hasNext()) {
+        return null
+    }
+    val first = iter.next()
+    for (element in iter) {
+        if (first != element) {
+            return null
+        }
+    }
+    return first
+}

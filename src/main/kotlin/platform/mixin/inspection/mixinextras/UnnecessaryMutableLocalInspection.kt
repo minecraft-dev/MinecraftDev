@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -58,7 +58,7 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
             val hasValidMixinAnnotation = method.annotations.any { ann ->
                 MixinAnnotationHandler.forMixinAnnotation(ann, project)
                     // Mutable Local references do have different semantics inside a WrapOperation.
-                    ?.let { it is InjectorAnnotationHandler && it !is WrapOperationHandler } == true
+                    ?.let { it is InsnInjectorAnnotationHandler && it !is WrapOperationHandler } == true
             }
             if (!hasValidMixinAnnotation) {
                 return

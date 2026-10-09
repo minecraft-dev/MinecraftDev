@@ -105,7 +105,7 @@ class InvokeAssignInjectionPoint : AbstractMethodInjectionPoint() {
         val fuzz = args["fuzz"]?.toIntOrNull()?.coerceAtLeast(1) ?: 1
         val skip = args["skip"]?.let { parseSkip(it) } ?: Const.DEFAULT_SKIP
 
-        if (mode == CollectVisitor.Mode.COMPLETION) {
+        if (!mode.assumeCorrectAt) {
             return MyCollectVisitor(mode, at.project, MemberInfo(), fuzz, skip)
         }
         return target?.let { MyCollectVisitor(mode, at.project, it, fuzz, skip) }

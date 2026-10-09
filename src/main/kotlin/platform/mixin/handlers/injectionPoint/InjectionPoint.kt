@@ -161,7 +161,7 @@ abstract class InjectionPoint<T : PsiElement> {
         // filters have passed, and the specifier acts on the result of them.
         // Separately, these happen to also be the filters that we don't want to apply during completion, so that all
         // results are shown.
-        if (mode != CollectVisitor.Mode.COMPLETION) {
+        if (mode.assumeCorrectAt) {
             addOrdinalFilter(at, targetClass, collectVisitor)
             addQuantifierFilter(at, targetClass, collectVisitor)
             addSpecifierFilter(at, targetClass, collectVisitor, defaultSpecifier)
@@ -458,7 +458,11 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
         val index: Int get() = sourceLocationInfo.index
     }
 
-    enum class Mode { RESOLUTION, COMPLETION }
+    enum class Mode(val assumeCorrectSignature: Boolean, val assumeCorrectAt: Boolean) {
+        RESOLUTION(true, true),
+        COMPLETION(false, false),
+        SUGGESTION(false, true),
+    }
 }
 
 fun nodeMatchesSelector(
@@ -467,7 +471,7 @@ fun nodeMatchesSelector(
     selector: MixinSelector,
     project: Project,
 ): PsiMethod? {
-    if (mode != CollectVisitor.Mode.COMPLETION) {
+    if (mode.assumeCorrectAt) {
         if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
             return null
         }

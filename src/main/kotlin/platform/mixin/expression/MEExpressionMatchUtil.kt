@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
@@ -249,7 +249,7 @@ object MEExpressionMatchUtil {
             return ExpressionContext.Type.SLICE
         }
 
-        val handler = MixinAnnotationHandler.forMixinAnnotation(annotationName, project) as? InjectorAnnotationHandler
+        val handler = MixinAnnotationHandler.forMixinAnnotation(annotationName, project) as? InsnInjectorAnnotationHandler
             ?: return ExpressionContext.Type.CUSTOM
         return handler.mixinExtrasExpressionContextType
     }

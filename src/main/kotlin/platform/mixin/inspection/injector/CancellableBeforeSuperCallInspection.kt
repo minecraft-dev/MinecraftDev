@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
@@ -61,7 +61,7 @@ class CancellableBeforeSuperCallInspection : MixinInspection() {
     object Util {
         fun doesInjectBeforeSuperConstructorCall(annotation: PsiAnnotation): Boolean {
             val handler = MixinAnnotationHandler.forMixinAnnotation(MixinConstants.Annotations.INJECT)!!
-                as InjectorAnnotationHandler
+                as InsnInjectorAnnotationHandler
 
             for (target in MixinAnnotationHandler.resolveTarget(annotation)) {
                 if (target !is MethodTargetMember) {

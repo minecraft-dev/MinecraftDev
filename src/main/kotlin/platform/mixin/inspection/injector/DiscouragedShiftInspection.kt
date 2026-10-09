@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
@@ -41,7 +41,7 @@ class DiscouragedShiftInspection : MixinInspection() {
                 return
             }
             val injectorAnnotation = AtResolver.findInjectorAnnotation(annotation) ?: return
-            val injector = MixinAnnotationHandler.forMixinAnnotation(injectorAnnotation, holder.project) as? InjectorAnnotationHandler
+            val injector = MixinAnnotationHandler.forMixinAnnotation(injectorAnnotation, holder.project) as? InsnInjectorAnnotationHandler
                 ?: return
             val atValue = annotation.findDeclaredAttributeValue("value") ?: return
             val atCode = atValue.constantStringValue ?: return
@@ -53,7 +53,7 @@ class DiscouragedShiftInspection : MixinInspection() {
         }
     }
 
-    private fun isShiftDiscouraged(shift: Int, at: PsiAnnotation, injector: InjectorAnnotationHandler, atCode: String): Boolean {
+    private fun isShiftDiscouraged(shift: Int, at: PsiAnnotation, injector: InsnInjectorAnnotationHandler, atCode: String): Boolean {
         if (injector.isShiftAlwaysDiscouraged) {
             return shift != 0
         }

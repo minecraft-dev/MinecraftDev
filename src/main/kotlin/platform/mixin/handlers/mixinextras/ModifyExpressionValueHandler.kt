@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,16 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
+import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
+import com.demonwav.mcdev.util.SequencedSet
+import com.demonwav.mcdev.util.emptySequencedSet
+import com.demonwav.mcdev.util.sequencedSetOf
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
@@ -56,22 +62,37 @@ class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
 
     override val allowedInsnDescription = "instructions that return a value"
 
-    override fun expectedMethodSignature(
+    override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
         target: TargetInsn
-    ): Pair<ParameterGroup, PsiType>? {
+    ): GeneralSignatures? {
         val psiType = getReturnType(target, annotation) ?: return null
-        return ParameterGroup(listOf(Parameter("original", psiType))) to psiType
+        return GeneralSignatures(
+            listOf(Parameter("original", psiType)),
+            psiType,
+            trailingParams = collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+            intLikePositions = intLikeTypePositions(target),
+        )
     }
 
-    override fun intLikeTypePositions(target: TargetInsn): List<MethodSignature.TypePosition> {
+    override fun suggestedMethodSignature(
+        annotation: PsiAnnotation,
+        targets: List<ClassAndMethodNode>
+    ): SuggestedSignature? {
+        return SuggestedSignature.general(
+            annotation,
+            expectedMethodSignatures(annotation, targets).collectSignatures<GeneralSignatures>() ?: return null
+        )
+    }
+
+    private fun intLikeTypePositions(target: TargetInsn): SequencedSet<MethodSignature.TypePosition> {
         val expressionType = target.getDecoration<Type>(ExpressionDecorations.SIMPLE_EXPRESSION_TYPE)
         if (expressionType == ExpressionASMUtils.INTLIKE_TYPE) {
-            return listOf(MethodSignature.TypePosition.Return, MethodSignature.TypePosition.Param(0))
+            return sequencedSetOf(MethodSignature.TypePosition.Return, MethodSignature.TypePosition.Param(0))
         }
-        return emptyList()
+        return emptySequencedSet()
     }
 
     private fun getReturnType(

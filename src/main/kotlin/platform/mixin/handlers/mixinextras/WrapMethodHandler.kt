@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,43 +21,48 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
-import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.inspection.injector.ExpectedSignatures
+import com.demonwav.mcdev.platform.mixin.inspection.injector.OperationWrapperSignatures
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
+import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.getGenericReturnType
-import com.demonwav.mcdev.platform.mixin.util.mixinExtrasOperationType
-import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.search.GlobalSearchScope
-import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodNode
 
 class WrapMethodHandler : InjectorAnnotationHandler() {
-    override val allowCoerce get() = true
-
-    override fun expectedMethodSignature(
+    override fun expectedMethodSignatures(
         annotation: PsiAnnotation,
-        targetClass: ClassNode,
-        targetMethod: MethodNode,
-    ): List<MethodSignature> {
-        val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
+        targets: List<ClassAndMethodNode>,
+        mode: CollectVisitor.Mode,
+    ): List<ExpectedSignatures<OperationWrapperSignatures>> {
+        return targets.map { (targetClass, targetMethod) ->
+            val returnType = targetMethod.getGenericReturnType(targetClass, annotation.project)
 
-        return listOf(
-            MethodSignature(
-                listOf(
-                    ParameterGroup(
-                        collectTargetMethodParameters(annotation.project, targetClass, targetMethod) +
-                            Parameter(
-                                "original",
-                                mixinExtrasOperationType(annotation, returnType) ?: return emptyList()
-                            ),
-                    )
-                ),
-                returnType
+            ExpectedSignatures.Valid(
+                OperationWrapperSignatures.create(
+                    annotation,
+                    collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+                    returnType,
+                ) ?: return@map ExpectedSignatures.Invalid
             )
+        }
+    }
+
+    override fun suggestedMethodSignature(
+        annotation: PsiAnnotation,
+        targets: List<ClassAndMethodNode>
+    ): SuggestedSignature? {
+        return SuggestedSignature.operationWrapper(
+            annotation,
+            expectedMethodSignatures(annotation, targets).collectSignatures<OperationWrapperSignatures>() ?: return null
         )
     }
 
@@ -84,5 +89,5 @@ class WrapMethodHandler : InjectorAnnotationHandler() {
         )?.let(::listOf).orEmpty()
     }
 
-    override val mixinExtrasExpressionContextType = ExpressionContext.Type.CUSTOM
+    override fun canAlwaysBeStatic(method: PsiMethod) = false
 }

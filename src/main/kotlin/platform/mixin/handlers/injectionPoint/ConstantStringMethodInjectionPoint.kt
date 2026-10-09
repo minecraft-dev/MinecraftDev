@@ -148,7 +148,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMethod>? {
-        if (mode == CollectVisitor.Mode.COMPLETION) {
+        if (!mode.assumeCorrectAt) {
             return MyCollectVisitor(mode, at.project, MemberInfo(), null)
         }
         return target?.let { MyCollectVisitor(mode, at.project, it, AtResolver.getArgs(at)["ldc"]) }
@@ -233,7 +233,7 @@ class ConstantStringMethodInjectionPoint : AbstractMethodInjectionPoint() {
             // must take a string and return void
             if (insn.desc != "(Ljava/lang/String;)V") return
 
-            if (mode != Mode.COMPLETION) {
+            if (mode.assumeCorrectAt) {
                 // ensure we match the target
                 if (!selector.matchMethod(insn.owner, insn.name, insn.desc)) {
                     return

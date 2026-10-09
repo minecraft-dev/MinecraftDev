@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,10 +21,13 @@
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
-import com.demonwav.mcdev.platform.mixin.util.mixinExtrasOperationType
+import com.demonwav.mcdev.platform.mixin.inspection.injector.OperationWrapperSignatures
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
+import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.toPsiType
 import com.demonwav.mcdev.util.Parameter
+import com.demonwav.mcdev.util.buildSequencedSet
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiType
@@ -47,31 +50,44 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         return if (annotation.hasAttribute("constant")) "constant" else "at"
     }
 
-    override fun expectedMethodSignature(
+    override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
         target: TargetInsn
-    ): Pair<ParameterGroup, PsiType>? {
+    ): OperationWrapperSignatures? {
         val params = getParameterTypes(target, targetClass, annotation) ?: return null
         val returnType = getReturnType(target, annotation) ?: return null
-        val operationType = mixinExtrasOperationType(annotation, returnType) ?: return null
-        return ParameterGroup(
-            params + Parameter("original", operationType)
-        ) to returnType
+        return OperationWrapperSignatures.create(
+            annotation,
+            params,
+            returnType,
+            intLikeTypePositions(target),
+            trailingParams = collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+        )
     }
 
-    override fun intLikeTypePositions(target: TargetInsn) = buildList {
+    override fun suggestedMethodSignature(
+        annotation: PsiAnnotation,
+        targets: List<ClassAndMethodNode>
+    ): SuggestedSignature? {
+        return SuggestedSignature.operationWrapper(
+            annotation,
+            expectedMethodSignatures(annotation, targets).collectSignatures<OperationWrapperSignatures>() ?: return null
+        )
+    }
+
+    private fun intLikeTypePositions(target: TargetInsn) = buildSequencedSet {
+        target.getDecoration<Array<Type>>(ExpressionDecorations.SIMPLE_OPERATION_ARGS)?.forEachIndexed { i, it ->
+            if (it == ExpressionASMUtils.INTLIKE_TYPE) {
+                add(MethodSignature.TypePosition.Param(i))
+            }
+        }
         if (
             target.getDecoration<Type>(ExpressionDecorations.SIMPLE_OPERATION_RETURN_TYPE)
             == ExpressionASMUtils.INTLIKE_TYPE
         ) {
             add(MethodSignature.TypePosition.Return)
-        }
-        target.getDecoration<Array<Type>>(ExpressionDecorations.SIMPLE_OPERATION_ARGS)?.forEachIndexed { i, it ->
-            if (it == ExpressionASMUtils.INTLIKE_TYPE) {
-                add(MethodSignature.TypePosition.Param(i))
-            }
         }
     }
 

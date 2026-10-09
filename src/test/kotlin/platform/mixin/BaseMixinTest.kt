@@ -40,7 +40,7 @@ abstract class BaseMixinTest : BaseMinecraftTest(PlatformType.MIXIN) {
     @BeforeEach
     fun initMixin() {
         runWriteTask {
-            mixinLibrary = createLibrary(project, "mixin")
+            mixinLibrary = createLibrary(project, "sponge-mixin")
             mixinExtrasLibrary = createLibrary(project, "mixinextras-common")
             testDataLibrary = createLibrary(project, "mixin-test-data")
         }

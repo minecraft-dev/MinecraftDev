@@ -97,7 +97,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiField>? {
-        if (mode == CollectVisitor.Mode.COMPLETION) {
+        if (!mode.assumeCorrectAt) {
             return MyCollectVisitor(mode, at.project, MemberInfo(), -1, null, 8)
         }
         val opcode = (at.findDeclaredAttributeValue("opcode")?.constantValue as? Int)
@@ -205,7 +205,7 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
             val insns = methodNode.instructions ?: return@sequence
             for (insn in insns) {
                 if (insn !is FieldInsnNode) continue
-                if (mode != Mode.COMPLETION) {
+                if (mode.assumeCorrectAt) {
                     if (opcode != -1 && opcode != insn.opcode) {
                         continue
                     }

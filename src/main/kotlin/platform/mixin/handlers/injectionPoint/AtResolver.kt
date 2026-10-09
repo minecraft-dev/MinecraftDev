@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarContext
 import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
@@ -297,7 +297,7 @@ class AtResolver(
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
         val injector = findInjectorAnnotation(at, skipThroughSlice = false)?.let(MixinAnnotationHandler::forMixinAnnotation)
-            as? InjectorAnnotationHandler
+            as? InsnInjectorAnnotationHandler
 
         // Collect all possible targets
         fun <T : PsiElement> doCollectVariants(injectionPoint: InjectionPoint<T>): List<Any> {

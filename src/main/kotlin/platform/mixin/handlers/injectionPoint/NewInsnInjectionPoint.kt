@@ -27,9 +27,7 @@ import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
-import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.platform.mixin.util.findMethods
-import com.demonwav.mcdev.util.MemberReference
 import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -104,7 +102,7 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiMember>? {
-        if (mode == CollectVisitor.Mode.COMPLETION) {
+        if (!mode.assumeCorrectAt) {
             return MyCollectVisitor(mode, at.project, MemberInfo())
         }
         return getTarget(at, target)?.let { MyCollectVisitor(mode, at.project, it) }

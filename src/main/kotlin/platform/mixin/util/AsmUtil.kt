@@ -75,7 +75,6 @@ import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiParameterListOwner
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
@@ -830,8 +829,21 @@ private fun MethodNode.getOffset(clazz: ClassNode?): Int {
     }
 }
 
-fun MethodNode.getParameter(clazz: ClassNode, index: Int, parameterList: PsiParameterList): PsiParameter? {
-    return parameterList.parameters.getOrNull(index - getOffset(clazz))
+private fun PsiMethod.getOffset(): Int {
+    val clazz = containingClass ?: return 0
+    return if (this.isConstructor) {
+        when {
+            clazz.isEnum -> 2
+            clazz.containingClass != null && !clazz.hasModifierProperty(PsiModifier.STATIC) -> 1
+            else -> 0
+        }
+    } else {
+        0
+    }
+}
+
+fun PsiMethod.getBytecodeParameter(index: Int): PsiParameter? {
+    return parameterList.parameters.getOrNull(index - getOffset())
 }
 
 /**
