@@ -57,6 +57,7 @@ import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassInitializer
+import com.intellij.psi.PsiClassOwner
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiCompiledFile
@@ -439,7 +440,10 @@ fun ClassNode.findStubClass(project: Project): PsiClass? {
 fun ClassNode.findSourceClass(project: Project, scope: GlobalSearchScope, canDecompile: Boolean = false): PsiClass? {
     return findQualifiedClass(name.replace('/', '.')) { name ->
         val stubClass = JavaPsiFacade.getInstance(project).findClass(name, scope) ?: return@findQualifiedClass null
-        val stubFile = stubClass.containingFile ?: return@findQualifiedClass null
+        val stubFile = stubClass.containingFile as PsiClassOwner? ?: return@findQualifiedClass null
+        if (stubFile !is PsiCompiledFile) {
+            return@findQualifiedClass stubFile.classes.firstOrNull()
+        }
         val classFile = stubFile.virtualFile
         if (classFile != null) {
             val sourceFile = JavaEditorFileSwapper.findSourceFile(project, classFile)
@@ -469,13 +473,6 @@ fun ClassNode.findFields(ref: MemberMatcher): Sequence<FieldNode> {
 
 fun ClassNode.findField(ref: MemberMatcher): FieldNode? {
     return findFields(ref).firstOrNull()
-}
-
-fun ClassNode.findMethods(ref: MixinSelector, allowStatic: Boolean): Sequence<MethodNode> {
-    val maxMatches = ref.quantifier.max(Quantifier.Context.MEMBER)
-    return methods?.asSequence()?.filter {
-        ref.matchMethod(it, this) && (maxMatches <= 1 || allowStatic || !it.hasAccess(Opcodes.ACC_STATIC))
-    }?.take(maxMatches).orEmpty()
 }
 
 fun ClassNode.findMethod(ref: MemberReference): MethodNode? {
@@ -759,8 +756,10 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
     return RecursionManager.doPreventingRecursion(lambdaMethod, false) {
         val pair = findContainingMethod(clazz, lambdaMethod) ?: return@doPreventingRecursion null
         val (containingMethod, locationInfo) = pair
-        val containingBodyElements = findAssociatedLambda(project, scope, clazz, containingMethod)?.let(::listOf)
-            ?: containingMethod.findBodyElements(clazz, project, scope).ifEmpty { return@doPreventingRecursion null }
+        val containingBodyElements =
+            (findAssociatedLambda(project, scope, clazz, containingMethod) as? PsiLambdaExpression)?.body?.let(::listOf)
+                ?: containingMethod.findBodyElements(clazz, project, scope)
+                    .ifEmpty { return@doPreventingRecursion null }
 
         val psiFile = containingBodyElements.first().containingFile ?: return@doPreventingRecursion null
         val matcher = locationInfo.createMatcher<PsiElement>(psiFile)

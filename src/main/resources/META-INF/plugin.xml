@@ -750,6 +750,7 @@
                  id="mcdev.mixin" order="first"/>
         <typedHandler implementation="com.demonwav.mcdev.platform.mixin.completion.InjectionPointTypedHandlerDelegate" />
         <typedHandler implementation="com.demonwav.mcdev.platform.mixin.completion.MixinTargetsTypedHandlerDelegate" />
+        <typedHandler implementation="com.demonwav.mcdev.platform.mixin.completion.MethodReferenceTypedHandlerDelegate" />
 
         <!-- Mixin configuration -->
         <fileType name="Mixin Json Configuration" language="JSON"

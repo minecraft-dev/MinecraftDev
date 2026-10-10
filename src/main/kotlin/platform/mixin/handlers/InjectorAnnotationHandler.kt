@@ -60,18 +60,16 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
         val selectors = method.mapNotNull { parseMixinSelector(it, methodAttr!!) } +
             desc.mapNotNull { DescSelectorParser.Util.descSelectorFromAnnotation(it) }
 
-        val targetsBySelector = selectors.associateWith { selector ->
+        val selectorsByTarget = selectors.groupBy { selector ->
             selector.getCustomOwner(targetClass)
         }
         val allowStatic = annotation.findParentOfType<PsiMethod>()?.hasModifierProperty(PsiModifier.STATIC) ?: true
 
-        return targetsBySelector.asSequence()
-            .flatMap { (selector, targetClass) ->
-                targetClass.findMethods(selector, allowStatic)
-                    .map { ClassAndMethodNode(targetClass, it) }
+        return selectorsByTarget.asSequence()
+            .flatMap { (targetClass, selectors) ->
+                targetClass.findMethods(selectors, allowStatic)
+                    .map { MethodTargetMember(targetClass, it) }
             }
-            .distinct()
-            .map { MethodTargetMember(it) }
             .toList()
     }
 
