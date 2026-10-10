@@ -22,6 +22,8 @@ package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider.RemoteAuthType
+import com.demonwav.mcdev.util.McdevReflection
+import com.demonwav.mcdev.util.McdevReflection.invokeUnwrap
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.extensions.authentication
 import com.intellij.collaboration.auth.AccountManager
@@ -33,7 +35,6 @@ import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
 import git4idea.remote.GitHttpAuthDataProvider
 import git4idea.remote.hosting.http.SilentHostedGitHttpAuthDataProviderBase
-import java.lang.reflect.Method
 import java.nio.file.Path
 import java.util.Properties
 import javax.xml.parsers.DocumentBuilderFactory
@@ -44,13 +45,6 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 object CreatorCredentials {
-    private val PROVIDER_ID_PROPERTY: Method = SilentHostedGitHttpAuthDataProviderBase::class.java
-        .getDeclaredMethod("getProviderId")
-        .also { it.isAccessible = true }
-    private val ACCOUNT_MANAGER_PROPERTY: Method = SilentHostedGitHttpAuthDataProviderBase::class.java
-        .getDeclaredMethod("getAccountManager")
-        .also { it.isAccessible = true }
-
     private val xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder()
     private val xPath = XPathFactory.newDefaultInstance().newXPath()
 
@@ -118,12 +112,15 @@ object CreatorCredentials {
         return request
     }
 
-    fun SilentHostedGitHttpAuthDataProviderBase<*, *>.getProviderId(): String
-        = PROVIDER_ID_PROPERTY.invoke(this) as String
+    fun SilentHostedGitHttpAuthDataProviderBase<*, *>.getProviderId(): String =
+        McdevReflection.Git4Idea.METHOD_SILENT_HOSTED_GIT_HTTP_AUTH_DATA_PROVIDER_BASE_GET_PROVIDER_ID
+            .invokeUnwrap(this) as String
 
     @Suppress("UNCHECKED_CAST")
-    private fun <A: ServerAccount, C: Any> SilentHostedGitHttpAuthDataProviderBase<A, C>.getAccountManager(): AccountManager<A, C>
-        = ACCOUNT_MANAGER_PROPERTY.invoke(this) as AccountManager<A, C>
+    private fun <A : ServerAccount, C : Any> SilentHostedGitHttpAuthDataProviderBase<A, C>.getAccountManager():
+        AccountManager<A, C> =
+        McdevReflection.Git4Idea.METHOD_SILENT_HOSTED_GIT_HTTP_AUTH_DATA_PROVIDER_BASE_GET_ACCOUNT_MANAGER
+            .invokeUnwrap(this) as AccountManager<A, C>
 
     fun getGitHttpAuthProviders(): List<SilentHostedGitHttpAuthDataProviderBase<ServerAccount, String>> {
         return GitHttpAuthDataProvider.EP_NAME.extensionList

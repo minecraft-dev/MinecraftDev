@@ -22,10 +22,12 @@ package com.demonwav.mcdev.util
 
 import com.intellij.codeInsight.generation.ClassMember
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase
+import com.intellij.collaboration.auth.AccountManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.psi.PsiClass
+import git4idea.remote.hosting.http.SilentHostedGitHttpAuthDataProviderBase
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -66,6 +68,26 @@ object McdevReflection {
     @JvmStatic
     val FIELD_PLUGIN_DOWNLOADER_MY_FILE: Field =
         PluginDownloader::class.java.getDeclaredFieldEx("myFile", Path::class.java)
+
+    /**
+     * Members from the Git4Idea plugin. Kept in a separate object so that they are only initialized when needed, and a
+     * missing Git4Idea plugin doesn't break the rest of [McdevReflection].
+     */
+    object Git4Idea {
+        @JvmStatic
+        val METHOD_SILENT_HOSTED_GIT_HTTP_AUTH_DATA_PROVIDER_BASE_GET_PROVIDER_ID: Method =
+            SilentHostedGitHttpAuthDataProviderBase::class.java
+                .getDeclaredMethodEx("getProviderId", String::class.java)
+
+        @JvmStatic
+        val METHOD_SILENT_HOSTED_GIT_HTTP_AUTH_DATA_PROVIDER_BASE_GET_ACCOUNT_MANAGER: Method =
+            SilentHostedGitHttpAuthDataProviderBase::class.java
+                .getDeclaredMethodEx("getAccountManager", AccountManager::class.java)
+
+        fun initialize() {
+            // load the class, used for testing
+        }
+    }
 
     /**
      * Like [Class.getDeclaredField], but makes the field accessible and checks that it has the expected [type].

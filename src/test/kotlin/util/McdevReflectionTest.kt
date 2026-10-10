@@ -33,4 +33,11 @@ class McdevReflectionTest {
         // them can't be found.
         assertDoesNotThrow { McdevReflection.initialize() }
     }
+
+    @Test
+    @DisplayName("Reflected Git4Idea members exist")
+    fun reflectedGit4IdeaMembersExist() {
+        // McdevReflection.Git4Idea is initialized separately from McdevReflection, so must be tested separately.
+        assertDoesNotThrow { McdevReflection.Git4Idea.initialize() }
+    }
 }
