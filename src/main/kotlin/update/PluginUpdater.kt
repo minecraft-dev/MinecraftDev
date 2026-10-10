@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.update
 
-import com.demonwav.mcdev.util.findDeclaredField
+import com.demonwav.mcdev.util.McdevReflection
 import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.ide.plugins.IdeaPluginDescriptor
@@ -136,7 +136,7 @@ object PluginUpdater {
                         val status = downloader.prepareToInstall(indicator)
                         // If the download failed, quit
                         // But otherwise force the install
-                        if (!status && downloader.findDeclaredField("myFile") == null) {
+                        if (!status && McdevReflection.FIELD_PLUGIN_DOWNLOADER_MY_FILE.get(downloader) == null) {
                             return
                         }
 
