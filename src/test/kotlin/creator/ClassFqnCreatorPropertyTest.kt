@@ -96,6 +96,6 @@ class ClassFqnCreatorPropertyTest : CreatorTemplateProcessorTestBase() {
 
         buildCoordsProperty.graphProperty.set(BuildSystemCoordinates("com.example.project", "example-project", "1.0"))
         nameProperty.graphProperty.set("My Project")
-        assertEquals(ClassFqn("com.example.project.myProject.MyProject"), fqnProperty.get())
+        assertEquals(ClassFqn("com.example.project.myproject.MyProject"), fqnProperty.get())
     }
 }

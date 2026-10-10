@@ -25,16 +25,21 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.BuildSystemCoordinates
 import com.demonwav.mcdev.creator.custom.model.ClassFqn
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
-import com.demonwav.mcdev.util.capitalize
-import com.demonwav.mcdev.util.decapitalize
+import com.intellij.openapi.util.text.StringUtil
 
 class SuggestClassNamePropertyDerivation : PreparedDerivation {
 
     override fun derive(parentValues: List<Any?>): Any {
         val coords = parentValues[0] as BuildSystemCoordinates
         val name = parentValues[1] as String
-        val sanitizedName = name.split(NOT_JAVA_IDENTIFIER).joinToString("", transform = String::capitalize)
-        return ClassFqn("${coords.groupId}.${sanitizedName.decapitalize()}.$sanitizedName")
+
+        val sanitizedName = name.split(NOT_JAVA_IDENTIFIER)
+            .joinToString("", transform = { StringUtil.capitalizeWords(it,true) })
+
+        val packageGroup = coords.groupId.lowercase()
+        val packageArtifact = sanitizedName.lowercase()
+
+        return ClassFqn("$packageGroup.$packageArtifact.$sanitizedName")
     }
 
     companion object : PropertyDerivationFactory {
