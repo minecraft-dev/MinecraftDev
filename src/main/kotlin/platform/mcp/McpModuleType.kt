@@ -37,6 +37,7 @@ object McpModuleType : AbstractModuleType<McpModule>("", "") {
 
     init {
         CommonColors.applyStandardColors(colorMap, McpConstants.CHAT_FORMATTING)
+        CommonColors.applyStandardColors(colorMap, McpConstants.TEXT_COLOR)
     }
 
     override fun classToColorMappings(module: Module): Map<String, Color> {

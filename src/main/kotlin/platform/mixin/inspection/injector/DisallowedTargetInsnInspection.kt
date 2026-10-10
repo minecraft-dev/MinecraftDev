@@ -20,11 +20,10 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findContainingClass
@@ -37,20 +36,18 @@ class DisallowedTargetInsnInspection : MixinInspection() {
 
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
-            if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT)) {
+            if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT) &&
+                !annotation.hasQualifiedName(MixinConstants.Annotations.CONSTANT)
+            ) {
                 return
             }
 
             val injectorAnnotation = AtResolver.findInjectorAnnotation(annotation, skipThroughSlice = false) ?: return
             val injector = MixinAnnotationHandler.forMixinAnnotation(injectorAnnotation, annotation.project)
-                as? InjectorAnnotationHandler ?: return
+                as? InsnInjectorAnnotationHandler ?: return
             val containingClass = injectorAnnotation.findContainingClass() ?: return
             val hasInvalidInstructions = containingClass.mixinTargets.any { targetClass ->
                 injector.resolveTarget(injectorAnnotation, targetClass).any { targetMember ->
-                    if (targetMember !is MethodTargetMember) {
-                        return@any false
-                    }
-
                     AtResolver(annotation, targetMember.classAndMethod.clazz, targetMember.classAndMethod.method)
                         .resolveInstructions()
                         .any {

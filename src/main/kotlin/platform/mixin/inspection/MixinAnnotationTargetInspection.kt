@@ -65,7 +65,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                                 .map {
                                     AtResolver(annotation, it.clazz, it.method).isUnresolved() ?: return@classLoop null
                                 }
-                                .reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure()
+                                .reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure("Could not resolve @At target")
                         }
                         .reduceOrNull(InsnResolutionInfo.Failure::combine)
                     if (failure != null) {
@@ -75,8 +75,7 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                     val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project) ?: return
                     val failure = handler.isUnresolved(annotation)
                     if (failure != null) {
-                        val message = handler.createUnresolvedMessage(annotation) ?: return
-                        addProblem(annotation, message, failure)
+                        addProblem(annotation, failure.messages.joinToString("; "), failure)
                     }
                 }
             }

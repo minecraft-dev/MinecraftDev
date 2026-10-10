@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -51,7 +51,7 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
                 val problemElement = modifyVariable.nameReferenceElement ?: return
 
                 val injector =
-                    MixinAnnotationHandler.forMixinAnnotation(MODIFY_VARIABLE) as? InjectorAnnotationHandler ?: return
+                    MixinAnnotationHandler.forMixinAnnotation(MODIFY_VARIABLE) as? InsnInjectorAnnotationHandler ?: return
                 val localInfo = LocalInfo.fromAnnotation(localType, modifyVariable)
 
                 if (Util.shouldReport(localInfo, injector, modifyVariable)) {
@@ -69,7 +69,7 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
     object Util {
         fun shouldReport(
             localInfo: LocalInfo,
-            injector: InjectorAnnotationHandler,
+            injector: InsnInjectorAnnotationHandler,
             injectorAnnotation: PsiAnnotation,
         ): Boolean {
             if (localInfo.argsOnly) {

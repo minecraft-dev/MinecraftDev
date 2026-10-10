@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,8 +20,13 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.TargetInsn
+import com.demonwav.mcdev.platform.mixin.inspection.injector.BasicSignatures
+import com.demonwav.mcdev.platform.mixin.inspection.injector.ExpectedSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SignatureSuggestion
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.ARGS
 import com.demonwav.mcdev.util.Parameter
 import com.intellij.psi.JavaPsiFacade
@@ -33,7 +38,7 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.MethodNode
 
-class ModifyArgsHandler : InjectorAnnotationHandler() {
+class ModifyArgsHandler : InsnInjectorAnnotationHandler() {
     override fun isInsnAllowed(insn: AbstractInsnNode, decorations: Map<String, Any?>): Boolean {
         return insn is MethodInsnNode
     }
@@ -44,21 +49,36 @@ class ModifyArgsHandler : InjectorAnnotationHandler() {
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
-    ): List<MethodSignature> {
+        targetInsn: TargetInsn,
+    ): ExpectedSignatures<BasicSignatures> {
         val argsType = JavaPsiFacade.getElementFactory(annotation.project)
             .createTypeByFQClassName(ARGS, annotation.resolveScope)
-        return listOf(
-            MethodSignature(
-                listOf(
-                    ParameterGroup(listOf(Parameter("args", argsType))),
-                    ParameterGroup(
-                        collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
-                        required = ParameterGroup.RequiredLevel.OPTIONAL,
-                        isVarargs = true,
-                    ),
+        val shortParams = listOf(Parameter("args", argsType))
+        return ExpectedSignatures.Valid(
+            BasicSignatures(
+                MethodSignature(
+                    shortParams,
+                    PsiTypes.voidType(),
+                    allowCoerceRequired = false,
                 ),
-                PsiTypes.voidType(),
-            ),
+                MethodSignature(
+                    shortParams + collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+                    PsiTypes.voidType(),
+                    allowCoerceRequired = false,
+                ),
+            )
+        )
+    }
+
+    override fun suggestedMethodSignature(
+        annotation: PsiAnnotation,
+        targets: List<ClassAndMethodNode>
+    ): SuggestedSignature {
+        val argsType = JavaPsiFacade.getElementFactory(annotation.project)
+            .createTypeByFQClassName(ARGS, annotation.resolveScope)
+        return SuggestedSignature(
+            listOf(SignatureSuggestion.Param("args", argsType)),
+            PsiTypes.voidType(),
         )
     }
 

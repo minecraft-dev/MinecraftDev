@@ -28,7 +28,7 @@ import org.objectweb.asm.tree.ClassNode
 interface MixinMemberAnnotationHandler : MixinAnnotationHandler {
     override fun isUnresolved(annotation: PsiAnnotation, targetClass: ClassNode): InsnResolutionInfo.Failure? {
         return if (resolveTarget(annotation, targetClass).isEmpty()) {
-            InsnResolutionInfo.Failure()
+            createUnresolvedMessage(annotation)?.let(InsnResolutionInfo<Nothing>::Failure)
         } else {
             null
         }
@@ -39,4 +39,6 @@ interface MixinMemberAnnotationHandler : MixinAnnotationHandler {
         val targets = resolveTarget(annotation, targetClass)
         return targets.mapNotNull { it.findSourceElement(project, annotation.resolveScope, canDecompile = true) }
     }
+
+    fun createUnresolvedMessage(annotation: PsiAnnotation): String?
 }

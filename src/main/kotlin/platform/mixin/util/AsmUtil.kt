@@ -21,7 +21,9 @@
 package com.demonwav.mcdev.platform.mixin.util
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.util.MemberMatcher
 import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.anonymousClasses
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.childrenOfType
@@ -55,6 +57,7 @@ import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiClassInitializer
+import com.intellij.psi.PsiClassOwner
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiCompiledFile
@@ -73,7 +76,6 @@ import com.intellij.psi.PsiMethodReferenceExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.PsiParameter
-import com.intellij.psi.PsiParameterList
 import com.intellij.psi.PsiParameterListOwner
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
@@ -438,7 +440,10 @@ fun ClassNode.findStubClass(project: Project): PsiClass? {
 fun ClassNode.findSourceClass(project: Project, scope: GlobalSearchScope, canDecompile: Boolean = false): PsiClass? {
     return findQualifiedClass(name.replace('/', '.')) { name ->
         val stubClass = JavaPsiFacade.getInstance(project).findClass(name, scope) ?: return@findQualifiedClass null
-        val stubFile = stubClass.containingFile ?: return@findQualifiedClass null
+        val stubFile = stubClass.containingFile as PsiClassOwner? ?: return@findQualifiedClass null
+        if (stubFile !is PsiCompiledFile) {
+            return@findQualifiedClass stubFile.classes.firstOrNull()
+        }
         val classFile = stubFile.virtualFile
         if (classFile != null) {
             val sourceFile = JavaEditorFileSwapper.findSourceFile(project, classFile)
@@ -462,20 +467,16 @@ fun ClassNode.findFieldByName(name: String): FieldNode? {
     return fields?.firstOrNull { it.name == name }
 }
 
-fun ClassNode.findFields(ref: MixinSelector): Sequence<FieldNode> {
+fun ClassNode.findFields(ref: MemberMatcher): Sequence<FieldNode> {
     return fields?.asSequence()?.filter { ref.matchField(it, this) } ?: emptySequence()
 }
 
-fun ClassNode.findField(ref: MixinSelector): FieldNode? {
+fun ClassNode.findField(ref: MemberMatcher): FieldNode? {
     return findFields(ref).firstOrNull()
 }
 
-fun ClassNode.findMethods(ref: MixinSelector): Sequence<MethodNode> {
-    return methods?.asSequence()?.filter { ref.matchMethod(it, this) } ?: emptySequence()
-}
-
-fun ClassNode.findMethod(ref: MixinSelector): MethodNode? {
-    return findMethods(ref).firstOrNull()
+fun ClassNode.findMethod(ref: MemberReference): MethodNode? {
+    return methods?.asSequence()?.firstOrNull { ref.matchMethod(it, this) }
 }
 
 private fun makeFakeClass(name: String): ClassNode {
@@ -755,8 +756,10 @@ private fun findAssociatedLambda(project: Project, scope: GlobalSearchScope, cla
     return RecursionManager.doPreventingRecursion(lambdaMethod, false) {
         val pair = findContainingMethod(clazz, lambdaMethod) ?: return@doPreventingRecursion null
         val (containingMethod, locationInfo) = pair
-        val containingBodyElements = findAssociatedLambda(project, scope, clazz, containingMethod)?.let(::listOf)
-            ?: containingMethod.findBodyElements(clazz, project, scope).ifEmpty { return@doPreventingRecursion null }
+        val containingBodyElements =
+            (findAssociatedLambda(project, scope, clazz, containingMethod) as? PsiLambdaExpression)?.body?.let(::listOf)
+                ?: containingMethod.findBodyElements(clazz, project, scope)
+                    .ifEmpty { return@doPreventingRecursion null }
 
         val psiFile = containingBodyElements.first().containingFile ?: return@doPreventingRecursion null
         val matcher = locationInfo.createMatcher<PsiElement>(psiFile)
@@ -825,8 +828,21 @@ private fun MethodNode.getOffset(clazz: ClassNode?): Int {
     }
 }
 
-fun MethodNode.getParameter(clazz: ClassNode, index: Int, parameterList: PsiParameterList): PsiParameter? {
-    return parameterList.parameters.getOrNull(index - getOffset(clazz))
+private fun PsiMethod.getOffset(): Int {
+    val clazz = containingClass ?: return 0
+    return if (this.isConstructor) {
+        when {
+            clazz.isEnum -> 2
+            clazz.containingClass != null && !clazz.hasModifierProperty(PsiModifier.STATIC) -> 1
+            else -> 0
+        }
+    } else {
+        0
+    }
+}
+
+fun PsiMethod.getBytecodeParameter(index: Int): PsiParameter? {
+    return parameterList.parameters.getOrNull(index - getOffset())
 }
 
 /**

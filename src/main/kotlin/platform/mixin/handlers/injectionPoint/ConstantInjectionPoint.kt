@@ -50,6 +50,7 @@ import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiSwitchLabelStatementBase
 import com.intellij.psi.util.PsiUtil
 import com.intellij.util.ArrayUtilRt
+import java.util.EnumSet
 import java.util.Locale
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -194,6 +195,10 @@ class ConstantInjectionPoint : InjectionPoint<PsiElement>() {
     ): LookupElementBuilder? {
         return null
     }
+
+    fun getTargetedConstant(insn: AbstractInsnNode) =
+        insn.computeConstantValue(EnumSet.allOf(ExpandCondition::class.java))
+            ?.let { if (it === NullSentinel) null else it }
 
     class ConstantInfo(val constant: Any?, val expandConditions: Set<ExpandCondition>)
 

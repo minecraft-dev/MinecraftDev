@@ -3,13 +3,12 @@ package test;
 import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInSimple;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 
 @Mixin(MixedInSimple.class)
 public class TestMixin {
 
-    @Inject(method = "simpleMethod", at = @At("RETURN"))
-    private void injectCtor(String string, String invalidLocal<caret>) {
+    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "Ljava/lang/Integer;parseInt(Ljava/lang/String;I)I"))
+    private void inject(String stringToParse, int base<caret>) {
     }
 }
