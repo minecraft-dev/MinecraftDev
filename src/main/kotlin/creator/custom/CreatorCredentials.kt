@@ -24,6 +24,7 @@ import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider.RemoteAuthType
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.extensions.authentication
+import com.intellij.collaboration.auth.AccountManager
 import com.intellij.collaboration.auth.ServerAccount
 import com.intellij.collaboration.auth.findAccountOrNull
 import com.intellij.credentialStore.CredentialAttributes
@@ -31,7 +32,8 @@ import com.intellij.credentialStore.Credentials
 import com.intellij.credentialStore.generateServiceName
 import com.intellij.ide.passwordSafe.PasswordSafe
 import git4idea.remote.GitHttpAuthDataProvider
-import git4idea.remote.hosting.http.SilentHostedGitHttpAuthDataProvider
+import git4idea.remote.hosting.http.SilentHostedGitHttpAuthDataProviderBase
+import java.lang.reflect.Method
 import java.nio.file.Path
 import java.util.Properties
 import javax.xml.parsers.DocumentBuilderFactory
@@ -42,6 +44,12 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 object CreatorCredentials {
+    private val PROVIDER_ID_PROPERTY: Method = SilentHostedGitHttpAuthDataProviderBase::class.java
+        .getDeclaredMethod("getProviderId")
+        .also { it.isAccessible = true }
+    private val ACCOUNT_MANAGER_PROPERTY: Method = SilentHostedGitHttpAuthDataProviderBase::class.java
+        .getDeclaredMethod("getAccountManager")
+        .also { it.isAccessible = true }
 
     private val xmlDocumentBuilder = DocumentBuilderFactory.newDefaultInstance().newDocumentBuilder()
     private val xPath = XPathFactory.newDefaultInstance().newXPath()
@@ -110,30 +118,37 @@ object CreatorCredentials {
         return request
     }
 
-    fun getGitHttpAuthProviders(): List<SilentHostedGitHttpAuthDataProvider<ServerAccount>> {
+    fun SilentHostedGitHttpAuthDataProviderBase<*, *>.getProviderId(): String
+        = PROVIDER_ID_PROPERTY.invoke(this) as String
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <A: ServerAccount, C: Any> SilentHostedGitHttpAuthDataProviderBase<A, C>.getAccountManager(): AccountManager<A, C>
+        = ACCOUNT_MANAGER_PROPERTY.invoke(this) as AccountManager<A, C>
+
+    fun getGitHttpAuthProviders(): List<SilentHostedGitHttpAuthDataProviderBase<ServerAccount, String>> {
         return GitHttpAuthDataProvider.EP_NAME.extensionList
-            .filterIsInstance<SilentHostedGitHttpAuthDataProvider<ServerAccount>>()
+            .filterIsInstance<SilentHostedGitHttpAuthDataProviderBase<ServerAccount, String>>()
     }
 
-    fun findGitHttpAuthProvider(providerId: String): SilentHostedGitHttpAuthDataProvider<ServerAccount>? {
-        return getGitHttpAuthProviders().find { provider -> provider.providerId == providerId }
+    fun findGitHttpAuthProvider(providerId: String): SilentHostedGitHttpAuthDataProviderBase<ServerAccount, String>? {
+        return getGitHttpAuthProviders().find { provider -> provider.getProviderId() == providerId }
     }
 
     fun getGitHttpAuthAccounts(providerId: String): MutableList<ServerAccount> {
-        return findGitHttpAuthProvider(providerId)?.accountManager?.accountsState?.value.orEmpty().toMutableList()
+        return findGitHttpAuthProvider(providerId)?.getAccountManager()?.accountsState?.value.orEmpty().toMutableList()
     }
 
     fun findGitHttpAuthAccount(credentials: String): ServerAccount? {
         val providerId = credentials.substringBefore(':').takeIf(String::isNotBlank) ?: return null
         val accountId = credentials.substringAfter(':').takeIf(String::isNotBlank) ?: return null
-        val accountManager = findGitHttpAuthProvider(providerId)?.accountManager ?: return null
+        val accountManager = findGitHttpAuthProvider(providerId)?.getAccountManager() ?: return null
         return accountManager.findAccountOrNull { account -> account.id == accountId }
     }
 
     suspend fun findGitHttpAuthBearerToken(credentials: String): Pair<String, String>? {
         val providerId = credentials.substringBefore(':').takeIf(String::isNotBlank) ?: return null
         val accountId = credentials.substringAfter(':').takeIf(String::isNotBlank) ?: return null
-        val accountManager = findGitHttpAuthProvider(providerId)?.accountManager ?: return null
+        val accountManager = findGitHttpAuthProvider(providerId)?.getAccountManager() ?: return null
         val account = accountManager.findAccountOrNull { account -> account.id == accountId } ?: return null
         val token = accountManager.findCredentials(account) ?: return null
         return account.name to token

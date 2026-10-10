@@ -32,7 +32,7 @@ class AtSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getHighlightingLexer() = AtLexerAdapter()
 
-    override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
         when (tokenType) {
             AtTypes.KEYWORD_ELEMENT -> KEYWORD_KEYS
             AtTypes.CLASS_NAME_ELEMENT -> CLASS_NAME_KEYS

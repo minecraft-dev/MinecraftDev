@@ -47,52 +47,54 @@ tasks.publishPlugin {
 
         val log = Logging.getLogger(javaClass)
 
-        val path = archiveFile.get().asFile.toPath().absolute()
+        val paths = archiveFiles.files.map { it.toPath() }
         val pluginId = "com.demonwav.minecraft-dev"
-        channels.get().forEach { channel ->
-            log.info("Uploading plugin '$pluginId' from '$path' to '${host.get()}', channel: '$channel'")
+        paths.forEach { path ->
+            channels.get().forEach { channel ->
+                log.info("Uploading plugin '$pluginId' from '$path' to '${host.get()}', channel: '$channel'")
 
-            try {
-                val repositoryClient = when (ideServices.get()) {
-                    true -> PluginRepositoryFactory.createWithImplementationClass(
-                        host.get(),
-                        token.get(),
-                        "Automation",
-                        IdeServicesPluginRepositoryService::class.java,
-                    )
+                try {
+                    val repositoryClient = when (ideServices.get()) {
+                        true -> PluginRepositoryFactory.createWithImplementationClass(
+                            host.get(),
+                            token.get(),
+                            "Automation",
+                            IdeServicesPluginRepositoryService::class.java,
+                        )
 
-                    false -> PluginRepositoryFactory.create(host.get(), token.get())
-                }
-                val uploadBean = repositoryClient.uploader.uploadUpdateByXmlIdAndFamily(
-                    id = pluginId,
-                    family = ProductFamily.INTELLIJ,
-                    file = path.toFile(),
-                    channel = channel.takeIf { it != "default" },
-                    notes = null,
-                    isHidden = hidden.get(),
-                )
-                log.info("Uploaded successfully as version ID ${uploadBean.id}")
-
-                val since = uploadBean.since
-                log.info("Since is ${since}, until is ${uploadBean.until}")
-                if (since != null && uploadBean.until.isNullOrBlank()) {
-                    val newUntil = since.substringBefore(".") + ".*"
-                    log.info("Updating until to $newUntil")
-                    val request = HttpRequest.newBuilder()
-                        .uri(URI.create("https://plugins.jetbrains.com/api/updates/${uploadBean.id}/since-until"))
-                        .header("Authorization", "Bearer ${token.get()}")
-                        .header("Content-Type", "application/json")
-                        .header("User-Agent", "Minecraft Development Plugin Publisher")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"since\":\"${uploadBean.since}\",\"until\":\"$newUntil\"}"))
-                        .build()
-                    val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                        throw IOException("Updating until failed with status code ${response.statusCode()}, ${response.body()}")
+                        false -> PluginRepositoryFactory.create(host.get(), token.get())
                     }
-                    log.info("Successful with status code ${response.statusCode()}")
+                    val uploadBean = repositoryClient.uploader.uploadUpdateByXmlIdAndFamily(
+                        id = pluginId,
+                        family = ProductFamily.INTELLIJ,
+                        file = path.toFile(),
+                        channel = channel.takeIf { it != "default" },
+                        notes = null,
+                        isHidden = hidden.get(),
+                    )
+                    log.info("Uploaded successfully as version ID ${uploadBean.id}")
+
+                    val since = uploadBean.since
+                    log.info("Since is ${since}, until is ${uploadBean.until}")
+                    if (since != null && uploadBean.until.isNullOrBlank()) {
+                        val newUntil = since.substringBefore(".") + ".*"
+                        log.info("Updating until to $newUntil")
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create("https://plugins.jetbrains.com/api/updates/${uploadBean.id}/since-until"))
+                            .header("Authorization", "Bearer ${token.get()}")
+                            .header("Content-Type", "application/json")
+                            .header("User-Agent", "Minecraft Development Plugin Publisher")
+                            .POST(HttpRequest.BodyPublishers.ofString("{\"since\":\"${uploadBean.since}\",\"until\":\"$newUntil\"}"))
+                            .build()
+                        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                            throw IOException("Updating until failed with status code ${response.statusCode()}, ${response.body()}")
+                        }
+                        log.info("Successful with status code ${response.statusCode()}")
+                    }
+                } catch (exception: Exception) {
+                    throw GradleException("Failed to upload plugin: ${exception.message}", exception)
                 }
-            } catch (exception: Exception) {
-                throw GradleException("Failed to upload plugin: ${exception.message}", exception)
             }
         }
     })

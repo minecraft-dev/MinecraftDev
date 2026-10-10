@@ -26,6 +26,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.listCellRenderer.textListCellRenderer
 import com.intellij.uiDesigner.core.GridConstraints
@@ -34,12 +35,10 @@ import com.intellij.unscramble.UnscrambleSupport
 import java.awt.Dimension
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.swing.ComboBoxModel
 import javax.swing.JPanel
 import net.fabricmc.mappingio.MappedElementKind
 import net.fabricmc.mappingio.MappingReader
 import net.fabricmc.mappingio.MappingVisitor
-import org.jdesktop.swingx.combobox.MapComboBoxModel
 import org.jetbrains.plugins.gradle.util.GradleUtil
 
 class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
@@ -48,14 +47,13 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
 
     override fun getPresentableName() = "Remap Tiny names"
 
-    class SettingsComponent(mappings: Map<String, Path>) : JPanel(GridLayoutManager(1, 2)) {
+    class SettingsComponent(val mappings: Map<String, Path>) : JPanel(GridLayoutManager(1, 2)) {
 
-        val mappingsBoxModel: MapComboBoxModel<String, Path> = MapComboBoxModel(mappings)
         @Suppress("UNCHECKED_CAST")
-        val mappingsBox: ComboBox<String> = ComboBox(mappingsBoxModel as ComboBoxModel<String>)
+        val mappingsBox: ComboBox<String> = ComboBox(CollectionComboBoxModel(mappings.keys.toList()))
 
         init {
-            mappingsBox.renderer = textListCellRenderer { "[$it] ${mappingsBoxModel.getValue(it)}" }
+            mappingsBox.renderer = textListCellRenderer { "[$it] ${mappings[it]}" }
             add(
                 JBLabel("Mappings: "),
                 GridConstraints(
@@ -110,7 +108,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
 
     override fun unscramble(project: Project, text: String, logName: String, settings: SettingsComponent?): String? {
         val mappingsFile = logName.takeIf(String::isNotBlank)?.let(Paths::get)
-            ?: settings?.mappingsBoxModel?.let { mappings -> mappings.selectedItem?.let(mappings::getValue) }
+            ?: settings?.mappings?.let { mappings -> settings.mappingsBox.selectedItem?.let(mappings::get) }
             ?: return null
 
         val interToNamed = mutableMapOf<String, String>()

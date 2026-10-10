@@ -30,7 +30,7 @@ import com.intellij.psi.tree.IElementType
 class LangSyntaxHighlighter(private val lexer: Lexer) : SyntaxHighlighterBase() {
     override fun getHighlightingLexer() = lexer
 
-    override fun getTokenHighlights(tokenType: IElementType?) =
+    override fun getTokenHighlights(tokenType: IElementType) =
         when (tokenType) {
             LangTypes.KEY, LangTypes.DUMMY -> KEY_KEYS
             LangTypes.EQUALS -> EQUALS_KEYS

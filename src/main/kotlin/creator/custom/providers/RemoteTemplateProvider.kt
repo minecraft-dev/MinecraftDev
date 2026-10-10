@@ -24,6 +24,7 @@ import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.CreatorCredentials
+import com.demonwav.mcdev.creator.custom.CreatorCredentials.getProviderId
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.modalityState
 import com.demonwav.mcdev.creator.selectProxy
@@ -209,7 +210,7 @@ open class RemoteTemplateProvider : TemplateProvider {
             defaultRepo?.authCredentials.takeIf { authTypeProperty.get() == RemoteAuthType.GIT_HTTP }
         val gitAuthProviderProperty = propertyGraph.lazyProperty {
             initialGitAuthCredentials?.substringBefore(':')
-                ?: CreatorCredentials.getGitHttpAuthProviders().first().providerId
+                ?: CreatorCredentials.getGitHttpAuthProviders().first().getProviderId()
         }
         val gitAuthAccountProperty = propertyGraph.lazyProperty {
             initialGitAuthCredentials?.let(CreatorCredentials::findGitHttpAuthAccount)
@@ -304,7 +305,7 @@ open class RemoteTemplateProvider : TemplateProvider {
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.BEARER))
 
             row(MCDevBundle("creator.ui.custom.remote.git_http_provider.label")) {
-                comboBox(CollectionComboBoxModel(CreatorCredentials.getGitHttpAuthProviders().map { it.providerId }))
+                comboBox(CollectionComboBoxModel(CreatorCredentials.getGitHttpAuthProviders().map { it.getProviderId() }))
                     .align(AlignX.FILL)
                     .bindItem(gitAuthProviderProperty)
                     .validationOnApply { box ->
