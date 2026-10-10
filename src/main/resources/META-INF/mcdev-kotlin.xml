@@ -3,7 +3,7 @@
 
     https://mcdev.io/
 
-    Copyright (C) 2025 minecraft-dev
+    Copyright (C) 2026 minecraft-dev
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -20,8 +20,6 @@
 
 <idea-plugin>
     <extensions defaultExtensionNs="com.demonwav.minecraft-dev">
-        <gradleFileType implementation="com.demonwav.mcdev.creator.buildsystem.KotlinGradleFile$Type" />
-
         <eventGenHelper language="kotlin" implementationClass="com.demonwav.mcdev.insight.generation.KotlinEventGenHelper"/>
     </extensions>
 
