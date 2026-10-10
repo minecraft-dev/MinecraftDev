@@ -20,13 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
 import com.demonwav.mcdev.platform.mixin.util.hasNamedLocalVariables
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
@@ -62,7 +61,7 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
             val problemElement = modifyVariable.nameReferenceElement ?: return
 
             val injector =
-                MixinAnnotationHandler.forMixinAnnotation(MODIFY_VARIABLE) as? InjectorAnnotationHandler ?: return
+                MixinAnnotationHandler.forMixinAnnotation(MODIFY_VARIABLE) as? InsnInjectorAnnotationHandler ?: return
             val localInfo = LocalInfo.fromAnnotation(localType, modifyVariable)
 
             if (ignoreForImplicitLocals && localInfo.isImplicit) {
@@ -106,7 +105,7 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
     object Util {
         fun getVariableNameToIntroduce(
             localInfo: LocalInfo,
-            injector: InjectorAnnotationHandler,
+            injector: InsnInjectorAnnotationHandler,
             injectorAnnotation: PsiAnnotation,
         ): String? {
             if (localInfo.index == null && localInfo.ordinal == null && localInfo.names.isNotEmpty()) {
@@ -124,7 +123,7 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
                 }
 
                 for (target in injector.resolveTarget(injectorAnnotation, targetClass)) {
-                    val (clazz, method) = (target as? MethodTargetMember)?.classAndMethod ?: continue
+                    val (clazz, method) = target.classAndMethod
                     for (insn in injector.resolveInstructions(injectorAnnotation, clazz, method)) {
                         val matchedLocals = localInfo.matchLocals(
                             module,

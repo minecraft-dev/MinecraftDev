@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,7 +21,6 @@
 package com.demonwav.mcdev.platform.mixin.action
 
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
-import com.demonwav.mcdev.platform.mixin.reference.toMixinString
 import com.demonwav.mcdev.util.findReferencedMember
 import com.demonwav.mcdev.util.getQualifiedMemberReference
 import com.demonwav.mcdev.util.qualifiedMemberReference

@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
@@ -54,7 +54,7 @@ class LocalArgsOnlyInspection : MixinInspection() {
             val method = parameter.declarationScope as? PsiMethod ?: return
 
             val (injector, injectorAnnotation) = method.annotations.mapFirstNotNull { annotation ->
-                (MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InjectorAnnotationHandler)?.let { it to annotation }
+                (MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InsnInjectorAnnotationHandler)?.let { it to annotation }
             } ?: return
 
             val localType = parameter.type.unwrapLocalRef()

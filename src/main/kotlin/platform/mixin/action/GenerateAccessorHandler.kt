@@ -27,11 +27,12 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
+import com.demonwav.mcdev.util.McdevReflection
+import com.demonwav.mcdev.util.McdevReflection.invokeUnwrap
 import com.demonwav.mcdev.util.capitalize
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.fullQualifiedName
-import com.demonwav.mcdev.util.invokeDeclaredMethod
 import com.demonwav.mcdev.util.invokeLater
 import com.intellij.codeInsight.daemon.impl.quickfix.CreateClassKind
 import com.intellij.codeInsight.generation.ClassMember
@@ -115,21 +116,12 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                 {
                     val offset = mixinEditor.caretModel.offset
                     try {
-                        this.invokeDeclaredMethod(
-                            "doGenerate",
-                            params = arrayOf(
-                                Project::class.java,
-                                Editor::class.java,
-                                PsiClass::class.java,
-                                Array<ClassMember>::class.java,
-                            ),
-                            args = arrayOf(
-                                project,
-                                mixinEditor,
-                                mixinClass,
-                                members,
-                            ),
-                            owner = GenerateMembersHandlerBase::class.java,
+                        McdevReflection.METHOD_GENERATE_MEMBERS_HANDLER_BASE_DO_GENERATE.invokeUnwrap(
+                            this,
+                            project,
+                            mixinEditor,
+                            mixinClass,
+                            members,
                         )
                     } catch (e: GenerateCodeException) {
                         val message = e.message ?: "Unknown error"

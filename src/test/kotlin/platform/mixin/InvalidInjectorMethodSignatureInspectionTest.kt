@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -137,6 +137,442 @@ class InvalidInjectorMethodSignatureInspectionTest : BaseMixinTest() {
                 private void injectCtor(String string, CallbackInfo ci) {
                 }
             }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Wildcard Inject with Single Target")
+    fun wildcardInInjectWithSingleTarget() {
+        doTest(
+            """
+            package test;
+
+            import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureInspection.MixedInOuter;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+            @Mixin(MixedInOuter.class)
+            public class TestMixin {
+                @Inject(method = "*", at = @At(value = "INVOKE", target = "Lcom/demonwav/mcdev/mixintestdata/invalidInjectorMethodSignatureInspection/MixedInOuter;method2()V"))
+                private void test(CallbackInfo ci) {
+                }
+            }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyArgs")
+    fun modifyArgs() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInSimple;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyArgs;
+                import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+                
+                @Mixin(MixedInSimple.class)
+                public class TestMixin {
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private void correct(Args args) {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private void correctWithTrailing(Args args, String string, int i) {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void prefixOfTrailing(Args args, String string)</error> {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void coerceTrailing(Args args, @Coerce Object string, int i)</error> {
+                    }
+                    
+                    @ModifyArgs(method = "simpleMethod", at = @At(value = "INVOKE", target = "parseInt"))
+                    private <error descr="Method signature does not match expected signature for ModifyArgs">void coerceArgs(@Coerce Object args)</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyArg")
+    fun modifyArg() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyArg;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyArg;
+                
+                @Mixin(MixedInModifyArg.class)
+                public class TestMixin {
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private String correct(String original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private int correct(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"))
+                    private String correctFull(String x, int y) {
+                        return x;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private int correctIndex(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private <error descr="Method signature does not match expected signature for ModifyArg">int captureOuter(int original, Object obj)</error> {
+                        return original;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"), index = 2)
+                    private <error descr="Method signature does not match expected signature for ModifyArg">int captureOuter(int a, int b, int c, Object obj)</error> {
+                        return c;
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee3"))
+                    private <error descr="There are no possible signatures for this injector">void implicit()</error> {
+                    }
+                    
+                    @ModifyArg(method = "caller", at = @At(value = "INVOKE", target = "callee1"), index = 1)
+                    private @Coerce <error descr="Method signature does not match expected signature for ModifyArg">Object coerce(@Coerce Object x)</error> {
+                        return x;
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyVariable")
+    fun modifyVariable() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyVariable;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.ModifyVariable;
+                
+                @Mixin(MixedInModifyVariable.class)
+                public class TestMixin {
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private Integer correct(Integer original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correct(char original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctPartialCapture(char original, String arg) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctFullCapture(char original, String arg, Object arg2) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"))
+                    private char correctCoerceTrailing(char original, @Coerce Object arg) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method3", at = @At("RETURN"), ordinal = 2)
+                    private int correctOrdinal(int original) {
+                        return original;
+                    }
+                    
+                    @ModifyVariable(method = "method2", at = @At("RETURN"))
+                    private <error descr="There are no possible signatures for this injector">void implicit()</error> {
+                    }
+                    
+                    @ModifyVariable(method = "method1", at = @At("RETURN"), index = 1)
+                    private @Coerce <error descr="Method signature does not match expected signature for ModifyVariable">Object coerce(@Coerce Object x)</error> {
+                        return x;
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("WrapMethod")
+    fun wrapMethod() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapMethod;
+                import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+                import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+                import org.spongepowered.asm.mixin.Mixin;
+                
+                @Mixin(MixedInWrapMethod.class)
+                class TestMixin {
+                    @WrapMethod(method = {"method1", "method7"})
+                    private void <error descr="Impossible combination of targets: some require a static handler and others a non-static handler">mustBeStaticAndNonStatic</error>(String arg, Operation<Void> original) {
+                    }
+                    
+                    @WrapMethod(method = {"method7", "method8"})
+                    private static <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyReturnValue")
+    fun modifyReturnValue() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyReturnValue;
+                import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyReturnValue.class)
+                class TestMixin {
+                    @ModifyReturnValue(method = {"method1", "method4"}, at = @At("RETURN"))
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyExpressionValue")
+    fun modifyExpressionValue() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyExpressionValue;
+                import com.llamalad7.mixinextras.expression.Expression;
+                import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyExpressionValue.class)
+                class TestMixin {
+                    @ModifyExpressionValue(
+                        method = "method1", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Expression("42")
+                    @ModifyExpressionValue(
+                        method = "method1", at = {@At("MIXINEXTRAS:EXPRESSION"), @At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapesWithIntLike()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyConstant")
+    fun modifyConstant() {
+        doTest(
+            """
+                package test;
+
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyConstant;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                import org.spongepowered.asm.mixin.injection.Constant;
+                import org.spongepowered.asm.mixin.injection.ModifyConstant;
+                
+                import java.io.Serializable;
+                
+                @Mixin(MixedInModifyConstant.class)
+                class TestMixin {
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Integer.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">Class<?> wrongShape(Class<?> original)</error> {
+                        return null;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Long.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">boolean wrongShape(Object obj, Class<?> clazz)</error> {
+                        return true;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = @Constant(classValue = Integer.class))
+                    private <error descr="Method signature does not match expected signature for ModifyConstant">boolean coerceInstanceof(Object obj, @Coerce Object clazz)</error> {
+                        return true;
+                    }
+                    
+                    @ModifyConstant(method = "method1", constant = {@Constant(intValue = 42), @Constant(stringValue = "hello")})
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @ModifyConstant(
+                            method = "method2",
+                            constant = {@Constant(classValue = Integer.class), @Constant(classValue = Long.class)}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void differentShapesAndTrailingParamIsUnhelpful()</error> {
+                    }
+                    
+                    @ModifyConstant(method = "method2", constant = @Constant(nullValue = true))
+                    private <error descr="There are no possible signatures for this injector">void cannotModifyNull()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("ModifyReceiver")
+    fun modifyReceiver() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInModifyReceiver;
+                import com.llamalad7.mixinextras.injector.ModifyReceiver;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInModifyReceiver.class)
+                class TestMixin {
+                    @ModifyReceiver(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("WrapWithCondition")
+    fun wrapWithCondition() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapWithCondition;
+                import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                
+                @Mixin(MixedInWrapWithCondition.class)
+                class TestMixin {
+                    @WrapWithCondition(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("Redirect")
+    fun redirect() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInRedirect;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Redirect;
+                
+                @Mixin(MixedInRedirect.class)
+                class TestMixin {
+                    @Redirect(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Redirect(
+                        method = "caller", at = {@At(value = "CONSTANT", args = "classValue=java/lang/Integer"), @At(value = "INVOKE", target = "callee5")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void compatibleShapesButCannotCoerce()</error> {
+                    }
+                }
+            """,
+        )
+    }
+
+    @Test
+    @DisplayName("WrapOperation")
+    fun wrapOperation() {
+        doTest(
+            """
+                package test;
+                
+                import com.demonwav.mcdev.mixintestdata.invalidInjectorMethodSignatureFix.MixedInWrapOperation;
+                import com.llamalad7.mixinextras.expression.Definition;
+                import com.llamalad7.mixinextras.expression.Expression;
+                import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+                import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+                import org.spongepowered.asm.mixin.Mixin;
+                import org.spongepowered.asm.mixin.injection.At;
+                import org.spongepowered.asm.mixin.injection.Coerce;
+                
+                @Mixin(MixedInWrapOperation.class)
+                class TestMixin {
+                    @WrapOperation(
+                        method = "caller", at = {@At(value = "INVOKE", target = "callee1"), @At(value = "INVOKE", target = "callee2")}
+                    )
+                    private <error descr="There are no possible signatures for this injector">void incompatibleShapes()</error> {
+                    }
+                    
+                    @Definition(id = "callee7", method = "callee7")
+                    @Expression({"? == 3", "callee7(?, ?)"})
+                    @WrapOperation(method = "caller2", at = @At("MIXINEXTRAS:EXPRESSION"))
+                    private <error descr="There are no possible signatures for this injector">void noWorkingIntLikeAnchor()</error> {
+                    }
+                    
+                    @WrapOperation(
+                        method = "caller3", 
+                        at = {@At(value = "INVOKE", target = "callee8"), @At(value = "INVOKE", target = "callee9")}
+                    )            
+                    private <error descr="There are no possible signatures for this injector">void doesNotTryToCoerceOperationToReconcileDifferingParamCounts()</error> {
+                    }
+                    
+                    @WrapOperation(
+                        method = "caller3", 
+                        at = {@At(value = "INVOKE", target = "callee8"), @At(value = "INVOKE", target = "callee9")}
+                    )            
+                    private void coercingTheOperationIsAllowedIfTheUserReallyWantsTo(Object arg, @Coerce Object arg2, @Coerce Object arg3) {
+                    }
+                }
             """,
         )
     }

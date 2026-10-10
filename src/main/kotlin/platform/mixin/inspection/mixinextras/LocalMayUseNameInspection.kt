@@ -20,11 +20,11 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection.Util.getVariableNameToIntroduce
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection.ReplaceWithNameFix
+import com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection.Util.getVariableNameToIntroduce
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.unwrapLocalRef
@@ -72,7 +72,7 @@ class LocalMayUseNameInspection : MixinInspection() {
             }
 
             val (injector, injectorAnnotation) = method.annotations.mapFirstNotNull { annotation ->
-                (MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InjectorAnnotationHandler)?.let { it to annotation }
+                (MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? InsnInjectorAnnotationHandler)?.let { it to annotation }
             } ?: return
 
             val variableName = getVariableNameToIntroduce(localInfo, injector, injectorAnnotation) ?: return

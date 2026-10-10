@@ -22,7 +22,6 @@ package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findContainingClass
@@ -109,11 +108,7 @@ class ShareUtil(private val project: Project) {
             val id = this.value ?: return emptyList()
 
             return mixinTargets.flatMap { targetClass ->
-                injector.resolveTarget(injectorAnnotation, targetClass).mapNotNull { target ->
-                    if (target !is MethodTargetMember) {
-                        return@mapNotNull null
-                    }
-
+                injector.resolveTarget(injectorAnnotation, targetClass).map { target ->
                     ShareKey(
                         namespace,
                         id,

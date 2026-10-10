@@ -33,6 +33,7 @@ import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.findModule
+import com.demonwav.mcdev.util.normalize
 import com.demonwav.mcdev.util.resolveClassArray
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -328,4 +329,20 @@ fun PsiModifierListOwner.shouldDoMixinAccessChecks(): Boolean {
     }
 
     return true
+}
+
+private val INT_TYPES = setOf(
+    PsiTypes.intType(),
+    PsiTypes.shortType(),
+    PsiTypes.charType(),
+    PsiTypes.byteType(),
+    PsiTypes.booleanType(),
+)
+
+fun checkCoerce(expected: PsiType, actual: PsiType, coerce: Boolean, expectedIntLike: Boolean): Boolean = when {
+    expectedIntLike -> actual in INT_TYPES
+    actual.normalize() == expected.normalize() -> true
+    !coerce -> false
+    actual in INT_TYPES -> expected == PsiTypes.intType()
+    else -> isAssignable(actual.normalize(), expected.normalize())
 }

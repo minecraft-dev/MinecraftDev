@@ -68,7 +68,7 @@ fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", versio
 sentry = "io.sentry:sentry:8.37.1"
 
 # Testing
-test-mixin = "org.spongepowered:mixin:0.8.5"
+test-mixin = "net.fabricmc:sponge-mixin:0.17.4+mixin.0.8.7"
 test-spigotapi = "org.spigotmc:spigot-api:1.21.11-R0.2-SNAPSHOT"
 test-bungeecord = "net.md-5:bungeecord-api:1.21-R0.4"
 test-spongeapi = "org.spongepowered:spongeapi:7.4.0"

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,10 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.inspection.injector.ParameterGroup
+import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
+import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
+import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
+import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.nextRealInsn
 import com.intellij.psi.PsiAnnotation
-import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
 import com.llamalad7.mixinextras.expression.impl.point.ExpressionContext
 import org.objectweb.asm.Opcodes
@@ -66,14 +68,28 @@ class WrapWithConditionHandler : MixinExtrasInjectorAnnotationHandler() {
         return getPsiParameters(insn, targetClass, annotation)?.size ?: 0
     }
 
-    override fun expectedMethodSignature(
+    override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,
         targetClass: ClassNode,
         targetMethod: MethodNode,
         target: TargetInsn
-    ): Pair<ParameterGroup, PsiType>? {
+    ): GeneralSignatures? {
         val params = getPsiParameters(target.insn, targetClass, annotation) ?: return null
-        return ParameterGroup(params) to PsiTypes.booleanType()
+        return GeneralSignatures(
+            params,
+            PsiTypes.booleanType(),
+            trailingParams = collectTargetMethodParameters(annotation.project, targetClass, targetMethod),
+        )
+    }
+
+    override fun suggestedMethodSignature(
+        annotation: PsiAnnotation,
+        targets: List<ClassAndMethodNode>
+    ): SuggestedSignature? {
+        return SuggestedSignature.general(
+            annotation,
+            expectedMethodSignatures(annotation, targets).collectSignatures<GeneralSignatures>() ?: return null
+        )
     }
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.WRAP_WITH_CONDITION
