@@ -18,11 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.bukkit.framework
+package com.demonwav.mcdev.platform.fabric.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 
-val BUKKIT_LIBRARY_KIND: LibraryKind by libraryKind("bukkit-api")
-val SPIGOT_LIBRARY_KIND: LibraryKind by libraryKind("spigot-api")
-val PAPER_LIBRARY_KIND: LibraryKind by libraryKind("paper-api")
+class FabricLibraryDetector : ClassMinecraftLibraryDetector(
+    PlatformType.FABRIC,
+    "net.fabricmc.loader.api.FabricLoader",
+)

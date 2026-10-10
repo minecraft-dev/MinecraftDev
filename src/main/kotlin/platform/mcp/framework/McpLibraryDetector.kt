@@ -18,9 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.neoforge.framework
+package com.demonwav.mcdev.platform.mcp.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.mcp.util.McpConstants
 
-val NEOFORGE_LIBRARY_KIND: LibraryKind by libraryKind("neoforge-library")
+class McpLibraryDetector : ClassMinecraftLibraryDetector(PlatformType.MCP, McpConstants.MINECRAFT_SERVER)

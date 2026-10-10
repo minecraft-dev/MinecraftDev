@@ -18,9 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.forge.framework
+package com.demonwav.mcdev.platform.bukkit.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryFile
+import com.demonwav.mcdev.platform.PlatformType
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 
-val FORGE_LIBRARY_KIND: LibraryKind by libraryKind("forge-library")
+class ModernPaperLibraryDetector : ClassMinecraftLibraryDetector(
+    PlatformType.PAPER,
+    "io.papermc.paper.ServerBuildInfo",
+) {
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        super.isLibraryPresent(project, scope) &&
+            hasLibraryFile("apiVersioning.json", "apiVersioning.json", scope)
+}

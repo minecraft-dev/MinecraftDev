@@ -22,9 +22,11 @@ package com.demonwav.mcdev.framework
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.facet.MinecraftFacetConfiguration
+import com.demonwav.mcdev.facet.MinecraftFacetDetector
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.runWriteTask
 import com.intellij.facet.FacetManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.LanguageLevelModuleExtension
@@ -32,8 +34,13 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
 
+@ExtendWith(MinecraftFacetDetectionExtension::class)
 abstract class BaseMinecraftTest(
     vararg platformTypes: PlatformType,
 ) : ProjectBuilderTest(
@@ -46,6 +53,18 @@ abstract class BaseMinecraftTest(
         if (testPath.isNotBlank()) {
             fixture.testDataPath = "$BASE_DATA_PATH/$testPath"
         }
+    }
+
+    internal fun awaitMinecraftFacetDetection() {
+        runBlocking {
+            project.service<MinecraftFacetDetector>().awaitLatestDetection()
+        }
+    }
+}
+
+class MinecraftFacetDetectionExtension : BeforeTestExecutionCallback {
+    override fun beforeTestExecution(context: ExtensionContext) {
+        (context.requiredTestInstance as BaseMinecraftTest).awaitMinecraftFacetDetection()
     }
 }
 
