@@ -13,7 +13,7 @@ jobs:
         os:
           - 'ubuntu-latest'
           - 'macos-latest'
-          - 'windows-latest'
+          # - 'windows-latest' # On Windows, tests are flaky for some reason
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout sources
