@@ -88,15 +88,13 @@ class LocalInfo(
     ): List<LocalVariables.LocalVariable>? {
         val locals = getLocals(module, targetClass, methodNode, insn)
             ?.drop(if (methodNode.hasAccess(Opcodes.ACC_STATIC)) 0 else 1)
+            ?.filterNotNull()
             ?: return null
         val typeDesc = type?.descriptor
         if (ordinal != null) {
             val ordinals = mutableMapOf<String, Int>()
             val result = mutableListOf<LocalVariables.LocalVariable>()
             for (local in locals) {
-                if (local == null) {
-                    continue
-                }
                 val ordinal = ordinals[local.desc] ?: 0
                 ordinals[local.desc!!] = ordinal + 1
                 if (ordinal == this.ordinal && (!matchType || typeDesc == null || local.desc == typeDesc)) {
@@ -107,7 +105,7 @@ class LocalInfo(
         }
 
         if (index != null) {
-            val local = locals.firstOrNull { it?.index == index }
+            val local = locals.firstOrNull { it.index == index }
             if (local != null) {
                 if (!matchType || typeDesc == null || local.desc == typeDesc) {
                     return listOf(local)
@@ -119,9 +117,6 @@ class LocalInfo(
         if (names.isNotEmpty()) {
             val result = mutableListOf<LocalVariables.LocalVariable>()
             for (local in locals) {
-                if (local == null) {
-                    continue
-                }
                 if (names.contains(local.name)) {
                     if (!matchType || typeDesc == null || local.desc == typeDesc) {
                         result += local
@@ -132,15 +127,13 @@ class LocalInfo(
         }
 
         // implicit mode
-        if (mode == CollectVisitor.Mode.COMPLETION) {
-            return locals.asSequence()
-                .filterNotNull()
-                .filter { local -> locals.count { it?.desc == local.desc } == 1 }
-                .toList()
+        if (!mode.assumeCorrectSignature) {
+            val byType = locals.asSequence().filter { it.desc != null }.groupBy { it.desc!! }
+            return byType.values.mapNotNull { it.singleOrNull() }
         }
 
         return if (matchType && typeDesc != null) {
-            locals.singleOrNull { it?.desc == typeDesc }?.let { listOf(it) } ?: emptyList()
+            locals.singleOrNull { it.desc == typeDesc }?.let { listOf(it) } ?: emptyList()
         } else {
             emptyList()
         }

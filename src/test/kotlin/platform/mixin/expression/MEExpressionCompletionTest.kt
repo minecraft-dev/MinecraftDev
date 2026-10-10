@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,7 +25,7 @@ import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.mixin.BaseMixinTest
 import com.demonwav.mcdev.platform.mixin.util.MissingLVTChecker
 import com.demonwav.mcdev.util.BeforeOrAfter
-import com.demonwav.mcdev.util.invokeDeclaredMethod
+import com.demonwav.mcdev.util.McdevReflection.invokeUnwrap
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
@@ -112,14 +112,9 @@ class MEExpressionCompletionTest : BaseMixinTest() {
 
         // TODO: this is for debugging, remove this once we figure out why tests are failing
         try {
-            val actual = StringUtil.convertLineSeparators(
-                (fixture.invokeDeclaredMethod(
-                    "getHostFile",
-                    emptyArray(),
-                    emptyArray(),
-                    CodeInsightTestFixtureImpl::class.java
-                ) as PsiFile).text
-            )
+            val getHostFile = CodeInsightTestFixtureImpl::class.java.getDeclaredMethod("getHostFile")
+                .also { it.isAccessible = true }
+            val actual = StringUtil.convertLineSeparators((getHostFile.invokeUnwrap(fixture) as PsiFile).text)
             assertEquals(
                 expectedAfter.replace("<caret>", ""),
                 actual

@@ -20,10 +20,9 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MethodReference
-import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findClassNodeByPsiClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
@@ -51,7 +50,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.util.isAncestor
 import com.intellij.psi.util.parentOfType
-import com.intellij.psi.util.parents
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LineNumberNode
 import org.objectweb.asm.tree.MethodNode
@@ -133,12 +131,11 @@ class MEShowFlowAction : AnAction() {
             val modifierList = string.parentOfType<PsiMethod>()?.modifierList ?: return emptySequence()
             val (injectorAnnotation, injector) =
                 modifierList.annotations.firstNotNullOfOrNull { ann ->
-                    (MixinAnnotationHandler.forMixinAnnotation(ann, project) as? InjectorAnnotationHandler)
+                    (MixinAnnotationHandler.forMixinAnnotation(ann, project) as? InsnInjectorAnnotationHandler)
                         ?.let { ann to it }
                 } ?: return emptySequence()
             return psiClass.mixinTargets.asSequence()
                 .flatMap { injector.resolveTarget(injectorAnnotation, it) }
-                .filterIsInstance<MethodTargetMember>()
                 .map { target ->
                     Resolved(target.classAndMethod.clazz, target.classAndMethod.method) {
                         it.populateMatchStatuses(module, string, modifierList)

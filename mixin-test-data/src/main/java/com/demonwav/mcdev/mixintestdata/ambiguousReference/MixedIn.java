@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,5 +28,8 @@ public class MixedIn {
     }
 
     public void uniqueMethod(String string) {
+    }
+
+    public void uniqueDescMethod(int i) {
     }
 }

@@ -21,6 +21,8 @@
 package com.demonwav.mcdev.platform.mixin.expression
 
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
+import com.demonwav.mcdev.util.McdevReflection
+import com.demonwav.mcdev.util.McdevReflection.invokeUnwrap
 import com.demonwav.mcdev.util.findContainingModifierList
 import com.demonwav.mcdev.util.findContainingNameValuePair
 import com.demonwav.mcdev.util.parseArray
@@ -44,23 +46,11 @@ import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.parentOfType
 import com.intellij.util.SmartList
-import java.lang.reflect.Method
 
 class MEExpressionInjector : MultiHostInjector {
     private object Const {
         val ELEMENTS = listOf(PsiLiteralExpression::class.java)
         val ME_EXPRESSION_INJECTION = Key.create<MEExpressionInjection>("mcdev.meExpressionInjection")
-
-        val CLASS_INJECTION_RESULT: Class<*> =
-            Class.forName("com.intellij.psi.impl.source.tree.injected.InjectionResult")
-        val CLASS_INJECTION_REGISTRAR_IMPL: Class<*> =
-            Class.forName("com.intellij.psi.impl.source.tree.injected.InjectionRegistrarImpl")
-        val METHOD_ADD_TO_RESULTS: Method =
-            CLASS_INJECTION_REGISTRAR_IMPL.getDeclaredMethod("addToResults", CLASS_INJECTION_RESULT)
-                .also { it.isAccessible = true }
-        val METHOD_GET_INJECTED_RESULT: Method =
-            CLASS_INJECTION_REGISTRAR_IMPL.getDeclaredMethod("getInjectedResult")
-                .also { it.isAccessible = true }
     }
 
     private data class MEExpressionInjection(val modCount: Long, val injectionResult: Any)
@@ -89,7 +79,8 @@ class MEExpressionInjector : MultiHostInjector {
         val modCount = PsiModificationTracker.getInstance(project).modificationCount
         val primaryElement = modifierList.getUserData(Const.ME_EXPRESSION_INJECTION)
         if (primaryElement != null && primaryElement.modCount == modCount) {
-            Const.METHOD_ADD_TO_RESULTS.invoke(registrar, primaryElement.injectionResult)
+            McdevReflection.METHOD_INJECTION_REGISTRAR_IMPL_ADD_TO_RESULTS
+                .invokeUnwrap(registrar, primaryElement.injectionResult)
             return
         }
 
@@ -144,7 +135,10 @@ class MEExpressionInjector : MultiHostInjector {
 
         modifierList.putUserData(
             Const.ME_EXPRESSION_INJECTION,
-            MEExpressionInjection(modCount, Const.METHOD_GET_INJECTED_RESULT.invoke(registrar))
+            MEExpressionInjection(
+                modCount,
+                McdevReflection.METHOD_INJECTION_REGISTRAR_IMPL_GET_INJECTED_RESULT.invokeUnwrap(registrar)!!,
+            )
         )
     }
 

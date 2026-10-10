@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mcp.util
 object McpConstants {
 
     const val CHAT_FORMATTING = "net.minecraft.ChatFormatting"
+    const val TEXT_COLOR = "net.minecraft.network.chat.TextColor"
     const val MINECRAFT_SERVER = "net.minecraft.server.MinecraftServer"
     const val PNG_MCMETA = "*.png.mcmeta"
 }

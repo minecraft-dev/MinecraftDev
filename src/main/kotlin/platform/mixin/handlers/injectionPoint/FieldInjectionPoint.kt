@@ -21,9 +21,10 @@
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
-import com.demonwav.mcdev.util.MemberReference
+import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantValue
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -96,8 +97,8 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         targetClass: ClassNode,
         mode: CollectVisitor.Mode,
     ): CollectVisitor<PsiField>? {
-        if (mode == CollectVisitor.Mode.COMPLETION) {
-            return MyCollectVisitor(mode, at.project, MemberReference(""), -1, null, 8)
+        if (!mode.assumeCorrectAt) {
+            return MyCollectVisitor(mode, at.project, MemberInfo(), -1, null, 8)
         }
         val opcode = (at.findDeclaredAttributeValue("opcode")?.constantValue as? Int)
             ?.takeIf { it in Const.VALID_OPCODES } ?: -1
@@ -197,11 +198,14 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         private val arrayAccess: ArrayAccessType?,
         private val fuzz: Int,
     ) : CollectVisitor<PsiField>(mode) {
+        override val quantifier: Quantifier
+            get() = selector.quantifier
+
         override fun accept(methodNode: MethodNode) = sequence {
             val insns = methodNode.instructions ?: return@sequence
             for (insn in insns) {
                 if (insn !is FieldInsnNode) continue
-                if (mode != Mode.COMPLETION) {
+                if (mode.assumeCorrectAt) {
                     if (opcode != -1 && opcode != insn.opcode) {
                         continue
                     }

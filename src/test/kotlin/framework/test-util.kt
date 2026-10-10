@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,12 +22,16 @@
 
 package com.demonwav.mcdev.framework
 
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.JarFileSystem
 import com.intellij.openapi.vfs.StandardFileSystems
@@ -126,5 +130,54 @@ fun testInspectionFix(fixture: JavaCodeInsightTestFixture, basePath: String, fix
     fixture.configureByText(JavaFileType.INSTANCE, original)
     val intention = fixture.findSingleIntention(fixName)
     fixture.launchAction(intention)
+    fixture.checkResult(expected)
+}
+
+fun testAllInspectionFixes(fixture: JavaCodeInsightTestFixture, basePath: String, fixName: String) {
+    val caller = ReflectionUtil.getCallerClass(4)!!
+    val original =
+        caller.getResource("$basePath.java")?.readText()?.trim()?.lineSequence()?.joinToString("\n")
+            ?: Assertions.fail("no test data")
+    val expected = caller.getResource("$basePath.after.java")?.readText()?.trim()?.lineSequence()
+        ?.joinToString("\n") ?: Assertions.fail("no expected data")
+
+    fixture.configureByText(JavaFileType.INSTANCE, original)
+    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
+
+    var lastFixedRange: TextRange? = null
+    while (true) {
+        val (fix, range) = fixture.doHighlighting().firstNotNullOfOrNull { info ->
+            info.findRegisteredQuickFix { descriptor, range ->
+                descriptor.action.takeIf { it.familyName == fixName }?.let { it to range }
+            }
+        } ?: break
+
+        Assertions.assertNotEquals(lastFixedRange, range, "Fix loop")
+        lastFixedRange = range
+
+        val document = fixture.file.fileDocument
+        val lineNumber = document.getLineNumber(range.endOffset)
+        val expectTemplate = document.getText(
+            TextRange(
+                document.getLineStartOffset(lineNumber),
+                document.getLineEndOffset(lineNumber),
+            )
+        ).trimEnd().endsWith("expect-template")
+
+        fixture.launchAction(fix)
+
+        val hadTemplate = TemplateManager.getInstance(fixture.project).finishTemplate(fixture.editor)
+        if (expectTemplate) {
+            Assertions.assertTrue(hadTemplate, "No live template but one was expected")
+        } else {
+            Assertions.assertFalse(hadTemplate, "Had live template but one was not expected")
+        }
+    }
+
+    val remainingIssues = fixture.doHighlighting().filter { it.severity >= HighlightSeverity.WARNING }
+    Assertions.assertEquals(emptyList<Nothing>(), remainingIssues)
+
+    Assertions.assertTrue(lastFixedRange != null, "No fixes applied")
+
     fixture.checkResult(expected)
 }

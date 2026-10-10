@@ -126,9 +126,10 @@ fun PsiElement.findContextElement(): PsiElement? {
  */
 fun LookupElementBuilder.completeToLiteral(
     context: PsiElement,
+    customLiteral: String? = null,
     extraAction: ((Editor, PsiLiteral) -> Unit)? = null
 ): LookupElementBuilder {
-    if (context is PsiLiteral && extraAction == null) {
+    if (context is PsiLiteral && extraAction == null && customLiteral == null) {
         // Context is already a literal
         return this
     }
@@ -137,7 +138,12 @@ fun LookupElementBuilder.completeToLiteral(
     // not sure how you would keep line breaks after completion
     return withInsertHandler { insertionContext, item ->
         insertionContext.laterRunnable =
-            ReplaceElementWithLiteral(insertionContext.editor, insertionContext.file, item.lookupString, extraAction)
+            ReplaceElementWithLiteral(
+                insertionContext.editor,
+                insertionContext.file,
+                customLiteral ?: item.lookupString,
+                extraAction,
+            )
     }
 }
 

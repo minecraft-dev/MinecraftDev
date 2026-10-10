@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
-import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
+import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
@@ -101,7 +101,7 @@ class InjectLocalCaptureReplaceWithLocalInspection : MixinInspection() {
 
                 // resolve the local variables at the targets
                 val handler = MixinAnnotationHandler.forMixinAnnotation(MixinConstants.Annotations.INJECT)
-                    as InjectorAnnotationHandler
+                    as InsnInjectorAnnotationHandler
                 val module = annotation.findModule() ?: return
                 val localsAndParamCountsAtTargets = handler.resolveInstructions(annotation).map { result ->
                     val locals = LocalVariables.getLocals(

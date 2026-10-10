@@ -53,16 +53,17 @@ import org.objectweb.asm.tree.MethodNode
 import org.objectweb.asm.tree.VarInsnNode
 
 abstract class AbstractLoadInjectionPoint(private val store: Boolean) : InjectionPoint<PsiElement>() {
-    private fun getModifyVariableInfo(at: PsiAnnotation, mode: CollectVisitor.Mode?): LocalInfo? {
+    private fun getModifyVariableInfo(at: PsiAnnotation, mode: CollectVisitor.Mode): LocalInfo? {
         val modifyVariable = at.parentOfType<PsiAnnotation>() ?: return null
         if (!modifyVariable.hasQualifiedName(MODIFY_VARIABLE)) {
             return null
         }
 
         val method = modifyVariable.findContainingMethod() ?: return null
-        val localType = method.parameterList.getParameter(0)?.type
-        if (localType == null && mode != CollectVisitor.Mode.COMPLETION) {
-            return null
+        var localType = method.parameterList.getParameter(0)?.type
+        when {
+            !mode.assumeCorrectSignature -> localType = null
+            localType == null -> return null
         }
         return LocalInfo.fromAnnotation(localType, modifyVariable)
     }
@@ -90,7 +91,7 @@ abstract class AbstractLoadInjectionPoint(private val store: Boolean) : Injectio
         target: MixinSelector?,
         targetClass: PsiClass,
     ): NavigationVisitor? {
-        val info = getModifyVariableInfo(at, null) ?: return null
+        val info = getModifyVariableInfo(at, CollectVisitor.Mode.RESOLUTION) ?: return null
         return MyNavigationVisitor(info, store)
     }
 
