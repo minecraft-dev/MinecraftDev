@@ -1,5 +1,19 @@
 # Minecraft Development for IntelliJ
 
+## [1.9.0]
+
+### Added
+
+- Added `MapColor` and `TextColor` preview color gutter icons
+- Added Fabric 26.1+ class templates
+- Added Mixin quanitifer support
+- Added lambda selector support
+
+### Fixed
+
+- Fixed errors when using wildcards in Mixins, caused by MinecraftDev requiring a match in all methods rather than any of them
+- Fixed opcode warning for `JUMP` injection point
+
 ## [1.8.22]
 
 ### Fixed
