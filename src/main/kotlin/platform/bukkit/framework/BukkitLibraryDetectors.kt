@@ -18,9 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.framework
+package com.demonwav.mcdev.platform.bukkit.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.MavenMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 
-val MCP_LIBRARY_KIND: LibraryKind by libraryKind("mcp-library")
+class BukkitLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.BUKKIT, "org.bukkit", "bukkit")
+
+class SpigotLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.SPIGOT, "org.spigotmc", "spigot-api")
+
+class OldPaperLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.PAPER, "com.destroystokyo.paper", "paper-api")
+
+class PaperLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.PAPER, "io.papermc.paper", "paper-api", false)

@@ -18,10 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.bungeecord.framework
+package com.demonwav.mcdev.platform.forge.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 
-val BUNGEECORD_LIBRARY_KIND: LibraryKind by libraryKind("bungeecord-api")
-val WATERFALL_LIBRARY_KIND: LibraryKind by libraryKind("waterfall-api")
+class ForgeLibraryDetector : ClassMinecraftLibraryDetector(PlatformType.FORGE, ForgeConstants.MOD_ANNOTATION)
