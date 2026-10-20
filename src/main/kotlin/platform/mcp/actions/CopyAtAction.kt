@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mcp.mappings.Mappings
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.demonwav.mcdev.util.internalName
 import com.demonwav.mcdev.util.showBalloon
 import com.demonwav.mcdev.util.showSuccessBalloon
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -58,7 +59,7 @@ class CopyAtAction : SrgActionBase() {
                     copyToClipboard(
                         data.editor,
                         data.element,
-                        className + " " + parent.name + parent.descriptor,
+                        className + " " + parent.internalName + parent.descriptor,
                     )
                 }
                 is PsiClass -> {
