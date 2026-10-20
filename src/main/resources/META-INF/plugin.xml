@@ -361,6 +361,8 @@
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
         <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
         <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
+        <postStartupActivity implementation="com.demonwav.mcdev.update.OutdatedIdeChecker"/>
+        <notificationGroup id="Minecraft Development updates" displayType="STICKY_BALLOON"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
