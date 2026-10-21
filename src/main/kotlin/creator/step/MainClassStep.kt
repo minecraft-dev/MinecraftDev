@@ -41,13 +41,14 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
         val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
 
         if (buildSystemProps.artifactId.contains('.')) {
-            // if the artifact id is invalid, don't confuse ourselves by copying its dots
             return className
         }
 
-        return buildSystemProps.groupId.toPackageName() +
-            "." + buildSystemProps.artifactId.toPackageName() +
-            "." + findStep<AbstractModNameStep>().name.toJavaClassName()
+        val group = buildSystemProps.groupId.toPackageName()
+        val artifact = buildSystemProps.artifactId.toPackageName()
+        val mainClassName = findStep<AbstractModNameStep>().name.toJavaClassName()
+
+        return "$group.$artifact.$mainClassName"
     }
 
     val classNameProperty = propertyGraph.lazyProperty(::suggestMainClassName)
