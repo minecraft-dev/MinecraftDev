@@ -1650,6 +1650,7 @@
 
         <registryKey defaultValue="true" description="Use the new mappings parser." key="mcdev.new.tsrg.parser"/>
         <registryKey defaultValue="false" description="Assume Minecraft is unobfuscated" key="mcdev.unobfuscated.minecraft"/>
+        <registryKey defaultValue="true" description="Warn when the IDE is too old to receive further plugin updates" key="mcdev.outdated.ide.warning"/>
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">

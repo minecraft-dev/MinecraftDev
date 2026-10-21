@@ -29,6 +29,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.BuildNumber
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.io.HttpRequests
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
@@ -41,7 +42,7 @@ import kotlinx.coroutines.withContext
  */
 class OutdatedIdeChecker : ProjectActivity {
     override suspend fun execute(project: Project) {
-        if (!checked.compareAndSet(false, true)) {
+        if (!Registry.`is`("mcdev.outdated.ide.warning") || !checked.compareAndSet(false, true)) {
             return
         }
 
