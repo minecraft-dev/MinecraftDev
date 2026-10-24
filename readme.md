@@ -65,7 +65,7 @@ Building
 
 Build the plugin with:
 
-`./gradlew build`
+`./gradlew buildPlugin`
 
 The output .zip file for the plugin will be in `build/distributions`.
 
