@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,11 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:JvmName("PlatformVersion")
+
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.fromJson
+import com.demonwav.mcdev.util.loggerForTopLevel
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.demonwav.mcdev.util.withSuppressed
 import com.github.kittinunf.fuel.core.FuelManager
@@ -30,7 +32,6 @@ import com.github.kittinunf.fuel.core.requests.suspendable
 import com.github.kittinunf.fuel.coroutines.awaitString
 import com.google.gson.Gson
 import com.intellij.openapi.diagnostic.Attachment
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.net.JdkProxyProvider
 import java.io.IOException
 import java.net.Proxy
@@ -52,12 +53,7 @@ private const val OVH_BASE_URL = "https://versions.denwav.com/versions/"
 
 private val URLS = listOf(CLOUDFLARE_BASE_URL, GITHUB_BASE_URL, OVH_BASE_URL)
 
-val PLATFORM_VERSION_LOGGER = logger<PlatformVersion>()
-
-suspend fun getVersionSelector(type: PlatformType): PlatformVersion {
-    val versionJson = type.versionJson ?: throw UnsupportedOperationException("Incorrect platform type: $type")
-    return getVersionJson(versionJson)
-}
+val PLATFORM_VERSION_LOGGER = loggerForTopLevel()
 
 suspend inline fun <reified T : Any> getVersionJson(path: String): T {
     return getVersionJson(path, T::class)
@@ -112,5 +108,3 @@ fun selectProxy(urlText: String): Proxy? {
     }
     return null
 }
-
-data class PlatformVersion(var versions: List<String>, var selectedIndex: Int)
