@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.mcp.at.AtFileType
 import com.demonwav.mcdev.platform.mcp.gradle.McpModelData
 import com.demonwav.mcdev.platform.mcp.gradle.tooling.McpModelNMD
 import com.demonwav.mcdev.platform.mcp.srg.SrgType
+import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
 import com.demonwav.mcdev.util.runWriteTaskLater
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
@@ -45,7 +46,7 @@ object McpModelNMDHandler : McpModelDataHandler {
         val data = resolverCtx.getExtraProject(gradleModule, McpModelNMD::class.java) ?: return
 
         val minecraftVersion = when {
-            data.neoForgeVersion != null -> "1." + data.neoForgeVersion!!.substringBeforeLast('.').removeSuffix(".0")
+            data.neoForgeVersion != null -> NeoForgeVersion.getMinecraftVersion(data.neoForgeVersion!!)
             data.neoFormVersion != null -> data.neoFormVersion!!.substringBeforeLast('-').removeSuffix(".0")
             else -> null
         }

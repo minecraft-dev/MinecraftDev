@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -56,5 +56,21 @@ object MinecraftVersions {
         minecraftVersion <= MC1_20_4 -> JavaSdkVersion.JDK_17
         minecraftVersion <= MC1_21_11 -> JavaSdkVersion.JDK_21
         else -> JavaSdkVersion.JDK_25
+    }
+
+    /**
+     * Returns the version of the next major Minecraft release, mimicking the code used in Forge's MDK.
+     * For example 1.20.4 -> 1.21, and 26.1 -> 26.2 with the year-based versioning scheme.
+     *
+     * See https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
+     */
+    fun nextMajorVersion(minecraftVersion: SemanticVersion): String {
+        val first = minecraftVersion.parts.getOrNull(0)?.versionString ?: "1"
+        val mcNext = when (val part = minecraftVersion.parts.getOrNull(1)) {
+            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
+            null -> "?"
+            else -> part.versionString
+        }
+        return "$first.$mcNext"
     }
 }
