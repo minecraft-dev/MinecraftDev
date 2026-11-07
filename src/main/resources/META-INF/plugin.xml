@@ -201,6 +201,9 @@
             implementation="com.demonwav.mcdev.creator.custom.types.FabricVersionsCreatorProperty$Factory"
             type="fabric_versions"/>
         <creatorPropertyType
+            implementation="com.demonwav.mcdev.creator.custom.types.FabricGameVersionCreatorProperty$Factory"
+            type="fabric_game_version"/>
+        <creatorPropertyType
             implementation="com.demonwav.mcdev.creator.custom.types.ForgeVersionsCreatorProperty$Factory"
             type="forge_versions"/>
         <creatorPropertyType
@@ -253,6 +256,12 @@
                           type="run_gradle_tasks"/>
         <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.GitAddAllFinalizer"
                           type="git_add_all"/>
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.GenerateFilesFinalizer"
+                          type="generate_files"/>
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.ReplaceInFileFinalizer"
+                          type="replace_in_file"/>
+        <creatorFinalizer implementation="com.demonwav.mcdev.creator.custom.finalizers.RunNpmPackageFinalizer"
+                          type="run_npm_package"/>
 
         <mixinSelectorParser id="regex" implementation="com.demonwav.mcdev.platform.mixin.reference.MixinRegexParser"
                              order="before memberReference"/>
