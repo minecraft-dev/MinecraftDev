@@ -44,6 +44,7 @@ import com.demonwav.mcdev.util.countIsAtLeast
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.equivalentTo
 import com.demonwav.mcdev.util.findMethods
+import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.internalName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaPsiFacade
@@ -93,6 +94,7 @@ class AtResolver(
     private val at: PsiAnnotation,
     private val targetClass: ClassNode,
     private val targetMethod: MethodNode,
+    private val sourceElement: PsiElement? = null,
 ) {
     companion object {
         fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
@@ -241,8 +243,8 @@ class AtResolver(
         val project = at.project
 
         // Resolve the target source class
-        val targetPsiClass = getTargetClass(target)
-            .findSourceClass(project, GlobalSearchScope.allScope(project), canDecompile = true)
+        val targetPsiClass = sourceElement?.findContainingClass()
+            ?: getTargetClass(target).findSourceClass(project, GlobalSearchScope.allScope(project), canDecompile = true)
             ?: return emptyList()
         val targetPsiFile = targetPsiClass.containingFile ?: return emptyList()
 
@@ -252,13 +254,16 @@ class AtResolver(
 
         // Find the element in the desugared class, first by directly searching and then by searching in the original
         // and reverse mapping it into the desugared class.
-        val desugaredTargetElement = when {
+        val desugaredTargetElement = sourceElement?.let { original ->
+            DesugarUtil.getOriginalToDesugaredMap(desugaredTargetClass)[original]
+                ?.firstOrNull { it is PsiParameterListOwner }
+        } ?: when {
             targetMethod.isClinit -> desugaredTargetClass.initializers.firstOrNull {
                 it.hasModifierProperty(PsiModifier.STATIC)
             }
             else -> desugaredTargetClass.findMethods(targetMethod.memberReference).firstOrNull()
         } ?: run {
-            val originalTargetElement = targetMethod.findSourceElement(
+            val originalTargetElement = sourceElement ?: targetMethod.findSourceElement(
                 getTargetClass(target),
                 project,
                 GlobalSearchScope.allScope(project),
