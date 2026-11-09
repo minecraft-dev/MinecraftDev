@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.MixinTargetMember
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiClass
 import org.objectweb.asm.tree.ClassNode
 
 /** Supplies shadow targets contributed by other transformations of the same target class. */
@@ -34,6 +35,8 @@ interface ShadowTargetResolver {
         member: PsiMember,
         effectiveName: String,
     ): List<MixinTargetMember>
+
+    fun findCompletionTargets(mixinClass: PsiClass): Sequence<MixinTargetMember> = emptySequence()
 
     companion object {
         val EP_NAME = ExtensionPointName.create<ShadowTargetResolver>("com.demonwav.minecraft-dev.shadowTargetResolver")
