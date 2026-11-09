@@ -27,7 +27,6 @@ import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.bytecode
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
-import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.findUpstreamMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberReference
@@ -116,6 +115,10 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     }
 
     fun resolve(context: PsiElement): Sequence<ClassAndMethodNode>? {
+        return resolveWithSelectors(context)?.map { it.second }
+    }
+
+    private fun resolveWithSelectors(context: PsiElement): Sequence<Pair<MixinSelector, ClassAndMethodNode>>? {
         val allowStatic = context.parentOfType<PsiMethod>()?.hasModifierProperty(PsiModifier.STATIC) ?: true
         val targets = getTargets(context) ?: return null
         val targetedMethods = when (context) {
@@ -124,30 +127,20 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
         }
         val selectors = targetedMethods.mapNotNull { parseSelector(it, context) }
 
-        return resolve(targets, selectors, allowStatic)
-    }
-
-    private fun resolve(
-        targets: Collection<ClassNode>,
-        selectors: List<MixinSelector>,
-        allowStatic: Boolean,
-    ): Sequence<ClassAndMethodNode> {
-        return targets.asSequence()
-            .flatMap { target ->
-                selectors.asSequence().map { it.getCustomOwner(target) to it }
+        return targets.asSequence().flatMap { target ->
+            selectors.asSequence().flatMap { selector ->
+                val owner = selector.getCustomOwner(target)
+                owner.findMethods(listOf(selector), allowStatic)
+                    .map { selector to ClassAndMethodNode(owner, it) }
             }
-            .groupBy({ it.first }, { it.second })
-            .asSequence()
-            .flatMap { (target, selectors) ->
-                target.findMethods(selectors, allowStatic)
-                    .map { ClassAndMethodNode(target, it) }
-            }
+        }
     }
 
     fun resolveForNavigation(context: PsiElement): Array<PsiElement>? {
-        return resolve(context)?.mapNotNull {
-            it.method.findSourceElement(
-                it.clazz,
+        return resolveWithSelectors(context)?.mapNotNull { (selector, target) ->
+            selector.findSourceMethod(
+                target.clazz,
+                target.method,
                 context.project,
                 scope = context.resolveScope,
                 canDecompile = true,
@@ -156,9 +149,10 @@ abstract class AbstractMethodReference : PolyReferenceResolver(), MixinReference
     }
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {
-        return resolve(context)?.mapNotNull {
-            it.method.findSourceElement(
-                it.clazz,
+        return resolveWithSelectors(context)?.mapNotNull { (selector, target) ->
+            selector.findSourceMethod(
+                target.clazz,
+                target.method,
                 context.project,
                 scope = context.resolveScope,
                 canDecompile = false,
