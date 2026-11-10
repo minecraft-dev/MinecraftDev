@@ -28,7 +28,7 @@ import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.toml.tomlType
 import com.demonwav.mcdev.toml.unquoteKey
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.findMcpModule
+import com.demonwav.mcdev.util.findMinecraftModule
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
@@ -90,7 +90,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     }
 
                     val forgeVersion = runCatching {
-                        keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
+                        keyValue.findMinecraftModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
                     }.getOrNull()
                     val minVersion = ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION
                     if (forgeVersion != null && forgeVersion < minVersion) {
@@ -115,7 +115,7 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 }
                 "clientSideOnly" -> {
                     val forgeVersion = runCatching {
-                        keyValue.findMcpModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
+                        keyValue.findMinecraftModule()?.getSettings()?.platformVersion?.let(SemanticVersion::parse)
                     }.getOrNull()
                     val minVersion = ForgeConstants.CLIENT_ONLY_MANIFEST_VERSION
                     if (forgeVersion != null && forgeVersion < minVersion) {

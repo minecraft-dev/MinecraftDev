@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SLICE
+import com.demonwav.mcdev.platform.mixin.util.findSourceElement
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.MemberMatcher
 import com.demonwav.mcdev.util.Quantifier
@@ -42,11 +43,11 @@ import com.demonwav.mcdev.util.resolveTypeArray
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiCallExpression
 import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiLiteral
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifierList
@@ -61,6 +62,8 @@ import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.parentOfType
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodNode
 import java.util.Locale
 import java.util.regex.PatternSyntaxException
 import org.objectweb.asm.Type
@@ -98,6 +101,14 @@ interface MixinSelector : MemberMatcher {
     val next: MixinSelector? get() = null
 
     fun withQuantifier(quantifier: Quantifier): MixinSelector
+
+    fun findSourceMethod(
+        owner: ClassNode,
+        method: MethodNode,
+        project: Project,
+        scope: GlobalSearchScope,
+        canDecompile: Boolean,
+    ): PsiElement? = method.findSourceElement(owner, project, scope, canDecompile)
 }
 
 class MixinMemberParser : MixinSelectorParser {

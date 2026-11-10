@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -42,7 +42,6 @@ import com.demonwav.mcdev.creator.step.WebsiteStep
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
 
@@ -64,13 +63,6 @@ class NeoForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
 
-        val nextMcVersion = when (val part = mcVersion.parts.getOrNull(1)) {
-            // Extract the major version and increment (1.20.4 -> 1.21), as is done manually in the MDK
-            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
-            null -> "?"
-            else -> part.versionString
-        }
-
         val packDescriptor = ForgePackDescriptor.forMcVersion(mcVersion) ?: ForgePackDescriptor.FORMAT_3
 
         assets.addTemplateProperties(
@@ -82,7 +74,7 @@ class NeoForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
             "MOD_VERSION" to buildSystemProps.version,
             "NEOFORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
             "MC_VERSION" to mcVersion,
-            "MC_NEXT_VERSION" to "1.$nextMcVersion",
+            "MC_NEXT_VERSION" to MinecraftVersions.nextMajorVersion(mcVersion),
             "LICENSE" to license,
             "DESCRIPTION" to description,
             "MIXIN_CONFIG" to if (useMixins) "$modId.mixins.json" else null,

@@ -28,7 +28,7 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SidedProxyAnnotator
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
-import com.demonwav.mcdev.platform.mcp.McpModuleSettings
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleSettings
 import com.demonwav.mcdev.toml.stringValue
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.SourceType
@@ -127,7 +127,7 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     }
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod): String {
-        val mcVersion = McpModuleSettings.getInstance(module).state.minecraftVersion
+        val mcVersion = MinecraftModuleSettings.getInstance(module).state.minecraftVersion
             ?.let { SemanticVersion.parse(it) }
         if (mcVersion != null && mcVersion >= ForgeModuleType.FG3_MC_VERSION) {
             return formatWrongEventMessage(

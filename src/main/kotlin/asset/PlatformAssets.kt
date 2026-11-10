@@ -66,9 +66,4 @@ object PlatformAssets : Assets() {
 
     val NEOFORGE_ICON = IconUtil.scale(loadIcon("/assets/icons/platform/NeoForge.png"), null, 0.125f)
     val NEOFORGE_ICON_2X = IconUtil.scale(loadIcon("/assets/icons/platform/NeoForge.png"), null, 0.25f)
-
-    val MCP_ICON = loadIcon("/assets/icons/platform/MCP.png")
-    val MCP_ICON_2X = loadIcon("/assets/icons/platform/MCP@2x.png")
-    val MCP_ICON_DARK = loadIcon("/assets/icons/platform/MCP_dark.png")
-    val MCP_ICON_2X_DARK = loadIcon("/assets/icons/platform/MCP@2x_dark.png")
 }

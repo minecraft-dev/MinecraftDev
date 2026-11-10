@@ -26,10 +26,10 @@ import com.demonwav.mcdev.platform.AbstractModule
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.fabric.reference.EntryPointReference
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
-import com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomData
-import com.demonwav.mcdev.platform.mcp.mappings.HardcodedYarnToMojmap
-import com.demonwav.mcdev.platform.mcp.mappings.HasCustomNamedMappings
-import com.demonwav.mcdev.platform.mcp.mappings.MappingsManager
+import com.demonwav.mcdev.platform.minecraft.fabricloom.FabricLoomData
+import com.demonwav.mcdev.platform.minecraft.mappings.HardcodedYarnToMojmap
+import com.demonwav.mcdev.platform.minecraft.mappings.HasCustomNamedMappings
+import com.demonwav.mcdev.platform.minecraft.mappings.MappingsManager
 import com.demonwav.mcdev.util.SourceType
 import com.demonwav.mcdev.util.nullable
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions

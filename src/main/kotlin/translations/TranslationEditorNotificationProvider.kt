@@ -24,7 +24,7 @@ import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.sorting.Ordering
 import com.demonwav.mcdev.translations.sorting.TranslationSorter
 import com.demonwav.mcdev.util.applyWriteAction
-import com.demonwav.mcdev.util.findMcpModule
+import com.demonwav.mcdev.util.findMinecraftModule
 import com.demonwav.mcdev.util.mcDomain
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
@@ -60,15 +60,15 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
             return null
         }
 
-        val hasMcpModule = file.findPsiFile(project)?.findMcpModule() != null
+        val hasMinecraftModule = file.findPsiFile(project)?.findMinecraftModule() != null
         return Function {
-            createNotificationPanel(missingTranslations, hasMcpModule, file, project)
+            createNotificationPanel(missingTranslations, hasMinecraftModule, file, project)
         }
     }
 
     private fun createNotificationPanel(
         missingTranslations: Sequence<Translation>,
-        hasMcpModule: Boolean,
+        hasMinecraftModule: Boolean,
         file: VirtualFile,
         project: Project
     ): InfoPanel {
@@ -86,8 +86,8 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
                 EditorNotifications.updateAll()
             }
 
-            if (!hasMcpModule) {
-                // TranslationSorter.query requires an MCP module to work
+            if (!hasMinecraftModule) {
+                // TranslationSorter.query requires a Minecraft module to work
                 return@createActionLabel
             }
 

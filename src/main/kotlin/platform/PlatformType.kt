@@ -38,8 +38,8 @@ import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
-import com.demonwav.mcdev.platform.mcp.McpModuleType
-import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
+import com.demonwav.mcdev.platform.minecraft.framework.MINECRAFT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.MixinModuleType
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
@@ -68,7 +68,7 @@ enum class PlatformType(
     VELOCITY(VelocityModuleType, "velocity.json"),
     MIXIN(MixinModuleType),
     NEOFORGE(NeoForgeModuleType),
-    MCP(McpModuleType),
+    MINECRAFT(MinecraftModuleType),
     ADVENTURE(AdventureModuleType),
     ;
 
@@ -98,7 +98,7 @@ enum class PlatformType(
             ARCHITECTURY_LIBRARY_KIND -> ARCHITECTURY
             FORGE_LIBRARY_KIND -> FORGE
             FABRIC_LIBRARY_KIND -> FABRIC
-            MCP_LIBRARY_KIND -> MCP
+            MINECRAFT_LIBRARY_KIND -> MINECRAFT
             MIXIN_LIBRARY_KIND -> MIXIN
             BUNGEECORD_LIBRARY_KIND -> BUNGEECORD
             WATERFALL_LIBRARY_KIND -> WATERFALL

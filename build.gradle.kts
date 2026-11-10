@@ -299,11 +299,11 @@ license {
     }
 }
 
-val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
-val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/mcp/at/gen")
+val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
 
-val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/mcp/ct/gen")
-val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/mcp/ct/gen")
+val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
 
 val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
 val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")

@@ -1,5 +1,25 @@
 # Minecraft Development for IntelliJ
 
+## [1.9.1]
+
+### Added
+
+- Added a warning when the IDE is more than 3 versions out of date, meaning you won't receive new updates for MinecraftDev.
+- Added more constants to `MinecraftVersions`.
+- Allow plugins to customize source resolution for navigation via custom Mixin selectors.
+- Allow plugins to customize `@Shadow` targets.
+
+### Changed
+
+- Bumped templates version to 4.
+- The Fabric project creator now uses the Fabric CLI.
+- Renamed most "MCP" features to "Minecraft" features to better reflect what they actually are.
+
+### Fixed
+
+- Fixed copy AT action copying wrong name for constructors.
+- Fixed Forge/NeoForge versions where Minecraft versions don't start with "1.".
+
 ## [1.9.0]
 
 ### Added

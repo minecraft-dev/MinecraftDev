@@ -18,11 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.mcp.at.gen;
+package com.demonwav.mcdev.platform.minecraft.at.gen;
 
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
-import static com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes.*;
+import static com.demonwav.mcdev.platform.minecraft.at.gen.psi.AtTypes.*;
 import static com.intellij.psi.TokenType.*;
 
 %%
