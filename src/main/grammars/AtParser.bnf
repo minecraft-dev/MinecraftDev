@@ -19,18 +19,18 @@
  */
 
 {
-    parserClass="com.demonwav.mcdev.platform.mcp.at.gen.parser.AtParser"
+    parserClass="com.demonwav.mcdev.platform.minecraft.at.gen.parser.AtParser"
 
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="At"
     psiImplClassSuffix="Impl"
-    psiPackage="com.demonwav.mcdev.platform.mcp.at.gen.psi"
-    psiImplPackage="com.demonwav.mcdev.platform.mcp.at.gen.psi.impl"
+    psiPackage="com.demonwav.mcdev.platform.minecraft.at.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.minecraft.at.gen.psi.impl"
 
-    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.at.gen.psi.AtTypes"
-    elementTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtElementType"
-    tokenTypeClass="com.demonwav.mcdev.platform.mcp.at.psi.AtTokenType"
+    elementTypeHolderClass="com.demonwav.mcdev.platform.minecraft.at.gen.psi.AtTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.minecraft.at.psi.AtElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.minecraft.at.psi.AtTokenType"
 
     consumeTokenMethod="consumeTokenFast"
 }
@@ -41,8 +41,8 @@ private line ::= !<<eof>> entry? COMMENT? end_line
 private end_line ::= CRLF | <<eof>>
 
 entry ::= keyword class_name line_value? {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtEntryMixin"
     pin = 1
     recoverWhile = line_recover
 }
@@ -51,49 +51,49 @@ private line_recover ::= !(end_line | COMMENT)
 private line_value ::= function | field_name | asterisk
 
 asterisk ::= ASTERISK_ELEMENT {
-   implements="com.demonwav.mcdev.platform.mcp.at.psi.AtElement"
+   implements="com.demonwav.mcdev.platform.minecraft.at.psi.AtElement"
 }
 
 keyword ::= KEYWORD_ELEMENT {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtKeywordImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtKeywordMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtKeywordImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtKeywordMixin"
     methods=[
         keywordElement="KEYWORD_ELEMENT"
     ]
 }
 
 class_name ::= CLASS_NAME_ELEMENT {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtClassNameImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtClassNameMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtClassNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtClassNameMixin"
     methods=[
         classNameElement="CLASS_NAME_ELEMENT"
     ]
 }
 
 field_name ::= NAME_ELEMENT {
-    mixin= "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFieldNameImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFieldNameMixin"
+    mixin= "com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtFieldNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtFieldNameMixin"
     methods=[
         nameElement="NAME_ELEMENT"
     ]
 }
 
 function ::= func_name OPEN_PAREN argument* CLOSE_PAREN return_value {
-    mixin= "com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFunctionImplMixin"
-    implements= "com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFunctionMixin"
+    mixin= "com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtFunctionImplMixin"
+    implements= "com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtFunctionMixin"
 }
 
 func_name ::= NAME_ELEMENT {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtFuncNameImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtFuncNameMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtFuncNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtFuncNameMixin"
     methods=[
         nameElement="NAME_ELEMENT"
     ]
 }
 
 argument ::= PRIMITIVE | CLASS_VALUE {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtArgumentImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtArgumentMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtArgumentImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtArgumentMixin"
     methods=[
         primitive="PRIMITIVE"
         classValue="CLASS_VALUE"
@@ -101,8 +101,8 @@ argument ::= PRIMITIVE | CLASS_VALUE {
 }
 
 return_value ::= PRIMITIVE | CLASS_VALUE {
-    mixin="com.demonwav.mcdev.platform.mcp.at.psi.mixins.impl.AtReturnValueImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.at.psi.mixins.AtReturnValueMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.impl.AtReturnValueImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.at.psi.mixins.AtReturnValueMixin"
     methods=[
         primitive="PRIMITIVE"
         classValue="CLASS_VALUE"

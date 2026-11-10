@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.intellij.execution.RunConfigurationExtension
 import com.intellij.execution.configurations.DebuggingRunnerData
 import com.intellij.execution.configurations.JavaParameters
@@ -66,11 +66,11 @@ abstract class ModuleDebugRunConfigurationExtension : RunConfigurationExtension(
                 attachToProcess(handler, module)
             }
             is GradleRunConfiguration -> {
-                // Loose way to confirm we are in an MCP project, this is fine for now because we don't rely on specific
+                // Loose way to confirm we are in a Minecraft project, this is fine for now because we don't rely on specific
                 // information to ungrab (like MC version)
                 // Ideally we would find the module matching the run's sourceSet as defined in the build script
                 val module = configuration.project.modules.firstOrNull {
-                    MinecraftFacet.getInstance(it)?.isOfType(McpModuleType) == true
+                    MinecraftFacet.getInstance(it)?.isOfType(MinecraftModuleType) == true
                 } ?: return
                 attachToProcess(handler, module)
             }

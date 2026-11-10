@@ -355,7 +355,7 @@
                * Forge
                * NeoForge
                * Fabric
-               * MCP
+               * Minecraft
                * Mixin
                * Velocity
                * BungeeCord
@@ -641,63 +641,63 @@
             implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyPresentationProvider"/>
         <!--endregion-->
 
-        <!--region MCP-->
+        <!--region MINECRAFT-->
         <!---->
 
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.gradle.McpDataService"/>
-        <externalProjectDataService implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.minecraft.gradle.MinecraftDataService"/>
+        <externalProjectDataService implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.FabricLoomDataService"/>
         <externalProjectDataService
-            implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDataService"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.vanillagradle.VanillaGradleDataService"/>
 
         <library.presentationProvider
-            implementation="com.demonwav.mcdev.platform.mcp.framework.McpPresentationProvider"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.framework.MinecraftPresentationProvider"/>
 
-        <runConfigurationExtension implementation="com.demonwav.mcdev.platform.mcp.debug.McpRunConfigurationExtension"/>
+        <runConfigurationExtension implementation="com.demonwav.mcdev.platform.minecraft.debug.MinecraftRunConfigurationExtension"/>
 
         <attachSourcesProvider
-            implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomDecompileSourceProvider"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.FabricLoomDecompileSourceProvider"/>
         <attachSourcesProvider
-            implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleDecompileSourceProvider"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.vanillagradle.VanillaGradleDecompileSourceProvider"/>
 
         <!-- access transformer file type -->
         <fileType name="Access Transformers" language="Access Transformers"
-                  implementationClass="com.demonwav.mcdev.platform.mcp.at.AtFileType" fieldName="INSTANCE"
+                  implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtFileType" fieldName="INSTANCE"
                   patterns="*_at.cfg"/>
         <lang.parserDefinition language="Access Transformers"
-                               implementationClass="com.demonwav.mcdev.platform.mcp.at.AtParserDefinition"/>
+                               implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Access Transformers"
-                                       implementationClass="com.demonwav.mcdev.platform.mcp.at.AtSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.at.AtColorSettingsPage"/>
+                                       implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.minecraft.at.AtColorSettingsPage"/>
         <lang.commenter language="Access Transformers"
-                        implementationClass="com.demonwav.mcdev.platform.mcp.at.AtCommenter"/>
-        <typedHandler implementation="com.demonwav.mcdev.platform.mcp.at.completion.AtTypedHandlerDelegate"/>
+                        implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtCommenter"/>
+        <typedHandler implementation="com.demonwav.mcdev.platform.minecraft.at.completion.AtTypedHandlerDelegate"/>
         <completion.contributor language="Access Transformers"
-                                implementationClass="com.demonwav.mcdev.platform.mcp.at.completion.AtCompletionContributor"/>
-        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.mcp.at.AtGotoDeclarationHandler"/>
-        <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.mcp.at.AtAnnotator"/>
+                                implementationClass="com.demonwav.mcdev.platform.minecraft.at.completion.AtCompletionContributor"/>
+        <gotoDeclarationHandler implementation="com.demonwav.mcdev.platform.minecraft.at.AtGotoDeclarationHandler"/>
+        <annotator language="Access Transformers" implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtAnnotator"/>
 
         <!-- class tweaker file type -->
         <fileType name="Class Tweaker" language="Class Tweaker"
-                  implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtFileType" fieldName="INSTANCE"
+                  implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtFileType" fieldName="INSTANCE"
                   patterns="*.accesswidener;*.aw;*.classtweaker;*.ct"/>
         <lang.parserDefinition language="Class Tweaker"
-                               implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtParserDefinition"/>
+                               implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Class Tweaker"
-                                       implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="com.demonwav.mcdev.platform.mcp.ct.CtColorSettingsPage"/>
-        <lang.commenter language="Class Tweaker" implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtCommenter"/>
-        <annotator language="Class Tweaker" implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtAnnotator"/>
+                                       implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.minecraft.ct.CtColorSettingsPage"/>
+        <lang.commenter language="Class Tweaker" implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtCommenter"/>
+        <annotator language="Class Tweaker" implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtAnnotator"/>
         <completion.contributor language="Class Tweaker"
-                                implementationClass="com.demonwav.mcdev.platform.mcp.ct.CtCompletionContributor"/>
+                                implementationClass="com.demonwav.mcdev.platform.minecraft.ct.CtCompletionContributor"/>
         <codeInsight.unresolvedReferenceQuickFixProvider
-            implementation="com.demonwav.mcdev.platform.mcp.ct.fixes.CopyAwAccessibleEntryFix$Provider"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.ct.fixes.CopyAwAccessibleEntryFix$Provider"/>
 
-        <moduleService serviceImplementation="com.demonwav.mcdev.platform.mcp.McpModuleSettings"/>
+        <moduleService serviceImplementation="com.demonwav.mcdev.platform.minecraft.MinecraftModuleSettings"/>
 
         <gotoSymbolContributor
-            implementation="com.demonwav.mcdev.platform.mcp.navigation.SrgMemberChooseByNameContributor"/>
-        <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.fabricloom.TinyUnscrambler"/>
-        <unscrambleSupport implementation="com.demonwav.mcdev.platform.mcp.srg.McpUnscrambler"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.navigation.SrgMemberChooseByNameContributor"/>
+        <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.TinyUnscrambler"/>
+        <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.srg.McpUnscrambler"/>
         <!--endregion-->
 
         <!--region MIXIN-->
@@ -1049,35 +1049,35 @@
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection"/>
         <!--endregion-->
 
-        <!--region MCP INSPECTIONS-->
+        <!--region MINECRAFT INSPECTIONS-->
         <localInspection displayName="Unused access transformer"
-                         groupName="MCP"
+                         groupName="Minecraft"
                          language="Access Transformers"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.at.AtUsageInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtUsageInspection"/>
         <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
-                         groupName="MCP"
+                         groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="false"
                          level="WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.inspections.StackEmptyInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.inspections.StackEmptyInspection"/>
         <localInspection displayName="Duplicate access widener"
-                         groupName="MCP"
+                         groupName="Minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.ct.inspections.DuplicateAwEntryInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.DuplicateAwEntryInspection"/>
         <localInspection displayName="Unknown CT namespace"
-                         groupName="MCP"
+                         groupName="Minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
                          hasStaticDescription="true"
-                         implementationClass="com.demonwav.mcdev.platform.mcp.ct.inspections.UnknownCtNamespaceInspection"/>
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.UnknownCtNamespaceInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
@@ -1665,10 +1665,10 @@
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.plugins.gradle">
-        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.gradle.McpProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.minecraft.gradle.MinecraftProjectResolverExtension"/>
         <projectResolve
-            implementation="com.demonwav.mcdev.platform.mcp.vanillagradle.VanillaGradleProjectResolverExtension"/>
-        <projectResolve implementation="com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomProjectResolverExtension"/>
+            implementation="com.demonwav.mcdev.platform.minecraft.vanillagradle.VanillaGradleProjectResolverExtension"/>
+        <projectResolve implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.FabricLoomProjectResolverExtension"/>
         <projectResolve
             implementation="com.demonwav.mcdev.platform.architectury.framework.ArchitecturyProjectResolverExtension"/>
     </extensions>
@@ -1734,27 +1734,27 @@
                 popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.FindSrgMappingAction" id="FindSrgMappingAction"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.FindSrgMappingAction" id="FindSrgMappingAction"
                 text="Get SRG Name"
                 description="Find the associated SRG mapping for this element">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAtAction" id="CopyATAction"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAtAction" id="CopyATAction"
                 text="AT Entry"
                 description="Copy the reference to clipboard in Access Transformer format">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.GotoAtEntryAction" id="GotoAtEntry"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.GotoAtEntryAction" id="GotoAtEntry"
                 text="AT Entry"
                 description="Go to the relevant Access Transformer entry, if it exists">
             <add-to-group group-id="EditorPopupMenu.GoTo"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyCoremodTargetAction" id="CopyCoremodTargetAction"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyCoremodTargetAction" id="CopyCoremodTargetAction"
                 text="Coremod Target Reference"
                 description="Copy the reference to the element for use in a javascript coremod">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.LookupMemberAction" id="LookupMcpMember"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.LookupMemberAction" id="LookupMcpMember"
                 text="Lookup MCP Member"
                 description="Lookup MCP mapping info on a SRG field or method">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
@@ -1768,7 +1768,7 @@
                 text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mcp.actions.CopyAwAction" id="CopyAWAction"
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction"
                 text="AW Entry"
                 description="Copy the reference to clipboard in Access Widener format">
             <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>

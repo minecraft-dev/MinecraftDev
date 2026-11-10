@@ -24,7 +24,7 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
 import com.demonwav.mcdev.platform.architectury.framework.ArchitecturyGradleData
 import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
-import com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModel
+import com.demonwav.mcdev.platform.minecraft.gradle.tooling.archloom.ArchitecturyModel
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.runWriteTaskLater
@@ -169,9 +169,9 @@ class MinecraftFacetDetector : ProjectActivity {
             types.addAll(platforms)
 
             if (facet.configuration.state.forgePatcher) {
-                // make sure Forge and MCP are present
+                // make sure Forge and Minecraft are present
                 types.add(PlatformType.FORGE)
-                types.add(PlatformType.MCP)
+                types.add(PlatformType.MINECRAFT)
             }
 
             facet.refresh()

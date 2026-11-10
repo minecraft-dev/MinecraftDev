@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.forge.reflection.reference
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.toTypedArray
 import com.intellij.psi.PsiClass
@@ -49,7 +49,7 @@ abstract class ReflectedMemberReferenceBasePoly(element: PsiLiteral) : PsiRefere
 
         val name = memberName
         val srgManager = element.findModule()?.let { MinecraftFacet.getInstance(it) }
-            ?.getModuleOfType(McpModuleType)?.mappingsManager
+            ?.getModuleOfType(MinecraftModuleType)?.mappingsManager
         val srgMap = srgManager?.mappingsNow
         val mcpName = srgMap?.mapIntermediaryToMapped(name) ?: name
 
