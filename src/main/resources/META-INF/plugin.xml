@@ -111,6 +111,8 @@
         <extensionPoint name="mixinAnnotationHandler" beanClass="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandlerInfo" dynamic="true">
             <with attribute="implementation" implements="com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler"/>
         </extensionPoint>
+        <extensionPoint name="shadowTargetResolver"
+                        interface="com.demonwav.mcdev.platform.mixin.handlers.ShadowTargetResolver" dynamic="true"/>
         <extensionPoint name="injectionPoint"
                         beanClass="com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPointInfo"
                         dynamic="true">

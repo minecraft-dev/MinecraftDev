@@ -49,7 +49,7 @@ class ShadowHandler : MixinMemberAnnotationHandler {
         if (hasAliases(annotation)) return emptyList()
         val member = annotation.parentOfType<PsiMember>() ?: return emptyList()
         val name = getEffectiveName(annotation, member) ?: return emptyList()
-        return when (member) {
+        val targetMembers = when (member) {
             is PsiMethod -> listOfNotNull(
                 targetClass.findMethod(MemberReference(name, member.descriptor))
                     ?.let { MethodTargetMember(targetClass, it) },
@@ -58,6 +58,10 @@ class ShadowHandler : MixinMemberAnnotationHandler {
                 targetClass.findFieldByName(name)?.let { FieldTargetMember(targetClass, it) },
             )
             else -> emptyList()
+        }
+        if (targetMembers.isNotEmpty()) return targetMembers
+        return ShadowTargetResolver.EP_NAME.extensionList.flatMap {
+            it.resolveTarget(annotation, targetClass, member, name)
         }
     }
 
