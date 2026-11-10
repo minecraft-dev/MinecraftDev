@@ -20,8 +20,8 @@
 
 package com.demonwav.mcdev.translations.identification
 
-import com.demonwav.mcdev.platform.mcp.mappings.getMappedClass
-import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethod
+import com.demonwav.mcdev.platform.minecraft.mappings.getMappedClass
+import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethod
 import com.demonwav.mcdev.translations.DeprecatedTranslations
 import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.identification.TranslationInstance.FormattingError

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -44,7 +44,6 @@ import com.demonwav.mcdev.platform.forge.util.ForgePackAdditionalData
 import com.demonwav.mcdev.platform.forge.util.ForgePackDescriptor
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
-import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.project.Project
 
@@ -65,14 +64,6 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val website = data.getUserData(WebsiteStep.KEY) ?: ""
 
-        val nextMcVersion = when (val part = mcVersion.parts.getOrNull(1)) {
-            // Mimics the code used to get the next Minecraft version in Forge's MDK
-            // https://github.com/MinecraftForge/MinecraftForge/blob/0ff8a596fc1ef33d4070be89dd5cb4851f93f731/build.gradle#L884
-            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
-            null -> "?"
-            else -> part.versionString
-        }
-
         val packDescriptor = ForgePackDescriptor.forMcVersion(mcVersion) ?: ForgePackDescriptor.FORMAT_3
         val additionalPackData = ForgePackAdditionalData.forMcVersion(mcVersion)
 
@@ -87,7 +78,7 @@ class ForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
             "DISPLAY_TEST" to (forgeVersion >= ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION),
             "FORGE_SPEC_VERSION" to forgeVersion.parts[0].versionString,
             "MC_VERSION" to mcVersion,
-            "MC_NEXT_VERSION" to "1.$nextMcVersion",
+            "MC_NEXT_VERSION" to MinecraftVersions.nextMajorVersion(mcVersion),
             "LICENSE" to license,
             "DESCRIPTION" to description,
             "PACK_FORMAT" to packDescriptor.format,

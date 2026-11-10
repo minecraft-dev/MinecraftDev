@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.translations.intentions
 
 import com.demonwav.mcdev.TranslationSettings
-import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethodCall
+import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethodCall
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.runWriteAction

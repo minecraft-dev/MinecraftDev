@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporterImpl
@@ -31,12 +32,20 @@ import com.intellij.openapi.extensions.RequiredElement
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.KeyedExtensionCollector
 import com.intellij.serviceContainer.BaseKeyedLazyInstance
+import com.intellij.ui.dsl.builder.Panel
 import com.intellij.util.KeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 
 interface CreatorFinalizer {
 
     fun validate(reporter: TemplateValidationReporter, properties: Map<String, Any>) = Unit
+
+    /**
+     * Creates the UI elements to show in the creator when this finalizer is part of the template, such as settings
+     * the finalizer needs or warnings about what it will do. Identical (as in [equals]) elements created by multiple
+     * finalizers are only shown once.
+     */
+    fun createUi(properties: Map<String, Any>): List<FinalizerUi> = emptyList()
 
     suspend fun execute(
         context: WizardContext,
@@ -83,6 +92,22 @@ interface CreatorFinalizer {
             }
         }
 
+        fun buildUiAll(
+            panel: Panel,
+            context: CreatorContext,
+            finalizers: List<Map<String, Any>>,
+        ) {
+            val uis = finalizers.flatMap { properties ->
+                val finalizer = (properties["type"] as? String)?.let(COLLECTOR::findSingle)
+                    ?: return@flatMap emptyList()
+                finalizer.createUi(properties)
+            }
+
+            for (ui in uis.distinct()) {
+                ui.buildUi(panel, context)
+            }
+        }
+
         suspend fun executeAll(
             context: WizardContext,
             project: Project,
@@ -110,6 +135,13 @@ interface CreatorFinalizer {
             }
         }
     }
+}
+
+/**
+ * A part of the creator UI contributed by a [CreatorFinalizer].
+ */
+interface FinalizerUi {
+    fun buildUi(panel: Panel, context: CreatorContext)
 }
 
 class CreatorFinalizerBean : BaseKeyedLazyInstance<CreatorFinalizer>(), KeyedLazyInstance<CreatorFinalizer> {

@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.platform.architectury.framework
 
-import com.demonwav.mcdev.platform.mcp.gradle.tooling.archloom.ArchitecturyModel
+import com.demonwav.mcdev.platform.minecraft.gradle.tooling.archloom.ArchitecturyModel
 import com.intellij.openapi.externalSystem.model.DataNode
 import com.intellij.openapi.externalSystem.model.project.ModuleData
 import org.gradle.tooling.model.idea.IdeaModule

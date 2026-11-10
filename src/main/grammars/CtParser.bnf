@@ -19,18 +19,18 @@
  */
 
 {
-    parserClass="com.demonwav.mcdev.platform.mcp.ct.gen.parser.CtParser"
+    parserClass="com.demonwav.mcdev.platform.minecraft.ct.gen.parser.CtParser"
 
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
     psiClassPrefix="Ct"
     psiImplClassSuffix="Impl"
-    psiPackage="com.demonwav.mcdev.platform.mcp.ct.gen.psi"
-    psiImplPackage="com.demonwav.mcdev.platform.mcp.ct.gen.psi.impl"
+    psiPackage="com.demonwav.mcdev.platform.minecraft.ct.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.minecraft.ct.gen.psi.impl"
 
-    elementTypeHolderClass="com.demonwav.mcdev.platform.mcp.ct.gen.psi.CtTypes"
-    elementTypeClass="com.demonwav.mcdev.platform.mcp.ct.psi.CtElementType"
-    tokenTypeClass="com.demonwav.mcdev.platform.mcp.ct.psi.CtTokenType"
+    elementTypeHolderClass="com.demonwav.mcdev.platform.minecraft.ct.gen.psi.CtTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.minecraft.ct.psi.CtElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.minecraft.ct.psi.CtTokenType"
 }
 
 aw_file ::= header_line line*
@@ -41,8 +41,8 @@ private line ::= !<<eof>> entry? COMMENT? end_line
 private end_line ::= crlf | <<eof>>
 
 header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtHeaderImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtHeaderMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtHeaderImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtHeaderMixin"
     methods=[
         namespaceElement="HEADER_NAMESPACE_ELEMENT"
     ]
@@ -51,43 +51,43 @@ header ::= HEADER_NAME HEADER_VERSION_ELEMENT HEADER_NAMESPACE_ELEMENT {
 
 private entry ::= aw_entry | itf_entry | extend_enum_entry {
     name="ClassTweaker Entry"
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtEntryMixin"
     recoverWhile = line_recover
 }
 
 private aw_entry ::= aw_class_entry | aw_method_entry | aw_field_entry {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwEntryMixin"
 }
 
 aw_class_entry ::= access class_literal class_name {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwClassEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwClassEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwClassEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwClassEntryMixin"
     pin = 2
 }
 
 aw_method_entry ::= access method_literal class_name member_name method_desc {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwMethodEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwMethodEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwMethodEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwMethodEntryMixin"
     pin = 2
 }
 
 aw_field_entry ::= access field_literal class_name member_name field_desc {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwFieldEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwFieldEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwFieldEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwFieldEntryMixin"
     pin = 2
 }
 
 itf_entry ::= INJECT_INTERFACE_ELEMENT class_name signature {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtItfEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtItfEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtItfEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtItfEntryMixin"
     pin = 1
 }
 
 extend_enum_entry ::= EXTEND_ENUM_ELEMENT class_name member_name {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtExtendEnumEntryImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtExtendEnumEntryMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtExtendEnumEntryImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtExtendEnumEntryMixin"
     pin = 1
 }
 
@@ -106,16 +106,16 @@ method_literal ::= METHOD_ELEMENT
 field_literal ::= FIELD_ELEMENT
 
 class_name ::= CLASS_NAME_ELEMENT {
-    mixin="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwClassNameImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwClassNameMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwClassNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwClassNameMixin"
     methods=[
         classNameElement="CLASS_NAME_ELEMENT"
     ]
 }
 
 member_name ::= NAME_ELEMENT {
-    mixin= "com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwMemberNameImplMixin"
-    implements="com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwMemberNameMixin"
+    mixin= "com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwMemberNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwMemberNameMixin"
     methods=[
         nameElement="NAME_ELEMENT"
     ]
@@ -126,8 +126,8 @@ method_desc ::= OPEN_PAREN desc_element* CLOSE_PAREN desc_element
 field_desc ::= desc_element
 
 desc_element ::= OPEN_BRACKET* (PRIMITIVE | CLASS_VALUE) {
-    mixin= "com.demonwav.mcdev.platform.mcp.ct.psi.mixins.impl.CtAwDescElementImplMixin"
-    implements= "com.demonwav.mcdev.platform.mcp.ct.psi.mixins.CtAwDescElementMixin"
+    mixin= "com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtAwDescElementImplMixin"
+    implements= "com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwDescElementMixin"
     methods=[
         primitive="PRIMITIVE"
         classValue="CLASS_VALUE"

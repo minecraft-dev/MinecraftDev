@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.forge.reflection.reference
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.qualifiedMemberReference
@@ -74,7 +74,7 @@ object ReflectedMethodReference : PsiReferenceProvider() {
                             ?: return@withInsertHandler
                         val params = literal.parent as? PsiExpressionList ?: return@withInsertHandler
                         val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
-                            ?.getModuleOfType(McpModuleType)?.mappingsManager
+                            ?.getModuleOfType(MinecraftModuleType)?.mappingsManager
                         val srgMap = srgManager?.mappingsNow
 
                         val signature = method.getSignature(PsiSubstitutor.EMPTY)
