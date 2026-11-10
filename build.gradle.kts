@@ -127,6 +127,7 @@ dependencies {
         bundledPlugin("org.jetbrains.kotlin")
         bundledPlugin("org.toml.lang")
         bundledPlugin("org.jetbrains.plugins.yaml")
+        bundledPlugin("org.jetbrains.plugins.github")
 
         testFramework(TestFrameworkType.JUnit5)
         testFramework(TestFrameworkType.Platform)
