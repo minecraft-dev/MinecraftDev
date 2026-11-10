@@ -52,7 +52,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
     val neoforge = platformState(PlatformType.NEOFORGE)
     val fabric = platformState(PlatformType.FABRIC)
     val architectury = platformState(PlatformType.ARCHITECTURY)
-    val mcp = platformState(PlatformType.MCP)
+    val minecraft = platformState(PlatformType.MINECRAFT)
     val mixin = platformState(PlatformType.MIXIN)
     val velocity = platformState(PlatformType.VELOCITY)
     val bungeecord = platformState(PlatformType.BUNGEECORD)
@@ -93,7 +93,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                 forge, "Forge", PlatformAssets.FORGE_ICON_2X,
                 {
                     afterChange { _ ->
-                        also(this, mcp.enabled)
+                        also(this, minecraft.enabled)
                         unique(this, architectury.enabled)
                     }
                 },
@@ -110,7 +110,7 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                 fabric, "Fabric", PlatformAssets.FABRIC_ICON_2X,
                 {
                     afterChange { _ ->
-                        also(this, mixin.enabled, mcp.enabled)
+                        also(this, mixin.enabled, minecraft.enabled)
                         unique(this, architectury.enabled)
                     }
                 },
@@ -131,13 +131,12 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
                 },
             )
 
-            val mcpIcon = if (isDarkMode) PlatformAssets.MCP_ICON_2X_DARK else PlatformAssets.MCP_ICON_2X
-            createRow(mcp, "MCP", mcpIcon)
+            createRow(minecraft, "Minecraft", PlatformAssets.MINECRAFT_ICON_2X)
 
             val mixinIcon = if (isDarkMode) PlatformAssets.MIXIN_ICON_2X_DARK else PlatformAssets.MIXIN_ICON_2X
             createRow(
                 mixin, "Mixin", mixinIcon,
-                { afterChange { _ -> also(this, mcp.enabled) } }
+                { afterChange { _ -> also(this, minecraft.enabled) } }
             )
 
             createRow(velocity, "Velocity", PlatformAssets.VELOCITY_ICON_2X)

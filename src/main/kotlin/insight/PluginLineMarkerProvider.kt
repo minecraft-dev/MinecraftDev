@@ -71,7 +71,7 @@ class PluginLineMarkerProvider : LineMarkerProviderDescriptor() {
                         PlatformType.WATERFALL -> ThreeState.NO
                         PlatformType.VELOCITY -> ThreeState.NO
                         PlatformType.MIXIN -> ThreeState.YES
-                        PlatformType.MCP -> ThreeState.YES
+                        PlatformType.MINECRAFT -> ThreeState.YES
                         PlatformType.ADVENTURE -> ThreeState.UNSURE
                     }
                 }

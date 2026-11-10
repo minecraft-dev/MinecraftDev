@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.translations.identification
 
-import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
+import com.demonwav.mcdev.platform.minecraft.framework.MINECRAFT_LIBRARY_KIND
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocation
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocationProvider
 import com.intellij.openapi.project.Project
@@ -38,7 +38,7 @@ class TranslationAnnotationsLocationProvider : AnnotationsLocationProvider {
     ): Collection<AnnotationsLocation> {
         val isMinecraftLibrary = LibraryPresentationManager.getInstance().isLibraryOfKind(
             library.getFiles(OrderRootType.CLASSES).toList(),
-            MCP_LIBRARY_KIND
+            MINECRAFT_LIBRARY_KIND
         )
         if (isMinecraftLibrary) {
             return listOf(TranslationExternalAnnotationsArtifactsResolver.Util.fakeMavenLocation)

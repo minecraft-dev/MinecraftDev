@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.fabric.reference
 
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
-import com.demonwav.mcdev.platform.mcp.fabricloom.FabricLoomData
+import com.demonwav.mcdev.platform.minecraft.fabricloom.FabricLoomData
 import com.demonwav.mcdev.util.findModule
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.vfs.VirtualFile

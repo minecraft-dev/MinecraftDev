@@ -26,7 +26,7 @@ import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.forge.ForgeModuleType
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.platform.neoforge.NeoForgeModuleType
 import com.demonwav.mcdev.util.MinecraftTemplates
 import com.demonwav.mcdev.util.MinecraftVersions
@@ -70,7 +70,7 @@ class MinecraftClassCreateAction :
         val isNeoForge = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
         val isFabric = MinecraftFacet.getInstance(module, FabricModuleType) != null
 
-        val mcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()
+        val mcVersion = MinecraftFacet.getInstance(module, MinecraftModuleType)?.getSettings()
             ?.minecraftVersion?.let(SemanticVersion::parse)
 
         if (isForge && mcVersion != null) {
@@ -131,7 +131,7 @@ class MinecraftClassCreateAction :
         val isFabricMod = MinecraftFacet.getInstance(module, FabricModuleType) != null
         val isForgeMod = MinecraftFacet.getInstance(module, ForgeModuleType) != null
         val isNeoForgeMod = MinecraftFacet.getInstance(module, NeoForgeModuleType) != null
-        val hasMcVersion = MinecraftFacet.getInstance(module, McpModuleType)?.getSettings()?.minecraftVersion != null
+        val hasMcVersion = MinecraftFacet.getInstance(module, MinecraftModuleType)?.getSettings()?.minecraftVersion != null
 
         return (isFabricMod || isNeoForgeMod || isForgeMod && hasMcVersion) && super.isAvailable(dataContext)
     }
