@@ -33,6 +33,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.parentOfType
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.analysis.api.KaIdeApi
 import org.jetbrains.kotlin.idea.base.analysis.api.utils.shortenReferences
 import org.jetbrains.kotlin.idea.base.analysis.api.utils.shortenReferencesInRange
@@ -114,7 +115,7 @@ class KotlinEventGenHelper : EventGenHelper {
         val entry = factory.createSuperTypeEntry(fqn)
         val insertedEntry = ktClass.addSuperTypeListEntry(entry)
         when (KotlinPluginModeProvider.currentPluginMode) {
-            KotlinPluginMode.K1 -> ShortenReferences.DEFAULT.process(insertedEntry)
+            KotlinPluginMode.K1 -> @OptIn(K1Deprecation::class) ShortenReferences.DEFAULT.process(insertedEntry)
             // TODO find a non-internal alternative to this...
             KotlinPluginMode.K2 -> @OptIn(KaIdeApi::class) shortenReferences(insertedEntry)
         }
@@ -128,7 +129,7 @@ class KotlinEventGenHelper : EventGenHelper {
 
         val marker = JvmEventGenHelper.doReformat(project, file, startOffset, endOffset) ?: return
         when (KotlinPluginModeProvider.currentPluginMode) {
-            KotlinPluginMode.K1 -> ShortenReferences.DEFAULT.process(file, marker.startOffset, marker.endOffset)
+            KotlinPluginMode.K1 -> @OptIn(K1Deprecation::class) ShortenReferences.DEFAULT.process(file, marker.startOffset, marker.endOffset)
             // TODO find a non-internal alternative to this...
             KotlinPluginMode.K2 -> @OptIn(KaIdeApi::class) shortenReferencesInRange(file, marker.textRange)
         }

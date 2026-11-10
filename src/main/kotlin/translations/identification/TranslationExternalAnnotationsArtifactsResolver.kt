@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,7 +26,7 @@ import com.intellij.codeInsight.ExternalAnnotationsArtifactsResolver
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocation
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathManager
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.application.runReadActionBlocking
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -119,7 +119,7 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
             return false
         }
 
-        val annotationsPath = runReadAction { findAnnotationsPath(false) ?: findAnnotationsPath(true) }
+        val annotationsPath = runReadActionBlocking { findAnnotationsPath(false) ?: findAnnotationsPath(true) }
             ?: return false
 
         val editor = ExistingLibraryEditor(library, null)

@@ -1063,7 +1063,7 @@ object MEExpressionCompletionUtil {
         )
 
     private fun LookupElement.withTail(tailType: TailType?) = object : TailTypeDecorator<LookupElement>(this) {
-        override fun computeTailType(context: InsertionContext?) = tailType
+        override fun computeTailType(context: InsertionContext) = tailType
     }
 
     private fun LookupElementBuilder.withDefinition(id: String, definitionValue: String) =

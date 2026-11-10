@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.completion
 
 import com.demonwav.mcdev.platform.mixin.reference.MixinReferences
+import com.demonwav.mcdev.platform.mixin.handlers.ShadowTargetResolver
 import com.demonwav.mcdev.platform.mixin.util.findShadowTargets
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.constantStringValue
@@ -124,7 +125,9 @@ class MixinCompletionContributor : CompletionContributor() {
             }
 
             // Process methods and fields from target class
-            val elements = findShadowTargets(psiClass, start, superMixin != null)
+            val extensionTargets = ShadowTargetResolver.EP_NAME.extensionList.asSequence()
+                .flatMap { it.findCompletionTargets(start) }
+            val elements = (findShadowTargets(psiClass, start, superMixin != null) + extensionTargets)
                 .filter {
                     val name = it.name
                     StringUtil.isJavaIdentifier(name) && prefixMatcher.prefixMatches(name)

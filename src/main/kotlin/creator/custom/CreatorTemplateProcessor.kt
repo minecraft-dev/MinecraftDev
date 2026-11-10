@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -44,6 +44,7 @@ import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.refreshAndFindVirtualFile
@@ -118,6 +119,11 @@ class CreatorTemplateProcessor(
                         uiFactory.accept(this)
                     }
                 }
+            }
+
+            if (!reporter.hasErrors) {
+                // Always shown, even without properties, as these can include warnings about what the template does
+                CreatorFinalizer.buildUiAll(this, context, template.descriptor.finalizers.orEmpty())
             }
         }
     }
@@ -230,55 +236,7 @@ class CreatorTemplateProcessor(
         val templateProperties = collectTemplateProperties()
         thisLogger().debug("Template properties: $templateProperties")
 
-        val generatedFiles = mutableListOf<Pair<TemplateFile, Path>>()
-        for (file in template.descriptor.files.orEmpty()) {
-            if (file.condition != null &&
-                !TemplateEvaluator.condition(templateProperties, file.condition).getOrElse { false }
-            ) {
-                continue
-            }
-
-            val relativeTemplate = TemplateEvaluator.template(templateProperties, file.template).getOrNull()
-                ?: continue
-            val relativeDest = TemplateEvaluator.template(templateProperties, file.destination).getOrNull()
-                ?: continue
-
-            try {
-                val templateContents = template.loadTemplateContents(relativeTemplate)
-                    ?: continue
-
-                val destPath = projectPath.resolve(relativeDest).toAbsolutePath()
-                if (!destPath.startsWith(projectPath)) {
-                    // We want to make sure template files aren't 'escaping' the project directory
-                    continue
-                }
-
-                var fileTemplateProperties = templateProperties
-                if (file.properties != null) {
-                    fileTemplateProperties = templateProperties.toMutableMap()
-                    fileTemplateProperties.putAll(file.properties)
-                }
-
-                val processedContent = TemplateEvaluator.template(fileTemplateProperties, templateContents)
-                    .onFailure { t ->
-                        val attachment = Attachment(relativeTemplate, templateContents)
-                        thisLogger().error("Failed evaluate template '$relativeTemplate'", t, attachment)
-                    }
-                    .getOrNull()
-                    ?: continue
-
-                destPath.parent.createDirectories()
-                destPath.writeText(processedContent)
-
-                generatedFiles.add(file to destPath)
-            } catch (t: Throwable) {
-                if (t is ControlFlowException) {
-                    throw t
-                }
-
-                thisLogger().error("Failed to process template file $file", t)
-            }
-        }
+        val generatedFiles = writeFiles(template, template.descriptor.files.orEmpty(), templateProperties, projectPath)
 
         val finalizeAction = suspend {
             WriteAction.runAndWait<Throwable> {
@@ -286,16 +244,12 @@ class CreatorTemplateProcessor(
                 // Apparently a module root is required for the reformat to work
                 setupTempRootModule(project, projectPath)
 
-                val genVirtualFiles = generatedFiles
-                    .mapNotNullTo(mutableListOf()) {
-                        it.first to (it.second.refreshAndFindVirtualFile() ?: return@mapNotNullTo null)
-                    }
-                reformatFiles(project, genVirtualFiles)
-                openFilesInEditor(project, genVirtualFiles)
+                reformatAndOpenFiles(project, generatedFiles)
             }
 
             val finalizers = template.descriptor.finalizers
             if (!finalizers.isNullOrEmpty()) {
+                context.wizardContext.putUserData(LOADED_TEMPLATE_KEY, template)
                 CreatorFinalizer.executeAll(context.wizardContext, project, finalizers, templateProperties)
             }
         }
@@ -325,38 +279,121 @@ class CreatorTemplateProcessor(
         return properties.mapValuesTo(into) { (_, prop) -> prop.get() }
     }
 
-    private fun reformatFiles(
-        project: Project,
-        files: MutableList<Pair<TemplateFile, VirtualFile>>
-    ) {
-        val psiManager = PsiManager.getInstance(project)
-        val psiFiles = files.asSequence()
-            .filter { (desc, _) -> desc.reformat != false }
-            .mapNotNull { (_, file) -> psiManager.findFile(file) }
+    companion object {
+        /**
+         * The template whose files are being generated, so finalizers can read files from it.
+         */
+        val LOADED_TEMPLATE_KEY = Key.create<LoadedTemplate>("mcdev.creator.loadedTemplate")
 
-        val processor = ReformatCodeProcessor(project, psiFiles.toTypedArray(), null, false)
-        psiFiles.forEach(processor::setDoNotKeepLineBreaks)
+        /**
+         * Evaluates the given template files and writes them to the project directory.
+         *
+         * @return the files that were written, and where they were written to
+         */
+        fun writeFiles(
+            template: LoadedTemplate,
+            files: List<TemplateFile>,
+            templateProperties: Map<String, Any?>,
+            projectPath: Path,
+        ): List<Pair<TemplateFile, Path>> {
+            val generatedFiles = mutableListOf<Pair<TemplateFile, Path>>()
+            for (file in files) {
+                if (file.condition != null &&
+                    !TemplateEvaluator.condition(templateProperties, file.condition).getOrElse { false }
+                ) {
+                    continue
+                }
 
-        val insightSettings = CodeInsightSettings.getInstance()
-        val oldSecondReformat = insightSettings.ENABLE_SECOND_REFORMAT
-        insightSettings.ENABLE_SECOND_REFORMAT = true
-        try {
-            processor.run()
-        } finally {
-            insightSettings.ENABLE_SECOND_REFORMAT = oldSecondReformat
+                val relativeTemplate = TemplateEvaluator.template(templateProperties, file.template).getOrNull()
+                    ?: continue
+                val relativeDest = TemplateEvaluator.template(templateProperties, file.destination).getOrNull()
+                    ?: continue
+
+                try {
+                    val templateContents = template.loadTemplateContents(relativeTemplate)
+                        ?: continue
+
+                    val destPath = projectPath.resolve(relativeDest).toAbsolutePath()
+                    if (!destPath.startsWith(projectPath)) {
+                        // We want to make sure template files aren't 'escaping' the project directory
+                        continue
+                    }
+
+                    var fileTemplateProperties = templateProperties
+                    if (file.properties != null) {
+                        fileTemplateProperties = templateProperties.toMutableMap()
+                        fileTemplateProperties.putAll(file.properties)
+                    }
+
+                    val processedContent = TemplateEvaluator.template(fileTemplateProperties, templateContents)
+                        .onFailure { t ->
+                            val attachment = Attachment(relativeTemplate, templateContents)
+                            thisLogger().error("Failed evaluate template '$relativeTemplate'", t, attachment)
+                        }
+                        .getOrNull()
+                        ?: continue
+
+                    destPath.parent.createDirectories()
+                    destPath.writeText(processedContent)
+
+                    generatedFiles.add(file to destPath)
+                } catch (t: Throwable) {
+                    if (t is ControlFlowException) {
+                        throw t
+                    }
+
+                    thisLogger().error("Failed to process template file $file", t)
+                }
+            }
+            return generatedFiles
         }
-    }
 
-    private fun openFilesInEditor(
-        project: Project,
-        files: MutableList<Pair<TemplateFile, VirtualFile>>
-    ) {
-        val fileEditorManager = FileEditorManager.getInstance(project)
-        val projectView = ProjectView.getInstance(project)
-        for ((desc, file) in files) {
-            if (desc.openInEditor == true) {
-                fileEditorManager.openFile(file, true)
-                projectView.select(null, file, false)
+        /**
+         * Reformats and opens the given generated files, as requested by their [TemplateFile]. Must be called in a
+         * write action.
+         */
+        fun reformatAndOpenFiles(project: Project, generatedFiles: List<Pair<TemplateFile, Path>>) {
+            val genVirtualFiles = generatedFiles
+                .mapNotNullTo(mutableListOf()) {
+                    it.first to (it.second.refreshAndFindVirtualFile() ?: return@mapNotNullTo null)
+                }
+            reformatFiles(project, genVirtualFiles)
+            openFilesInEditor(project, genVirtualFiles)
+        }
+
+        private fun reformatFiles(
+            project: Project,
+            files: MutableList<Pair<TemplateFile, VirtualFile>>
+        ) {
+            val psiManager = PsiManager.getInstance(project)
+            val psiFiles = files.asSequence()
+                .filter { (desc, _) -> desc.reformat != false }
+                .mapNotNull { (_, file) -> psiManager.findFile(file) }
+
+            val processor = ReformatCodeProcessor(project, psiFiles.toTypedArray(), null, false)
+            psiFiles.forEach(processor::setDoNotKeepLineBreaks)
+
+            val insightSettings = CodeInsightSettings.getInstance()
+            val oldSecondReformat = insightSettings.ENABLE_SECOND_REFORMAT
+            insightSettings.ENABLE_SECOND_REFORMAT = true
+            try {
+                processor.run()
+            } finally {
+                insightSettings.ENABLE_SECOND_REFORMAT = oldSecondReformat
+            }
+        }
+
+        private fun openFilesInEditor(
+            project: Project,
+            files: MutableList<Pair<TemplateFile, VirtualFile>>
+        ) {
+            val fileEditorManager = FileEditorManager.getInstance(project)
+            val projectView = ProjectView.getInstance(project)
+            for ((desc, file) in files) {
+                if (desc.openInEditor == true) {
+                    fileEditorManager.openFile(file, true)
+                    projectView.select(null, file, false)
+                }
             }
         }
     }

@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.platform.forge.reflection.reference
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.simpleQualifiedMemberReference
@@ -67,7 +67,7 @@ object ReflectedFieldReference : PsiReferenceProvider() {
                             ?: return@withInsertHandler
 
                         val srgManager = literal.findModule()?.let { MinecraftFacet.getInstance(it) }
-                            ?.getModuleOfType(McpModuleType)?.mappingsManager
+                            ?.getModuleOfType(MinecraftModuleType)?.mappingsManager
                         val srgMap = srgManager?.mappingsNow
                         val srgField = srgMap?.getIntermediaryField(field.simpleQualifiedMemberReference)
                             ?: return@withInsertHandler

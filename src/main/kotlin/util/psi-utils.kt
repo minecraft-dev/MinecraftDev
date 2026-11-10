@@ -21,8 +21,8 @@
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.facet.MinecraftFacet
-import com.demonwav.mcdev.platform.mcp.McpModule
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModule
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarUtil
 import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.intellij.ide.highlighter.JavaClassFileType
@@ -336,7 +336,7 @@ inline fun <T> PsiElement.lockedCached(
     }
 }
 
-fun PsiElement.findMcpModule() = this.cached {
+fun PsiElement.findMinecraftModule() = this.cached {
     val file = containingFile?.viewProvider?.virtualFile ?: return@cached null
     val index = ProjectFileIndex.getInstance(project)
     val modules = if (index.isInLibrary(file)) {
@@ -350,13 +350,13 @@ fun PsiElement.findMcpModule() = this.cached {
         sequenceOf(this.findModule())
     }
 
-    modules.firstNotNullOfOrNull { it?.findMcpModule() }
+    modules.firstNotNullOfOrNull { it?.findMinecraftModule() }
 }
 
-private fun Module.findMcpModule(): McpModule? {
-    var result: McpModule? = null
+private fun Module.findMinecraftModule(): MinecraftModule? {
+    var result: MinecraftModule? = null
     ModuleUtilCore.visitMeAndDependentModules(this) {
-        result = MinecraftFacet.getInstance(it, McpModuleType)
+        result = MinecraftFacet.getInstance(it, MinecraftModuleType)
         result == null
     }
     return result
@@ -364,7 +364,7 @@ private fun Module.findMcpModule(): McpModule? {
 
 val PsiElement.mcVersion: SemanticVersion?
     get() = this.cached {
-        findMcpModule()?.let {
+        findMinecraftModule()?.let {
             SemanticVersion.tryParse(it.getSettings().minecraftVersion ?: return@let null)
         }
     }

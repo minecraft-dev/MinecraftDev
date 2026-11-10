@@ -38,6 +38,7 @@ import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.codeInspection.options.OptPane
 import com.intellij.ide.util.PackageUtil
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.module.Module
@@ -59,17 +60,12 @@ import com.intellij.psi.PsiVariable
 import com.intellij.psi.createSmartPointer
 import com.intellij.psi.impl.source.PsiClassReferenceType
 import com.siyeh.ig.BaseInspection
-import com.siyeh.ig.BaseInspection.formatString
-import com.siyeh.ig.ui.UiUtils
-import javax.swing.JComponent
 import org.jdom.Element
 
 class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
-    private val injectableTypesList = Const.defaultInjectableTypes.toMutableList()
-
     @JvmField
-    var injectableTypes: String = Const.serializedDefaultInjectableTypes
+    var injectableTypesList = Const.defaultInjectableTypes.toMutableList()
 
     override fun getStaticDescription() = "Invalid @Inject usage in Sponge plugin class."
 
@@ -358,8 +354,6 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             "org.bstats.sponge.MetricsLite2.Factory",
             "org.bstats.sponge.Metrics2.Factory",
         )
-
-        val serializedDefaultInjectableTypes: String = formatString(defaultInjectableTypes)
     }
 
     class RemoveAnnotationParameters(annotation: PsiAnnotation, val txt: String) :
@@ -468,28 +462,23 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
         }
     }
 
-    override fun createOptionsPanel(): JComponent? {
-        val chooserList = UiUtils.createTreeClassChooserList(
-            injectableTypesList,
-            "Injectable types",
-            "Choose Injectable Type",
-        )
-        UiUtils.setComponentSize(chooserList, 7, 25)
-        return chooserList
-    }
+    override fun getOptionsPane(): OptPane = OptPane.pane(
+        OptPane.stringList("injectableTypesList", "Injectable types")
+    )
 
     override fun readSettings(node: Element) {
+        val hasNewFormat = node.getChildren("option").any { it.getAttributeValue("name") == "injectableTypesList" }
         super.readSettings(node)
-        BaseInspection.parseString(injectableTypes, injectableTypesList)
-    }
-
-    override fun writeSettings(node: Element) {
-        injectableTypes = if (injectableTypesList.isEmpty()) {
-            Const.serializedDefaultInjectableTypes
-        } else {
-            formatString(injectableTypesList)
+        if (!hasNewFormat) {
+            for (child in node.getChildren("option")) {
+                if (child.getAttributeValue("name") == "injectableTypes") {
+                    val value = child.getAttributeValue("value")
+                    if (!value.isNullOrEmpty()) {
+                        injectableTypesList.clear()
+                        BaseInspection.parseString(value, injectableTypesList)
+                    }
+                }
+            }
         }
-
-        super.writeSettings(node)
     }
 }

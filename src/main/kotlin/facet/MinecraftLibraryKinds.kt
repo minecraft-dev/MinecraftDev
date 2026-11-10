@@ -29,7 +29,7 @@ import com.demonwav.mcdev.platform.bungeecord.framework.BUNGEECORD_LIBRARY_KIND
 import com.demonwav.mcdev.platform.bungeecord.framework.WATERFALL_LIBRARY_KIND
 import com.demonwav.mcdev.platform.fabric.framework.FABRIC_LIBRARY_KIND
 import com.demonwav.mcdev.platform.forge.framework.FORGE_LIBRARY_KIND
-import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
+import com.demonwav.mcdev.platform.minecraft.framework.MINECRAFT_LIBRARY_KIND
 import com.demonwav.mcdev.platform.mixin.framework.MIXIN_LIBRARY_KIND
 import com.demonwav.mcdev.platform.neoforge.framework.NEOFORGE_LIBRARY_KIND
 import com.demonwav.mcdev.platform.sponge.framework.SPONGE_LIBRARY_KIND
@@ -45,7 +45,7 @@ val MINECRAFT_LIBRARY_KINDS by lazy {
         NEOFORGE_LIBRARY_KIND,
         FABRIC_LIBRARY_KIND,
         ARCHITECTURY_LIBRARY_KIND,
-        MCP_LIBRARY_KIND,
+        MINECRAFT_LIBRARY_KIND,
         MIXIN_LIBRARY_KIND,
         BUNGEECORD_LIBRARY_KIND,
         WATERFALL_LIBRARY_KIND,

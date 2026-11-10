@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -126,7 +126,7 @@ class MEExpressionCompletionContributor : CompletionContributor() {
                         BasicExpressionCompletionContributor.createKeywordLookupItem(parameters.position, keyword.name)
                     if (keyword.tailType != TailTypes.noneType()) {
                         lookupItem = object : TailTypeDecorator<LookupElement>(lookupItem) {
-                            override fun computeTailType(context: InsertionContext?) = keyword.tailType
+                            override fun computeTailType(context: InsertionContext) = keyword.tailType
                         }
                     }
                     lookupItem

@@ -20,7 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
-import com.demonwav.mcdev.platform.mcp.McpModuleType
+import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
@@ -32,7 +32,7 @@ abstract class TranslationInspection : LocalInspectionTool() {
     protected abstract fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor
 
     final override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
-        if (McpModuleType.isInModule(holder.file)) {
+        if (MinecraftModuleType.isInModule(holder.file)) {
             return buildVisitor(holder)
         }
 
@@ -40,7 +40,7 @@ abstract class TranslationInspection : LocalInspectionTool() {
     }
 
     final override fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
-        return if (McpModuleType.isInModule(file)) {
+        return if (MinecraftModuleType.isInModule(file)) {
             super.processFile(file, manager)
         } else {
             listOf()

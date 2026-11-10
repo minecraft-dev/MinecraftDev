@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,11 +36,8 @@ import com.intellij.facet.FacetTypeId
 import com.intellij.facet.FacetTypeRegistry
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.module.ModuleGrouper
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
@@ -227,14 +224,14 @@ class MinecraftFacet(
     fun findFile(path: String, type: SourceType): VirtualFile? {
         try {
             return findFile0(path, type)
-        } catch (ignored: RefreshRootsException) {
+        } catch (_: RefreshRootsException) {
         }
 
         updateRoots()
 
         return try {
             findFile0(path, type)
-        } catch (ignored: RefreshRootsException) {
+        } catch (_: RefreshRootsException) {
             // Well we tried our best
             null
         }
@@ -267,32 +264,6 @@ class MinecraftFacet(
             get() = FacetTypeRegistry.getInstance().findFacetType(TYPE_ID) as? MinecraftFacetType
 
         fun getInstance(module: Module) = FacetManager.getInstance(module).getFacetByType(ID)
-
-        fun getChildInstances(module: Module) = runReadAction run@{
-            val instance = getInstance(module)
-            if (instance != null) {
-                return@run setOf(instance)
-            }
-
-            val project = module.project
-            val manager = ModuleManager.getInstance(project)
-            val grouper = ModuleGrouper.instanceFor(project)
-
-            val result = mutableSetOf<MinecraftFacet>()
-
-            val modulePath = grouper.getModuleAsGroupPath(module) ?: return@run result
-
-            for (m in manager.modules) {
-                val path = grouper.getGroupPath(m)
-                if (modulePath != path) {
-                    continue
-                }
-
-                val facet = getInstance(m) ?: continue
-                result.add(facet)
-            }
-            return@run result
-        }
 
         fun <T : AbstractModule> getInstance(module: Module, type: AbstractModuleType<T>) =
             getInstance(module)?.getModuleOfType(type)

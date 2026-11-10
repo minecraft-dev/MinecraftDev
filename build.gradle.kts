@@ -114,6 +114,7 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.idea.maven")
         bundledPlugin("com.intellij.gradle")
+        bundledPlugin("org.jetbrains.idea.reposearch")
         bundledPlugin("org.intellij.groovy")
         bundledPlugin("ByteCodeViewer")
         bundledModule("intellij.platform.langInjection")
@@ -298,11 +299,11 @@ license {
     }
 }
 
-val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/mcp/at/gen")
-val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/mcp/at/gen")
+val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
 
-val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/mcp/ct/gen")
-val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/mcp/ct/gen")
+val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
 
 val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
 val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")

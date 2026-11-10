@@ -20,8 +20,8 @@
 
 package com.demonwav.mcdev.translations.inspections
 
-import com.demonwav.mcdev.platform.mcp.mappings.getMappedClass
-import com.demonwav.mcdev.platform.mcp.mappings.getMappedMethod
+import com.demonwav.mcdev.platform.minecraft.mappings.getMappedClass
+import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethod
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.util.findModule
 import com.intellij.codeInsight.intention.FileModifier
