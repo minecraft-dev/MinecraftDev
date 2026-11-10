@@ -18,18 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.bungeecord.framework
+package com.demonwav.mcdev.platform.neoforge.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
-import com.demonwav.mcdev.facet.MavenLibraryPresentationProvider
-import com.intellij.framework.library.LibraryVersionProperties
+import com.demonwav.mcdev.facet.ClassMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
+import com.demonwav.mcdev.platform.neoforge.util.NeoForgeConstants
 
-class BungeeCordPresentationProvider :
-    MavenLibraryPresentationProvider(BUNGEECORD_LIBRARY_KIND, "net.md-5", "bungeecord-api") {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.BUNGEECORD_ICON
-}
-
-class WaterfallPresentationProvider :
-    MavenLibraryPresentationProvider(WATERFALL_LIBRARY_KIND, "io.github.waterfallmc", "waterfall-api") {
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.WATERFALL_ICON
-}
+class NeoForgeLibraryDetector :
+    ClassMinecraftLibraryDetector(PlatformType.NEOFORGE, NeoForgeConstants.MOD_ANNOTATION)

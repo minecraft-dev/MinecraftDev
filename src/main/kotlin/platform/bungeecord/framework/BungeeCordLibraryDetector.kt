@@ -18,9 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.adventure.framework
+package com.demonwav.mcdev.platform.bungeecord.framework
 
-import com.demonwav.mcdev.util.libraryKind
-import com.intellij.openapi.roots.libraries.LibraryKind
+import com.demonwav.mcdev.facet.MavenMinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 
-val ADVENTURE_LIBRARY_KIND: LibraryKind by libraryKind("adventure-api")
+class BungeeCordLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.BUNGEECORD, "net.md-5", "bungeecord-api")
+
+class WaterfallLibraryDetector :
+    MavenMinecraftLibraryDetector(PlatformType.WATERFALL, "io.github.waterfallmc", "waterfall-api")

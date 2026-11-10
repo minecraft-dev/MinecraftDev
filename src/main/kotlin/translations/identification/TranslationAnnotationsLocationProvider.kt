@@ -20,13 +20,15 @@
 
 package com.demonwav.mcdev.translations.identification
 
-import com.demonwav.mcdev.platform.mcp.framework.MCP_LIBRARY_KIND
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.platform.PlatformType
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocation
 import com.intellij.codeInsight.externalAnnotation.location.AnnotationsLocationProvider
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.roots.libraries.Library
-import com.intellij.openapi.roots.ui.configuration.libraries.LibraryPresentationManager
+import com.intellij.psi.search.GlobalSearchScopes
 
 class TranslationAnnotationsLocationProvider : AnnotationsLocationProvider {
     override fun getLocations(
@@ -36,11 +38,17 @@ class TranslationAnnotationsLocationProvider : AnnotationsLocationProvider {
         groupId: String?,
         version: String?
     ): Collection<AnnotationsLocation> {
-        val isMinecraftLibrary = LibraryPresentationManager.getInstance().isLibraryOfKind(
-            library.getFiles(OrderRootType.CLASSES).toList(),
-            MCP_LIBRARY_KIND
-        )
-        if (isMinecraftLibrary) {
+        if (DumbService.isDumb(project)) {
+            return emptyList()
+        }
+
+        val libraryRoots = library.getFiles(OrderRootType.CLASSES)
+        if (libraryRoots.isEmpty()) {
+            return emptyList()
+        }
+
+        val libraryScope = GlobalSearchScopes.directoriesScope(project, true, *libraryRoots)
+        if (MinecraftLibraryDetector.isLibraryPresent(PlatformType.MCP, project, libraryScope)) {
             return listOf(TranslationExternalAnnotationsArtifactsResolver.Util.fakeMavenLocation)
         }
         return emptyList()

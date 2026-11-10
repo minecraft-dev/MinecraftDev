@@ -20,25 +20,22 @@
 
 package com.demonwav.mcdev.platform.sponge.framework
 
-import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.facet.MinecraftLibraryDetector
+import com.demonwav.mcdev.facet.hasLibraryManifest
+import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.util.get
-import com.demonwav.mcdev.util.manifest
-import com.intellij.framework.library.LibraryVersionProperties
-import com.intellij.openapi.roots.libraries.LibraryPresentationProvider
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 import java.util.jar.Attributes.Name.IMPLEMENTATION_TITLE
 import java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION
 import java.util.jar.Attributes.Name.SPECIFICATION_TITLE
 import java.util.jar.Attributes.Name.SPECIFICATION_VERSION
 
-class SpongePresentationProvider : LibraryPresentationProvider<LibraryVersionProperties>(SPONGE_LIBRARY_KIND) {
+class SpongeLibraryDetector : MinecraftLibraryDetector {
+    override val platformType = PlatformType.SPONGE
 
-    override fun getIcon(properties: LibraryVersionProperties?) = PlatformAssets.SPONGE_ICON
-
-    override fun detect(classesRoots: List<VirtualFile>): LibraryVersionProperties? {
-        for (classesRoot in classesRoots) {
-            val manifest = classesRoot.manifest ?: continue
-
+    override fun isLibraryPresent(project: Project, scope: GlobalSearchScope): Boolean =
+        hasLibraryManifest(scope) { manifest ->
             loop@ for (title in setOf("SpongeAPI", "spongeapi")) {
                 val versionAttribute = when (title) {
                     manifest[IMPLEMENTATION_TITLE] -> IMPLEMENTATION_VERSION
@@ -46,10 +43,10 @@ class SpongePresentationProvider : LibraryPresentationProvider<LibraryVersionPro
                     else -> continue@loop
                 }
 
-                val version = manifest[versionAttribute] ?: continue
-                return LibraryVersionProperties(version)
+                if (manifest[versionAttribute] != null) {
+                    return@hasLibraryManifest true
+                }
             }
+            false
         }
-        return null
-    }
 }
