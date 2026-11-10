@@ -166,7 +166,7 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
                     for (libraryEntity in libraryEntities.distinctBy { it.name }) {
                         storage.modifyLibraryEntity(libraryEntity) {
                             roots += LibraryRoot(
-                                model.getVirtualFileUrlManager().getOrCreateFromUrl("jar://$sourcePath!/"),
+                                model.getVirtualFileUrlManager().storeAndGet("jar://$sourcePath!/"),
                                 LibraryRootTypeId.SOURCES
                             )
                         }

@@ -40,7 +40,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.backend.workspace.WorkspaceModel
-import com.intellij.platform.backend.workspace.toVirtualFileUrl
+import com.intellij.platform.backend.workspace.storeAndGet
 import com.intellij.platform.workspace.jps.entities.LibraryRoot
 import com.intellij.platform.workspace.jps.entities.LibraryRootTypeId
 import com.intellij.platform.workspace.jps.entities.modifyLibraryEntity
@@ -84,7 +84,7 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
 
         val libraryEntity = diff.resolve(library.libraryId) ?: return true
         val vfUrlManager = WorkspaceModel.getInstance(project).getVirtualFileUrlManager()
-        val newUrl = annotationsPath.toVirtualFileUrl(vfUrlManager)
+        val newUrl = vfUrlManager.storeAndGet(annotationsPath)
         val annotationsRootType = LibraryRootTypeId(AnnotationOrderRootType.ANNOTATIONS_ID)
 
         val alreadyExists = libraryEntity.roots.any { it.type == annotationsRootType && it.url == newUrl }

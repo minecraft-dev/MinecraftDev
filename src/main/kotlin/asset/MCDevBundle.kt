@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,14 +28,20 @@ import org.jetbrains.annotations.PropertyKey
 @NonNls
 private const val BUNDLE = "messages.MinecraftDevelopment"
 
-object MCDevBundle : DynamicBundle(BUNDLE) {
+object MCDevBundle {
+
+    private val bundle = DynamicBundle(MCDevBundle::class.java, BUNDLE)
 
     operator fun invoke(@PropertyKey(resourceBundle = BUNDLE) key: String): String {
-        return getMessage(key)
+        return bundle.getMessage(key)
     }
 
     operator fun invoke(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any?): String {
-        return getMessage(key, *params)
+        return bundle.getMessage(key, *params)
+    }
+
+    fun messageOrNull(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any): String? {
+        return bundle.messageOrNull(key, *params)
     }
 
     fun pointer(@PropertyKey(resourceBundle = BUNDLE) key: String) = Supplier { invoke(key) }
