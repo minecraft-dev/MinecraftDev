@@ -286,11 +286,16 @@ fun PsiType.normalize(): PsiType {
 }
 
 fun PsiType.toObjectType(project: Project): PsiType =
-    when (val normalized = normalize()) {
-        is PsiPrimitiveType ->
-            normalized.getBoxedType(PsiManager.getInstance(project), GlobalSearchScope.allScope(project))
-                ?: normalized
-        else -> normalized
+    if (this is PsiIntersectionType) {
+        // erasure of an intersection type only keeps the first conjunct, which loses information
+        PsiIntersectionType.createIntersection(conjuncts.map { it.toObjectType(project) })
+    } else {
+        when (val normalized = normalize()) {
+            is PsiPrimitiveType ->
+                normalized.getBoxedType(PsiManager.getInstance(project), GlobalSearchScope.allScope(project))
+                    ?: normalized
+            else -> normalized
+        }
     }
 
 val PsiMethod.nameAndParameterTypes: String
