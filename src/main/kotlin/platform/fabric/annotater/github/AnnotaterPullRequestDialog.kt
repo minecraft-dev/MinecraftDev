@@ -41,10 +41,7 @@ class AnnotaterPullRequestDialog(
     private val changes: List<String>,
     private val uncommittedChanges: List<String>,
     existingTitle: String?,
-    /**
-     * Whether the changes are pushed to an existing pull request, so there's no title or description to enter.
-     */
-    private val update: Boolean,
+    private val update: Boolean, // existing PR or update?
 ) : DialogWrapper(project) {
     private val accountModel = CollectionComboBoxModel(accounts, defaultAccount ?: accounts.first())
 

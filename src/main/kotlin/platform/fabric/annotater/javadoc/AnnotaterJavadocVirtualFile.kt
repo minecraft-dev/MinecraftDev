@@ -35,9 +35,6 @@ class AnnotaterJavadocVirtualFile(
     val copy: AnnotaterJavadocSourceCopy,
     val target: AnnotaterJavadocTarget,
 ) : LightVirtualFile(copy.fileName, JavaFileType.INSTANCE, copy.text) {
-    /**
-     * The reason the last save failed, shown in the editor banner.
-     */
     @Volatile
     var error: String? = null
 

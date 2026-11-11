@@ -34,10 +34,6 @@ import com.intellij.psi.util.PsiTreeUtil
  * its source file that has the annotater Javadoc as its doc comment.
  */
 object AnnotaterJavadocRendering {
-    /**
-     * Finds the checkout whose Javadocs should be displayed instead of the existing Javadoc of [member], or null if
-     * the existing Javadoc should be shown.
-     */
     fun checkoutForDisplay(member: PsiMember): AnnotaterCheckout? {
         if (!AnnotaterSettings.instance.showAnnotaterJavadocs) {
             return null
@@ -55,9 +51,6 @@ object AnnotaterJavadocRendering {
             ?: member.textRange.startOffset
     }
 
-    /**
-     * Finds the declaration of [member] in a copy of its source file with [javadoc] as its doc comment.
-     */
     private fun copiedDeclaration(member: PsiMember, javadoc: String?): PsiJavaDocumentedElement? {
         val target = AnnotaterJavadocTarget.fromPsi(member) ?: return null
         val copy = AnnotaterJavadocSourceCopy.create(member) { if (it == target) javadoc else null } ?: return null
@@ -65,9 +58,6 @@ object AnnotaterJavadocRendering {
         return copy.memberOf(file, target) as? PsiJavaDocumentedElement
     }
 
-    /**
-     * Generates the Quick Documentation of [member] using [javadoc] as its description.
-     */
     fun generateDoc(member: PsiMember, javadoc: String?): String? {
         val declaration = copiedDeclaration(member, javadoc) ?: return null
         return JavaDocumentationProvider.generateDocStatic(declaration, null)

@@ -70,7 +70,7 @@ class AnnotaterGitVcs : AnnotaterVcs {
     private val titledBranches = ConcurrentHashMap.newKeySet<String>()
 
     /**
-     * The [PushStatus] of each managed checkout by root, so that the editor banner can show it without running git.
+     * Cached so that the editor banner can show it without running git.
      */
     private val pushStatuses = ConcurrentHashMap<Path, PushStatus>()
 
@@ -79,9 +79,6 @@ class AnnotaterGitVcs : AnnotaterVcs {
      */
     private val pushStatusCheckouts = ConcurrentHashMap<Path, AnnotaterCheckout>()
 
-    /**
-     * The checkouts whose [pushStatuses] are waiting to be refreshed.
-     */
     private val pendingPushStatuses = ConcurrentHashMap.newKeySet<Path>()
 
     private val pushStatusExecutor =
@@ -224,7 +221,7 @@ class AnnotaterGitVcs : AnnotaterVcs {
     }
 
     /**
-     * Reads the checked out branch straight from the worktree's `HEAD` file, to avoid running git.
+     * Reads the worktree's `HEAD` file directly, to avoid running git.
      */
     private fun readHeadBranch(root: Path): String? {
         return try {
@@ -278,9 +275,6 @@ class AnnotaterGitVcs : AnnotaterVcs {
         return title
     }
 
-    /**
-     * Updates the title of the checked out contribution shown in editor banners.
-     */
     private fun refreshCurrentTitle(project: Project, checkout: AnnotaterCheckout) {
         val branch = currentBranch(project, checkout.root) ?: return
         loadTitles(project, checkout)
@@ -290,9 +284,6 @@ class AnnotaterGitVcs : AnnotaterVcs {
         }
     }
 
-    /**
-     * The title of the pull request already opened for the contribution [branch], if any.
-     */
     fun pullRequestTitle(project: Project, checkout: AnnotaterCheckout, branch: String): String? {
         loadTitles(project, checkout)
         return titles[branch]
@@ -315,7 +306,7 @@ class AnnotaterGitVcs : AnnotaterVcs {
     }
 
     /**
-     * Remembers the title of the pull request for the contribution [branch], as its git branch description.
+     * Stored as the branch's git branch description.
      */
     fun setContributionTitle(project: Project, checkout: AnnotaterCheckout, branch: String, title: String) {
         run(project, checkout.root, GitCommand.CONFIG, "branch.$branch.description", title)
@@ -372,16 +363,9 @@ class AnnotaterGitVcs : AnnotaterVcs {
         return PushStatus(pullRequestUrl, hasUnpushedChanges)
     }
 
-    /**
-     * The URL of the pull request opened for the contribution [branch], if any.
-     */
     fun pullRequestUrl(project: Project, checkout: AnnotaterCheckout, branch: String): String? =
         getBranchConfig(project, checkout, branch, PULL_REQUEST_KEY)
 
-    /**
-     * Remembers that the contribution [branch] has been pushed to the pull request at [url], so that the editor banner
-     * offers to update it when there are new changes.
-     */
     fun setPullRequest(project: Project, checkout: AnnotaterCheckout, branch: String, url: String) {
         run(project, checkout.root, GitCommand.CONFIG, "branch.$branch.$PULL_REQUEST_KEY", url)
         run(
@@ -436,9 +420,6 @@ class AnnotaterGitVcs : AnnotaterVcs {
         }
     }
 
-    /**
-     * The number of commits on the current branch that aren't in the upstream version branch.
-     */
     fun commitsAheadOfUpstream(project: Project, checkout: AnnotaterCheckout): Int {
         val output = run(
             project,

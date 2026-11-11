@@ -24,8 +24,6 @@ import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocStor
 import java.nio.file.Path
 
 /**
- * An annotater checkout on disk for one Minecraft version.
- *
  * @property managed whether the plugin created this checkout and may run git operations in it
  */
 class AnnotaterCheckout(val root: Path, val config: AnnotaterConfig, val managed: Boolean) {

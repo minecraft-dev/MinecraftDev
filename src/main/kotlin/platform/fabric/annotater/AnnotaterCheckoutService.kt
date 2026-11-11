@@ -39,9 +39,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
-/**
- * Finds the annotater checkout to use for Minecraft classes.
- */
 @Service(Service.Level.APP)
 class AnnotaterCheckoutService {
     private val checkouts = ConcurrentHashMap<Path, AnnotaterCheckout>()
@@ -68,7 +65,7 @@ class AnnotaterCheckoutService {
     }
 
     /**
-     * Finds the checkout for [version] according to the user's settings, ignoring whether the feature is enabled.
+     * Ignores whether annotater is enabled.
      */
     private fun statusForVersion(version: String): Status {
         val settings = AnnotaterSettings.instance
@@ -111,10 +108,6 @@ class AnnotaterCheckoutService {
         return statusForVersion(version)
     }
 
-    /**
-     * The checkout to use for [element], or null if annotater is disabled, [element] isn't part of Minecraft, or no
-     * checkout exists for its Minecraft version.
-     */
     fun checkoutFor(element: PsiElement): AnnotaterCheckout? {
         if (!AnnotaterSettings.instance.enabled) {
             return null
@@ -123,10 +116,6 @@ class AnnotaterCheckoutService {
         return checkoutFor(element.project, file)
     }
 
-    /**
-     * The checkout to use for [file] in [project], or null if annotater is disabled, [file] isn't part of Minecraft,
-     * or no checkout exists for its Minecraft version.
-     */
     fun checkoutFor(project: Project, file: VirtualFile): AnnotaterCheckout? {
         if (!AnnotaterSettings.instance.enabled || !isMinecraftFile(project, file)) {
             return null
@@ -175,10 +164,6 @@ class AnnotaterCheckoutService {
         val instance: AnnotaterCheckoutService
             get() = ApplicationManager.getApplication().getService(AnnotaterCheckoutService::class.java)
 
-        /**
-         * Whether any module of [project] is a Fabric mod. Annotater is a Fabric project, so it's offered more
-         * prominently there.
-         */
         fun isFabricProject(project: Project): Boolean {
             return ModuleManager.getInstance(project).modules.any {
                 MinecraftFacet.getInstance(it, FabricModuleType) != null
@@ -186,14 +171,10 @@ class AnnotaterCheckoutService {
         }
 
         /**
-         * The file containing [element]. Elements of a class file's decompiled text are in the class file.
+         * Elements of a class file's decompiled text are in the class file.
          */
         fun virtualFileOf(element: PsiElement): VirtualFile? = element.containingFile?.originalFile?.virtualFile
 
-        /**
-         * Whether [file] is a class or source file from a Minecraft jar, as opposed to project sources or another
-         * library.
-         */
         fun isMinecraftFile(project: Project, file: VirtualFile): Boolean {
             val fileIndex = ProjectFileIndex.getInstance(project)
             if (!fileIndex.isInLibrary(file)) {

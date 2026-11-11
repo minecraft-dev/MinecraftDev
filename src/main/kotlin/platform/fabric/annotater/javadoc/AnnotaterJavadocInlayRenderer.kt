@@ -74,9 +74,6 @@ class AnnotaterJavadocInlayRenderer(
     override fun getContextMenuGroup(inlay: Inlay<*>): ActionGroup =
         DefaultActionGroup(AnnotaterJavadocInlayPassFactory.EditAction(pointer))
 
-    /**
-     * The x coordinate of the declaration, where the comment starts.
-     */
     private fun startX(inlay: Inlay<*>): Int {
         // The size is first calculated while the inlay is being created, before it has a valid offset. The offset
         // differs from initialOffset after the document changes, until the highlighting pass replaces the inlay
@@ -96,9 +93,6 @@ class AnnotaterJavadocInlayRenderer(
     private var lines: List<List<Token>>? = null
     private var linesScheme: EditorColorsScheme? = null
 
-    /**
-     * The doc comment, split into lines of tokens highlighted as they would be in a Java file.
-     */
     private fun lines(): List<List<Token>> {
         val scheme = editor.colorsScheme
         lines?.takeIf { linesScheme === scheme }?.let { return it }

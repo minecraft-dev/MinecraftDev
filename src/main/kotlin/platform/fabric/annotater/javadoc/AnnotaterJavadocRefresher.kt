@@ -30,9 +30,6 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.EditorNotifications
 import java.nio.file.Path
 
-/**
- * Refreshes the places annotater Javadocs are displayed when they change, whether through the plugin or on disk.
- */
 class AnnotaterJavadocRefresher : AnnotaterListener, BulkFileListenerBackgroundable {
     override fun checkoutsChanged() {
         refresh(updateNotifications = true)

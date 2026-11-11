@@ -90,9 +90,6 @@ object AnnotaterBuildCheck {
         return commandLine
     }
 
-    /**
-     * Shows the output of the failed checks, offering to cancel submitting, which is the default, or submit anyway.
-     */
     private class FailedDialog(project: Project, private val log: String) : DialogWrapper(project) {
         init {
             title = MCDevBundle("fabric.annotater.pr.check_build.failed")

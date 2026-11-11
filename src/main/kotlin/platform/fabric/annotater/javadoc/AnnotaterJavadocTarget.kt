@@ -36,13 +36,13 @@ import com.intellij.psi.impl.compiled.ClsElementImpl
 
 /**
  * A class, field or method that can have a Javadoc comment in annotater. All names are internal (slash separated)
- * official names, and members are identified by their name and JVM descriptor.
+ * names, and members are identified by their name and JVM descriptor.
  */
 sealed class AnnotaterJavadocTarget {
     abstract val owner: String
 
     /**
-     * The internal name of the top level class whose `.mapping` file stores this target.
+     * The top level class whose `.mapping` file stores this target.
      */
     val outerClass: String
         get() = outerClassName(owner)
@@ -65,8 +65,7 @@ sealed class AnnotaterJavadocTarget {
 
     companion object {
         /**
-         * The target documented by [element], which may be an element of a class file's decompiled text. Anonymous
-         * classes can't be documented, but their members can.
+         * The target documented by [element], which may be an element of a class file's decompiled text.
          */
         fun fromPsi(element: PsiElement): AnnotaterJavadocTarget? {
             // Decompiled text is generated from the compiled class, which is more reliable to get the target of

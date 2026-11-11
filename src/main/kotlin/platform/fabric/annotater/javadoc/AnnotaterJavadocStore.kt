@@ -41,16 +41,15 @@ import net.fabricmc.mappingio.format.enigma.EnigmaFileWriter
 import net.fabricmc.mappingio.tree.MappingTree
 import net.fabricmc.mappingio.tree.MemoryMappingTree
 import net.fabricmc.mappingio.tree.VisitOrder
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
- * Reads and writes the Javadoc comments stored in an annotater `mappings` directory. Comments are stored in Enigma
- * format, with one file per top level class at `<mappings>/<internal/class/Name>.mapping`. The files are written
- * in the same way as annotater formats them, so that saving doesn't reformat unrelated parts of a file.
+ * Reads and writes the Javadoc comments stored in an annotater `mappings` directory.
  *
  * Use [forDirectory] rather than the constructor outside of tests, so that every checkout of a directory sees the
  * comments the others write.
  */
-class AnnotaterJavadocStore(val mappingsDir: Path) {
+class AnnotaterJavadocStore @VisibleForTesting constructor(val mappingsDir: Path) {
     private val cache = ConcurrentHashMap<String, MemoryMappingTree>()
 
     fun fileFor(outerClass: String): Path = mappingsDir.resolve("$outerClass.mapping")
@@ -87,7 +86,7 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
     }
 
     /**
-     * Like [set], but for several targets at once. All targets must share the same outer class.
+     * All targets must share the same outer class.
      */
     @Throws(IOException::class)
     @Synchronized
@@ -137,9 +136,6 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
         fun forDirectory(mappingsDir: Path): AnnotaterJavadocStore =
             stores.computeIfAbsent(mappingsDir.normalize(), ::AnnotaterJavadocStore)
 
-        /**
-         * Forgets the cached comments of every store, for when the checkouts change, such as by switching branch.
-         */
         fun invalidateAll() {
             for (store in stores.values) {
                 store.cache.clear()

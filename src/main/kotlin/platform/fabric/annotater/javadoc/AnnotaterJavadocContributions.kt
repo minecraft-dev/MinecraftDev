@@ -41,21 +41,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import java.util.concurrent.CompletableFuture
 import javax.swing.JComponent
 
-/**
- * Switching a managed annotater checkout between contributions, so that a pull request can be updated after review,
- * and deleting contributions.
- */
 object AnnotaterJavadocContributions {
-    /**
-     * The label for the contribution [checkout] is on, for the editor banner.
-     */
     fun currentLabel(vcs: AnnotaterVcs, checkout: AnnotaterCheckout): String =
         vcs.currentContribution(checkout)?.displayName ?: MCDevBundle("fabric.annotater.contribution.new")
 
-    /**
-     * Shows a popup under [component] for switching between and deleting contributions if [checkout] is managed, and
-     * configuring annotater.
-     */
     fun showPopup(project: Project, checkout: AnnotaterCheckout, component: JComponent) {
         val vcs = AnnotaterVcs.instance?.takeIf { checkout.managed }
         if (vcs == null) {
@@ -167,9 +156,6 @@ object AnnotaterJavadocContributions {
         }
     }
 
-    /**
-     * Asks for a message to commit the uncommitted changes with, if there are any, then switches to [branch].
-     */
     private fun askForCommitMessageThenSwitch(
         project: Project,
         checkout: AnnotaterCheckout,
@@ -207,10 +193,6 @@ object AnnotaterJavadocContributions {
         }.queue()
     }
 
-    /**
-     * Commits the uncommitted changes with [commitMessage] if it isn't null, then checks out [branch], restarting the
-     * editing of the Javadoc being edited.
-     */
     private fun commitAndCheckOut(
         project: Project,
         checkout: AnnotaterCheckout,
@@ -238,9 +220,6 @@ object AnnotaterJavadocContributions {
         }.queue()
     }
 
-    /**
-     * Deletes [contribution] after asking for confirmation. Only the local branch is deleted.
-     */
     private fun deleteContribution(
         project: Project,
         checkout: AnnotaterCheckout,

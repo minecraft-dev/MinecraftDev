@@ -47,10 +47,6 @@ import org.jetbrains.plugins.github.authentication.GHAccountsUtil
 import org.jetbrains.plugins.github.authentication.accounts.GithubAccount
 import org.jetbrains.plugins.github.util.GHCompatibilityUtil
 
-/**
- * Commits annotater changes, forks annotater on GitHub, pushes the contribution branch to the fork and opens a pull
- * request, using accounts from the GitHub plugin.
- */
 class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
     override fun availableAction(checkout: AnnotaterCheckout): AnnotaterPullRequests.Action? {
         val status = AnnotaterGitVcs.instance?.pushStatus(checkout)?.takeIf { it.hasUnpushedChanges } ?: return null

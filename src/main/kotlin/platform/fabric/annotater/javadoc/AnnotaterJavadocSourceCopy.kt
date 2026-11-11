@@ -43,17 +43,13 @@ import com.intellij.testFramework.LightVirtualFile
  * existing Javadocs replaced by the annotater Javadocs as Markdown doc comments. This lets the IDE's own Java support
  * be used to edit and render annotater Javadocs in their real context.
  *
- * The member at index `i` of [AnnotaterJavadocTarget.declarations] documents `targets[i]`, or nothing if that is null, e.g. for members of other
- * top level classes in the same file.
+ * The member at index `i` of [AnnotaterJavadocTarget.declarations] documents `targets[i]`, or nothing if that is null,
+ * e.g. for members of other top level classes in the same file.
  */
 class AnnotaterJavadocSourceCopy(
     val fileName: String,
     val text: String,
     val targets: List<AnnotaterJavadocTarget?>,
-    /**
-     * The language level to parse the copy at: that of the source file, but at least the first that supports Markdown
-     * doc comments.
-     */
     val languageLevel: LanguageLevel,
 ) {
     /**
@@ -127,8 +123,7 @@ class AnnotaterJavadocSourceCopy(
 
     companion object {
         /**
-         * Extracts the Markdown text of a `///` doc comment, removing the `///` prefixes and the common indentation.
-         * Returns null when the comment is blank.
+         * Removes the `///` prefixes and the common indentation. Returns null when the comment is blank.
          */
         private fun extractMarkdown(comment: PsiDocComment): String? {
             val lines = comment.text.lines().map { line ->
@@ -142,9 +137,6 @@ class AnnotaterJavadocSourceCopy(
             return text.ifEmpty { null }
         }
 
-        /**
-         * Formats Markdown as a `///` doc comment with the given indentation, ending with a newline.
-         */
         private fun formatMarkdown(markdown: String, indent: String): String {
             return markdown.lines().joinToString("") { line ->
                 if (line.isEmpty()) "$indent///\n" else "$indent/// $line\n"

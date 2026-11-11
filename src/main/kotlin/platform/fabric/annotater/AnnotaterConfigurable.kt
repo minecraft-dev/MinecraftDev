@@ -145,8 +145,7 @@ class AnnotaterConfigurable : Configurable {
     }.also { panel = it }
 
     /**
-     * Checks that [directory] is an annotater checkout for a Minecraft version used by an open project, returning
-     * the problem and whether it's an error rather than a warning.
+     * Returns the problem and whether it's an error rather than a warning.
      */
     private fun validateCustomDirectory(directory: String): Pair<String, Boolean>? {
         if (directory.isBlank()) {
@@ -170,8 +169,7 @@ class AnnotaterConfigurable : Configurable {
     }
 
     /**
-     * A reminder to follow annotater's contribution guidelines, which can differ between version branches, linking to
-     * those of the versions used by open projects, or of the default branch if there are none.
+     * The guidelines can differ between version branches, so link to those of each version in use.
      */
     private fun contributionGuidelinesNote(): String {
         fun link(branch: String, text: String) =
@@ -237,9 +235,6 @@ class AnnotaterConfigurable : Configurable {
 
     override fun reset() = panel.reset()
 
-    /**
-     * The Minecraft versions of all modules in open projects, as configured in their Minecraft module settings.
-     */
     private fun knownMinecraftVersions(): List<String> {
         return ProjectManager.getInstance().openProjects.flatMap { project ->
             ModuleManager.getInstance(project).modules.mapNotNull {

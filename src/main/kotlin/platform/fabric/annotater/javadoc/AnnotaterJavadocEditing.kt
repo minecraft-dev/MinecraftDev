@@ -48,8 +48,7 @@ import java.io.IOException
 
 object AnnotaterJavadocEditing {
     /**
-     * Whether to offer editing annotater Javadocs in [project]. In Fabric projects it's offered even before annotater
-     * is set up, to make it discoverable.
+     * In Fabric projects it's offered even before annotater is set up, to make it discoverable.
      */
     fun isOffered(project: Project): Boolean {
         return AnnotaterSettings.instance.enabled || AnnotaterCheckoutService.isFabricProject(project)
@@ -71,10 +70,6 @@ object AnnotaterJavadocEditing {
         return candidate.takeIf { isDocumentable(it) }
     }
 
-    /**
-     * Converts an element of a decompiled class's text to the compiled element it was generated from, if there is
-     * one, and filters out elements that can't have annotater Javadocs.
-     */
     fun normalize(element: PsiElement): PsiMember? {
         val member = (element.getUserData(ClsElementImpl.COMPILED_ELEMENT) ?: element) as? PsiMember ?: return null
         return member.takeIf { AnnotaterJavadocTarget.fromPsi(it) != null }
@@ -85,15 +80,12 @@ object AnnotaterJavadocEditing {
         return AnnotaterCheckoutService.isMinecraftFile(member.project, file)
     }
 
-    /**
-     * Starts editing the annotater Javadoc of the member found by [findTarget].
-     */
     fun open(project: Project, editor: Editor, file: PsiFile) {
         open(project, findTarget(editor, file) ?: return)
     }
 
     /**
-     * Starts editing the annotater Javadoc of [member], in an editor embedded in the Minecraft class it's displayed in.
+     * Edits in an editor embedded in the Minecraft class [member] is displayed in.
      */
     fun open(project: Project, member: PsiMember) {
         val checkout = when (val status = AnnotaterCheckoutService.instance.status(member)) {

@@ -28,9 +28,6 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 
-/**
- * The contents of an annotater checkout's `config.json`.
- */
 data class AnnotaterConfig(
     val version: String,
     val mappings: String,

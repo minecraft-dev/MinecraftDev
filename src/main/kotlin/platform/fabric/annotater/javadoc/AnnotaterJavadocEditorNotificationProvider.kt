@@ -36,9 +36,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.Function
 import javax.swing.JComponent
 
-/**
- * Shows a banner in Minecraft classes that annotater Javadocs are displayed in, i.e. that have an annotater checkout.
- */
 class AnnotaterJavadocEditorNotificationProvider : EditorNotificationProvider {
     override fun collectNotificationData(
         project: Project,

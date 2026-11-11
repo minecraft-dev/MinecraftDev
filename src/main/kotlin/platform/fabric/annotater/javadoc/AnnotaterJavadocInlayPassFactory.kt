@@ -54,10 +54,6 @@ import com.intellij.psi.SmartPsiElementPointer
 import javax.swing.Icon
 
 /**
- * Displays annotater Javadocs in Minecraft classes, both decompiled and attached sources. Existing doc comments are
- * folded away, and annotater Javadocs are shown as block inlays above their declarations. Declarations with an
- * annotater Javadoc also get a gutter icon to edit it.
- *
  * The IDE's rendered doc comments (reader mode) would show the existing Javadocs again, so they're turned off in these
  * editors. Javadocs can't be added to the decompiled text itself, as the IDE requires decompiled classes' doc comments
  * to match their compiled stubs.
@@ -86,9 +82,6 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
         TextEditorHighlightingPass(file.project, editor.document, false) {
         private val documentStamp = editor.document.modificationStamp
 
-        /**
-         * Whether annotater Javadocs replace the existing ones, which is never the case without a checkout.
-         */
         private var showJavadocs = false
         private var items = emptyList<Item>()
         private var gutterIcons = emptyList<GutterIcon>()

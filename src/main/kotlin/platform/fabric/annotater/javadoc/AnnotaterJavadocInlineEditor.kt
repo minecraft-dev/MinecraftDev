@@ -102,13 +102,12 @@ class AnnotaterJavadocInlineEditor private constructor(
     val file: AnnotaterJavadocVirtualFile,
     private val document: Document,
     /**
-     * The edited member in the Minecraft class it's displayed in, so that editing can be restarted when the checkout
-     * switches branch.
+     * Kept so that editing can be restarted when the checkout switches branch.
      */
     val source: SmartPsiElementPointer<PsiMember>?,
 ) : Disposable {
     /**
-     * The pending automatic save, which is delayed until the user stops typing.
+     * Delayed save until the user stops typing.
      */
     private var saveJob: Job? = null
 
@@ -117,16 +116,10 @@ class AnnotaterJavadocInlineEditor private constructor(
     @Volatile
     private var dirty = false
 
-    /**
-     * The editor of the Minecraft class that the Javadoc is edited in.
-     */
     @Volatile
     var hostEditor: Editor? = null
         private set
 
-    /**
-     * The editor embedded in [hostEditor] that edits the Javadoc.
-     */
     var editor: EditorEx? = null
         private set
 
@@ -190,9 +183,6 @@ class AnnotaterJavadocInlineEditor private constructor(
         guards += guard
     }
 
-    /**
-     * Shows the embedded editor above [offset] in [host], and focuses it.
-     */
     fun show(host: EditorEx, offset: Int) {
         val range = commentRange() ?: return
         val editor = EditorFactory.getInstance().createEditor(document, project, file, false, EditorKind.MAIN_EDITOR)
@@ -486,9 +476,6 @@ class AnnotaterJavadocInlineEditor private constructor(
         private val saveExecutor =
             AppExecutorUtil.createBoundedApplicationPoolExecutor("Annotater Javadoc saving", 1)
 
-        /**
-         * The annotater Javadoc being edited in [project], if any.
-         */
         fun current(project: Project): AnnotaterJavadocInlineEditor? = project.getUserData(CURRENT_KEY)
 
         /**
@@ -503,7 +490,7 @@ class AnnotaterJavadocInlineEditor private constructor(
         }
 
         /**
-         * Whether [range] of [document] is entirely within one guarded block, so the user didn't write it.
+         * Whether [range] of [document] is entirely within one guarded block, i.e. the user didn't write it.
          */
         fun isGuarded(document: Document, range: TextRange): Boolean {
             val guard = document.getRangeGuard(range.startOffset, range.endOffset) ?: return false
@@ -511,9 +498,8 @@ class AnnotaterJavadocInlineEditor private constructor(
         }
 
         /**
-         * Starts editing the Javadoc of [file]'s target, finishing the previous editing in the project
-         * first. Returns null if the previous editing couldn't be finished, or the target's doc comment can't be found
-         * in [file].
+         * Finishes the previous editing in the project first. Returns null if that couldn't be finished, or the
+         * target's doc comment can't be found in [file].
          */
         fun start(
             project: Project,

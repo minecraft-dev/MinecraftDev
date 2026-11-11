@@ -25,7 +25,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 
 /**
- * Git operations on managed annotater checkouts. Only available when the Git plugin is installed.
+ * Only available when the Git plugin is installed.
  */
 interface AnnotaterVcs {
     /**
@@ -52,12 +52,12 @@ interface AnnotaterVcs {
     fun currentContribution(checkout: AnnotaterCheckout): AnnotaterContribution?
 
     /**
-     * The contribution branches in the managed [checkout], newest first. Must not be called on the EDT.
+     * Newest first. Must not be called on the EDT.
      */
     fun contributions(project: Project?, checkout: AnnotaterCheckout): List<AnnotaterContribution>
 
     /**
-     * The mapping files in [checkout] that have changed since the last commit. Must not be called on the EDT.
+     * Must not be called on the EDT.
      */
     fun uncommittedMappingFiles(project: Project?, checkout: AnnotaterCheckout): List<String>
 
@@ -92,8 +92,6 @@ interface AnnotaterVcs {
 }
 
 /**
- * A local branch in a managed checkout holding one contribution, which becomes one pull request.
- *
  * @property title the title of the contribution's pull request, or its latest commit message if it doesn't have one
  * yet, or null if nothing has been committed to it
  */
@@ -102,9 +100,6 @@ data class AnnotaterContribution(val branch: String, val title: String?) {
         get() = title ?: branch
 
     companion object {
-        /**
-         * A pull request title or commit message describing changes to the mapping [files].
-         */
         fun defaultTitle(files: List<String>): String {
             val classes = files.map { it.substringAfterLast('/').removeSuffix(".mapping") }.distinct()
             return when {
@@ -117,7 +112,7 @@ data class AnnotaterContribution(val branch: String, val title: String?) {
 }
 
 /**
- * Creating pull requests to annotater. Only available when the GitHub plugin is installed.
+ * Only available when the GitHub plugin is installed.
  */
 interface AnnotaterPullRequests {
     enum class Action { CREATE, UPDATE }
@@ -128,9 +123,6 @@ interface AnnotaterPullRequests {
      */
     fun availableAction(checkout: AnnotaterCheckout): Action?
 
-    /**
-     * Creates a pull request with the changes in [checkout], or pushes them to its existing pull request.
-     */
     fun submit(project: Project, checkout: AnnotaterCheckout)
 
     companion object {

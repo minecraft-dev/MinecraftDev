@@ -80,9 +80,6 @@ class AnnotaterJavadocUnqualifiedReferenceInspection : LocalInspectionTool() {
     }
 
     private object Util {
-        /**
-         * Returns the fully qualified name of the class [reference] refers to, if it isn't already written as such.
-         */
         fun qualifiedNameIfUnqualified(reference: PsiJavaCodeReferenceElement): String? {
             val resolved = reference.resolve() as? PsiClass ?: return null
             val qualifiedName = resolved.qualifiedName ?: return null
