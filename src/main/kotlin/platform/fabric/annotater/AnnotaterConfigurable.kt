@@ -81,7 +81,6 @@ class AnnotaterConfigurable : Configurable {
             row {
                 checkBox(MCDevBundle("fabric.annotater.settings.show_javadocs"))
                     .bindSelected(settings::showAnnotaterJavadocs)
-                    .comment(MCDevBundle("fabric.annotater.settings.show_javadocs.comment"))
             }
             lateinit var managed: Cell<JBRadioButton>
             lateinit var custom: Cell<JBRadioButton>
