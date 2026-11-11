@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.fabric.annotater
 
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.EdtInterceptor
+import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCodeStyleSettingsModifier
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocInlineEditor
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocIntentionActionFilter
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRendering
@@ -29,8 +30,10 @@ import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocSour
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocTarget
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqualifiedReferenceInspection
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVirtualFile
+import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.ide.impl.HeadlessDataManager
 import com.intellij.lang.annotation.HighlightSeverity
@@ -49,6 +52,7 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.codeStyle.modifier.TransientCodeStyleSettings
 import com.intellij.psi.search.GlobalSearchScope
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
@@ -56,6 +60,7 @@ import kotlin.io.path.readText
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -121,6 +126,9 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
                 package net.minecraft.world.level;
 
                 public class Level {
+                    public boolean addEntity(net.minecraft.util.Ticker<?> ticker, String[] names, int count) {
+                        return true;
+                    }
                 }
                 """.trimIndent(),
             )
@@ -133,6 +141,15 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
             null -> clazz
             else -> clazz.findMethodsByName(name, false).firstOrNull() ?: clazz.findFieldByName(name, false)!!
         }
+    }
+
+    /**
+     * Tests use temporary code style settings, which code style settings modifiers aren't applied to.
+     */
+    private fun withAnnotaterCodeStyle(action: () -> Unit) {
+        val settings = TransientCodeStyleSettings(fixture.file.virtualFile, project, CodeStyle.getSettings(project))
+        AnnotaterJavadocCodeStyleSettingsModifier().modifySettings(settings, fixture.file)
+        CodeStyle.doWithTemporarySettings(project, settings, Runnable(action))
     }
 
     private val pi = AnnotaterJavadocTarget.FieldTarget("net/minecraft/util/Mth", "PI", "F")
@@ -424,6 +441,29 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
         assertTrue(
             fixture.editor.document.text.contains("/// See [net.minecraft.world.level.Level]."),
             fixture.editor.document.text,
+        )
+    }
+
+    @Test
+    @DisplayName("Method completion inserts fully qualified parameter types")
+    fun methodParameterCompletion() {
+        val copy = clampCopy("See [net.minecraft.world.level.Level#addEn].")
+        fixture.openFileInEditor(AnnotaterJavadocVirtualFile(checkout, copy, clamp))
+        fixture.editor.caretModel.moveToOffset(fixture.editor.document.text.indexOf("#addEn]") + 6)
+        TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
+        withAnnotaterCodeStyle { fixture.completeBasic() }
+        // The parameters can still be edited with the template Java starts for them
+        val templateState = TemplateManagerImpl.getTemplateState(fixture.editor)
+        assertNotNull(templateState)
+        val parameters = fixture.editor.document.getText(templateState!!.getVariableRange("PARAMETERS")!!)
+        assertTrue(parameters.contains("net.minecraft.util.Ticker, java.lang.String\\[\\], int"), parameters)
+        templateState.gotoEnd(false)
+        val text = fixture.editor.document.text
+        assertTrue(
+            text.contains(
+                "See [net.minecraft.world.level.Level#addEntity(net.minecraft.util.Ticker, java.lang.String\\[\\], int)].",
+            ),
+            text,
         )
     }
 

@@ -715,6 +715,8 @@
             implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocEditorNotificationProvider"/>
         <codeStyleSettingsModifier
             implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCodeStyleSettingsModifier"/>
+        <completion.contributor language="JAVA" order="first"
+                                implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCompletionContributor"/>
         <daemon.intentionActionFilter
             implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocIntentionActionFilter"/>
         <vetoRenameCondition
