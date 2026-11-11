@@ -82,6 +82,7 @@ class AnnotaterConfigurable : Configurable {
                 checkBox(MCDevBundle("fabric.annotater.settings.show_javadocs"))
                     .bindSelected(settings::showAnnotaterJavadocs)
             }
+            separator()
             lateinit var managed: Cell<JBRadioButton>
             lateinit var custom: Cell<JBRadioButton>
             buttonsGroup {
