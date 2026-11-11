@@ -22,8 +22,6 @@ package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterCheckout
 import com.intellij.ide.highlighter.JavaFileType
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtil
 import com.intellij.testFramework.LightVirtualFile
@@ -47,7 +45,7 @@ class AnnotaterJavadocVirtualFile(
         get() = copy.outerClass
 
     init {
-        putUserData(PsiUtil.FILE_LANGUAGE_LEVEL_KEY, LanguageLevel.HIGHEST)
+        putUserData(PsiUtil.FILE_LANGUAGE_LEVEL_KEY, copy.languageLevel)
     }
 
     companion object {

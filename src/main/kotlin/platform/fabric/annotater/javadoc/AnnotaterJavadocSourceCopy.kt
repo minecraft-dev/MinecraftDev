@@ -33,7 +33,6 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
@@ -44,13 +43,18 @@ import com.intellij.testFramework.LightVirtualFile
  * existing Javadocs replaced by the annotater Javadocs as Markdown doc comments. This lets the IDE's own Java support
  * be used to edit and render annotater Javadocs in their real context.
  *
- * The member at index `i` of [members] documents `targets[i]`, or nothing if that is null, e.g. for members of other
+ * The member at index `i` of [AnnotaterJavadocTarget.declarations] documents `targets[i]`, or nothing if that is null, e.g. for members of other
  * top level classes in the same file.
  */
 class AnnotaterJavadocSourceCopy(
     val fileName: String,
     val text: String,
     val targets: List<AnnotaterJavadocTarget?>,
+    /**
+     * The language level to parse the copy at: that of the source file, but at least the first that supports Markdown
+     * doc comments.
+     */
+    val languageLevel: LanguageLevel,
 ) {
     /**
      * The internal name of the top level class whose Javadocs this copy edits.
@@ -62,9 +66,8 @@ class AnnotaterJavadocSourceCopy(
         return PsiManager.getInstance(project).findFile(createVirtualFile()) as? PsiJavaFile
     }
 
-    fun createVirtualFile(): LightVirtualFile = LightVirtualFile(fileName, JavaFileType.INSTANCE, text).also {
-        // Markdown doc comments are only parsed at a high enough language level
-        it.putUserData(PsiUtil.FILE_LANGUAGE_LEVEL_KEY, LanguageLevel.HIGHEST)
+    private fun createVirtualFile(): LightVirtualFile = LightVirtualFile(fileName, JavaFileType.INSTANCE, text).also {
+        it.putUserData(PsiUtil.FILE_LANGUAGE_LEVEL_KEY, languageLevel)
     }
 
     /**
@@ -72,14 +75,14 @@ class AnnotaterJavadocSourceCopy(
      */
     fun memberOf(file: PsiJavaFile, target: AnnotaterJavadocTarget): PsiMember? {
         val index = targets.indexOf(target)
-        return if (index < 0) null else members(file).getOrNull(index)
+        return if (index < 0) null else AnnotaterJavadocTarget.declarations(file).getOrNull(index)
     }
 
     /**
      * Finds the target documented by [member] of [file], which must have been created from this copy.
      */
     fun targetOf(file: PsiJavaFile, member: PsiMember): AnnotaterJavadocTarget? {
-        val index = members(file).indexOf(member)
+        val index = AnnotaterJavadocTarget.declarations(file).indexOf(member)
         return if (index < 0) null else targets.getOrNull(index)
     }
 
@@ -109,7 +112,7 @@ class AnnotaterJavadocSourceCopy(
             }
         }
 
-        val members = members(file)
+        val members = AnnotaterJavadocTarget.declarations(file)
         if (members.size != targets.size) {
             return ExtractResult.Error(MCDevBundle("fabric.annotater.javadoc.error.structure_changed"))
         }
@@ -124,21 +127,10 @@ class AnnotaterJavadocSourceCopy(
 
     companion object {
         /**
-         * Finds the classes, fields and methods declared in [file], in the order matching [targets]. Local and
-         * anonymous classes are not included, and neither are members that don't appear in the source, such as the
-         * implicit methods of records.
-         */
-        fun members(file: PsiJavaFile): List<PsiMember> = members(file.classes).toList()
-
-        private fun members(classes: Array<PsiClass>): Sequence<PsiMember> = classes.asSequence().flatMap { clazz ->
-            sequenceOf(clazz) + clazz.fields + clazz.methods + members(clazz.innerClasses)
-        }.filter { it.node != null }
-
-        /**
          * Extracts the Markdown text of a `///` doc comment, removing the `///` prefixes and the common indentation.
          * Returns null when the comment is blank.
          */
-        fun extractMarkdown(comment: PsiDocComment): String? {
+        private fun extractMarkdown(comment: PsiDocComment): String? {
             val lines = comment.text.lines().map { line ->
                 val trimmed = line.trimStart()
                 if (trimmed.startsWith("///")) trimmed.substring(3) else trimmed
@@ -153,7 +145,7 @@ class AnnotaterJavadocSourceCopy(
         /**
          * Formats Markdown as a `///` doc comment with the given indentation, ending with a newline.
          */
-        fun formatMarkdown(markdown: String, indent: String): String {
+        private fun formatMarkdown(markdown: String, indent: String): String {
             return markdown.lines().joinToString("") { line ->
                 if (line.isEmpty()) "$indent///\n" else "$indent/// $line\n"
             }
@@ -163,7 +155,7 @@ class AnnotaterJavadocSourceCopy(
          * Formats Markdown as a `///` doc comment to insert at a column after [indent], followed by [indent] again for
          * the declaration after it.
          */
-        fun formatInsertedMarkdown(markdown: String, indent: String): String {
+        private fun formatInsertedMarkdown(markdown: String, indent: String): String {
             // Leave a space after an empty first line, so the user can start typing there straight away
             return "/// " + formatMarkdown(markdown, indent).removePrefix("$indent///").removePrefix(" ") + indent
         }
@@ -188,8 +180,9 @@ class AnnotaterJavadocSourceCopy(
             placeholderFor: AnnotaterJavadocTarget? = null,
             javadoc: (AnnotaterJavadocTarget) -> String?,
         ): AnnotaterJavadocSourceCopy? {
-            val outermost = generateSequence(element as? PsiClass ?: element.containingClass) { it.containingClass }
-                .lastOrNull() ?: return null
+            val outermost = PsiTreeUtil.getTopmostParentOfType(element, PsiClass::class.java)
+                ?: element as? PsiClass
+                ?: return null
             val outerClass = AnnotaterJavadocTarget.fromPsi(outermost)?.outerClass ?: return null
             val source = sourceFile(outermost) ?: return null
             val text = source.text
@@ -197,10 +190,8 @@ class AnnotaterJavadocSourceCopy(
             val targets = mutableListOf<AnnotaterJavadocTarget?>()
             // The replacements of the existing doc comments, in text order
             val replacements = mutableListOf<Pair<TextRange, String>>()
-            for (member in members(source)) {
-                // Decompiled text is generated from the compiled class, which is more reliable to get the target of
-                val compiled = member.getUserData(ClsElementImpl.COMPILED_ELEMENT) ?: member
-                val target = AnnotaterJavadocTarget.fromPsi(compiled)?.takeIf { it.outerClass == outerClass }
+            for (member in AnnotaterJavadocTarget.declarations(source)) {
+                val target = AnnotaterJavadocTarget.fromPsi(member)?.takeIf { it.outerClass == outerClass }
                 val existing = (member as PsiJavaDocumentedElement).docComment
                 val start = existing?.textRange?.startOffset ?: member.textRange.startOffset
                 val lineStart = text.lastIndexOf('\n', start - 1) + 1
@@ -227,7 +218,10 @@ class AnnotaterJavadocSourceCopy(
             for ((range, replacement) in replacements.sortedByDescending { it.first.startOffset }) {
                 sb.replace(range.startOffset, range.endOffset, replacement)
             }
-            return AnnotaterJavadocSourceCopy("${outermost.name}.java", sb.toString(), targets)
+            // Need at least Java 23 to parse Markdown Javadocs
+            val languageLevel = PsiUtil.getLanguageLevel(source).takeIf { it.isAtLeast(LanguageLevel.JDK_23) }
+                ?: LanguageLevel.JDK_23
+            return AnnotaterJavadocSourceCopy("${outermost.name}.java", sb.toString(), targets, languageLevel)
         }
     }
 }

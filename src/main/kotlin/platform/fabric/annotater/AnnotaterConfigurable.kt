@@ -59,7 +59,11 @@ class AnnotaterConfigurable : Configurable {
 
     override fun createComponent(): JComponent = panel {
         row(
-            JLabel(MCDevBundle("fabric.annotater.settings.title"), GeneralAssets.ANNOTATER_LARGE, SwingConstants.LEADING)
+            JLabel(
+                MCDevBundle("fabric.annotater.settings.title"),
+                GeneralAssets.TINY_POTATO_LARGE,
+                SwingConstants.LEADING,
+            )
                 .apply { font = font.deriveFont(Font.BOLD, font.size * 1.5f) },
         ) {}.bottomGap(BottomGap.MEDIUM)
 
@@ -71,6 +75,9 @@ class AnnotaterConfigurable : Configurable {
                 .comment(MCDevBundle("fabric.annotater.settings.enabled.comment"))
         }
         indent {
+            row {
+                text(contributionGuidelinesNote())
+            }
             row {
                 checkBox(MCDevBundle("fabric.annotater.settings.show_javadocs"))
                     .bindSelected(settings::showAnnotaterJavadocs)
@@ -162,6 +169,26 @@ class AnnotaterConfigurable : Configurable {
         return null
     }
 
+    /**
+     * A reminder to follow annotater's contribution guidelines, which can differ between version branches, linking to
+     * those of the versions used by open projects, or of the default branch if there are none.
+     */
+    private fun contributionGuidelinesNote(): String {
+        fun link(branch: String, text: String) =
+            "<a href=\"https://github.com/FabricMC/annotater/blob/$branch/CONTRIBUTING.md\">$text</a>"
+
+        val versions = knownMinecraftVersions()
+        val links = when (versions.size) {
+            0 -> link("HEAD", MCDevBundle("fabric.annotater.settings.guidelines.link"))
+            1 -> link(versions.single(), MCDevBundle("fabric.annotater.settings.guidelines.link"))
+            else -> MCDevBundle(
+                "fabric.annotater.settings.guidelines.link.version",
+                versions.joinToString(", ") { link(it, it) },
+            )
+        }
+        return MCDevBundle("fabric.annotater.settings.guidelines", links)
+    }
+
     private fun cloneOrUpdate(vcs: AnnotaterVcs) {
         val versions = knownMinecraftVersions()
         val version = when (versions.size) {
@@ -173,6 +200,7 @@ class AnnotaterConfigurable : Configurable {
                 )
                 return
             }
+
             1 -> versions.single()
             else -> Messages.showEditableChooseDialog(
                 MCDevBundle("fabric.annotater.settings.clone_now.version"),
@@ -209,18 +237,18 @@ class AnnotaterConfigurable : Configurable {
 
     override fun reset() = panel.reset()
 
-    companion object {
-        /**
-         * The Minecraft versions of all modules in open projects, as configured in their Minecraft module settings.
-         */
-        fun knownMinecraftVersions(): List<String> {
-            return ProjectManager.getInstance().openProjects.flatMap { project ->
-                ModuleManager.getInstance(project).modules.mapNotNull {
-                    MinecraftModuleSettings.getInstance(it).state.minecraftVersion
-                }
-            }.filter { it.isNotBlank() }.distinct()
-        }
+    /**
+     * The Minecraft versions of all modules in open projects, as configured in their Minecraft module settings.
+     */
+    private fun knownMinecraftVersions(): List<String> {
+        return ProjectManager.getInstance().openProjects.flatMap { project ->
+            ModuleManager.getInstance(project).modules.mapNotNull {
+                MinecraftModuleSettings.getInstance(it).state.minecraftVersion
+            }
+        }.filter { it.isNotBlank() }.distinct()
+    }
 
+    object Util {
         fun show(project: Project?) {
             ShowSettingsUtil.getInstance().showSettingsDialog(project, AnnotaterConfigurable::class.java)
         }

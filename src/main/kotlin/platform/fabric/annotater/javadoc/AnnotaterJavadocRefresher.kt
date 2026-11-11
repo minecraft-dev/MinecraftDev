@@ -25,7 +25,7 @@ import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterListener
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.BulkFileListenerBackgroundable
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.EditorNotifications
 import java.nio.file.Path
@@ -33,7 +33,7 @@ import java.nio.file.Path
 /**
  * Refreshes the places annotater Javadocs are displayed when they change, whether through the plugin or on disk.
  */
-class AnnotaterJavadocRefresher : AnnotaterListener, BulkFileListener {
+class AnnotaterJavadocRefresher : AnnotaterListener, BulkFileListenerBackgroundable {
     override fun checkoutsChanged() {
         refresh(updateNotifications = true)
     }

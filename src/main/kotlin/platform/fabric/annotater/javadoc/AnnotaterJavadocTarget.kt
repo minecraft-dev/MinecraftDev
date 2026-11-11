@@ -22,10 +22,17 @@ package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.internalName
+import com.intellij.psi.PsiAnonymousClass
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
+import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiTypeParameter
+import com.intellij.psi.SyntaxTraverser
+import com.intellij.psi.impl.compiled.ClsElementImpl
 
 /**
  * A class, field or method that can have a Javadoc comment in annotater. All names are internal (slash separated)
@@ -57,32 +64,53 @@ sealed class AnnotaterJavadocTarget {
     ) : AnnotaterJavadocTarget()
 
     companion object {
+        /**
+         * The target documented by [element], which may be an element of a class file's decompiled text. Anonymous
+         * classes can't be documented, but their members can.
+         */
         fun fromPsi(element: PsiElement): AnnotaterJavadocTarget? {
-            return when (element) {
-                is PsiClass -> {
-                    if (element.qualifiedName == null) {
-                        // Anonymous and local classes can't be documented
-                        return null
-                    }
-                    ClassTarget(element.internalName ?: return null)
-                }
-
+            // Decompiled text is generated from the compiled class, which is more reliable to get the target of
+            val compiled = element.getUserData(ClsElementImpl.COMPILED_ELEMENT) ?: element
+            if (compiled !is PsiMember || !isDocumentable(compiled)) {
+                return null
+            }
+            return when (compiled) {
+                is PsiClass -> ClassTarget(compiled.internalName ?: return null)
                 is PsiField -> {
-                    val owner = element.containingClass?.takeIf { it.qualifiedName != null } ?: return null
-                    FieldTarget(owner.internalName ?: return null, element.name, element.descriptor ?: return null)
+                    val owner = compiled.containingClass?.internalName ?: return null
+                    FieldTarget(owner, compiled.name, compiled.descriptor ?: return null)
                 }
 
                 is PsiMethod -> {
-                    val owner = element.containingClass?.takeIf { it.qualifiedName != null } ?: return null
-                    MethodTarget(
-                        owner.internalName ?: return null,
-                        element.internalName,
-                        element.descriptor ?: return null
-                    )
+                    val owner = compiled.containingClass?.internalName ?: return null
+                    MethodTarget(owner, compiled.internalName, compiled.descriptor ?: return null)
                 }
 
                 else -> null
             }
+        }
+
+        /**
+         * The classes, fields and methods declared in the source of [file] in text order, including those in local
+         * and anonymous classes, but not members that don't appear in the source, such as the implicit methods of
+         * records. For a class file, these are the declarations in its decompiled text.
+         */
+        fun declarations(file: PsiJavaFile): List<PsiMember> {
+            val source = (if (file is PsiCompiledElement) file.mirror else file) as? PsiJavaFile ?: return emptyList()
+            return SyntaxTraverser.psiTraverser(source)
+                .filter(PsiMember::class.java)
+                .filter(::isDocumentable)
+                .toList()
+        }
+
+        /**
+         * Whether [member] is a kind of declaration that can be documented: a class, field or method, but not a type
+         * parameter or anonymous class (including enum constant bodies), which are also [PsiClass]es.
+         */
+        private fun isDocumentable(member: PsiMember): Boolean = when (member) {
+            is PsiTypeParameter, is PsiAnonymousClass -> false
+            is PsiClass, is PsiField, is PsiMethod -> true
+            else -> false
         }
 
         /**

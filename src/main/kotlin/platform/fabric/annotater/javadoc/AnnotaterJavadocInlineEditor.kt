@@ -38,6 +38,7 @@ import com.intellij.openapi.actionSystem.DataSink
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.UiDataProvider
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
@@ -45,10 +46,8 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
-import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.editor.event.DocumentEvent
@@ -64,7 +63,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
-import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiJavaDocumentedElement
@@ -73,7 +72,6 @@ import com.intellij.psi.PsiMember
 import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.ui.ColorUtil
 import com.intellij.ui.EditorNotifications
-import com.intellij.util.Alarm
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
@@ -83,6 +81,12 @@ import java.awt.event.ComponentEvent
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 import javax.swing.JPanel
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * The editing of one annotater Javadoc, in an editor embedded above its declaration in the Minecraft class it's
@@ -103,7 +107,10 @@ class AnnotaterJavadocInlineEditor private constructor(
      */
     val source: SmartPsiElementPointer<PsiMember>?,
 ) : Disposable {
-    private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD, this)
+    /**
+     * The pending automatic save, which is delayed until the user stops typing.
+     */
+    private var saveJob: Job? = null
 
     private val guards = mutableListOf<RangeMarker>()
 
@@ -123,8 +130,6 @@ class AnnotaterJavadocInlineEditor private constructor(
     var editor: EditorEx? = null
         private set
 
-    private var inlay: Inlay<*>? = null
-
     val checkout: AnnotaterCheckout
         get() = file.checkout
 
@@ -133,17 +138,17 @@ class AnnotaterJavadocInlineEditor private constructor(
 
     init {
         installGuardedBlocks()
-        // The default handler shows a modal dialog, which is annoying when editing a guarded block by accident
-        EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(document) {
-            val editor = editor ?: return@setReadonlyFragmentModificationHandler
-            HintManager.getInstance().showErrorHint(editor, MCDevBundle("fabric.annotater.javadoc.read_only"))
-        }
         document.addDocumentListener(
             object : DocumentListener {
                 override fun documentChanged(event: DocumentEvent) {
                     dirty = true
-                    alarm.cancelAllRequests()
-                    alarm.addRequest(::save, SAVE_DELAY_MS)
+                    saveJob?.cancel()
+                    saveJob = project.service<ProjectScope>().coroutineScope.launch(Dispatchers.EDT) {
+                        delay(SAVE_DELAY_MS.milliseconds)
+                        // Otherwise save would cancel this job, which cancels the save partway through
+                        saveJob = null
+                        save()
+                    }
                 }
             },
             this,
@@ -166,21 +171,22 @@ class AnnotaterJavadocInlineEditor private constructor(
 
     /**
      * Makes everything outside of the edited doc comment read-only. The line break after the comment is read-only too,
-     * so that the declaration can't be joined onto the comment.
+     * so that the declaration can't be joined onto the comment. The guards are greedy at the ends of the document, so
+     * nothing can be inserted there, but not next to the comment, so that text can be inserted at its start and end.
      */
     private fun installGuardedBlocks() {
         val range = commentRange() ?: return
-        addGuard(0, range.startOffset)
-        addGuard(range.endOffset, document.textLength)
+        addGuard(0, range.startOffset, greedyToLeft = true, greedyToRight = false)
+        addGuard(range.endOffset, document.textLength, greedyToLeft = false, greedyToRight = true)
     }
 
-    private fun addGuard(start: Int, end: Int) {
+    private fun addGuard(start: Int, end: Int, greedyToLeft: Boolean, greedyToRight: Boolean) {
         if (end <= start) {
             return
         }
         val guard = document.createGuardedBlock(start, end)
-        guard.isGreedyToLeft = false
-        guard.isGreedyToRight = false
+        guard.isGreedyToLeft = greedyToLeft
+        guard.isGreedyToRight = greedyToRight
         guards += guard
     }
 
@@ -256,7 +262,7 @@ class AnnotaterJavadocInlineEditor private constructor(
             },
         )
 
-        inlay = EditorEmbeddedComponentManager.getInstance().addComponent(
+        val inlay = EditorEmbeddedComponentManager.getInstance().addComponent(
             host,
             component,
             EditorEmbeddedComponentManager.Properties(
@@ -270,6 +276,7 @@ class AnnotaterJavadocInlineEditor private constructor(
                 offset,
             ),
         )
+        inlay?.let { Disposer.register(this, it) }
 
         // Finish editing when the Minecraft class is closed
         EditorFactory.getInstance().addEditorFactoryListener(
@@ -351,7 +358,8 @@ class AnnotaterJavadocInlineEditor private constructor(
      */
     fun save(): CompletableFuture<Boolean> {
         ApplicationManager.getApplication().assertIsDispatchThread()
-        alarm.cancelAllRequests()
+        saveJob?.cancel()
+        saveJob = null
         if (!dirty || project.isDisposed) {
             return CompletableFuture.completedFuture(file.error == null)
         }
@@ -405,7 +413,9 @@ class AnnotaterJavadocInlineEditor private constructor(
             store.invalidate(outerClass)
             if (store.get(target) != javadoc) {
                 store.setAll(mapOf(target to javadoc))
-                LocalFileSystem.getInstance().refreshNioFiles(listOf(store.fileFor(outerClass)))
+                // Refreshing only the file wouldn't notice it if the VFS hasn't loaded it yet, such as when it's created
+                val mappingFile = store.fileFor(outerClass).toFile()
+                VfsUtil.markDirtyAndRefresh(false, false, true, mappingFile.parentFile, mappingFile)
                 ApplicationManager.getApplication().messageBus.syncPublisher(AnnotaterListener.TOPIC)
                     .javadocsChanged(checkout.root, outerClass)
             }
@@ -453,15 +463,14 @@ class AnnotaterJavadocInlineEditor private constructor(
         if (wasCurrent) {
             project.putUserData(CURRENT_KEY, null)
         }
-        inlay?.let(Disposer::dispose)
-        inlay = null
+        saveJob?.cancel()
+        saveJob = null
         editor?.let(EditorFactory.getInstance()::releaseEditor)
         editor = null
         for (guard in guards) {
             document.removeGuardedBlock(guard)
         }
         guards.clear()
-        EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(document, null)
         if (wasCurrent && !project.isDisposed) {
             restartHostHighlighting()
             EditorNotifications.getInstance(project).updateAllNotifications()
@@ -470,7 +479,7 @@ class AnnotaterJavadocInlineEditor private constructor(
     }
 
     companion object {
-        private const val SAVE_DELAY_MS = 750
+        private const val SAVE_DELAY_MS = 750L
 
         private val CURRENT_KEY = Key.create<AnnotaterJavadocInlineEditor>("mcdev.annotater.javadocInlineEditor")
 
@@ -483,10 +492,12 @@ class AnnotaterJavadocInlineEditor private constructor(
         fun current(project: Project): AnnotaterJavadocInlineEditor? = project.getUserData(CURRENT_KEY)
 
         /**
-         * The parent of the inline editors of a project, so they're disposed with it.
+         * The parent of the inline editors of a project, so they're disposed with it, and the scope of their
+         * coroutines. Plugins shouldn't use the project itself as a parent disposable, as that leaks the plugin's
+         * classes if it's unloaded while the project is open.
          */
         @Service(Service.Level.PROJECT)
-        private class ProjectDisposable : Disposable {
+        private class ProjectScope(val coroutineScope: CoroutineScope) : Disposable {
             override fun dispose() {
             }
         }
@@ -521,7 +532,7 @@ class AnnotaterJavadocInlineEditor private constructor(
                 return null
             }
             project.putUserData(CURRENT_KEY, inlineEditor)
-            Disposer.register(project.service<ProjectDisposable>(), inlineEditor)
+            Disposer.register(project.service<ProjectScope>(), inlineEditor)
             EditorNotifications.getInstance(project).updateAllNotifications()
             return inlineEditor
         }

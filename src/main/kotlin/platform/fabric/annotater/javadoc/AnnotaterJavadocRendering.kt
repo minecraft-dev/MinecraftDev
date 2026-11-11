@@ -24,14 +24,10 @@ import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterCheckout
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterCheckoutService
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterSettings
 import com.intellij.lang.java.JavaDocumentationProvider
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiCompiledElement
 import com.intellij.psi.PsiJavaDocumentedElement
-import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.util.PsiTreeUtil
-import java.io.IOException
 
 /**
  * Renders annotater Javadocs with the IDE's own Java documentation renderer, by rendering the declaration in a copy of
@@ -50,15 +46,6 @@ object AnnotaterJavadocRendering {
     }
 
     /**
-     * All classes, fields and methods declared in [file] and its inner classes.
-     */
-    fun displayedMembers(file: PsiJavaFile): Sequence<PsiMember> = members(file.classes)
-
-    private fun members(classes: Array<PsiClass>): Sequence<PsiMember> = classes.asSequence().flatMap { clazz ->
-        sequenceOf(clazz) + clazz.fields + clazz.methods + members(clazz.innerClasses)
-    }
-
-    /**
      * The offset that the annotater Javadoc of [member] is displayed above: its declaration, after any existing
      * doc comment.
      */
@@ -66,15 +53,6 @@ object AnnotaterJavadocRendering {
         val existing = if (member is PsiCompiledElement) null else (member as? PsiJavaDocumentedElement)?.docComment
         return existing?.let { PsiTreeUtil.skipWhitespacesAndCommentsForward(it) }?.textRange?.startOffset
             ?: member.textRange.startOffset
-    }
-
-    fun getJavadoc(checkout: AnnotaterCheckout, target: AnnotaterJavadocTarget): String? {
-        return try {
-            if (checkout.javadocStore.hasFile(target.outerClass)) checkout.javadocStore.get(target) else null
-        } catch (e: IOException) {
-            thisLogger().info("Failed to read annotater Javadoc of $target", e)
-            null
-        }
     }
 
     /**

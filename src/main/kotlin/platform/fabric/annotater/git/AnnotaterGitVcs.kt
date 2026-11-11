@@ -36,6 +36,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vcs.VcsException
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.EditorNotifications
+import com.intellij.util.concurrency.AppExecutorUtil
 import git4idea.commands.Git
 import git4idea.commands.GitCommand
 import git4idea.commands.GitLineHandler
@@ -67,6 +68,39 @@ class AnnotaterGitVcs : AnnotaterVcs {
      * The branches whose [contributionTitles] have been looked up at least once.
      */
     private val titledBranches = ConcurrentHashMap.newKeySet<String>()
+
+    /**
+     * The [PushStatus] of each managed checkout by root, so that the editor banner can show it without running git.
+     */
+    private val pushStatuses = ConcurrentHashMap<Path, PushStatus>()
+
+    /**
+     * The checkouts whose [pushStatuses] have been requested, to refresh them when they change.
+     */
+    private val pushStatusCheckouts = ConcurrentHashMap<Path, AnnotaterCheckout>()
+
+    /**
+     * The checkouts whose [pushStatuses] are waiting to be refreshed.
+     */
+    private val pendingPushStatuses = ConcurrentHashMap.newKeySet<Path>()
+
+    private val pushStatusExecutor =
+        AppExecutorUtil.createBoundedApplicationPoolExecutor("Annotater push status", 1)
+
+    init {
+        ApplicationManager.getApplication().messageBus.connect().subscribe(
+            AnnotaterListener.TOPIC,
+            object : AnnotaterListener {
+                override fun checkoutsChanged() {
+                    pushStatusCheckouts.values.forEach(::refreshPushStatus)
+                }
+
+                override fun javadocsChanged(checkoutRoot: Path, outerClass: String) {
+                    pushStatusCheckouts[checkoutRoot]?.let(::refreshPushStatus)
+                }
+            },
+        )
+    }
 
     override fun cloneOrUpdate(
         project: Project?,
@@ -118,7 +152,7 @@ class AnnotaterGitVcs : AnnotaterVcs {
     }
 
     @Throws(VcsException::class)
-    fun cloneOrUpdateNow(project: Project?, version: String, indicator: ProgressIndicator): AnnotaterCheckout {
+    private fun cloneOrUpdateNow(project: Project?, version: String, indicator: ProgressIndicator): AnnotaterCheckout {
         val gitProject = project ?: ProjectManager.getInstance().defaultProject
         synchronized(lock) {
             val root = AnnotaterSettings.instance.effectiveManagedRoot
@@ -290,6 +324,85 @@ class AnnotaterGitVcs : AnnotaterVcs {
         EditorNotifications.updateAll()
     }
 
+    /**
+     * Whether the contribution checked out in a managed checkout has a pull request, and whether it has changes that
+     * haven't been pushed to it, or to a new pull request if it doesn't have one.
+     */
+    data class PushStatus(val pullRequestUrl: String?, val hasUnpushedChanges: Boolean)
+
+    /**
+     * The [PushStatus] of the managed [checkout], or null if it isn't known yet, in which case it's looked up in the
+     * background and the editor banners are updated. This is cheap enough to call from any thread.
+     */
+    fun pushStatus(checkout: AnnotaterCheckout): PushStatus? {
+        if (!checkout.managed) {
+            return null
+        }
+        if (pushStatusCheckouts.put(checkout.root, checkout) == null) {
+            refreshPushStatus(checkout)
+        }
+        return pushStatuses[checkout.root]
+    }
+
+    private fun refreshPushStatus(checkout: AnnotaterCheckout) {
+        val root = checkout.root
+        if (!pendingPushStatuses.add(root)) {
+            return
+        }
+        pushStatusExecutor.execute {
+            pendingPushStatuses.remove(root)
+            val status = runCatching { computePushStatus(ProjectManager.getInstance().defaultProject, checkout) }
+                .getOrNull()
+            val old = if (status == null) pushStatuses.remove(root) else pushStatuses.put(root, status)
+            if (old != status) {
+                EditorNotifications.updateAll()
+            }
+        }
+    }
+
+    private fun computePushStatus(project: Project, checkout: AnnotaterCheckout): PushStatus {
+        val branch = currentBranch(project, checkout.root) ?: return PushStatus(null, false)
+        val pullRequestUrl = getBranchConfig(project, checkout, branch, PULL_REQUEST_KEY)
+        val pushedCommit = getBranchConfig(project, checkout, branch, PUSHED_COMMIT_KEY)
+        val hasUnpushedChanges = when {
+            uncommittedMappingFiles(project, checkout).isNotEmpty() -> true
+            pullRequestUrl != null && pushedCommit != null -> headCommit(project, checkout) != pushedCommit
+            else -> commitsAheadOfUpstream(project, checkout) > 0
+        }
+        return PushStatus(pullRequestUrl, hasUnpushedChanges)
+    }
+
+    /**
+     * The URL of the pull request opened for the contribution [branch], if any.
+     */
+    fun pullRequestUrl(project: Project, checkout: AnnotaterCheckout, branch: String): String? =
+        getBranchConfig(project, checkout, branch, PULL_REQUEST_KEY)
+
+    /**
+     * Remembers that the contribution [branch] has been pushed to the pull request at [url], so that the editor banner
+     * offers to update it when there are new changes.
+     */
+    fun setPullRequest(project: Project, checkout: AnnotaterCheckout, branch: String, url: String) {
+        run(project, checkout.root, GitCommand.CONFIG, "branch.$branch.$PULL_REQUEST_KEY", url)
+        run(
+            project,
+            checkout.root,
+            GitCommand.CONFIG,
+            "branch.$branch.$PUSHED_COMMIT_KEY",
+            headCommit(project, checkout),
+        )
+        refreshPushStatus(checkout)
+    }
+
+    private fun getBranchConfig(project: Project, checkout: AnnotaterCheckout, branch: String, key: String): String? {
+        // git config exits with 1 when the key isn't set
+        return runCatching { run(project, checkout.root, GitCommand.CONFIG, "--get", "branch.$branch.$key") }
+            .getOrNull()?.firstOrNull()?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun headCommit(project: Project, checkout: AnnotaterCheckout): String =
+        run(project, checkout.root, GitCommand.REV_PARSE, "HEAD").first().trim()
+
     override fun uncommittedMappingFiles(project: Project?, checkout: AnnotaterCheckout): List<String> {
         val output = run(
             project ?: ProjectManager.getInstance().defaultProject,
@@ -374,6 +487,45 @@ class AnnotaterGitVcs : AnnotaterVcs {
         ApplicationManager.getApplication().messageBus.syncPublisher(AnnotaterListener.TOPIC).checkoutsChanged()
     }
 
+    override fun deleteContribution(
+        project: Project?,
+        checkout: AnnotaterCheckout,
+        branch: String,
+        indicator: ProgressIndicator,
+    ) {
+        val gitProject = project ?: ProjectManager.getInstance().defaultProject
+        synchronized(lock) {
+            if (currentBranch(gitProject, checkout.root) == branch) {
+                // Discard the contribution's uncommitted changes, including new mapping files
+                val untracked = run(
+                    gitProject,
+                    checkout.root,
+                    GitCommand.STATUS,
+                    "--porcelain",
+                    "--untracked-files=all",
+                    "--",
+                    checkout.config.mappings,
+                ).filter { it.startsWith("?? ") }.map { checkout.root.resolve(it.substring(3)) }
+                run(
+                    gitProject,
+                    checkout.root,
+                    GitCommand.CHECKOUT,
+                    "--force",
+                    "--detach",
+                    "$UPSTREAM_REMOTE/${checkout.version}",
+                )
+                untracked.forEach { Files.deleteIfExists(it) }
+            }
+            // Also deletes the branch's configuration, such as its pull request title
+            run(gitProject, checkout.root, GitCommand.BRANCH, "-D", branch)
+            titles.remove(branch)
+            contributionTitles.remove(branch)
+            titledBranches.remove(branch)
+        }
+        LocalFileSystem.getInstance().refreshNioFiles(listOf(checkout.root), true, true, null)
+        ApplicationManager.getApplication().messageBus.syncPublisher(AnnotaterListener.TOPIC).checkoutsChanged()
+    }
+
     private fun branchPrefix(checkout: AnnotaterCheckout) = "mcdev/${checkout.version}/"
 
     private fun currentBranch(project: Project, dir: Path): String? {
@@ -411,14 +563,21 @@ class AnnotaterGitVcs : AnnotaterVcs {
     companion object {
         private const val REPO_DIR = ".repo"
         private const val HEAD_REF_PREFIX = "ref: refs/heads/"
-        const val UPSTREAM_REMOTE = "origin"
+        private const val UPSTREAM_REMOTE = "origin"
+
+        /**
+         * The git config keys of contribution branches, under `branch.<name>`, storing the URL of their pull request
+         * and the commit last pushed to it.
+         */
+        private const val PULL_REQUEST_KEY = "mcdevPullRequest"
+        private const val PUSHED_COMMIT_KEY = "mcdevPushedCommit"
 
         /**
          * The GitHub repository annotater is cloned from and pull requests are opened against, as `owner/name`. Can
          * be overridden to test against a fork without opening real pull requests.
          */
         val upstreamRepository: String = System.getProperty("mcdev.annotater.upstream", "FabricMC/annotater")
-        val upstreamUrl = "https://github.com/$upstreamRepository.git"
+        private val upstreamUrl = "https://github.com/$upstreamRepository.git"
 
         val instance: AnnotaterGitVcs?
             get() = AnnotaterVcs.instance as? AnnotaterGitVcs

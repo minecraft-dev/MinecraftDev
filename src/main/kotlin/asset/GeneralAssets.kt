@@ -26,6 +26,6 @@ object GeneralAssets : Assets() {
 
     val MC_TEMPLATE = loadIcon("/assets/icons/general/MinecraftTemplate.png")
 
-    val ANNOTATER = loadIcon("/assets/icons/general/Annotater.png")
-    val ANNOTATER_LARGE = loadIcon("/assets/icons/general/AnnotaterLarge.png")
+    val TINY_POTATO = loadIcon("/assets/icons/general/tiny_potato.png")
+    val TINY_POTATO_LARGE = loadIcon("/assets/icons/general/tiny_potato_large.png")
 }

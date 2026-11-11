@@ -34,5 +34,5 @@ class AnnotaterCheckout(val root: Path, val config: AnnotaterConfig, val managed
 
     val mappingsDir: Path = root.resolve(config.mappings)
 
-    val javadocStore = AnnotaterJavadocStore(mappingsDir)
+    val javadocStore = AnnotaterJavadocStore.forDirectory(mappingsDir)
 }

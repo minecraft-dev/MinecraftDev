@@ -73,6 +73,18 @@ interface AnnotaterVcs {
         indicator: ProgressIndicator,
     )
 
+    /**
+     * Deletes the contribution [branch] from the managed [checkout]. Only the local branch is deleted, not any branch
+     * pushed for it or its pull request. If [branch] is checked out, its uncommitted changes are discarded and the
+     * upstream version branch is checked out instead. Must not be called on the EDT.
+     */
+    fun deleteContribution(
+        project: Project?,
+        checkout: AnnotaterCheckout,
+        branch: String,
+        indicator: ProgressIndicator,
+    )
+
     companion object {
         val instance: AnnotaterVcs?
             get() = ApplicationManager.getApplication().getService(AnnotaterVcs::class.java)
@@ -108,9 +120,18 @@ data class AnnotaterContribution(val branch: String, val title: String?) {
  * Creating pull requests to annotater. Only available when the GitHub plugin is installed.
  */
 interface AnnotaterPullRequests {
-    fun canCreatePullRequest(checkout: AnnotaterCheckout): Boolean = checkout.managed
+    enum class Action { CREATE, UPDATE }
 
-    fun createPullRequest(project: Project, checkout: AnnotaterCheckout)
+    /**
+     * Whether a pull request can be created or updated with the changes in [checkout], or null if there's nothing to
+     * submit. This is cheap enough to call from any thread, so it may be null until the changes have been looked up.
+     */
+    fun availableAction(checkout: AnnotaterCheckout): Action?
+
+    /**
+     * Creates a pull request with the changes in [checkout], or pushes them to its existing pull request.
+     */
+    fun submit(project: Project, checkout: AnnotaterCheckout)
 
     companion object {
         val instance: AnnotaterPullRequests?

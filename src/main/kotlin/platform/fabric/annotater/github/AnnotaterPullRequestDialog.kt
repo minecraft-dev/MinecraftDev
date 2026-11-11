@@ -27,6 +27,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.CollectionComboBoxModel
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.rows
@@ -40,19 +41,29 @@ class AnnotaterPullRequestDialog(
     private val changes: List<String>,
     private val uncommittedChanges: List<String>,
     existingTitle: String?,
+    /**
+     * Whether the changes are pushed to an existing pull request, so there's no title or description to enter.
+     */
+    private val update: Boolean,
 ) : DialogWrapper(project) {
     private val accountModel = CollectionComboBoxModel(accounts, defaultAccount ?: accounts.first())
 
     var prTitle = existingTitle ?: AnnotaterContribution.defaultTitle(changes)
     var prDescription = ""
     var commitMessage = AnnotaterContribution.defaultTitle(uncommittedChanges)
+    var checkBuild = true
 
     val account: GithubAccount?
         get() = accountModel.selected
 
     init {
-        title = MCDevBundle("fabric.annotater.create_pull_request")
-        setOKButtonText(MCDevBundle("fabric.annotater.pr.dialog.ok"))
+        if (update) {
+            title = MCDevBundle("fabric.annotater.update_pull_request")
+            setOKButtonText(MCDevBundle("fabric.annotater.pr.dialog.update"))
+        } else {
+            title = MCDevBundle("fabric.annotater.create_pull_request")
+            setOKButtonText(MCDevBundle("fabric.annotater.pr.dialog.ok"))
+        }
         init()
     }
 
@@ -61,16 +72,26 @@ class AnnotaterPullRequestDialog(
             comboBox(accountModel, SimpleListCellRenderer.create("") { it.name })
                 .align(AlignX.FILL)
         }
-        row(MCDevBundle("fabric.annotater.pr.dialog.title")) {
-            textField().bindText(::prTitle).align(AlignX.FILL).focused()
-        }
-        row(MCDevBundle("fabric.annotater.pr.dialog.description")) {
-            textArea().bindText(::prDescription).rows(6).align(AlignX.FILL)
+        if (!update) {
+            row(MCDevBundle("fabric.annotater.pr.dialog.title")) {
+                textField().bindText(::prTitle).align(AlignX.FILL).focused()
+            }
+            row(MCDevBundle("fabric.annotater.pr.dialog.description")) {
+                textArea().bindText(::prDescription).rows(6).align(AlignX.FILL)
+            }
         }
         if (uncommittedChanges.isNotEmpty()) {
             row(MCDevBundle("fabric.annotater.pr.dialog.commit_message")) {
-                textField().bindText(::commitMessage).align(AlignX.FILL)
+                val field = textField().bindText(::commitMessage).align(AlignX.FILL)
+                if (update) {
+                    field.focused()
+                }
             }
+        }
+        row {
+            checkBox(MCDevBundle("fabric.annotater.pr.dialog.check_build"))
+                .bindSelected(::checkBuild)
+                .comment(MCDevBundle("fabric.annotater.pr.dialog.check_build.comment"))
         }
         if (changes.isNotEmpty()) {
             row {

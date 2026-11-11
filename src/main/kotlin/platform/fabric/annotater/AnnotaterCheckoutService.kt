@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.fabric.annotater
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocStore
 import com.demonwav.mcdev.platform.minecraft.MinecraftModuleSettings
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
@@ -32,7 +33,6 @@ import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiUtilCore
 import java.io.IOException
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
@@ -52,6 +52,7 @@ class AnnotaterCheckoutService {
             object : AnnotaterListener {
                 override fun checkoutsChanged() {
                     checkouts.clear()
+                    AnnotaterJavadocStore.invalidateAll()
                 }
             },
         )
@@ -69,7 +70,7 @@ class AnnotaterCheckoutService {
     /**
      * Finds the checkout for [version] according to the user's settings, ignoring whether the feature is enabled.
      */
-    fun statusForVersion(version: String): Status {
+    private fun statusForVersion(version: String): Status {
         val settings = AnnotaterSettings.instance
         return when (settings.checkoutMode) {
             AnnotaterSettings.CheckoutMode.MANAGED -> {
@@ -105,7 +106,7 @@ class AnnotaterCheckoutService {
         if (!AnnotaterSettings.instance.enabled) {
             return Status.Disabled
         }
-        val file = PsiUtilCore.getVirtualFile(element) ?: return Status.UnknownMinecraftVersion
+        val file = virtualFileOf(element) ?: return Status.UnknownMinecraftVersion
         val version = minecraftVersion(element.project, file) ?: return Status.UnknownMinecraftVersion
         return statusForVersion(version)
     }
@@ -118,7 +119,7 @@ class AnnotaterCheckoutService {
         if (!AnnotaterSettings.instance.enabled) {
             return null
         }
-        val file = PsiUtilCore.getVirtualFile(element) ?: return null
+        val file = virtualFileOf(element) ?: return null
         return checkoutFor(element.project, file)
     }
 
@@ -179,8 +180,15 @@ class AnnotaterCheckoutService {
          * prominently there.
          */
         fun isFabricProject(project: Project): Boolean {
-            return ModuleManager.getInstance(project).modules.any { MinecraftFacet.getInstance(it, FabricModuleType) != null }
+            return ModuleManager.getInstance(project).modules.any {
+                MinecraftFacet.getInstance(it, FabricModuleType) != null
+            }
         }
+
+        /**
+         * The file containing [element]. Elements of a class file's decompiled text are in the class file.
+         */
+        fun virtualFileOf(element: PsiElement): VirtualFile? = element.containingFile?.originalFile?.virtualFile
 
         /**
          * Whether [file] is a class or source file from a Minecraft jar, as opposed to project sources or another

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
+import com.intellij.openapi.diagnostic.thisLogger
 import java.io.IOException
 import java.io.StringReader
 import java.io.StringWriter
@@ -33,6 +34,7 @@ import kotlin.io.path.writeText
 import net.fabricmc.mappingio.MappedElementKind
 import net.fabricmc.mappingio.MappingUtil
 import net.fabricmc.mappingio.MappingVisitor
+import net.fabricmc.mappingio.adapter.EmptyElementFilter
 import net.fabricmc.mappingio.adapter.ForwardingMappingVisitor
 import net.fabricmc.mappingio.format.enigma.EnigmaFileReader
 import net.fabricmc.mappingio.format.enigma.EnigmaFileWriter
@@ -42,15 +44,16 @@ import net.fabricmc.mappingio.tree.VisitOrder
 
 /**
  * Reads and writes the Javadoc comments stored in an annotater `mappings` directory. Comments are stored in Enigma
- * format, with one file per top level class at `<mappings>/<internal/class/Name>.mapping`. The reading and writing
- * matches mcsrc.dev so that files edited by either tool produce the same diffs.
+ * format, with one file per top level class at `<mappings>/<internal/class/Name>.mapping`. The files are written
+ * in the same way as annotater formats them, so that saving doesn't reformat unrelated parts of a file.
+ *
+ * Use [forDirectory] rather than the constructor outside of tests, so that every checkout of a directory sees the
+ * comments the others write.
  */
 class AnnotaterJavadocStore(val mappingsDir: Path) {
     private val cache = ConcurrentHashMap<String, MemoryMappingTree>()
 
     fun fileFor(outerClass: String): Path = mappingsDir.resolve("$outerClass.mapping")
-
-    fun hasFile(outerClass: String): Boolean = fileFor(outerClass).exists()
 
     @Throws(IOException::class)
     fun get(target: AnnotaterJavadocTarget): String? {
@@ -59,6 +62,18 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
             is AnnotaterJavadocTarget.ClassTarget -> clazz.comment
             is AnnotaterJavadocTarget.FieldTarget -> clazz.getField(target.name, target.descriptor)?.comment
             is AnnotaterJavadocTarget.MethodTarget -> clazz.getMethod(target.name, target.descriptor)?.comment
+        }
+    }
+
+    /**
+     * Like [get], but returns null if the `.mapping` file can't be read, for displaying Javadocs.
+     */
+    fun getOrNull(target: AnnotaterJavadocTarget): String? {
+        return try {
+            if (fileFor(target.outerClass).exists()) get(target) else null
+        } catch (e: IOException) {
+            thisLogger().info("Failed to read annotater Javadoc of $target", e)
+            null
         }
     }
 
@@ -103,10 +118,6 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
         cache.remove(outerClass)
     }
 
-    fun invalidateAll() {
-        cache.clear()
-    }
-
     @Throws(IOException::class)
     private fun treeFor(outerClass: String): MemoryMappingTree {
         cache[outerClass]?.let { return it }
@@ -116,8 +127,27 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
     }
 
     companion object {
+        private val stores = ConcurrentHashMap<Path, AnnotaterJavadocStore>()
+
+        /**
+         * The store of [mappingsDir], shared by all of its checkouts. The checkout objects are replaced whenever the
+         * checkouts change, such as when a contribution branch is created on the first edit, but an editor started
+         * before that keeps saving through the old one.
+         */
+        fun forDirectory(mappingsDir: Path): AnnotaterJavadocStore =
+            stores.computeIfAbsent(mappingsDir.normalize(), ::AnnotaterJavadocStore)
+
+        /**
+         * Forgets the cached comments of every store, for when the checkouts change, such as by switching branch.
+         */
+        fun invalidateAll() {
+            for (store in stores.values) {
+                store.cache.clear()
+            }
+        }
+
         @Throws(IOException::class)
-        fun readFile(text: String, path: String, expectedOuterClass: String? = null): MemoryMappingTree {
+        private fun readFile(text: String, path: String, expectedOuterClass: String? = null): MemoryMappingTree {
             val tree = MemoryMappingTree()
             try {
                 EnigmaFileReader.read(StringReader(text), withoutMethodVariables(tree))
@@ -138,7 +168,7 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
         }
 
         @Throws(IOException::class)
-        fun writeTree(tree: MemoryMappingTree): String {
+        private fun writeTree(tree: MemoryMappingTree): String {
             val meaningful = newTree()
             for (clazz in tree.classes) {
                 if (isMeaningful(clazz)) {
@@ -150,8 +180,9 @@ class AnnotaterJavadocStore(val mappingsDir: Path) {
             }
 
             val output = StringWriter()
+            // The same as annotater's own formatting
             EnigmaFileWriter(output).use { writer ->
-                meaningful.accept(writer, VisitOrder.createByName().classesBySrcNameShortFirst())
+                meaningful.accept(EmptyElementFilter(writer), VisitOrder.createByName())
             }
             return output.toString()
         }

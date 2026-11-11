@@ -36,23 +36,25 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.IdeFocusManager
-import com.intellij.psi.PsiAnonymousClass
-import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiMember
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiTypeParameter
 import com.intellij.psi.SmartPointerManager
 import com.intellij.psi.impl.compiled.ClsElementImpl
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.PsiUtilCore
 import java.io.IOException
 
 object AnnotaterJavadocEditing {
+    /**
+     * Whether to offer editing annotater Javadocs in [project]. In Fabric projects it's offered even before annotater
+     * is set up, to make it discoverable.
+     */
+    fun isOffered(project: Project): Boolean {
+        return AnnotaterSettings.instance.enabled || AnnotaterCheckoutService.isFabricProject(project)
+    }
+
     /**
      * Finds the Minecraft class, field or method that the caret is on or in, which may be a reference to it.
      */
@@ -70,38 +72,24 @@ object AnnotaterJavadocEditing {
     }
 
     /**
-     * Edits the annotater Javadoc of the member found by [findTarget].
-     */
-    fun edit(project: Project, editor: Editor, file: PsiFile) {
-        open(project, findTarget(editor, file) ?: return)
-    }
-
-    /**
-     * Converts an element of a decompiled class's text to the compiled element it was generated from, and filters out
-     * elements that can't have annotater Javadocs.
+     * Converts an element of a decompiled class's text to the compiled element it was generated from, if there is
+     * one, and filters out elements that can't have annotater Javadocs.
      */
     fun normalize(element: PsiElement): PsiMember? {
-        val compiled = element.getUserData(ClsElementImpl.COMPILED_ELEMENT) ?: element
-        return when (compiled) {
-            is PsiTypeParameter, is PsiAnonymousClass -> null
-            is PsiClass -> compiled.takeIf { it.qualifiedName != null }
-            is PsiField, is PsiMethod -> compiled
-            else -> null
-        }
+        val member = (element.getUserData(ClsElementImpl.COMPILED_ELEMENT) ?: element) as? PsiMember ?: return null
+        return member.takeIf { AnnotaterJavadocTarget.fromPsi(it) != null }
+    }
+
+    private fun isDocumentable(member: PsiMember): Boolean {
+        val file = AnnotaterCheckoutService.virtualFileOf(member) ?: return false
+        return AnnotaterCheckoutService.isMinecraftFile(member.project, file)
     }
 
     /**
-     * Whether to offer editing annotater Javadocs in [project]. In Fabric projects it's offered even before annotater
-     * is set up, to make it discoverable.
+     * Starts editing the annotater Javadoc of the member found by [findTarget].
      */
-    fun isOffered(project: Project): Boolean {
-        return AnnotaterSettings.instance.enabled || AnnotaterCheckoutService.isFabricProject(project)
-    }
-
-    fun isDocumentable(member: PsiMember): Boolean {
-        val file = PsiUtilCore.getVirtualFile(member) ?: return false
-        return AnnotaterCheckoutService.isMinecraftFile(member.project, file) &&
-            AnnotaterJavadocTarget.fromPsi(member) != null
+    fun open(project: Project, editor: Editor, file: PsiFile) {
+        open(project, findTarget(editor, file) ?: return)
     }
 
     /**
@@ -111,7 +99,7 @@ object AnnotaterJavadocEditing {
         val checkout = when (val status = AnnotaterCheckoutService.instance.status(member)) {
             is AnnotaterCheckoutService.Status.Available -> status.checkout
             AnnotaterCheckoutService.Status.Disabled -> {
-                AnnotaterConfigurable.show(project)
+                AnnotaterConfigurable.Util.show(project)
                 return
             }
 
@@ -154,7 +142,7 @@ object AnnotaterJavadocEditing {
 
         val (host, hostMember) = findHost(project, member, target) ?: return
         val copy = try {
-            ReadAction.compute<AnnotaterJavadocSourceCopy?, IOException> {
+            ReadAction.computeBlocking<AnnotaterJavadocSourceCopy?, IOException> {
                 AnnotaterJavadocSourceCopy.create(member, placeholderFor = target) { checkout.javadocStore.get(it) }
             }
         } catch (e: IOException) {
@@ -183,7 +171,7 @@ object AnnotaterJavadocEditing {
             }
             val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? PsiJavaFile
                 ?: return null
-            val hostMember = AnnotaterJavadocRendering.displayedMembers(file)
+            val hostMember = AnnotaterJavadocTarget.declarations(file)
                 .firstOrNull { AnnotaterJavadocTarget.fromPsi(it) == target }
                 ?: return null
             return editor to hostMember

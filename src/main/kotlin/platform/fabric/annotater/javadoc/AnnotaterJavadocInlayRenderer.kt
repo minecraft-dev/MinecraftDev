@@ -47,27 +47,17 @@ class AnnotaterJavadocInlayRenderer(
     private val javadoc: String,
     private val pointer: SmartPsiElementPointer<PsiMember>,
 ) : EditorCustomElementRenderer {
-    private var inlay: Inlay<*>? = null
-
-    // The inlay constructor calculates the size before the inlay is added to the tree, while its offset is still
-    // meaningless
-    private val offset: Int
-        get() = (inlay?.takeIf { it.isValid }?.offset ?: initialOffset).coerceIn(0, editor.document.textLength)
-
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
-        this.inlay = inlay
-        val indent = maxOf(0, startX() - editor.insets.left)
+        val indent = maxOf(0, startX(inlay) - editor.insets.left)
         return indent + lines().maxOf { line -> line.sumOf { it.width() } }
     }
 
     override fun calcHeightInPixels(inlay: Inlay<*>): Int {
-        this.inlay = inlay
         return lines().size * editor.lineHeight
     }
 
     override fun paint(inlay: Inlay<*>, g: Graphics, targetRegion: Rectangle, textAttributes: TextAttributes) {
-        this.inlay = inlay
-        val startX = startX()
+        val startX = startX(inlay)
         var y = targetRegion.y + editor.ascent
         for (line in lines()) {
             var x = startX
@@ -87,7 +77,10 @@ class AnnotaterJavadocInlayRenderer(
     /**
      * The x coordinate of the declaration, where the comment starts.
      */
-    private fun startX(): Int {
+    private fun startX(inlay: Inlay<*>): Int {
+        // The size is first calculated while the inlay is being created, before it has a valid offset. The offset
+        // differs from initialOffset after the document changes, until the highlighting pass replaces the inlay
+        val offset = (if (inlay.isValid) inlay.offset else initialOffset).coerceIn(0, editor.document.textLength)
         val document = editor.document
         val lineStart = document.getLineStartOffset(document.getLineNumber(offset))
         val contentStart = CharArrayUtil.shiftForward(document.immutableCharSequence, lineStart, " \t")

@@ -32,7 +32,7 @@ class EditAnnotaterJavadocAction : AnAction() {
 
     override fun update(e: AnActionEvent) {
         e.presentation.text = MCDevBundle("fabric.annotater.javadoc.edit")
-        e.presentation.icon = GeneralAssets.ANNOTATER
+        e.presentation.icon = GeneralAssets.TINY_POTATO
         val editor = e.getData(CommonDataKeys.EDITOR)
         val file = e.getData(CommonDataKeys.PSI_FILE)
         val project = e.project
@@ -47,6 +47,6 @@ class EditAnnotaterJavadocAction : AnAction() {
         val project = e.project ?: return
         val editor = e.getData(CommonDataKeys.EDITOR) ?: return
         val file = e.getData(CommonDataKeys.PSI_FILE) ?: return
-        AnnotaterJavadocEditing.edit(project, editor, file)
+        AnnotaterJavadocEditing.open(project, editor, file)
     }
 }

@@ -1722,7 +1722,7 @@
         <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
                   topic="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterListener"/>
         <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
-                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListenerBackgroundable"/>
     </applicationListeners>
 
     <projectListeners>

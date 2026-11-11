@@ -21,8 +21,9 @@
 package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.util.McdevReflection
+import com.demonwav.mcdev.util.McdevReflection.newInstanceUnwrap
 import com.intellij.codeInspection.LocalInspectionTool
-import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
@@ -30,7 +31,6 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
-import com.siyeh.ig.migration.MarkdownDocumentationCommentsMigrationInspection
 
 /**
  * Annotater only supports Markdown (`///`) Javadoc comments.
@@ -56,7 +56,7 @@ class AnnotaterJavadocCommentInspection : LocalInspectionTool() {
                     comment,
                     MCDevBundle("fabric.annotater.javadoc.error.not_markdown"),
                     ProblemHighlightType.GENERIC_ERROR,
-                    *findMarkdownMigrationFixes(holder, comment),
+                    McdevReflection.CONSTRUCTOR_MARKDOWN_DOCUMENTATION_COMMENTS_MIGRATION_FIX.newInstanceUnwrap(),
                 )
             }
 
@@ -72,17 +72,5 @@ class AnnotaterJavadocCommentInspection : LocalInspectionTool() {
                 )
             }
         }
-    }
-
-    /**
-     * Reuses the IDE's own "convert to Markdown documentation comment" quick fix.
-     */
-    private fun findMarkdownMigrationFixes(holder: ProblemsHolder, comment: PsiDocComment): Array<LocalQuickFix> {
-        val migrationHolder = ProblemsHolder(holder.manager, holder.file, holder.isOnTheFly)
-        comment.accept(MarkdownDocumentationCommentsMigrationInspection().buildVisitor(migrationHolder, true))
-        return migrationHolder.results
-            .flatMap { it.fixes.orEmpty().asIterable() }
-            .filterIsInstance<LocalQuickFix>()
-            .toTypedArray()
     }
 }

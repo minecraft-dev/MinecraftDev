@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.fabric.annotater
 
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
+import com.intellij.openapi.util.io.FileUtil
 import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -58,23 +59,18 @@ data class AnnotaterConfig(
 
             val version = raw.version?.takeIf { it.isNotBlank() }
                 ?: throw IOException("$FILE_NAME is missing \"version\"")
-            val mappings = validatePath(raw.mappings ?: throw IOException("$FILE_NAME is missing \"mappings\""))
-            val unpick = raw.unpickDefinitions?.let(::validatePath)
+            val mappings = validatePath(root, raw.mappings ?: throw IOException("$FILE_NAME is missing \"mappings\""))
+            val unpick = raw.unpickDefinitions?.let { validatePath(root, it) }
             return AnnotaterConfig(version, mappings, unpick)
         }
 
         /**
-         * Paths must be relative subdirectories using forward slashes, like mcsrc requires.
+         * Paths must be relative paths to subdirectories, like mcsrc requires.
          */
         @Throws(IOException::class)
-        private fun validatePath(path: String): String {
-            val segments = path.split('/')
-            val valid = path.isNotEmpty() &&
-                !path.startsWith('/') &&
-                '\\' !in path &&
-                ':' !in path &&
-                segments.none { it.isEmpty() || it == "." || it == ".." }
-            if (!valid) {
+        private fun validatePath(root: Path, path: String): String {
+            val resolved = runCatching { root.resolve(path).normalize() }.getOrNull()
+            if (resolved == null || !FileUtil.isAncestor(root.normalize().toFile(), resolved.toFile(), true)) {
                 throw IOException("Invalid path in $FILE_NAME: \"$path\"")
             }
             return path

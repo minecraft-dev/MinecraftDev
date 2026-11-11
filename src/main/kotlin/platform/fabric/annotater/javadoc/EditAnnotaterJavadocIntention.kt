@@ -45,7 +45,7 @@ class EditAnnotaterJavadocIntention : IntentionAction {
         if (editor == null || file == null) {
             return
         }
-        AnnotaterJavadocEditing.edit(project, editor, file)
+        AnnotaterJavadocEditing.open(project, editor, file)
     }
 
     override fun generatePreview(project: Project, editor: Editor, file: PsiFile): IntentionPreviewInfo =

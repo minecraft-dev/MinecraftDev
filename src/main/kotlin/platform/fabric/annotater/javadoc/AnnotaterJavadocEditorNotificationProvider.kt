@@ -21,8 +21,8 @@
 package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterPullRequests
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterCheckoutService
+import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterPullRequests
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterVcs
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
@@ -47,6 +47,7 @@ class AnnotaterJavadocEditorNotificationProvider : EditorNotificationProvider {
         val checkout = AnnotaterCheckoutService.instance.checkoutFor(project, file) ?: return null
         val javadocEditor = AnnotaterJavadocInlineEditor.current(project)?.takeIf { it.checkout.root == checkout.root }
         val error = javadocEditor?.file?.error
+        val pullRequests = AnnotaterPullRequests.instance
 
         return Function { fileEditor ->
             val status =
@@ -59,14 +60,18 @@ class AnnotaterJavadocEditorNotificationProvider : EditorNotificationProvider {
                 }
             }
 
-            val pullRequests = AnnotaterPullRequests.instance
-            if (pullRequests != null && pullRequests.canCreatePullRequest(checkout)) {
-                panel.createActionLabel(MCDevBundle("fabric.annotater.create_pull_request")) {
+            val pullRequestAction = pullRequests?.availableAction(checkout)
+            if (pullRequests != null && pullRequestAction != null) {
+                val text = when (pullRequestAction) {
+                    AnnotaterPullRequests.Action.CREATE -> MCDevBundle("fabric.annotater.create_pull_request")
+                    AnnotaterPullRequests.Action.UPDATE -> MCDevBundle("fabric.annotater.update_pull_request")
+                }
+                panel.createActionLabel(text) {
                     val saved = javadocEditor?.save() ?: CompletableFuture.completedFuture(true)
                     saved.thenAccept { success ->
                         if (success) {
                             ApplicationManager.getApplication().invokeLater {
-                                pullRequests.createPullRequest(project, checkout)
+                                pullRequests.submit(project, checkout)
                             }
                         }
                     }

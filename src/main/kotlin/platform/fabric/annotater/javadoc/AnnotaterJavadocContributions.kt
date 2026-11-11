@@ -42,7 +42,8 @@ import java.util.concurrent.CompletableFuture
 import javax.swing.JComponent
 
 /**
- * Switching a managed annotater checkout between contributions, so that a pull request can be updated after review.
+ * Switching a managed annotater checkout between contributions, so that a pull request can be updated after review,
+ * and deleting contributions.
  */
 object AnnotaterJavadocContributions {
     /**
@@ -52,8 +53,8 @@ object AnnotaterJavadocContributions {
         vcs.currentContribution(checkout)?.displayName ?: MCDevBundle("fabric.annotater.contribution.new")
 
     /**
-     * Shows a popup under [component] for switching between contributions if [checkout] is managed, and configuring
-     * annotater.
+     * Shows a popup under [component] for switching between and deleting contributions if [checkout] is managed, and
+     * configuring annotater.
      */
     fun showPopup(project: Project, checkout: AnnotaterCheckout, component: JComponent) {
         val vcs = AnnotaterVcs.instance?.takeIf { checkout.managed }
@@ -92,14 +93,27 @@ object AnnotaterJavadocContributions {
             }
             group.add(
                 DumbAwareAction.create(MCDevBundle("fabric.annotater.contribution.new"), AllIcons.General.Add) {
-                    switchTo(project, checkout, null)
+                    switchContribution(project, checkout, null)
                 },
             )
+            if (contributions.isNotEmpty()) {
+                val deleteGroup =
+                    DefaultActionGroup.createPopupGroup { MCDevBundle("fabric.annotater.contribution.delete") }
+                deleteGroup.templatePresentation.icon = AllIcons.General.Delete
+                for (contribution in contributions) {
+                    deleteGroup.add(
+                        DumbAwareAction.create(contribution.displayName) {
+                            deleteContribution(project, checkout, vcs, contribution, contribution.branch == current)
+                        },
+                    )
+                }
+                group.add(deleteGroup)
+            }
             group.add(Separator.getInstance())
         }
         group.add(
             DumbAwareAction.create(MCDevBundle("fabric.annotater.configure"), AllIcons.General.Settings) {
-                AnnotaterConfigurable.show(project)
+                AnnotaterConfigurable.Util.show(project)
             },
         )
         JBPopupFactory.getInstance()
@@ -125,7 +139,7 @@ object AnnotaterJavadocContributions {
     ) {
         override fun actionPerformed(e: AnActionEvent) {
             if (!current) {
-                switchTo(project, checkout, contribution.branch)
+                switchContribution(project, checkout, contribution.branch)
             }
         }
     }
@@ -135,7 +149,7 @@ object AnnotaterJavadocContributions {
      * edited is saved first, any uncommitted changes are committed to the current contribution, and editing is then
      * restarted with the Javadoc from the new branch.
      */
-    fun switchTo(project: Project, checkout: AnnotaterCheckout, branch: String?) {
+    fun switchContribution(project: Project, checkout: AnnotaterCheckout, branch: String?) {
         val vcs = AnnotaterVcs.instance ?: return
         val saves = listOfNotNull(javadocEditor(project, checkout)?.save())
         CompletableFuture.allOf(*saves.toTypedArray()).thenAccept {
@@ -148,12 +162,15 @@ object AnnotaterJavadocContributions {
                     )
                     return@invokeLater
                 }
-                checkUncommittedChanges(project, checkout, vcs, branch)
+                askForCommitMessageThenSwitch(project, checkout, vcs, branch)
             }
         }
     }
 
-    private fun checkUncommittedChanges(
+    /**
+     * Asks for a message to commit the uncommitted changes with, if there are any, then switches to [branch].
+     */
+    private fun askForCommitMessageThenSwitch(
         project: Project,
         checkout: AnnotaterCheckout,
         vcs: AnnotaterVcs,
@@ -168,7 +185,7 @@ object AnnotaterJavadocContributions {
 
             override fun onSuccess() {
                 if (uncommitted.isEmpty()) {
-                    switch(project, checkout, vcs, branch, null)
+                    commitAndCheckOut(project, checkout, vcs, branch, null)
                     return
                 }
                 val current = vcs.currentContribution(checkout)?.displayName
@@ -181,7 +198,7 @@ object AnnotaterJavadocContributions {
                     AnnotaterContribution.defaultTitle(uncommitted),
                     null,
                 )?.takeIf { it.isNotBlank() } ?: return
-                switch(project, checkout, vcs, branch, message)
+                commitAndCheckOut(project, checkout, vcs, branch, message)
             }
 
             override fun onThrowable(error: Throwable) {
@@ -190,7 +207,11 @@ object AnnotaterJavadocContributions {
         }.queue()
     }
 
-    private fun switch(
+    /**
+     * Commits the uncommitted changes with [commitMessage] if it isn't null, then checks out [branch], restarting the
+     * editing of the Javadoc being edited.
+     */
+    private fun commitAndCheckOut(
         project: Project,
         checkout: AnnotaterCheckout,
         vcs: AnnotaterVcs,
@@ -213,6 +234,56 @@ object AnnotaterJavadocContributions {
 
             override fun onFinished() {
                 reopen?.element?.let { AnnotaterJavadocEditing.open(project, it) }
+            }
+        }.queue()
+    }
+
+    /**
+     * Deletes [contribution] after asking for confirmation. Only the local branch is deleted.
+     */
+    private fun deleteContribution(
+        project: Project,
+        checkout: AnnotaterCheckout,
+        vcs: AnnotaterVcs,
+        contribution: AnnotaterContribution,
+        current: Boolean,
+    ) {
+        val message = MCDevBundle("fabric.annotater.contribution.delete.confirm", contribution.displayName) +
+            if (current) "\n\n" + MCDevBundle("fabric.annotater.contribution.delete.confirm.current") else ""
+        val confirmed = Messages.showOkCancelDialog(
+            project,
+            message,
+            MCDevBundle("fabric.annotater.contribution.delete.title"),
+            MCDevBundle("fabric.annotater.contribution.delete.ok"),
+            Messages.getCancelButton(),
+            Messages.getWarningIcon(),
+        ) == Messages.OK
+        if (!confirmed) {
+            return
+        }
+        if (current) {
+            // The Javadoc being edited is from the deleted branch, and its changes are discarded
+            javadocEditor(project, checkout)?.finish(force = true)
+        }
+        object : Task.Backgroundable(project, MCDevBundle("fabric.annotater.contribution.deleting"), false) {
+            override fun run(indicator: ProgressIndicator) {
+                vcs.deleteContribution(project, checkout, contribution.branch, indicator)
+            }
+
+            override fun onSuccess() {
+                AnnotaterNotifications.notifyInfo(
+                    project,
+                    MCDevBundle("fabric.annotater.contribution.deleted"),
+                    MCDevBundle("fabric.annotater.contribution.deleted.content", contribution.displayName),
+                )
+            }
+
+            override fun onThrowable(error: Throwable) {
+                AnnotaterNotifications.notifyError(
+                    project,
+                    MCDevBundle("fabric.annotater.contribution.delete.failed"),
+                    error,
+                )
             }
         }.queue()
     }

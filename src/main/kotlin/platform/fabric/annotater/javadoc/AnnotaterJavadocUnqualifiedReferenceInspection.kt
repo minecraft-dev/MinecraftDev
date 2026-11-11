@@ -53,7 +53,7 @@ class AnnotaterJavadocUnqualifiedReferenceInspection : LocalInspectionTool() {
                 if (PsiTreeUtil.getParentOfType(reference, PsiDocComment::class.java) == null) {
                     return
                 }
-                val qualifiedName = qualifiedNameIfUnqualified(reference) ?: return
+                val qualifiedName = Util.qualifiedNameIfUnqualified(reference) ?: return
                 holder.registerProblem(
                     reference,
                     MCDevBundle("fabric.annotater.inspection.unqualified.problem", qualifiedName),
@@ -79,7 +79,7 @@ class AnnotaterJavadocUnqualifiedReferenceInspection : LocalInspectionTool() {
         }
     }
 
-    companion object {
+    private object Util {
         /**
          * Returns the fully qualified name of the class [reference] refers to, if it isn't already written as such.
          */

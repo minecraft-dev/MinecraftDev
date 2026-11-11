@@ -23,7 +23,6 @@ package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.openapi.project.DumbService
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiMember
 
 /**
  * Shows annotater Javadocs instead of the existing Javadoc of Minecraft classes in Quick Documentation.
@@ -36,6 +35,6 @@ class AnnotaterJavadocDocumentationProvider : AbstractDocumentationProvider() {
         val member = AnnotaterJavadocEditing.normalize(element) ?: return null
         val checkout = AnnotaterJavadocRendering.checkoutForDisplay(member) ?: return null
         val target = AnnotaterJavadocTarget.fromPsi(member) ?: return null
-        return AnnotaterJavadocRendering.generateDoc(member, AnnotaterJavadocRendering.getJavadoc(checkout, target))
+        return AnnotaterJavadocRendering.generateDoc(member, checkout.javadocStore.getOrNull(target))
     }
 }

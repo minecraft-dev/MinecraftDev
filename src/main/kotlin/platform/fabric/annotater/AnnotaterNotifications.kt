@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project
 object AnnotaterNotifications {
     const val GROUP_ID = "Minecraft annotater"
 
-    fun describe(status: AnnotaterCheckoutService.Status): String = when (status) {
+    private fun describe(status: AnnotaterCheckoutService.Status): String = when (status) {
         is AnnotaterCheckoutService.Status.Available -> status.checkout.root.toString()
         AnnotaterCheckoutService.Status.Disabled -> MCDevBundle("fabric.annotater.status.disabled")
         AnnotaterCheckoutService.Status.UnknownMinecraftVersion ->
@@ -64,7 +64,7 @@ object AnnotaterNotifications {
         }
         notification.addAction(
             NotificationAction.createSimpleExpiring(MCDevBundle("fabric.annotater.configure")) {
-                AnnotaterConfigurable.show(project)
+                AnnotaterConfigurable.Util.show(project)
             },
         )
         notification.notify(project)

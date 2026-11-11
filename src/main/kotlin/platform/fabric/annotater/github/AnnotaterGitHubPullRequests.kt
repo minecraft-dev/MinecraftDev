@@ -52,10 +52,16 @@ import org.jetbrains.plugins.github.util.GHCompatibilityUtil
  * request, using accounts from the GitHub plugin.
  */
 class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
-    override fun canCreatePullRequest(checkout: AnnotaterCheckout) =
-        checkout.managed && AnnotaterGitVcs.instance != null
+    override fun availableAction(checkout: AnnotaterCheckout): AnnotaterPullRequests.Action? {
+        val status = AnnotaterGitVcs.instance?.pushStatus(checkout)?.takeIf { it.hasUnpushedChanges } ?: return null
+        return if (status.pullRequestUrl != null) {
+            AnnotaterPullRequests.Action.UPDATE
+        } else {
+            AnnotaterPullRequests.Action.CREATE
+        }
+    }
 
-    override fun createPullRequest(project: Project, checkout: AnnotaterCheckout) {
+    override fun submit(project: Project, checkout: AnnotaterCheckout) {
         val git = AnnotaterGitVcs.instance ?: return
 
         object : Task.Backgroundable(project, MCDevBundle("fabric.annotater.pr.checking"), true) {
@@ -64,6 +70,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
             private var commitsAhead = 0
             private var branch: String? = null
             private var existingTitle: String? = null
+            private var existingUrl: String? = null
 
             override fun run(indicator: ProgressIndicator) {
                 changes = git.mappingFilesChangedSinceUpstream(project, checkout)
@@ -71,6 +78,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                 commitsAhead = git.commitsAheadOfUpstream(project, checkout)
                 branch = git.currentContribution(checkout)?.branch
                 existingTitle = branch?.let { git.pullRequestTitle(project, checkout, it) }
+                existingUrl = branch?.let { git.pullRequestUrl(project, checkout, it) }
             }
 
             override fun onSuccess() {
@@ -83,7 +91,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                     )
                     return
                 }
-                showDialog(project, checkout, git, branch, changes, uncommittedChanges, existingTitle)
+                showDialog(project, checkout, git, branch, changes, uncommittedChanges, existingTitle, existingUrl)
             }
 
             override fun onThrowable(error: Throwable) {
@@ -100,6 +108,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         changes: List<String>,
         uncommittedChanges: List<String>,
         existingTitle: String?,
+        existingUrl: String?,
     ) {
         if (GHAccountsUtil.accounts.isEmpty()) {
             GHAccountsUtil.requestNewAccount(GithubServerPath.DEFAULT_SERVER, null, project) ?: return
@@ -115,30 +124,47 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         }
         val defaultAccount = GHAccountsUtil.getSingleOrDefaultAccount(project)?.takeIf { it in accounts }
 
-        val dialog =
-            AnnotaterPullRequestDialog(project, accounts, defaultAccount, changes, uncommittedChanges, existingTitle)
+        val dialog = AnnotaterPullRequestDialog(
+            project,
+            accounts,
+            defaultAccount,
+            changes,
+            uncommittedChanges,
+            existingTitle,
+            update = existingUrl != null,
+        )
         if (!dialog.showAndGet()) {
             return
         }
         val account = dialog.account ?: return
+        if (dialog.checkBuild && !AnnotaterBuildCheck.run(project, checkout)) {
+            return
+        }
         val token = GHCompatibilityUtil.getOrRequestToken(account, project) ?: return
 
-        val request = PullRequest(dialog.prTitle, dialog.prDescription, dialog.commitMessage, branch)
-        object : Task.Backgroundable(project, MCDevBundle("fabric.annotater.pr.creating"), false) {
+        val request = PullRequest(dialog.prTitle, dialog.prDescription, dialog.commitMessage, branch, existingUrl)
+        val title = if (existingUrl != null) "fabric.annotater.pr.updating" else "fabric.annotater.pr.creating"
+        object : Task.Backgroundable(project, MCDevBundle(title), false) {
             private var url: String? = null
 
             override fun run(indicator: ProgressIndicator) {
-                url =
+                val url =
                     submit(project, checkout, git, account, token, request, uncommittedChanges.isNotEmpty(), indicator)
-                // Label the contribution with its pull request, for switching back to it later
-                runCatching { git.setContributionTitle(project, checkout, request.branch, request.title) }
+                this.url = url
+                git.setPullRequest(project, checkout, request.branch, url)
+                if (existingUrl == null) {
+                    // Label the contribution with its pull request, for switching back to it later
+                    runCatching { git.setContributionTitle(project, checkout, request.branch, request.title) }
+                }
             }
 
             override fun onSuccess() {
                 val url = url ?: return
+                val notificationTitle =
+                    if (existingUrl != null) "fabric.annotater.pr.updated" else "fabric.annotater.pr.created"
                 Notification(
                     AnnotaterNotifications.GROUP_ID,
-                    MCDevBundle("fabric.annotater.pr.created"),
+                    MCDevBundle(notificationTitle),
                     url,
                     NotificationType.INFORMATION,
                 ).addAction(
@@ -147,10 +173,9 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                     },
                 ).addAction(
                     NotificationAction.createSimpleExpiring(MCDevBundle("fabric.annotater.pr.start_new")) {
-                        AnnotaterJavadocContributions.switchTo(project, checkout, null)
+                        AnnotaterJavadocContributions.switchContribution(project, checkout, null)
                     },
                 ).notify(project)
-                BrowserUtil.browse(url)
             }
 
             override fun onThrowable(error: Throwable) {
@@ -159,8 +184,20 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         }.queue()
     }
 
-    private class PullRequest(val title: String, val body: String, val commitMessage: String, val branch: String)
+    /**
+     * @property existingUrl the URL of the pull request to update, or null to create one
+     */
+    private class PullRequest(
+        val title: String,
+        val body: String,
+        val commitMessage: String,
+        val branch: String,
+        val existingUrl: String?,
+    )
 
+    /**
+     * Commits and pushes the changes, and creates the pull request unless it already exists. Returns its URL.
+     */
     @Throws(IOException::class, VcsException::class)
     private fun submit(
         project: Project,
@@ -176,7 +213,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         val upstream = AnnotaterGitVcs.upstreamRepository
 
         // Otherwise GitHub only rejects the pull request with "base invalid" after committing, forking and pushing
-        if (!api.exists("/repos/$upstream/branches/${checkout.version}")) {
+        if (request.existingUrl == null && !api.exists("/repos/$upstream/branches/${checkout.version}")) {
             throw IOException(MCDevBundle("fabric.annotater.pr.no_base_branch", upstream, checkout.version))
         }
 
@@ -185,6 +222,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
             git.commitMappings(project, checkout, request.commitMessage)
         }
 
+        // Returns the existing fork if there is one
         indicator.text = MCDevBundle("fabric.annotater.pr.forking")
         val fork = api.post("/repos/$upstream/forks", JsonObject())
         val forkName = fork.get("full_name").asString
@@ -194,6 +232,9 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
 
         indicator.text = MCDevBundle("fabric.annotater.pr.pushing")
         git.push(project, checkout, cloneUrl, request.branch)
+        if (request.existingUrl != null) {
+            return request.existingUrl
+        }
 
         indicator.text = MCDevBundle("fabric.annotater.pr.opening")
         val body = JsonObject().apply {

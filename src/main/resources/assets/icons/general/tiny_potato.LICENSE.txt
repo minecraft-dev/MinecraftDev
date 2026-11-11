@@ -1,3 +1,3 @@
-Annotater.png, Annotater@2x.png, AnnotaterLarge.png and AnnotaterLarge@2x.png are downscaled from
+tiny_potato.png, tiny_potato@2x.png, tiny_potato_large.png and tiny_potato_large@2x.png are downscaled from
 https://github.com/FabricMC/community/blob/main/media/tater-wall/png/potato.png by FabricMC, licensed under the
 Creative Commons Attribution 4.0 International license (https://creativecommons.org/licenses/by/4.0/).

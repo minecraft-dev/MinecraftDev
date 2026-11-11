@@ -30,9 +30,9 @@ import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocTarg
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqualifiedReferenceInspection
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVirtualFile
 import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.ide.DataManager
 import com.intellij.ide.impl.HeadlessDataManager
-import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.command.WriteCommandAction
@@ -97,6 +97,25 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
                 """.trimIndent(),
             )
             java(
+                "net/minecraft/util/Ticker.java",
+                """
+                package net.minecraft.util;
+
+                public class Ticker<T> {
+                    public <U> void tick() {
+                        class Step<V> {
+                            int count;
+                        }
+                        Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                            }
+                        };
+                    }
+                }
+                """.trimIndent(),
+            )
+            java(
                 "net/minecraft/world/level/Level.java",
                 """
                 package net.minecraft.world.level;
@@ -146,7 +165,25 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
             copy.text,
         )
         assertEquals("Mth.java", copy.fileName)
-        assertEquals(listOf(AnnotaterJavadocTarget.ClassTarget("net/minecraft/util/Mth"), pi, clamp), copy.targets)
+        assertEquals(listOf(AnnotaterJavadocTarget.ClassTarget("net/minecraft/util/Mth"), clamp, pi), copy.targets)
+    }
+
+    @Test
+    @DisplayName("Local classes and members of local and anonymous classes can be documented")
+    fun localAndAnonymousClasses() {
+        val copy = AnnotaterJavadocSourceCopy.create(findMember("net.minecraft.util.Ticker")) { null }!!
+        assertEquals(
+            listOf(
+                AnnotaterJavadocTarget.ClassTarget("net/minecraft/util/Ticker"),
+                AnnotaterJavadocTarget.MethodTarget("net/minecraft/util/Ticker", "tick", "()V"),
+                AnnotaterJavadocTarget.ClassTarget("net/minecraft/util/Ticker\$1Step"),
+                AnnotaterJavadocTarget.FieldTarget("net/minecraft/util/Ticker\$1Step", "count", "I"),
+                AnnotaterJavadocTarget.MethodTarget("net/minecraft/util/Ticker\$1", "run", "()V"),
+            ),
+            // Type parameters and anonymous classes are also PsiClasses, but aren't declarations that can be documented
+            copy.targets,
+        )
+        assertEquals("net/minecraft/util/Ticker", copy.outerClass)
     }
 
     @Test
@@ -185,6 +222,7 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
             copy.fileName,
             copy.text.replace("/// Clamps a value.", "/** Clamps a value. */"),
             copy.targets,
+            copy.languageLevel,
         )
         val result = changed.extractJavadocs(changed.createPsiFile(project)!!)
         assertInstanceOf(AnnotaterJavadocSourceCopy.ExtractResult.Error::class.java, result)
