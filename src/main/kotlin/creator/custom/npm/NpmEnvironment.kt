@@ -101,7 +101,7 @@ object NpmEnvironment {
         }
 
         val name = if (SystemInfo.isWindows) "npm.cmd" else "npm"
-        return PathEnvironmentVariableUtil.findInPath(name)?.absolutePath
+        return PathEnvironmentVariableUtil.findFirst(name)?.toAbsolutePath()?.toString()
     }
 
     /**
@@ -348,7 +348,7 @@ object NpmEnvironment {
         if (sibling.isRegularFile() && sibling.isExecutable()) {
             return sibling.toString()
         }
-        return PathEnvironmentVariableUtil.findInPath(name)?.absolutePath
+        return PathEnvironmentVariableUtil.findFirst(name)?.toAbsolutePath()?.toString()
     }
 
     /**

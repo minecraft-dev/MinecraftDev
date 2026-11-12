@@ -23,7 +23,7 @@ package com.demonwav.mcdev.errorreporter
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.update.PluginUtil
 import com.intellij.ide.DataManager
-import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.ide.plugins.PluginDetailsService
 import com.intellij.idea.IdeaLogger
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
@@ -91,9 +91,9 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         sentryEvent.throwable = event.throwable
 
-        PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)?.let { plugin ->
-            val (ideaVersion, coreVersion) = plugin.version.split('-', limit = 2)
-            sentryEvent.release = plugin.version
+        PluginDetailsService.getInstance().findDetails(PluginUtil.PLUGIN_ID)?.version?.let { version ->
+            val (ideaVersion, coreVersion) = version.split('-', limit = 2)
+            sentryEvent.release = version
             sentryEvent.setTag("idea_version", ideaVersion)
             sentryEvent.setTag("core_version", coreVersion)
         }

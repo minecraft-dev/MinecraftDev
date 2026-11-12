@@ -20,21 +20,15 @@
 
 package com.demonwav.mcdev.update
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor
-import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.ide.plugins.PluginDetailsService
 import com.intellij.openapi.extensions.PluginId
 
 object PluginUtil {
     val PLUGIN_ID = PluginId.getId("com.demonwav.minecraft-dev")
 
-    val plugin: IdeaPluginDescriptor
-        get() {
-            return PluginManagerCore.getPlugin(PLUGIN_ID)
-                ?: error("Minecraft Development plugin not found: " + PluginManagerCore.plugins.contentToString())
-        }
-
     val pluginVersion: String
-        get() = plugin.version
+        get() = PluginDetailsService.getInstance().findDetails(PLUGIN_ID)?.version
+            ?: error("Minecraft Development plugin not found")
 
     val useragent: String
         get() = "github_org/minecraft-dev/$pluginVersion"

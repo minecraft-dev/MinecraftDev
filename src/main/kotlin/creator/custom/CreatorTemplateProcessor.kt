@@ -37,7 +37,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.Attachment
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
@@ -387,11 +387,10 @@ class CreatorTemplateProcessor(
             project: Project,
             files: MutableList<Pair<TemplateFile, VirtualFile>>
         ) {
-            val fileEditorManager = FileEditorManager.getInstance(project)
-            val projectView = ProjectView.getInstance(project)
+                val projectView = ProjectView.getInstance(project)
             for ((desc, file) in files) {
                 if (desc.openInEditor == true) {
-                    fileEditorManager.openFile(file, true)
+                    OpenFileDescriptor(project, file).navigate(true)
                     projectView.select(null, file, false)
                 }
             }

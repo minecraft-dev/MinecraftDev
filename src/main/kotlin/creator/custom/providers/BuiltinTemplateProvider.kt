@@ -24,10 +24,10 @@ import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.modalityState
-import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.refreshSync
 import com.demonwav.mcdev.util.virtualFile
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.PluginPathManager
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.ui.dsl.builder.bindSelected
@@ -37,7 +37,9 @@ import javax.swing.JComponent
 class BuiltinTemplateProvider : RemoteTemplateProvider() {
 
     private val builtinRepoUrl = $$"https://github.com/minecraft-dev/templates/archive/refs/heads/v$version.zip"
-    private val builtinTemplatesPath = PluginUtil.plugin.pluginPath.resolve("lib/resources/builtin-templates")
+    private val builtinTemplatesPath =
+        PluginPathManager.getPluginDistPath(BuiltinTemplateProvider::class.java, "lib/resources/builtin-templates")
+            ?: error("Minecraft Development plugin directory not found")
     private var repoUpdated: Boolean = false
 
     override val label: String = MCDevBundle("template.provider.builtin.label")

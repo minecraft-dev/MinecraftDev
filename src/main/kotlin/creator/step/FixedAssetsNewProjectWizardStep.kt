@@ -33,7 +33,7 @@ import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.ide.wizard.runAfterOpened
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.NioFiles
 import com.intellij.openapi.vfs.VfsUtil
@@ -159,11 +159,10 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
 
         ReformatCodeProcessor(project, psiFiles.toTypedArray(), null, false).run()
 
-        val fileEditorManager = FileEditorManager.getInstance(project)
         val projectView = ProjectView.getInstance(project)
         for (file in generatedFiles) {
             if (file.path in filesToOpen) {
-                fileEditorManager.openFile(file, true)
+                OpenFileDescriptor(project, file).navigate(true)
                 projectView.select(null, file, false)
             }
         }
