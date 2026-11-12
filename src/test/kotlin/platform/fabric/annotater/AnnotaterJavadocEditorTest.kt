@@ -51,10 +51,12 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.codeStyle.modifier.TransientCodeStyleSettings
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.search.GlobalSearchScope
@@ -132,7 +134,7 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
 
                 public class Level {
                     public boolean addEntity(net.minecraft.util.Ticker<?> ticker, String[] names, int count) {
-                        return true;
+                        return  true ;
                     }
                 }
                 """.trimIndent(),
@@ -510,5 +512,58 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
 
         val hidden = AnnotaterJavadocRendering.generateDoc(clampMethod, null)!!
         assertFalse("Existing method docs" in hidden, hidden)
+    }
+
+    // TODO: uncomment in 2026.3
+    // @Test
+    // @DisplayName("Inserting a Javadoc stub formats it")
+    // fun javadocStub() {
+    //     val inlineEditor = startEditing(clampCopy(null, placeholderFor = clamp), clamp)
+    //     try {
+    //         fixture.openFileInEditor(inlineEditor.file)
+    //         fixture.editor.caretModel.moveToOffset(fixture.editor.document.text.indexOf("/// ") + 4)
+    //         withAnnotaterCodeStyle { fixture.completeBasic() }
+    //         fixture.lookup.currentItem = fixture.lookupElements!!.single { it.lookupString == "Insert Javadoc Stub" }
+    //         withAnnotaterCodeStyle { fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR) }
+    //         val text = fixture.editor.document.text
+    //         assertTrue(
+    //             text.contains(
+    //                 "    /// \n    /// @param value\n    /// @param min\n    /// @param max\n    /// @return\n" +
+    //                     "    public static int clamp(",
+    //             ),
+    //             text,
+    //         )
+    //     } finally {
+    //         Disposer.dispose(inlineEditor)
+    //     }
+    // }
+
+    @Test
+    @DisplayName("Formatting only changes the edited Javadoc")
+    fun formatting() {
+        val addEntity = AnnotaterJavadocTarget.MethodTarget(
+            "net/minecraft/world/level/Level",
+            "addEntity",
+            "(Lnet/minecraft/util/Ticker;[Ljava/lang/String;I)Z",
+        )
+        val copy = AnnotaterJavadocSourceCopy.create(findMember("net.minecraft.world.level.Level", "addEntity"), null) {
+            if (it == addEntity) "Adds an entity." else null
+        }!!
+        val inlineEditor = startEditing(copy, addEntity)
+        val document = FileDocumentManager.getInstance().getDocument(inlineEditor.file)!!
+        try {
+            WriteCommandAction.runWriteCommandAction(project) {
+                val offset = document.text.indexOf("/// Adds an entity.") + "/// Adds an entity.".length
+                document.insertString(offset, "\n  /// More.")
+                val documentManager = PsiDocumentManager.getInstance(project)
+                documentManager.commitDocument(document)
+                CodeStyleManager.getInstance(project).reformat(documentManager.getPsiFile(document)!!)
+            }
+            val text = document.text
+            assertTrue(text.contains("    /// Adds an entity.\n    /// More.\n"), text)
+            assertTrue(text.contains("return  true ;"), text)
+        } finally {
+            Disposer.dispose(inlineEditor)
+        }
     }
 }

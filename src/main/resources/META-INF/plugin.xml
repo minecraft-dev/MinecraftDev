@@ -721,8 +721,8 @@
             implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocIntentionActionFilter"/>
         <vetoRenameCondition
             implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVetoRenameCondition"/>
-        <lang.formatter.restriction
-            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocFormattingRestriction"/>
+        <lang.formatter language="JAVA"
+                        implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocFormattingModelBuilder"/>
         <intentionAction>
             <language>JAVA</language>
             <className>com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocIntention</className>
