@@ -30,11 +30,11 @@ import com.intellij.ide.starters.local.GeneratorResourceFile
 import com.intellij.ide.starters.local.GeneratorTemplateFile
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.runAfterOpened
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.io.NioFiles
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -96,7 +96,7 @@ abstract class FixedAssetsNewProjectWizardStep(parent: NewProjectWizardStep) : A
         if (ApplicationManager.getApplication().isUnitTestMode) {
             action()
         } else if (!project.isDisposed) {
-            StartupManager.getInstance(project).runAfterOpened {
+            runAfterOpened(project) {
                 WriteAction.runAndWait<Throwable>(action)
             }
         }

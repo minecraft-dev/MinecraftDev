@@ -37,7 +37,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.util.io.HttpRequests
 import java.io.IOException
 import java.net.URLEncoder
@@ -67,7 +66,7 @@ object PluginUpdater {
     private fun checkUpdatesInMainRepo(): PluginUpdateStatus {
         val buildNumber = ApplicationInfo.getInstance().build.asString()
         val currentVersion = PluginUtil.pluginVersion
-        val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8)
+        val os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, Charsets.UTF_8)
         val url =
             "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=" +
                 "$buildNumber&pluginVersion=$currentVersion&os=$os"

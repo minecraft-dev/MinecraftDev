@@ -39,13 +39,13 @@ import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.execution.RunManager
 import com.intellij.ide.ui.UISettings
 import com.intellij.ide.wizard.NewProjectWizardStep
+import com.intellij.ide.wizard.runAfterOpened
 import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.NonProjectFileWritingAccessProvider
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -223,7 +223,7 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
                 showProgress(project)
             }
 
-            StartupManager.getInstance(project).runAfterOpened {
+            runAfterOpened(project) {
                 latch.countDown()
             }
         }
