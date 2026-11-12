@@ -48,6 +48,7 @@ object PluginUpdater {
         ApplicationManager.getApplication().executeOnPooledThread { updateCheck(callback) }
     }
 
+    // Custom update check to enable downgrading the plugin switching from nightly -> stable
     private fun updateCheck(callback: (PluginUpdateStatus) -> Boolean) {
         var updateStatus: PluginUpdateStatus
         try {
