@@ -22,8 +22,6 @@ package com.demonwav.mcdev.update
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.updateSettings.PluginUpdateInfo
-import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.dsl.builder.Cell
@@ -50,27 +48,22 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
                 saveSettings()
                 updateCheckInProgressIcon.component.isVisible = true
                 resetUpdateStatus()
-                PluginUpdater.runUpdateCheck { result ->
+                PluginUpdater.runUpdateCheck { pluginUpdateStatus ->
                     updateCheckInProgressIcon.component.isVisible = false
 
-                    updateStatusLabel.component.text = result.fold(
-                        { info ->
-                            when (info) {
-                                is PluginUpdateInfo.NoUpdate ->
-                                    "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
-                                is PluginUpdateInfo.UpdateAvailable -> {
-                                    update = info.update
-                                    installButton.component.isVisible = true
-                                    "A new version (${info.update.pluginVersion}) is available"
-                                }
-                                is PluginUpdateInfo.CheckFailed ->
-                                    "Update check failed: " + info.errors.entries.joinToString("; ") { (host, e) ->
-                                        "${host ?: "Marketplace"}: ${e.message}"
-                                    }
-                            }
-                        },
-                        { e -> "Update check failed: ${e.message}" },
-                    )
+                    updateStatusLabel.component.text = when (pluginUpdateStatus) {
+                        is PluginUpdateStatus.LatestVersionInstalled ->
+                            "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
+                        is PluginUpdateStatus.Update -> {
+                            update = pluginUpdateStatus
+                            installButton.component.isVisible = true
+                            "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
+                        }
+                        else -> // CheckFailed
+                            "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
+                    }
+
+                    false
                 }
             }
             updateCheckInProgressIcon = icon(AnimatedIcon.Default.INSTANCE)
@@ -89,7 +82,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
             updateStatusLabel = label("")
         }
     }
-    private var update: PluginDownloader? = null
+    private var update: PluginUpdateStatus.Update? = null
     private var initialSelectedChannel: Int = 0
 
     init {
