@@ -53,7 +53,7 @@ class NeoForgeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunni
         val forgeVersion = data.getUserData(NeoForgeVersionChainStep.NEOFORGE_VERSION_KEY) ?: return
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val (mainPackageName, mainClassName) = splitPackage(mainClass)
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return
@@ -138,7 +138,7 @@ class NeoForgeMixinsJsonStep(parent: NewProjectWizardStep) : AbstractLongRunning
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         if (useMixins) {
             val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
-            val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+            val buildSystemProps = findStep<BuildSystemPropertiesStep>()
             assets.addTemplateProperties(
                 "PACKAGE_NAME" to "${buildSystemProps.groupId}.$modId.mixin",
                 "MOD_ID" to buildSystemProps.artifactId,

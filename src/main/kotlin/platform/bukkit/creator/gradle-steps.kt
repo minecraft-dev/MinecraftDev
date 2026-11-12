@@ -56,7 +56,7 @@ class BukkitGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val (manifestPath, _) = data.getUserData(AbstractBukkitPlatformStep.KEY)!!.getManifest()
         assets.addTemplateProperties(

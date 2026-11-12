@@ -58,7 +58,7 @@ class FabricBaseFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningAss
     override val description = "Adding Fabric project files (phase 1)"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val description = data.getUserData(DescriptionStep.KEY) ?: ""

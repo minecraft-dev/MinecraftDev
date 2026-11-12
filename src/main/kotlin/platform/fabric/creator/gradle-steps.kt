@@ -53,7 +53,7 @@ class FabricGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val mcVersion = data.getUserData(FabricVersionChainStep.MC_VERSION_KEY) ?: return
         val yarnVersion = data.getUserData(FabricVersionChainStep.YARN_VERSION_KEY) ?: return
         val loaderVersion = data.getUserData(FabricVersionChainStep.LOADER_VERSION_KEY) ?: return

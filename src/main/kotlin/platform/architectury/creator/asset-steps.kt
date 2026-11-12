@@ -73,7 +73,7 @@ class ArchitecturyProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongR
     override val description = "Adding Architectury project files (phase 1)"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val useMixins = data.getUserData(UseMixinsStep.KEY) ?: false
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
@@ -190,7 +190,7 @@ abstract class ArchitecturyMainClassStep(
     override val description = "Adding Architectury project files (phase $phase)"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val useArchApi = data.getUserData(ArchitecturyVersionChainStep.ARCHITECTURY_API_VERSION_KEY) != null

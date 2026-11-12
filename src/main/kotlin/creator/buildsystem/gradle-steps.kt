@@ -207,7 +207,7 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
         }
 
         val rootDirectory = Path.of(context.projectFileDirectory)
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
 
         // Tell IntelliJ to import this project
         rootDirectory.virtualFileOrError.refresh(false, true)
@@ -243,7 +243,7 @@ open class GradleImportStep(parent: NewProjectWizardStep) : AbstractLongRunningS
     private fun addRunTaskConfiguration(
         project: Project,
         rootDirectory: Path,
-        buildSystemProps: BuildSystemPropertiesStep<*>,
+        buildSystemProps: BuildSystemPropertiesStep,
         task: String,
     ) {
         val gradleType = GradleExternalTaskConfigurationType.getInstance()

@@ -24,7 +24,7 @@ import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.storeToData
 import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ide.wizard.AbstractNewProjectWizardStep
-import com.intellij.ide.wizard.NewProjectWizardBaseData
+import com.intellij.ide.wizard.NewProjectWizardBaseData.Companion.baseData
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.observable.util.bindStorage
 import com.intellij.openapi.ui.validation.CHECK_ARTIFACT_ID
@@ -46,8 +46,7 @@ private val versionValidation = validationErrorIf<String>(MCDevBundle("creator.v
     SemanticVersion.tryParse(it) == null
 }
 
-class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : AbstractNewProjectWizardStep(parent)
-    where ParentStep : NewProjectWizardStep, ParentStep : NewProjectWizardBaseData {
+class BuildSystemPropertiesStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
 
     val groupIdProperty = propertyGraph.property("org.example")
         .bindStorage("${javaClass.name}.groupId")
@@ -60,11 +59,11 @@ class BuildSystemPropertiesStep<ParentStep>(private val parent: ParentStep) : Ab
     var version by versionProperty
 
     init {
-        artifactIdProperty.dependsOn(parent.nameProperty, ::suggestArtifactId)
+        artifactIdProperty.dependsOn(baseData!!.nameProperty, ::suggestArtifactId)
         storeToData()
     }
 
-    private fun suggestArtifactId() = parent.name
+    private fun suggestArtifactId() = baseData!!.name
 
     override fun setupUI(builder: Panel) {
         builder.collapsibleGroup(MCDevBundle("creator.ui.group.title")) {

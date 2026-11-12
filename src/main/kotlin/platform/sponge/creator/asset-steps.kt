@@ -38,7 +38,7 @@ class SpongeProjectFilesStep(parent: NewProjectWizardStep) : AbstractLongRunning
     override val description = "Creating project files"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val (packageName, className) = splitPackage(mainClass)
 
