@@ -64,7 +64,7 @@ class SpongeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
     override val description = "Creating Gradle files"
 
     override fun setupAssets(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val spongeVersion = data.getUserData(SpongeApiVersionStep.KEY) ?: return
         val license = data.getUserData(LicenseStep.KEY) ?: return

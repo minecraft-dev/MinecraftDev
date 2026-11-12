@@ -45,7 +45,7 @@ import com.intellij.platform.workspace.jps.entities.LibraryRoot
 import com.intellij.platform.workspace.jps.entities.LibraryRootTypeId
 import com.intellij.platform.workspace.jps.entities.modifyLibraryEntity
 import com.intellij.platform.workspace.storage.MutableEntityStorage
-import com.intellij.workspaceModel.ide.impl.legacyBridge.library.LibraryBridge
+import com.intellij.workspaceModel.ide.legacyBridge.findLibraryId
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.resolvedPromise
@@ -76,13 +76,13 @@ class TranslationExternalAnnotationsArtifactsResolver : ExternalAnnotationsArtif
         annotationsLocation: AnnotationsLocation,
         diff: MutableEntityStorage
     ): Boolean {
-        if (library !is LibraryBridge || library.isDisposed) {
+        if (library is LibraryEx && library.isDisposed) {
             return true
         }
 
         val annotationsPath = findAnnotationsPath(false) ?: findAnnotationsPath(true) ?: return false
 
-        val libraryEntity = diff.resolve(library.libraryId) ?: return true
+        val libraryEntity = diff.resolve(findLibraryId(library)) ?: return true
         val vfUrlManager = WorkspaceModel.getInstance(project).getVirtualFileUrlManager()
         val newUrl = vfUrlManager.storeAndGet(annotationsPath)
         val annotationsRootType = LibraryRootTypeId(AnnotationOrderRootType.ANNOTATIONS_ID)
