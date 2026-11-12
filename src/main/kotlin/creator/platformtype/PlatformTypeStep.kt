@@ -23,7 +23,6 @@ package com.demonwav.mcdev.creator.platformtype
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.platformtype.PlatformTypeStep.Factory
 import com.intellij.ide.wizard.AbstractNewProjectWizardMultiStep
-import com.intellij.ide.wizard.NewProjectWizardBaseData
 import com.intellij.ide.wizard.NewProjectWizardMultiStepFactory
 import com.intellij.ide.wizard.NewProjectWizardStep
 import com.intellij.openapi.extensions.ExtensionPointName
@@ -36,13 +35,11 @@ import com.intellij.openapi.extensions.ExtensionPointName
  */
 class PlatformTypeStep private constructor(
     parent: NewProjectWizardStep,
-) : AbstractNewProjectWizardMultiStep<PlatformTypeStep, Factory>(parent, EP_NAME),
-    NewProjectWizardBaseData by parent as NewProjectWizardBaseData {
+) : AbstractNewProjectWizardMultiStep<PlatformTypeStep, Factory>(parent, EP_NAME) {
     companion object {
         val EP_NAME = ExtensionPointName<Factory>("com.demonwav.minecraft-dev.platformTypeWizard")
 
-        fun <P> create(parent: P) where P : NewProjectWizardStep, P : NewProjectWizardBaseData =
-            PlatformTypeStep(parent)
+        fun create(parent: NewProjectWizardStep) = PlatformTypeStep(parent)
     }
 
     override val self = this

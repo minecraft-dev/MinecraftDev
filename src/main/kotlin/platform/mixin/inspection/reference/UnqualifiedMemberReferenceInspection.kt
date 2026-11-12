@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.reference
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
+import com.demonwav.mcdev.platform.mixin.util.MemberInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiAnnotation
@@ -44,7 +45,8 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
 
         // TODO: Quick fix
 
-        val selector = parseMixinSelector(value) ?: return
+        // Only plain member references need to be qualified, other selectors (e.g. regex) have their own rules
+        val selector = parseMixinSelector(value) as? MemberInfo ?: return
         if (!selector.qualified) {
             holder.registerProblem(value, "Unqualified member reference in @At target")
             return

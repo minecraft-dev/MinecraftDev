@@ -38,7 +38,7 @@ import com.intellij.ui.dsl.builder.columns
 
 class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep(parent) {
     private fun suggestMainClassName(): String {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
 
         if (buildSystemProps.artifactId.contains('.')) {
             // if the artifact id is invalid, don't confuse ourselves by copying its dots
@@ -54,7 +54,7 @@ class MainClassStep(parent: NewProjectWizardStep) : AbstractNewProjectWizardStep
     var className by classNameProperty
 
     init {
-        whenStepAvailable<BuildSystemPropertiesStep<*>> { buildSystemStep ->
+        whenStepAvailable<BuildSystemPropertiesStep> { buildSystemStep ->
             classNameProperty.updateWhenChanged(buildSystemStep.groupIdProperty, ::suggestMainClassName)
             classNameProperty.updateWhenChanged(buildSystemStep.artifactIdProperty, ::suggestMainClassName)
         }

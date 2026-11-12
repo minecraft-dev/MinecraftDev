@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
+import com.demonwav.mcdev.platform.mixin.action.createShadowMembers
 import com.demonwav.mcdev.platform.mixin.action.disableAnnotationWrapping
 import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
@@ -38,7 +39,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiVariable
 import com.intellij.psi.impl.source.PostprocessReformattingAspect
 
 fun MixinTargetMember.createLookupElement(project: Project): LookupElement {
@@ -74,15 +74,15 @@ private class MixinFieldLookupItem(
 ) : VariableLookupItem(field) {
 
     override fun handleInsert(context: InsertionContext) {
-        insertShadow(context, shadow, field)
+        val shadowField = insertShadow(context, shadow, field) as? PsiField
 
-        // Replace object with proxy object so super doesn't qualify the reference
-        `object` = ShadowField(`object`)
+        // Point super at the new @Shadow field rather than the target class field. Otherwise, super sees that the
+        // inserted reference doesn't resolve to the target class field, and qualifies it with the target class name.
+        if (shadowField != null) {
+            `object` = shadowField
+        }
         super.handleInsert(context)
     }
-
-    @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
-    private class ShadowField(variable: PsiVariable) : PsiVariable by variable
 
     companion object {
         fun create(project: Project, shadow: FieldTargetMember): MixinFieldLookupItem {
@@ -96,11 +96,12 @@ private class MixinFieldLookupItem(
     }
 }
 
-private fun insertShadow(context: InsertionContext, shadow: MixinTargetMember, element: PsiMember) {
-    val mixinClass = shadow.mixin ?: context.file.findElementAt(context.startOffset)?.findContainingClass() ?: return
+private fun insertShadow(context: InsertionContext, shadow: MixinTargetMember, element: PsiMember): PsiMember? {
+    val mixinClass = shadow.mixin ?: context.file.findElementAt(context.startOffset)?.findContainingClass() ?: return null
 
     // Insert @Shadow element
-    insertShadows(context.project, mixinClass, sequenceOf(element))
+    val shadowMembers = createShadowMembers(context.project, mixinClass, sequenceOf(element))
+    insertShadows(mixinClass, shadowMembers)
     disableAnnotationWrapping(context.project) {
         PostprocessReformattingAspect.getInstance(context.project).doPostponedFormatting()
     }
@@ -115,4 +116,6 @@ private fun insertShadow(context: InsertionContext, shadow: MixinTargetMember, e
             )
         }
     }
+
+    return shadowMembers.singleOrNull()?.psiMember
 }

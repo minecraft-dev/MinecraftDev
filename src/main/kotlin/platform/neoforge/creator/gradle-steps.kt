@@ -75,7 +75,7 @@ class NeoForgeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
         val neogradleVersion = data.getUserData(NeoForgeVersionChainStep.NEOGRADLE_VERSION_KEY) ?: return
         val modId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val modName = data.getUserData(AbstractModNameStep.KEY) ?: return
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val javaVersion = context.projectJdk?.versionString?.let(JavaVersion::parse)
         val authors = data.getUserData(AuthorsStep.KEY) ?: emptyList()
         val description = data.getUserData(DescriptionStep.KEY) ?: return

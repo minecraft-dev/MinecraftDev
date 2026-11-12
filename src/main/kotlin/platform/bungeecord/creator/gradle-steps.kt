@@ -57,7 +57,7 @@ class BungeeGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunningA
 
     override fun setupAssets(project: Project) {
         val projectName = baseData!!.name
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         assets.addTemplateProperties(
             "PROJECT_NAME" to projectName,
             "GROUP_ID" to buildSystemProps.groupId,

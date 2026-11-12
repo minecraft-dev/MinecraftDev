@@ -72,7 +72,7 @@ abstract class AbstractPatchPomStep(parent: NewProjectWizardStep) : AbstractLong
     }
 
     protected fun setupCore(model: MavenDomProjectModel) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         model.groupId.value = buildSystemProps.groupId
         model.artifactId.value = buildSystemProps.artifactId
         model.version.value = buildSystemProps.version
@@ -178,13 +178,13 @@ class MavenImportStep(parent: NewProjectWizardStep) : AbstractLongRunningStep(pa
             return
         }
 
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         addRunTaskConfiguration(project, buildSystemProps, "package")
     }
 
     private fun addRunTaskConfiguration(
         project: Project,
-        buildSystemProps: BuildSystemPropertiesStep<*>,
+        buildSystemProps: BuildSystemPropertiesStep,
         task: String,
     ) {
         val mavenConfigFactory = MavenRunConfigurationType.getInstance().configurationFactories.first()

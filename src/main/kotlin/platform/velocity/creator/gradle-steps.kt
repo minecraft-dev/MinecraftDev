@@ -64,7 +64,7 @@ class VelocityGradleFilesStep(parent: NewProjectWizardStep) : AbstractLongRunnin
 
     override fun setupAssets(project: Project) {
         val projectName = baseData!!.name
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val javaVersion = findStep<JdkProjectSetupFinalizer>().preferredJdk.ordinal
         val mainClass = data.getUserData(MainClassStep.KEY) ?: return
         val (mainPackage, _) = splitPackage(mainClass)

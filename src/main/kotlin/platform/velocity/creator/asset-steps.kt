@@ -93,7 +93,7 @@ class VelocityModifyMainClassStep(
     override val description = "Patching main class"
 
     override fun perform(project: Project) {
-        val buildSystemProps = findStep<BuildSystemPropertiesStep<*>>()
+        val buildSystemProps = findStep<BuildSystemPropertiesStep>()
         val pluginId = data.getUserData(AbstractModIdStep.KEY) ?: return
         val pluginName = data.getUserData(AbstractModNameStep.KEY) ?: return
         val mainClassName = data.getUserData(MainClassStep.KEY) ?: return
