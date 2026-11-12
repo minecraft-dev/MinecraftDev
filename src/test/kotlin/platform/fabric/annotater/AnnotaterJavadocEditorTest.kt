@@ -32,6 +32,8 @@ import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqu
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVirtualFile
 import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.intention.IntentionManager
+import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
@@ -49,11 +51,14 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.codeStyle.modifier.TransientCodeStyleSettings
+import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.util.PsiTreeUtil
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.readText
@@ -404,6 +409,34 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
         assertFalse(filter.accept(intention, file, text.indexOf("return value")))
         assertFalse(filter.accept(intention, file, text.indexOf("// Not clamped")))
         assertFalse(filter.accept(intention, file, -1))
+    }
+
+    @Test
+    @DisplayName("The documented declaration's intentions aren't offered in its Javadoc, unlike the Javadoc's own")
+    fun declarationIntentions() {
+        val javadocIntention = object : PsiElementBaseIntentionAction() {
+            override fun getText() = "Javadoc intention"
+            override fun getFamilyName() = text
+            override fun isAvailable(project: Project, editor: Editor, element: PsiElement) =
+                PsiTreeUtil.getParentOfType(element, PsiDocComment::class.java) != null
+            override fun invoke(project: Project, editor: Editor, element: PsiElement) {}
+        }
+        IntentionManager.getInstance().addAction(javadocIntention)
+        Disposer.register(fixture.testRootDisposable) {
+            IntentionManager.getInstance().unregisterIntention(javadocIntention)
+        }
+        fixture.enableInspections(AnnotaterJavadocUnqualifiedReferenceInspection::class)
+        fixture.openFileInEditor(AnnotaterJavadocVirtualFile(checkout, clampCopy("Clamps a [String] value."), clamp))
+        val text = fixture.editor.document.text
+        fixture.editor.caretModel.moveToOffset(text.indexOf("Clamps"))
+        var intentions = fixture.availableIntentions.map { it.text }
+        assertTrue("Javadoc intention" in intentions, intentions.toString())
+        assertFalse("Change access modifier" in intentions, intentions.toString())
+        assertFalse("Generate overloaded method with default parameter values" in intentions, intentions.toString())
+        fixture.editor.caretModel.moveToOffset(text.indexOf("String]"))
+        intentions = fixture.availableIntentions.map { it.text }
+        assertTrue("Replace with 'java.lang.String'" in intentions, intentions.toString())
+        assertFalse("Change access modifier" in intentions, intentions.toString())
     }
 
     @Test

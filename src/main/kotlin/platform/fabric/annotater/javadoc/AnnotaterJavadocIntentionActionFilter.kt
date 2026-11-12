@@ -22,7 +22,13 @@ package com.demonwav.mcdev.platform.fabric.annotater.javadoc
 
 import com.intellij.codeInsight.daemon.impl.IntentionActionFilter
 import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.intention.IntentionActionDelegate
+import com.intellij.codeInsight.intention.IntentionManager
+import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction
+import com.intellij.modcommand.ActionContext
+import com.intellij.openapi.editor.impl.ImaginaryEditor
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 
@@ -41,10 +47,54 @@ class AnnotaterJavadocIntentionActionFilter : IntentionActionFilter {
         }
         val document = psiFile.viewProvider.document
         // The caret can be just after the end of a comment
-        return listOf(offset, offset - 1).any { candidate ->
-            val element = psiFile.findElementAt(candidate) ?: return@any false
-            val comment = PsiTreeUtil.getParentOfType(element, PsiDocComment::class.java, false) ?: return@any false
-            !AnnotaterJavadocInlineEditor.isGuarded(document, comment.textRange)
+        val comment = listOf(offset, offset - 1).firstNotNullOfOrNull { candidate ->
+            val element = psiFile.findElementAt(candidate) ?: return@firstNotNullOfOrNull null
+            PsiTreeUtil.getParentOfType(element, PsiDocComment::class.java, false)
+                ?.takeUnless { AnnotaterJavadocInlineEditor.isGuarded(document, it.textRange) }
+        } ?: return false
+        return !isDeclarationIntention(intentionAction, psiFile, comment)
+    }
+
+    /**
+     * Java offers some intentions of a declaration anywhere in its doc comment, such as changing its access modifier.
+     * These are told apart from the doc comment's own intentions by also being available on the declaration's name.
+     */
+    private fun isDeclarationIntention(action: IntentionAction, psiFile: PsiFile, comment: PsiDocComment): Boolean {
+        if (!isRegisteredIntention(action)) {
+            // keep quick fixes enabled
+            return false
         }
+        val name = (comment.owner as? PsiNameIdentifierOwner)?.nameIdentifier ?: return false
+        val editor = NameEditor(psiFile)
+        editor.caretModel.moveToOffset(name.textRange.startOffset)
+        val unwrapped = IntentionActionDelegate.unwrap(action)
+        val modCommand = unwrapped.asModCommandAction()
+        return try {
+            when {
+                unwrapped is PsiElementBaseIntentionAction ->
+                    unwrapped.checkFile(psiFile) && unwrapped.isAvailable(psiFile.project, editor, name)
+                modCommand != null -> modCommand.getPresentation(ActionContext.from(editor, psiFile)) != null
+                else -> unwrapped.isAvailable(psiFile.project, editor, psiFile)
+            }
+        } catch (_: UnsupportedOperationException) {
+            // The intention needs more of an editor than this has
+            false
+        }
+    }
+
+    private class NameEditor(psiFile: PsiFile) : ImaginaryEditor(psiFile.project, psiFile.viewProvider.document) {
+        override fun isViewer() = false
+
+        override fun isOneLineMode() = false
+    }
+
+    private fun isRegisteredIntention(action: IntentionAction): Boolean {
+        val unwrapped = unwrap(action)
+        return IntentionManager.getInstance().intentionActions.any { unwrap(it) === unwrapped }
+    }
+
+    private fun unwrap(action: IntentionAction): Any {
+        val unwrapped = IntentionActionDelegate.unwrap(action)
+        return unwrapped.asModCommandAction() ?: unwrapped
     }
 }
