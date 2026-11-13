@@ -22,10 +22,12 @@ package com.demonwav.mcdev.util
 
 import com.intellij.codeInsight.generation.ClassMember
 import com.intellij.codeInsight.generation.GenerateMembersHandlerBase
+import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.psi.PsiClass
+import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -64,6 +66,14 @@ object McdevReflection {
         )
 
     @JvmStatic
+    val CLASS_MARKDOWN_DOCUMENTATION_COMMENTS_MIGRATION_FIX: Class<*> =
+        Class.forName("com.siyeh.ig.migration.MarkdownDocumentationCommentsMigrationInspection\$MarkdownDocumentationCommentsMigrationFix")
+
+    @JvmStatic
+    val CONSTRUCTOR_MARKDOWN_DOCUMENTATION_COMMENTS_MIGRATION_FIX: Constructor<out LocalQuickFix> =
+        CLASS_MARKDOWN_DOCUMENTATION_COMMENTS_MIGRATION_FIX.getDeclaredConstructorEx()
+
+    @JvmStatic
     val FIELD_PLUGIN_DOWNLOADER_MY_FILE: Field =
         PluginDownloader::class.java.getDeclaredFieldEx("myFile", Path::class.java)
 
@@ -80,6 +90,18 @@ object McdevReflection {
     }
 
     /**
+     * Like [Class.getDeclaredConstructor], but makes the constructor accessible.
+     */
+    private inline fun <reified T> Class<*>.getDeclaredConstructorEx(vararg params: Class<*>): Constructor<out T> {
+        check(T::class.java.isAssignableFrom(this)) {
+            "Class ${this.name} is not a subclass of ${T::class.java.name}"
+        }
+        val constructor = this.asSubclass(T::class.java).getDeclaredConstructor(*params)
+        constructor.isAccessible = true
+        return constructor
+    }
+
+    /**
      * Like [Class.getDeclaredMethod], but makes the method accessible and checks that it has the expected [returnType].
      */
     private fun Class<*>.getDeclaredMethodEx(name: String, returnType: Class<*>, vararg params: Class<*>): Method {
@@ -89,6 +111,18 @@ object McdevReflection {
         }
         method.isAccessible = true
         return method
+    }
+
+    /**
+     * Like [Constructor.newInstance], but rethrows the exception thrown by the invoked constructor rather than wrapping
+     * it in an [InvocationTargetException].
+     */
+    fun <T> Constructor<T>.newInstanceUnwrap(vararg args: Any?): T {
+        try {
+            return newInstance(*args)
+        } catch (e: InvocationTargetException) {
+            throw e.cause ?: e
+        }
     }
 
     /**

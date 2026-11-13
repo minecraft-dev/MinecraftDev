@@ -193,6 +193,7 @@ idea {
 tasks.runIde {
     maxHeapSize = "2G"
     jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
+    systemProperty("mcdev.annotater.upstream", "Earthcomputer/annotater")
 }
 
 tasks.test {

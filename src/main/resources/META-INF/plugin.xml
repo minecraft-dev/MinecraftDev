@@ -34,6 +34,7 @@
     <depends optional="true" config-file="mcdev-kotlin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="mcdev-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="mcdev-yaml.xml">org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="mcdev-annotater-git.xml">Git4Idea</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
@@ -405,6 +406,10 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+        <applicationConfigurable displayName="Annotater"
+                                 id="Settings.Minecraft.Annotater"
+                                 parentId="Settings.Minecraft"
+                                 instance="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterConfigurable"/>
         <projectConfigurable displayName="Project-Specific Settings"
                              id="Settings.Minecraft.Project"
                              parentId="Settings.Minecraft"
@@ -698,6 +703,32 @@
             implementation="com.demonwav.mcdev.platform.minecraft.navigation.SrgMemberChooseByNameContributor"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.TinyUnscrambler"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.srg.McpUnscrambler"/>
+
+        <!-- annotater -->
+        <applicationService serviceImplementation="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterSettings"/>
+        <notificationGroup id="Minecraft annotater" displayType="BALLOON"/>
+        <lang.documentationProvider language="JAVA" order="first"
+                                    implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocDocumentationProvider"/>
+        <highlightingPassFactory
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocInlayPassFactory"/>
+        <editorNotificationProvider
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocEditorNotificationProvider"/>
+        <codeStyleSettingsModifier
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCodeStyleSettingsModifier"/>
+        <completion.contributor language="JAVA" order="first"
+                                implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCompletionContributor"/>
+        <daemon.intentionActionFilter
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocIntentionActionFilter"/>
+        <vetoRenameCondition
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVetoRenameCondition"/>
+        <lang.formatter language="JAVA"
+                        implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocFormattingModelBuilder"/>
+        <intentionAction>
+            <language>JAVA</language>
+            <className>com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocIntention</className>
+            <category>Minecraft</category>
+            <descriptionDirectoryName>EditAnnotaterJavadocIntention</descriptionDirectoryName>
+        </intentionAction>
         <!--endregion-->
 
         <!--region MIXIN-->
@@ -1050,6 +1081,20 @@
         <!--endregion-->
 
         <!--region MINECRAFT INSPECTIONS-->
+        <localInspection displayName="Unqualified class reference in annotater Javadoc"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqualifiedReferenceInspection"/>
+        <localInspection displayName="Unsupported comment in annotater Javadoc"
+                         groupName="Minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCommentInspection"/>
         <localInspection displayName="Unused access transformer"
                          groupName="Minecraft"
                          language="Access Transformers"
@@ -1676,6 +1721,10 @@
     <applicationListeners>
         <listener class="com.demonwav.mcdev.translations.TranslationFileListener"
                   topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+        <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
+                  topic="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterListener"/>
+        <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListenerBackgroundable"/>
     </applicationListeners>
 
     <projectListeners>
@@ -1767,6 +1816,12 @@
         <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass"
                 text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocAction"
+                id="EditAnnotaterJavadoc"
+                text="Edit Annotater Javadoc"
+                description="Edit the annotater Javadoc of this Minecraft class, field or method">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction"
                 text="AW Entry"
