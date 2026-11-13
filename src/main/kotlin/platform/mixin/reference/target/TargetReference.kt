@@ -29,7 +29,6 @@ import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.findQualifiedClass
-import com.demonwav.mcdev.util.computeStringArray
 import com.demonwav.mcdev.util.ifEmpty
 import com.demonwav.mcdev.util.insideAnnotationAttribute
 import com.demonwav.mcdev.util.reference.PolyReferenceResolver
@@ -86,17 +85,14 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
      * Null is returned when no parent annotation handler could be found, in which case we shouldn't mark this
      * reference as unresolved.
      */
-    private fun getInjector(at: PsiAnnotation): Pair<InjectorAnnotationHandler, PsiAnnotation>? =
-        generateSequence(at.parent) { it.parent }
+    private fun getTargets(at: PsiAnnotation, forUnresolved: Boolean): List<ClassAndMethodNode>? {
+        val (handler, annotation) = generateSequence(at.parent) { it.parent }
             .filterIsInstance<PsiAnnotation>()
             .flatMap { it.owner?.annotations?.asSequence() ?: emptySequence() }
             .mapNotNull { annotation ->
                 (MixinAnnotationHandler.forMixinAnnotation(annotation) as? InjectorAnnotationHandler)
                     ?.let { it to annotation }
-            }.firstOrNull()
-
-    private fun getTargets(at: PsiAnnotation, forUnresolved: Boolean): List<ClassAndMethodNode>? {
-        val (handler, annotation) = getInjector(at) ?: return null
+            }.firstOrNull() ?: return null
         if (forUnresolved && handler.isSoft) {
             return null
         }
@@ -117,25 +113,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     fun resolveNavigationTargets(context: PsiElement): Array<PsiElement>? {
         val at = context.parentOfType<PsiAnnotation>() ?: return null
         val targets = getTargets(at, false) ?: return null
-        val injector = getInjector(at)?.second
-        val methodAttr = injector?.findAttributeValue("method")
-        val selectors = methodAttr?.computeStringArray()?.mapNotNull { parseMixinSelector(it, methodAttr) }.orEmpty()
-        return targets.flatMap { target ->
-            val sourceElement = selectors.firstNotNullOfOrNull { selector ->
-                if (selector.matchMethod(target.method, target.clazz)) {
-                    selector.findSourceMethod(
-                        target.clazz,
-                        target.method,
-                        context.project,
-                        context.resolveScope,
-                        canDecompile = true,
-                    )
-                } else {
-                    null
-                }
-            }
-            AtResolver(at, target.clazz, target.method, sourceElement).resolveNavigationTargets()
-        }.toTypedArray()
+        return targets.flatMap { AtResolver(at, it.clazz, it.method).resolveNavigationTargets() }.toTypedArray()
     }
 
     override fun resolveReference(context: PsiElement): Array<ResolveResult> {

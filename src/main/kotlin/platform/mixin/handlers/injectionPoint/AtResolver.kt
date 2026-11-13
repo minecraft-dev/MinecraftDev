@@ -43,8 +43,8 @@ import com.demonwav.mcdev.util.constantValue
 import com.demonwav.mcdev.util.countIsAtLeast
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.equivalentTo
-import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.findContainingClass
+import com.demonwav.mcdev.util.findMethods
 import com.demonwav.mcdev.util.internalName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.JavaPsiFacade
@@ -94,7 +94,6 @@ class AtResolver(
     private val at: PsiAnnotation,
     private val targetClass: ClassNode,
     private val targetMethod: MethodNode,
-    private val sourceElement: PsiElement? = null,
 ) {
     companion object {
         fun getInjectionPoint(at: PsiAnnotation): InjectionPoint<*>? {
@@ -241,6 +240,23 @@ class AtResolver(
         val bytecodeResults = resolveInstructions()
 
         val project = at.project
+
+        val injector = findInjectorAnnotation(at)
+        val methodAttr = injector?.findAttributeValue("method")
+        val selectors = methodAttr?.computeStringArray()?.mapNotNull { parseMixinSelector(it, methodAttr) }.orEmpty()
+        val sourceElement = selectors.firstNotNullOfOrNull { selector ->
+            if (selector.matchMethod(targetMethod, targetClass)) {
+                selector.findSourceMethod(
+                    targetClass,
+                    targetMethod,
+                    project,
+                    at.resolveScope,
+                    canDecompile = true,
+                )
+            } else {
+                null
+            }
+        }
 
         // Resolve the target source class
         val targetPsiClass = sourceElement?.findContainingClass()
