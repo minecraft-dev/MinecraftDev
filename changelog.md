@@ -1,5 +1,12 @@
 # Minecraft Development for IntelliJ
 
+## [1.9.2]
+
+### Removed
+
+- Removed the old project wizard ("Minecraft (Old Wizard)"). New projects are created with the template-based "Minecraft" project creator.
+- Removed the file templates used by the old project wizard from Settings | Editor | File and Code Templates. The class skeleton templates are unchanged.
+
 ## [1.9.1]
 
 ### Added
