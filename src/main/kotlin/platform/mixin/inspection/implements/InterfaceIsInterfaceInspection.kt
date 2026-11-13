@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,8 +28,6 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiAnnotationMemberValue
 
 class InterfaceIsInterfaceInspection : MixinAnnotationAttributeInspection(INTERFACE, "iface") {
-
-    override fun getStaticDescription() = "Reports usages of @Interface with a regular class instead of an interface."
 
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -40,9 +40,6 @@ class BukkitListenerImplementedInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any) =
         "This class contains @EventHandler methods but does not implement Listener."
-
-    override fun getStaticDescription() =
-        "All Bukkit @EventHandler methods must reside in a class that implements Listener."
 
     override fun buildFix(vararg infos: Any): LocalQuickFix {
         val classPointer = (infos[0] as PsiClass).createSmartPointer()

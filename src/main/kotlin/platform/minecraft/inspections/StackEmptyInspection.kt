@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -53,11 +53,6 @@ class StackEmptyInspection : BaseInspection() {
         val compareExpression = infos[0] as PsiExpression
         return "\"${compareExpression.text}\" compared with ItemStack.EMPTY"
     }
-
-    override fun getStaticDescription() =
-        "Comparing an ItemStack to ItemStack.EMPTY to query stack emptiness can cause unwanted issues." +
-            "When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but" +
-            " the stack should still be considered empty. Instead, isEmpty() should be called."
 
     override fun buildFix(vararg infos: Any): LocalQuickFix {
         val compareExpressionPointer = (infos[0] as PsiExpression).createSmartPointer()

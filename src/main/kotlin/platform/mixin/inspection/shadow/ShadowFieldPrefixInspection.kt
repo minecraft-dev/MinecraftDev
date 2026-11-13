@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -39,8 +39,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiModifierList
 
 class ShadowFieldPrefixInspection : MixinInspection() {
-
-    override fun getStaticDescription() = "Reports @Shadow fields with prefixes"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

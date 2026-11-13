@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,10 +36,6 @@ class VariableUseSideOnlyInspection : BaseInspection() {
         val error = infos[0] as Error
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
-
-    override fun getStaticDescription() =
-        "Variables which are declared with a @SideOnly annotation can only be used " +
-            "in matching @SideOnly classes and methods."
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {

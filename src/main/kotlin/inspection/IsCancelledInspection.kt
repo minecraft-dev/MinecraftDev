@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,8 +33,6 @@ import org.jetbrains.annotations.Nls
 class IsCancelledInspection : BaseInspection() {
     @Nls
     override fun getDisplayName() = MCDevBundle("inspection.is_cancelled.name")
-
-    override fun getStaticDescription(): String = MCDevBundle("inspection.is_cancelled.description")
 
     override fun buildErrorString(vararg infos: Any): String {
         val useless = infos[0] as IsCancelled

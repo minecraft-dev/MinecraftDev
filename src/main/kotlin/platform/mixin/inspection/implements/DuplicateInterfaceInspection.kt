@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,8 +33,6 @@ import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiClass
 
 class DuplicateInterfaceInspection : MixinAnnotationAttributeInspection(MixinConstants.Annotations.IMPLEMENTS, null) {
-
-    override fun getStaticDescription() = "Reports duplicate @Interface classes in an @Implements annotation."
 
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,

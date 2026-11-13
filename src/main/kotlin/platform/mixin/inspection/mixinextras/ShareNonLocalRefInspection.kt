@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -37,8 +37,6 @@ import com.intellij.psi.PsiTypeElement
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 
 class ShareNonLocalRefInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when a @Share parameter is of a non-LocalRef type"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.MixinExtras.SHARE)) {

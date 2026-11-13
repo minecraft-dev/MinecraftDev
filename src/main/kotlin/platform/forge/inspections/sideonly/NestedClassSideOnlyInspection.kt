@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -35,12 +35,6 @@ class NestedClassSideOnlyInspection : BaseInspection() {
     override fun buildErrorString(vararg infos: Any) =
         "A nested class cannot declare a side that is different from the parent class." +
             "\nEither remove the nested class's @SideOnly annotation, or change it to match it's parent's side."
-
-    override fun getStaticDescription(): String {
-        return "Classes which are annotated with @SideOnly cannot contain any nested classes which are " +
-            "annotated with a different @SideOnly annotation. Since a class that is annotated with @SideOnly " +
-            "brings everything with it, @SideOnly annotated nested classes are usually useless."
-    }
 
     override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[0] as PsiAnnotation

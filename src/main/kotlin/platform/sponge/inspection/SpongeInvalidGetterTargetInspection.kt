@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,9 +33,6 @@ class SpongeInvalidGetterTargetInspection : AbstractBaseUastLocalInspectionTool(
 
     override fun getDisplayName() = "@Getter targeted method does not exist"
 
-    override fun getStaticDescription() =
-        "@Getter must target a method accessible from the event class of this listener"
-
     override fun checkMethod(
         method: UMethod,
         manager: InspectionManager,
@@ -52,7 +49,7 @@ class SpongeInvalidGetterTargetInspection : AbstractBaseUastLocalInspectionTool(
                 getter.findAttributeValue("value")?.sourcePsi?.let { problemAnchor ->
                     problems += manager.createProblemDescriptor(
                         problemAnchor,
-                        this.staticDescription,
+                        "@Getter must target a method accessible from the event class of this listener",
                         isOnTheFly,
                         null,
                         ProblemHighlightType.GENERIC_ERROR_OR_WARNING,

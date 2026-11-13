@@ -67,8 +67,6 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
     @JvmField
     var injectableTypesList = Const.defaultInjectableTypes.toMutableList()
 
-    override fun getStaticDescription() = "Invalid @Inject usage in Sponge plugin class."
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return if (SpongeModuleType.isInModule(holder.file)) {
             Visitor(holder)

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -31,9 +31,7 @@ class MissingMessageConstructorInspection : BaseInspection() {
     @Nls
     override fun getDisplayName() = "IMessage or IMessageHandler implementation without empty constructor"
 
-    override fun buildErrorString(vararg infos: Any?) = staticDescription
-
-    override fun getStaticDescription() =
+    override fun buildErrorString(vararg infos: Any?) =
         "All implementations of IMessage and IMessageHandler must have an empty constructor"
 
     override fun buildFix(vararg infos: Any?): LocalQuickFix? {

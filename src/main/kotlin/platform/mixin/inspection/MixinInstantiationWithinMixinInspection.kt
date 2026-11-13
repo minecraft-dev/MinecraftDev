@@ -44,8 +44,6 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiNewExpression
 
 class MixinInstantiationWithinMixinInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when a mixin class is instantiated within that same class using a constructor which doesn't exist in the target class"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitNewExpression(expression: PsiNewExpression) {
             if (expression.isArrayCreation || expression.anonymousClass != null) {

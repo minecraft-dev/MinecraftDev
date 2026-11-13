@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -35,8 +35,6 @@ import com.siyeh.ig.fixes.RenameFix
 import org.objectweb.asm.Opcodes
 
 class ShadowParameterNameInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when a parameter name in a shadow method does not match the target method"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.Annotations.SHADOW)) {

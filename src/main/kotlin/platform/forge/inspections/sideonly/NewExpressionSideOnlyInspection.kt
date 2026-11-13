@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,13 +36,6 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any) =
         "A class annotated with @SideOnly can only be used in other matching annotated classes and methods"
-
-    override fun getStaticDescription(): String {
-        return "A class that is annotated as @SideOnly(Side.CLIENT) or @SideOnly(Side.SERVER) cannot be " +
-            "used in classes or methods which are annotated differently, or not at all. Since the " +
-            "irrelevant code is removed when operating as a server or a client, common code cannot " +
-            "use @SideOnly annotated classes either."
-    }
 
     override fun buildFix(vararg infos: Any?): LocalQuickFix? {
         val annotation = infos[0] as? PsiAnnotation ?: return null

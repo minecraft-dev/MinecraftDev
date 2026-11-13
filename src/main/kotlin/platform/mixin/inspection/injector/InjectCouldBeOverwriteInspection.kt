@@ -82,9 +82,6 @@ import com.siyeh.ig.psiutils.VariableNameGenerator
 import org.objectweb.asm.Type
 
 class InjectCouldBeOverwriteInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when an @Inject is better written as an @Overwrite, " +
-        "because the @Inject always cancels and could cause silent mod incompatibilities"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitMethod(method: PsiMethod) {
             val injectAnnotation = method.findAnnotation(MixinConstants.Annotations.INJECT) ?: return

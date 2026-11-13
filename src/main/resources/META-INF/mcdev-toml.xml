@@ -3,7 +3,7 @@
 
     https://mcdev.io/
 
-    Copyright (C) 2025 minecraft-dev
+    Copyright (C) 2026 minecraft-dev
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -31,7 +31,6 @@
                          language="TOML"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.toml.platform.forge.inspections.ModsTomlValidationInspection"/>
     </extensions>
 </idea-plugin>

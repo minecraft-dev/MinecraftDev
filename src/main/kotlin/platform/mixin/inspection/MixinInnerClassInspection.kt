@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -32,8 +32,6 @@ import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.parentOfType
 
 class MixinInnerClassInspection : MixinInspection() {
-
-    override fun getStaticDescription() = "Reports invalid usages of inner classes in Mixins."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

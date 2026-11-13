@@ -784,49 +784,42 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
         <localInspection displayName="Missing translations"
                          groupName="Minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
         <localInspection displayName="Missing format arguments"
                          groupName="Minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
         <localInspection displayName="Superfluous format arguments"
                          groupName="Minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
         <localInspection displayName="Wrong translation argument types"
                          groupName="Minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.WrongTypeInTranslationArgsInspection"/>
         <localInspection displayName="Usage of deprecated translation"
                          groupName="Minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.translations.inspections.DeprecatedTranslationInspection"/>
         <localInspection displayName="Entity class does not match this entity class"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.inspection.WrongEntityDataParameterClassInspection"/>
         <!--endregion-->
 
@@ -836,7 +829,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.bukkit.inspection.BukkitListenerImplementedInspection"/>
         <!--endregion-->
 
@@ -846,7 +838,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
 
         <localInspection displayName="@Getter targeted method does not exist"
@@ -854,14 +845,12 @@
                          language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInvalidGetterTargetInspection"/>
         <localInspection displayName="Parameter's type is not assignable to its @Getter method return type"
                          groupName="Sponge"
                          language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
 
         <localInspection displayName="Invalid @Inject usage in Sponge plugin class"
@@ -869,14 +858,12 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInjectionInspection"/>
         <localInspection displayName="Sponge plugin class validity"
                          groupName="Sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongePluginClassInspection"/>
         <!--endregion-->
 
@@ -886,49 +873,42 @@
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in field declaration"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of @SideOnly in method declaration"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of method annotated with @SideOnly"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
         <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
                          groupName="MinecraftForge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
 
         <localInspection displayName="IMessage or IMessageHandler implementation without empty constructor"
@@ -936,7 +916,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.simpleimpl.MissingMessageConstructorInspection"/>
         <!--endregion-->
 
@@ -947,7 +926,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
         <localInspection displayName="Fabric mod JSON entrypoints validation"
                          shortName="FabricModJsonEntrypointsValidation"
@@ -955,7 +933,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection"/>
         <!--endregion-->
 
@@ -965,28 +942,24 @@
                          language="Access Transformers"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtUsageInspection"/>
         <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
                          groupName="Minecraft"
                          language="JAVA"
                          enabledByDefault="false"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.inspections.StackEmptyInspection"/>
         <localInspection displayName="Duplicate access widener"
                          groupName="Minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.DuplicateAwEntryInspection"/>
         <localInspection displayName="Unknown CT namespace"
                          groupName="Minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.UnknownCtNamespaceInspection"/>
         <!--endregion-->
 
@@ -998,7 +971,6 @@
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.NonJavaMixinInspection"/>
         <localInspection displayName="Mixin not in a mixin config"
                          shortName="UnusedMixin"
@@ -1006,7 +978,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.UnusedMixinInspection"/>
         <localInspection displayName="Mixin annotation outside of @Mixin class"
                          shortName="AnnotationOutsideOfMixin"
@@ -1014,7 +985,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
         <localInspection displayName="Missing or unused cancellable @Inject"
                          shortName="CancellableInjectionUsage"
@@ -1022,7 +992,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.MixinCancellableInspection"/>
         <localInspection displayName="Mixin parameter names don't match the target class"
                          shortName="NameDoesntMatchTargetClass"
@@ -1030,7 +999,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.MixinParameterNameInspection"/>
         <localInspection displayName="Invalid @Mixin Target"
                          shortName="InvalidMixinTarget"
@@ -1038,7 +1006,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
         <localInspection displayName="Invalid @Mixin super class"
                          shortName="MixinSuperClass"
@@ -1046,7 +1013,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection"/>
         <localInspection displayName="Public static member in @Mixin class"
                          shortName="PublicStaticMixinMember"
@@ -1054,7 +1020,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
         <localInspection displayName="Switch used on an enum mixin"
                          shortName="SwitchOnEnumMixin"
@@ -1062,7 +1027,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.EnumMixinSwitchStatementInspection"/>
         <localInspection displayName="Mixin instantiated within that same mixin using a constructor which doesn't exist"
                          shortName="MixinConstructorDoesntExist"
@@ -1070,7 +1034,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInstantiationWithinMixinInspection"/>
         <localInspection displayName="Inner classes in Mixins"
                          shortName="MixinInnerClass"
@@ -1078,7 +1041,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInnerClassInspection"/>
         <localInspection displayName="Mixin is wrong class type"
                          shortName="MixinWrongClassType"
@@ -1086,7 +1048,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassTypeInspection"/>
         <localInspection displayName="Reference to @Mixin class"
                          shortName="ReferenceToMixin"
@@ -1094,7 +1055,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassReferenceInspection"/>
         <!--endregion-->
 
@@ -1105,7 +1065,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationTargetInspection"/>
         <!--endregion-->
 
@@ -1116,7 +1075,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.MissingUniqueAnnotationInspection"/>
         <localInspection displayName="Name does not match the pattern for added mixin members"
                          shortName="AddedMixinMembersNamePattern"
@@ -1124,7 +1082,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
         <localInspection displayName="Name does not match the pattern for added enum constants"
                          shortName="AddedEnumConstantsNamePattern"
@@ -1132,7 +1089,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.EnumConstantNameFormatInspection"/>
         <!--endregion-->
 
@@ -1143,7 +1099,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection"/>
         <localInspection displayName="Empty @Implements"
                          shortName="EmptyImplements"
@@ -1151,7 +1106,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.EmptyImplementsInspection"/>
         <localInspection displayName="@Interface is interface"
                          shortName="InterfaceIsInterface"
@@ -1159,7 +1113,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection"/>
         <localInspection displayName="Invalid prefix on @Interface"
                          shortName="InvalidInterfacePrefix"
@@ -1167,7 +1120,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection"/>
         <localInspection displayName="Duplicate @Interface in @Implements"
                          shortName="DuplicateInterface"
@@ -1175,7 +1127,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfaceInspection"/>
         <localInspection displayName="Duplicate @Interface prefix in @Implements"
                          shortName="DuplicateInterfacePrefix"
@@ -1183,7 +1134,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfacePrefixInspection"/>
         <!--endregion-->
 
@@ -1194,7 +1144,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ImplicitConstructorInvokerInspection"/>
         <localInspection displayName="@Inject could be @Overwrite"
                          shortName="InjectCouldBeOverwrite"
@@ -1202,7 +1151,6 @@
                          language="JAVA"
                          enabledByDefault="false"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectCouldBeOverwriteInspection"/>
         <localInspection displayName="@Inject into Constructor"
                          shortName="InjectIntoConstructor"
@@ -1210,7 +1158,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectIntoConstructorInspection"/>
         <localInspection displayName="Missing or invalid use of opcode"
                          shortName="MissingOrInvalidOpcode"
@@ -1218,7 +1165,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectorOpcodeInspection"/>
         <localInspection displayName="Invalid injector method signature"
                          shortName="InvalidInjectorMethodSignature"
@@ -1226,7 +1172,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection"/>
         <localInspection displayName="@ModifyVariable may be argsOnly = true"
                          shortName="ModifyVariableMayBeArgsOnly"
@@ -1234,7 +1179,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
         <localInspection displayName="@ModifyVariable may use variable name"
                          shortName="ModifyVariableMayUseName"
@@ -1242,7 +1186,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection"/>
         <localInspection displayName="@Inject before a superconstructor call is cancellable"
                          shortName="InjectCancellableBeforeSuperConstructorCall"
@@ -1250,7 +1193,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
         <localInspection displayName="CTOR_HEAD is missing unsafe = true"
                          shortName="CtorHeadNoUnsafe"
@@ -1258,7 +1200,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection"/>
         <localInspection displayName="CTOR_HEAD is not targeting a constructor"
                          shortName="CtorHeadUsedForNonConstructor"
@@ -1266,7 +1207,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadUsedForNonConstructorInspection"/>
         <localInspection displayName="Unnecessary unsafe = true"
                          shortName="UnnecessaryUnsafe"
@@ -1274,7 +1214,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnnecessaryUnsafeInspection"/>
         <localInspection displayName="CTOR_HEAD with enforce=POST_INIT doesn't target a field"
                          shortName="CtorHeadPostInit"
@@ -1282,7 +1221,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadPostInitInspection"/>
         <localInspection displayName="Usage of discouraged injection point"
                          shortName="DiscouragedInjectionPoint"
@@ -1290,7 +1228,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DiscouragedInjectionPointInspection"/>
         <localInspection displayName="Usage of discouraged shifting in injection point"
                          shortName="DiscouragedShift"
@@ -1298,7 +1235,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DiscouragedShiftInspection"/>
         <localInspection displayName="Usage of disallowed injector target"
                          shortName="DisallowedTargetInsn"
@@ -1306,7 +1242,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DisallowedTargetInsnInspection"/>
         <localInspection displayName="Usage of LocalCapture.CAPTURE_FAILEXCEPTION"
                          shortName="LocalCaptureFailException"
@@ -1314,7 +1249,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CaptureFailExceptionInspection"/>
         <localInspection displayName="Unused @Inject local capture"
                          shortName="UnusedInjectLocalCapture"
@@ -1322,7 +1256,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnusedLocalCaptureInspection"/>
         <localInspection displayName="@Inject local capture can be replaced with @Local"
                          shortName="InjectLocalCaptureCanBeReplacedWithLocal"
@@ -1330,7 +1263,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.InjectLocalCaptureReplaceWithLocalInspection"/>
         <localInspection displayName="INVOKE_ASSIGN can be replaced with expression"
                          shortName="InvokeAssignCanReplacedWithExpression"
@@ -1338,7 +1270,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.InvokeAssignReplaceWithExpressionInspection"/>
         <!--endregion-->
 
@@ -1349,7 +1280,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteModifiersInspection"/>
         <localInspection displayName="Overwrite lacking @author JavaDoc tag"
                          shortName="OverwriteAuthorRequired"
@@ -1357,7 +1287,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteAuthorInspection"/>
         <!--endregion-->
 
@@ -1368,7 +1297,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.InvalidMemberReferenceInspection"/>
         <localInspection displayName="Unresolved reference"
                          shortName="UnresolvedMixinReference"
@@ -1376,7 +1304,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnresolvedReferenceInspection"/>
         <localInspection displayName="Ambiguous reference"
                          shortName="AmbiguousMixinReference"
@@ -1384,7 +1311,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.AmbiguousReferenceInspection"/>
         <localInspection displayName="Unqualified member reference"
                          shortName="UnqualifiedMemberReference"
@@ -1392,7 +1318,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnqualifiedMemberReferenceInspection"/>
         <localInspection displayName="Unnecessary qualified member reference"
                          shortName="UnnecessaryQualifiedMemberReference"
@@ -1400,7 +1325,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnnecessaryQualifiedMemberReferenceInspection"/>
         <!--endregion-->
 
@@ -1411,7 +1335,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection"/>
         <localInspection displayName="Shadow parameter names don't match the target class"
                          shortName="ShadowNameDoesntMatchTargetClass"
@@ -1419,7 +1342,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowParameterNameInspection"/>
         <localInspection displayName="@Shadow field with prefix"
                          shortName="ShadowFieldPrefix"
@@ -1427,7 +1349,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFieldPrefixInspection"/>
         <localInspection displayName="Unused @Shadow method prefix"
                          shortName="UnusedShadowMethodPrefix"
@@ -1435,7 +1356,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.UnusedShadowMethodPrefixInspection"/>
         <localInspection displayName="Modification of @Final field"
                          shortName="ShadowFinalModification"
@@ -1443,7 +1363,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
         <localInspection displayName="Missing abstract shadows in enum mixin"
                          shortName="MissingAbstractShadowsInEnumMixin"
@@ -1451,7 +1370,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.MissingAbstractShadowsInEnumInspection"/>
         <!--endregion-->
 
@@ -1462,7 +1380,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
         <localInspection displayName="Unnecessary mutable reference to captured local"
                          shortName="MixinExtrasUnnecessaryMutableLocal"
@@ -1470,7 +1387,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
         <localInspection displayName="Unresolved @Local capture"
                          shortName="UnresolvedLocalCapture"
@@ -1478,7 +1394,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnresolvedLocalCaptureInspection"/>
         <localInspection displayName="@Local may be argsOnly = true"
                          shortName="LocalMayBeArgsOnly"
@@ -1486,7 +1401,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalArgsOnlyInspection"/>
         <localInspection displayName="@Local may use name"
                          shortName="LocalMayUseName"
@@ -1494,7 +1408,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalMayUseNameInspection"/>
         <localInspection displayName="@Share has conflicting variable type"
                          shortName="ConflictingShareType"
@@ -1502,7 +1415,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.ConflictingShareTypeInspection"/>
         <localInspection displayName="@Share has non-LocalRef type"
                          shortName="ShareNonLocalRef"
@@ -1510,7 +1422,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.ShareNonLocalRefInspection"/>
         <localInspection displayName="@WrapWithCondition targets non-void instruction followed by pop"
                          shortName="WrapWithConditionTargetsNonVoid"
@@ -1518,7 +1429,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrapWithConditionValidNonVoidInspection"/>
         <!--endregion-->
 
@@ -1529,7 +1439,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.UnresolvedReferenceInspection"/>
         <localInspection displayName="Invalid config value"
                          shortName="InvalidConfigValue"
@@ -1537,7 +1446,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.ConfigValueInspection"/>
         <localInspection displayName="Invalid Mixin registration"
                          shortName="InvalidMixinRegistration"
@@ -1545,7 +1453,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinRegistrationInspection"/>
         <localInspection displayName="Invalid Mixin plugin registration"
                          shortName="InvalidMixinPluginRegistration"
@@ -1553,7 +1460,6 @@
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinPluginInspection"/>
         <!--endregion-->
         <!--endregion-->
@@ -1564,7 +1470,6 @@
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.bungeecord.inspection.BungeeCordListenerImplementedInspection"/>
         <!--endregion-->
         <!--endregion-->
