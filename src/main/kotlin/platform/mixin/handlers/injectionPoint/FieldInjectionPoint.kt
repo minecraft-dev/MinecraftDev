@@ -26,6 +26,7 @@ import com.demonwav.mcdev.platform.mixin.util.fakeResolve
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceField
 import com.demonwav.mcdev.util.Quantifier
 import com.demonwav.mcdev.util.constantValue
+import com.demonwav.mcdev.util.descriptor
 import com.intellij.codeInsight.completion.JavaLookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.editor.Editor
@@ -126,16 +127,24 @@ class FieldInjectionPoint : QualifiedInjectionPoint<PsiField>() {
         private val opcode: Int,
         private val arrayAccess: ArrayAccessType?,
     ) : NavigationVisitor() {
+        private var bytecodeOwner: String? = null
+
+        override fun configureBytecodeTarget(classNode: ClassNode, methodNode: MethodNode) {
+            bytecodeOwner = classNode.name
+        }
+
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression !is PsiMethodReferenceExpression) {
                 // early out for if the name does not match
                 val name = expression.referenceName
                 if (name == null || selector.canEverMatch(name)) {
                     (expression.resolve() as? PsiField)?.let { resolved ->
-                        var matches = selector.matchField(
-                            resolved,
-                            QualifiedMember.resolveQualifier(expression) ?: targetClass,
-                        )
+                        val qualifier = QualifiedMember.resolveQualifier(expression) ?: targetClass
+                        var matches = if (qualifier.qualifiedName == targetClass.qualifiedName && bytecodeOwner != null) {
+                            resolved.descriptor?.let { selector.matchField(bytecodeOwner!!, resolved.name, it) } == true
+                        } else {
+                            selector.matchField(resolved, qualifier)
+                        }
                         if (matches && opcode != -1) {
                             // check if we match the opcode
                             val isStatic = opcode == Opcodes.GETSTATIC || opcode == Opcodes.PUTSTATIC
