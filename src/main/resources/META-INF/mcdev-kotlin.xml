@@ -26,6 +26,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <!-- Plugin Verifier false positive, MP-7764 -->
         <supportsKotlinPluginMode supportsK2="true"/>
     </extensions>
 </idea-plugin>

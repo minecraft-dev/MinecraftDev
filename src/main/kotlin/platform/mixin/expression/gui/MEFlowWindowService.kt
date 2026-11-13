@@ -58,6 +58,7 @@ class MEFlowWindowService(private val project: Project, private val scope: Corou
         var toolWindow = toolWindowManager.getToolWindow(TOOL_WINDOW_ID)
 
         if (toolWindow == null) {
+            // override-only API usage IJPL-224900
             toolWindow = toolWindowManager.registerToolWindow(TOOL_WINDOW_ID) {
                 canCloseContent = true
                 anchor = ToolWindowAnchor.RIGHT

@@ -107,6 +107,7 @@ object PluginUpdater {
 
     private fun checkUpdatesInCustomRepo(host: String): PluginUpdateStatus {
         val plugins = try {
+            // internal API usage, IJPL-261587
             RepositoryHelper.loadPluginModels(host, null, null)
                 .map { it.getDescriptor() }
         } catch (_: IOException) {

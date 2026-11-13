@@ -69,6 +69,7 @@ fun NbtVirtualFile(backingFile: VirtualFile, project: Project): NbtVirtualFile {
     return NbtVirtualFile(backingFile, project, language, text, compressed, parseSuccessful)
 }
 
+// internal API usage, IJPL-163194
 class NbtVirtualFile(
     private val backingFile: VirtualFile,
     private val project: Project,

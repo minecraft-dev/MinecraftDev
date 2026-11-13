@@ -180,7 +180,6 @@ fun Row.jdkComboBoxWithPreference(
     // preselectJdkForNewModule -> setSelectedJdk -> combo renderer -> LocalFileSystem.findFileByPath
     // triggers a SlowOperations violation since the combo renderer does VFS I/O on the EDT.
     // This is entirely platform code we don't own, so allowSlowOperations is the only "solution".
-    @Suppress("UnstableApiUsage")
     SlowOperations.knownIssue("IDEA-364789").use {
         ProjectWizardUtil.preselectJdkForNewModule(project, lastUsedSdk, comboBox) { true }
     }
