@@ -330,6 +330,7 @@ class AnnotaterJavadocInlineEditor private constructor(
         editor.setBackgroundColor(
             ColorUtil.mix(host.colorsScheme.defaultBackground, host.colorsScheme.defaultForeground, 0.04),
         )
+        // Internal API usage, IJPL-5327
         DocRenderManager.setDocRenderingEnabled(editor, false)
     }
 

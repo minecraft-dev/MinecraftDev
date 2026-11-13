@@ -163,6 +163,7 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
                 editor.putUserData(Const.FOLDS_KEY, newFolds.takeIf { it.isNotEmpty() })
             }
 
+            // Internal API usage, IJPL-5327
             if (showJavadocs && DocRenderManager.isDocRenderingEnabled(editor)) {
                 DocRenderManager.setDocRenderingEnabled(editor, false)
                 editor.putUserData(Const.DOC_RENDERING_DISABLED_KEY, true)
