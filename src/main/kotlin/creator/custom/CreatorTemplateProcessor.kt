@@ -27,6 +27,7 @@ import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
 import com.demonwav.mcdev.creator.custom.types.CreatorPropertyFactory
 import com.demonwav.mcdev.creator.custom.types.ExternalCreatorProperty
+import com.demonwav.mcdev.platform.fabric.creator.FabricGradleWrapper
 import com.demonwav.mcdev.util.toTypedArray
 import com.demonwav.mcdev.util.virtualFileOrError
 import com.intellij.codeInsight.CodeInsightSettings
@@ -241,6 +242,7 @@ class CreatorTemplateProcessor(
         val finalizeAction = suspend {
             WriteAction.runAndWait<Throwable> {
                 LocalFileSystem.getInstance().refresh(false)
+                FabricGradleWrapper.writeIfFabricProject(projectPath)
                 // Apparently a module root is required for the reformat to work
                 setupTempRootModule(project, projectPath)
 
