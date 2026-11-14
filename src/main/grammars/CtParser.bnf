@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -82,6 +82,10 @@ aw_field_entry ::= access field_literal class_name member_name field_desc {
 itf_entry ::= INJECT_INTERFACE_ELEMENT class_name signature {
     mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtItfEntryImplMixin"
     implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtItfEntryMixin"
+    methods=[
+        interfaceSignature="/signature"
+        signature=""
+    ]
     pin = 1
 }
 
@@ -134,7 +138,13 @@ desc_element ::= OPEN_BRACKET* (PRIMITIVE | CLASS_VALUE) {
     ]
 }
 
-signature ::= CLASS_NAME_ELEMENT (LESS_THAN signature_element+ GREATER_THAN)?
+signature ::= CLASS_NAME_ELEMENT (LESS_THAN signature_element+ GREATER_THAN)? {
+    mixin="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl.CtSignatureImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtSignatureMixin"
+    methods=[
+        classNameElement="CLASS_NAME_ELEMENT"
+    ]
+}
 signature_element ::= OPEN_BRACKET* (PRIMITIVE | TYPE_VARIABLE | signature_class_element)
 signature_class_element ::= ASTERISK | ( (PLUS | MINUS)? SIGNATURE_CLASS_VALUE_START (LESS_THAN signature_element GREATER_THAN)? SIGNATURE_CLASS_VALUE_END )
 

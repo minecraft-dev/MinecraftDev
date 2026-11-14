@@ -23,4 +23,8 @@ package com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.impl
 import com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtItfEntryMixin
 import com.intellij.lang.ASTNode
 
-abstract class CtItfEntryImplMixin(node: ASTNode): CtEntryImplMixin(node), CtItfEntryMixin
+abstract class CtItfEntryImplMixin(node: ASTNode): CtEntryImplMixin(node), CtItfEntryMixin {
+
+    override val interfaceName: String?
+        get() = interfaceSignature?.className
+}

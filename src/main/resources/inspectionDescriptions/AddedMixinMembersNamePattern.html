@@ -33,5 +33,14 @@
 @Override public void doSomething() { ... }       // bad
 @Override public void myMod$doSomething() { ... } // good
 </code></pre>
+<p>
+    By default, methods implemented from interfaces in the current project are not reported in the following cases, each of
+    which can be disabled:
+</p>
+<ul>
+    <li>A parameter or return type of the method is a class from the current project, making a conflicting descriptor very unlikely.</li>
+    <li>The interface is injected with <code>transitive-inject-interface</code> in a class tweaker file, meaning it is intended to be used by other mods.</li>
+    <li>The interface is in a package matching the configured API package pattern.</li>
+</ul>
 </body>
 </html>

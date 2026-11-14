@@ -20,4 +20,10 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct.psi.mixins
 
-interface CtItfEntryMixin : CtEntryMixin
+import com.demonwav.mcdev.platform.minecraft.ct.gen.psi.CtSignature
+
+interface CtItfEntryMixin : CtEntryMixin {
+
+    val interfaceSignature: CtSignature?
+    val interfaceName: String?
+}

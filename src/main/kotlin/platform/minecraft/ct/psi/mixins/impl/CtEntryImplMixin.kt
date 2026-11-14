@@ -24,4 +24,8 @@ import com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtEntryMixin
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 
-abstract class CtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), CtEntryMixin
+abstract class CtEntryImplMixin(node: ASTNode) : ASTWrapperPsiElement(node), CtEntryMixin {
+
+    override val isTransitive: Boolean
+        get() = firstChild?.text?.startsWith("transitive-") == true
+}
