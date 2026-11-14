@@ -51,8 +51,6 @@ import com.siyeh.ig.psiutils.VariableNameGenerator
 import org.objectweb.asm.Type
 
 class WrapWithConditionValidNonVoidInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when @WrapWithCondition targets a non-void instruction followed by a pop"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             val handler = MixinAnnotationHandler.forMixinAnnotation(annotation, holder.project) as? WrapWithConditionHandler ?: return

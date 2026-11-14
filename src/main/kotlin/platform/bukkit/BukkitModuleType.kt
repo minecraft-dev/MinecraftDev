@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,6 @@ import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.bukkit.generation.BukkitEventGenerationPanel
 import com.demonwav.mcdev.platform.bukkit.util.BukkitConstants
 import com.demonwav.mcdev.util.CommonColors
-import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.psi.PsiClass
 
 object BukkitModuleType : AbstractModuleType<BukkitModule<BukkitModuleType>>("org.bukkit", "bukkit") {
@@ -50,6 +49,4 @@ object BukkitModuleType : AbstractModuleType<BukkitModule<BukkitModuleType>>("or
 
     override fun generateModule(facet: MinecraftFacet): BukkitModule<BukkitModuleType> = BukkitModule(facet, this)
     override fun getEventGenerationPanel(chosenClass: PsiClass) = BukkitEventGenerationPanel(chosenClass)
-
-    val API_TAG_VERSION = SemanticVersion.release(1, 13)
 }

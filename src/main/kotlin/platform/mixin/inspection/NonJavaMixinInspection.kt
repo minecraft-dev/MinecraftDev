@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -29,10 +29,6 @@ import com.intellij.lang.java.JavaLanguage
 import org.jetbrains.uast.UClass
 
 class NonJavaMixinInspection : AbstractBaseUastLocalInspectionTool(UClass::class.java) {
-    override fun getDisplayName() = "Mixin is not written in Java"
-    override fun getStaticDescription() =
-        "<html>Mixins should be written in Java. See <a href=\"$RELEVANT_ISSUE\">this Mixin issue</a></html>"
-
     override fun checkClass(
         aClass: UClass,
         manager: InspectionManager,
@@ -48,7 +44,7 @@ class NonJavaMixinInspection : AbstractBaseUastLocalInspectionTool(UClass::class
         }
         val problem = manager.createProblemDescriptor(
             aClass.uastAnchor?.sourcePsi ?: sourcePsi,
-            this.staticDescription,
+            "<html>Mixins should be written in Java. See <a href=\"$RELEVANT_ISSUE\">this Mixin issue</a></html>",
             isOnTheFly,
             null,
             ProblemHighlightType.GENERIC_ERROR_OR_WARNING

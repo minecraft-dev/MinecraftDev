@@ -48,9 +48,6 @@ import com.intellij.util.Processor
 
 class MixinCancellableInspection : MixinInspection() {
 
-    override fun getStaticDescription(): String =
-        "Reports missing or unused cancellable @Inject usages"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {

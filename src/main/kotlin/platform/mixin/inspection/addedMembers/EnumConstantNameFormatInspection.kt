@@ -57,8 +57,6 @@ class EnumConstantNameFormatInspection : AbstractAddedMembersInspection() {
     @JvmField
     var validNameFixReplace = "{MODID}_$0"
 
-    override fun getStaticDescription() = "Reports enum constants that are not properly prefixed by the mod id"
-
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
         if (field !is PsiEnumConstant) {
             return

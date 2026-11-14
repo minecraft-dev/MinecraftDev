@@ -1,0 +1,37 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports <code>@ModifyVariable</code> injectors relying on index or ordinal that may use a name instead
+</p>
+<!-- tooltip end -->
+<p>
+    The index and ordinal of a local variable change whenever local variables are added to or removed from the target method,
+    while its name usually stays the same. Names are also easier to understand. This is only reported where local variable names
+    are available at runtime.
+</p>
+<pre><code>
+@ModifyVariable(method = "foo", at = @At("STORE"), ordinal = 1)       // bad
+@ModifyVariable(method = "foo", at = @At("STORE"), name = "count")    // good
+</code></pre>
+</body>
+</html>

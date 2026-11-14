@@ -102,5 +102,4 @@ class InjectIntoConstructorInspection : MixinInspection() {
         }
     }
 
-    override fun getStaticDescription() = "@Inject into Constructor"
 }

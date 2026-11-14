@@ -22,7 +22,6 @@ package com.demonwav.mcdev.errorreporter
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.update.PluginUtil
-import com.intellij.diagnostic.LogMessage
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.idea.IdeaLogger
@@ -90,10 +89,7 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         event.message?.let { msg -> sentryEvent.message = Message().apply { message = msg} }
 
-        val data = event.data
-        if (data is LogMessage) {
-            sentryEvent.throwable = data.throwable
-        }
+        sentryEvent.throwable = event.throwable
 
         PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)?.let { plugin ->
             val (ideaVersion, coreVersion) = plugin.version.split('-', limit = 2)
@@ -128,8 +124,8 @@ class ErrorReporter : ErrorReportSubmitter() {
                 // only ever shows the global static API
                 val client = SentryClient(opts)
 
-                val hint = if (data is LogMessage && data.allAttachments.isNotEmpty()) {
-                    Hint.withAttachments(data.allAttachments.map { Attachment(it.bytes, it.name) })
+                val hint = if (event.attachments.isNotEmpty()) {
+                    Hint.withAttachments(event.attachments.map { Attachment(it.bytes, it.name) })
                 } else {
                     null
                 }

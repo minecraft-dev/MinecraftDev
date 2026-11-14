@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -31,9 +31,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.javadoc.PsiDocComment
 
 class OverwriteAuthorInspection : OverwriteInspection() {
-
-    override fun getStaticDescription() =
-        "For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag."
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val javadoc = method.docComment

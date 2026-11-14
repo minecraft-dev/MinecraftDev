@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.sponge.util
 
-import com.demonwav.mcdev.util.SemanticVersion
 import java.util.regex.Pattern
 
 object SpongeConstants {
@@ -44,7 +43,4 @@ object SpongeConstants {
     // Taken from https://github.com/SpongePowered/plugin-meta/blob/185f5c2/src/main/java/org/spongepowered/plugin/meta/PluginMetadata.java#L60
     private const val ID_PATTERN_STRING = "^[a-z][a-z0-9-_]{1,63}$"
     val ID_PATTERN: Pattern = Pattern.compile(ID_PATTERN_STRING)
-
-    val API8 = SemanticVersion.release(8)
-    val API9 = SemanticVersion.release(9)
 }

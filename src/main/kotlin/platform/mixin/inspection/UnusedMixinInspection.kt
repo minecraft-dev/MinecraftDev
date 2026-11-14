@@ -51,8 +51,6 @@ import com.intellij.psi.search.GlobalSearchScope
 
 class UnusedMixinInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Ensures that all Mixin classes are referenced from a Mixin configuration"
-
     override fun buildVisitor(holder: ProblemsHolder) = Visitor(holder)
 
     class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {

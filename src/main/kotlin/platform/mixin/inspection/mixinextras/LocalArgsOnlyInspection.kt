@@ -39,9 +39,6 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.util.parentOfType
 
 class LocalArgsOnlyInspection : MixinInspection() {
-    override fun getStaticDescription() =
-        "Checks that @Local has argsOnly if it targets arguments, which improves performance of the mixin"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = object : JavaElementVisitor() {
         override fun visitAnnotation(localAnnotation: PsiAnnotation) {
             if (!localAnnotation.hasQualifiedName(MixinConstants.MixinExtras.LOCAL)) {

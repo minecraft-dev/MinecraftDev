@@ -57,9 +57,6 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
 class InjectLocalCaptureReplaceWithLocalInspection : MixinInspection() {
-    override fun getStaticDescription() =
-        "Reports when @Inject local capture can be replaced with @Local, which is less brittle"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         val localClass = JavaPsiFacade.getInstance(holder.project)
             .findClass(MixinConstants.MixinExtras.LOCAL, GlobalSearchScope.allScope(holder.project))

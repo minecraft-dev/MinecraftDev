@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -35,10 +35,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiFile
 
 class SpongeLoggingInspection : AbstractBaseJavaLocalInspectionTool() {
-
-    override fun getStaticDescription() =
-        "Sponge provides a ${Constants.SLF4J_LOGGER} logger implementation using @Inject in your plugin class. " +
-            "You should not use ${Constants.JAVA_UTIL_LOGGER} in your plugin."
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return if (SpongeModuleType.isInModule(holder.file)) {

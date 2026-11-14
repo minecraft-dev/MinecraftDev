@@ -49,9 +49,6 @@ import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
 
 class InvokeAssignReplaceWithExpressionInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when INVOKE_ASSIGN could be replaced with a MixinExtras expression. " +
-        "Expressions are preferred over INVOKE_ASSIGN because they fail when an assignment doesn't exist."
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         val hasExpressions = JavaPsiFacade.getInstance(holder.project).findClass(
             MixinConstants.MixinExtras.EXPRESSION,

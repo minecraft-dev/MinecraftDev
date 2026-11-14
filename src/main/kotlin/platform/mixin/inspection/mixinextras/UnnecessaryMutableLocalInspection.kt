@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -50,8 +50,6 @@ import com.intellij.util.Processor
 import com.siyeh.ig.psiutils.MethodCallUtils
 
 class UnnecessaryMutableLocalInspection : MixinInspection() {
-    override fun getStaticDescription() = "Unnecessary mutable reference to captured local"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitMethod(method: PsiMethod) {
             val project = method.project

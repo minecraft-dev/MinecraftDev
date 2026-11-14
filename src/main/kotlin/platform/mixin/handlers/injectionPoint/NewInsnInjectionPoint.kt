@@ -113,8 +113,10 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
         val methodInsn = Util.findInitCall(newInsn) ?: return null
         when (val target = result.target) {
             is PsiClass -> {
+                val shortName = target.shortName ?: return null
                 return JavaLookupElementBuilder.forClass(target, target.internalName)
-                    .withPresentableText(target.shortName ?: return null)
+                    .withPresentableText(shortName)
+                    .withLookupString(shortName)
             }
             is PsiMethod -> {
                 val ownerName = methodInsn.owner.substringAfterLast('/').replace('$', '.')
@@ -128,6 +130,8 @@ class NewInsnInjectionPoint : InjectionPoint<PsiMember>() {
                     .setBoldIfInClass(target, targetClass)
                     .withPresentableText(ownerName + "." + target.internalName)
                     .withLookupString(target.internalName)
+                    .withLookupString(ownerName)
+                    .withLookupString(ownerName.substringAfterLast('.'))
             }
             else -> return null
         }

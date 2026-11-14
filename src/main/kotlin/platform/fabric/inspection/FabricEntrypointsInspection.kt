@@ -45,8 +45,6 @@ import com.intellij.psi.util.parentOfType
 
 class FabricEntrypointsInspection : LocalInspectionTool() {
 
-    override fun getStaticDescription() = "Validates entrypoints declared in Fabric mod JSON files."
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         if (holder.file.name == FabricConstants.FABRIC_MOD_JSON) {
             return Visitor(holder)

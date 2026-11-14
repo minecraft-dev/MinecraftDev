@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -68,14 +68,5 @@ class DuplicateAwEntryInspection : LocalInspectionTool() {
 
     override fun runForWholeFile(): Boolean {
         return true
-    }
-
-    override fun getDisplayName(): String {
-        return "Duplicate AW entry"
-    }
-
-    override fun getStaticDescription(): String {
-        return "Warns when the same element has its accessibility, mutability, " +
-            "or extensibility changed multiple times in one file."
     }
 }

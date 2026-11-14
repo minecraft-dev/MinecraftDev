@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -44,8 +44,6 @@ import com.intellij.psi.util.PsiUtil
 import org.objectweb.asm.Type
 
 class OverwriteModifiersInspection : OverwriteInspection() {
-
-    override fun getStaticDescription() = "Validates the modifiers of @Overwrite methods"
 
     override fun visitOverwrite(holder: ProblemsHolder, method: PsiMethod, overwrite: PsiAnnotation) {
         val overwriteAnnotation = method.getAnnotation(OVERWRITE) ?: return

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -49,8 +49,6 @@ import com.intellij.psi.util.PsiUtil.ACCESS_LEVEL_PROTECTED
 import org.objectweb.asm.Opcodes
 
 class ShadowModifiersInspection : MixinInspection() {
-
-    override fun getStaticDescription() = "Validates access modifiers of @Shadow members"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

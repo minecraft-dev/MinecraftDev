@@ -63,6 +63,6 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
         mixinEntryPoint = selected
     }
 
-    override fun readExternal(element: Element) = XmlSerializer.serializeInto(this, element)
+    override fun readExternal(element: Element) = XmlSerializer.deserializeInto(this, element)
     override fun writeExternal(element: Element) = XmlSerializer.serializeInto(this, element)
 }

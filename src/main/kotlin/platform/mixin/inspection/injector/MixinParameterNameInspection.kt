@@ -55,8 +55,6 @@ class MixinParameterNameInspection : MixinInspection() {
     @JvmField
     var reportForLocal = true
 
-    override fun getStaticDescription() = "Reports when a parameter name in a Mixin does not match the target class"
-
     override fun getOptionsPane() = OptPane.pane(
         OptPane.checkbox("reportForMainSignature", "Report for main signature"),
         OptPane.checkbox("reportForLocal", "Report for @Local parameters")

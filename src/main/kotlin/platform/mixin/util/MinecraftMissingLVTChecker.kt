@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -24,15 +24,16 @@ import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.mcVersion
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiElement
+import com.intellij.util.ThreeState
 
 class MinecraftMissingLVTChecker : MissingLVTChecker {
-    override fun hasMissingLVT(context: PsiElement, className: String): Boolean {
+    override fun hasMissingLVT(context: PsiElement, className: String): ThreeState {
         return when {
-            Registry.`is`("mcdev.unobfuscated.minecraft") -> false
-            !className.startsWith("net.minecraft.") && !className.startsWith("com.mojang.blaze3d.") -> false
+            Registry.`is`("mcdev.unobfuscated.minecraft") -> ThreeState.NO
+            !className.startsWith("net.minecraft.") && !className.startsWith("com.mojang.blaze3d.") -> ThreeState.NO
             else -> {
-                val mcVersion = context.mcVersion
-                mcVersion != null && mcVersion <= MinecraftVersions.MC1_21_11
+                val mcVersion = context.mcVersion ?: return ThreeState.UNSURE
+                ThreeState.fromBoolean(mcVersion <= MinecraftVersions.MC1_21_11)
             }
         }
     }

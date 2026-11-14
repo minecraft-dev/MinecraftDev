@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -30,8 +30,6 @@ import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class DeprecatedTranslationInspection : TranslationInspection() {
-    override fun getStaticDescription() = "Detects usage of translations that are removed or renamed in deprecated.json"
-
     private val typesHint: Array<Class<out UElement>> = arrayOf(UExpression::class.java)
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor =

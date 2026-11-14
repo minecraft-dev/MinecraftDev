@@ -59,8 +59,8 @@ class MinecraftModuleSettings : PersistentStateComponent<MinecraftModuleSettings
 
             // Attempt to find settings on the parent module
             val manager = ModuleManager.getInstance(module.project)
-            val path = manager.getModuleGroupPath(module) ?: return settings
-            val parent = manager.findModuleByName(path.last()) ?: return settings
+            val path = manager.getModuleGrouper(null).getGroupPath(module).ifEmpty { return settings }
+            val parent = manager.findModuleByName(path.joinToString(".")) ?: return settings
 
             val newSettings = parent.getService(MinecraftModuleSettings::class.java) as MinecraftModuleSettings
             if (newSettings.getState().minecraftVersion == null) {

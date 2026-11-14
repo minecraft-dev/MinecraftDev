@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,8 +33,6 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiFile
 
 class UnresolvedReferenceInspection : LocalInspectionTool() {
-
-    override fun getStaticDescription() = "Reports unresolved references in Fabric mod JSON files."
 
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         if (holder.file.name == FabricConstants.FABRIC_MOD_JSON) {

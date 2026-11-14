@@ -1,0 +1,37 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports translation keys that don't have a translation.
+</p>
+<!-- tooltip end -->
+<p>
+    If a translation key doesn't exist, Minecraft displays the key itself instead of a translated text. This is usually caused by
+    a typo in the key, or a translation missing from the language file.
+</p>
+<pre><code>
+// en_us.json: { "my_mod.greeting": "Hello!" }
+Component.translatable("my_mod.greting") // bad
+Component.translatable("my_mod.greeting") // good
+</code></pre>
+</body>
+</html>

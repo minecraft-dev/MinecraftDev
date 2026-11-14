@@ -1,0 +1,48 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports when <code>@WrapWithCondition</code> targets a non-void instruction followed by a pop
+</p>
+<!-- tooltip end -->
+<p>
+    When the condition is false, <code>@WrapWithCondition</code> skips the call, so the call has no return value. This only works
+    because the return value is discarded, and breaks if the target method is changed to use it, including by another Mixin.
+    Use <code>@WrapOperation</code> instead, which can provide a return value.
+</p>
+<pre><code>
+// target: list.add(item);
+
+// bad
+@WrapWithCondition(method = "foo", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+private boolean shouldAdd(List&lt;Item&gt; list, Item item) {
+    return item != null;
+}
+
+// good
+@WrapOperation(method = "foo", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+private boolean add(List&lt;Item&gt; list, Item item, Operation&lt;Boolean&gt; original) {
+    return item != null &amp;&amp; original.call(list, item);
+}
+</code></pre>
+</body>
+</html>

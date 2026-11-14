@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -41,8 +41,6 @@ import org.jetbrains.uast.UReferenceExpression
 import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class SuperfluousFormatInspection : TranslationInspection() {
-    override fun getStaticDescription() = "Detect superfluous format arguments for translations"
-
     private val typesHint: Array<Class<out UElement>> =
         arrayOf(UReferenceExpression::class.java, ULiteralExpression::class.java)
 

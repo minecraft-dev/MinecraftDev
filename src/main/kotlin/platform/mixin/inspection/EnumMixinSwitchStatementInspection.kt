@@ -39,8 +39,6 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.util.PsiTypesUtil
 
 class EnumMixinSwitchStatementInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when a switch statement or expression is used on an enum mixin"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitSwitchStatement(statement: PsiSwitchStatement) {
             visitSwitchBlock(statement)

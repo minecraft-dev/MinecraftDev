@@ -1,0 +1,46 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports added members not matching the correct name format
+</p>
+<!-- tooltip end -->
+<p>
+    Members added by mixins share the target class with members added by every other mod. Prefixing their names with the mod id
+    avoids conflicts between mods that add members with the same name. The required pattern and which members are reported can
+    be configured. This should be done when <code>@Unique</code> can't be used.
+</p>
+<pre><code>
+@Override public void doSomething() { ... }       // bad
+@Override public void myMod$doSomething() { ... } // good
+</code></pre>
+<p>
+    By default, methods implemented from interfaces in the current project are not reported in the following cases, each of
+    which can be disabled:
+</p>
+<ul>
+    <li>A parameter or return type of the method is a class from the current project, making a conflicting descriptor very unlikely.</li>
+    <li>The interface is injected with <code>transitive-inject-interface</code> in a class tweaker file, meaning it is intended to be used by other mods.</li>
+    <li>The interface is in a package matching the configured API package pattern.</li>
+</ul>
+</body>
+</html>

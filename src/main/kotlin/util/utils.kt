@@ -39,7 +39,6 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Condition
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.ThrowableComputable
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.profile.codeInspection.InspectionProfileManager
 import com.intellij.psi.PsiDocumentManager
@@ -52,7 +51,6 @@ import java.util.regex.PatternSyntaxException
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.math.min
-import kotlin.reflect.KClass
 import org.intellij.lang.annotations.Language
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.concurrency.Promise
@@ -68,27 +66,6 @@ fun runWriteTaskLater(func: () -> Unit) {
     invokeLater {
         ApplicationManager.getApplication().runWriteAction(func)
     }
-}
-
-inline fun Project.runWriteTaskInSmartMode(crossinline func: () -> Unit) {
-    val dumbService = DumbService.getInstance(this)
-    lateinit var runnable: Runnable
-    runnable = Runnable {
-        if (isDisposed) {
-            throw ProcessCanceledException()
-        }
-        runWriteTask {
-            if (isDisposed) {
-                throw ProcessCanceledException()
-            }
-            if (dumbService.isDumb) {
-                dumbService.runWhenSmart(runnable)
-            } else {
-                func()
-            }
-        }
-    }
-    dumbService.runWhenSmart(runnable)
 }
 
 fun <T> invokeAndWait(func: () -> T): T {
@@ -238,7 +215,6 @@ inline fun <T> Iterable<T>.firstIndexOrNull(predicate: (T) -> Boolean): Int? {
 // Using the ugly TypeToken approach we can use any complex generic signature, including
 // nested generics
 inline fun <reified T : Any> Gson.fromJson(text: String): T = fromJson(text, object : TypeToken<T>() {}.type)
-fun <T : Any> Gson.fromJson(text: String, type: KClass<T>): T = fromJson(text, type.java)
 
 /**
  * Splits a string into the longest prefix matching a predicate and the corresponding suffix *not* matching.
@@ -297,33 +273,6 @@ fun String.toJavaIdentifier(allowDollars: Boolean = true): String {
             }
         }
         .joinToString("")
-}
-
-fun String.toJavaClassName() = StringUtil.capitalizeWords(this, true)
-    .replace(" ", "").toJavaIdentifier(allowDollars = false)
-
-fun String.toPackageName(): String {
-    if (this.isEmpty()) {
-        return "_"
-    }
-
-    val firstChar = this.first().let {
-        if (it.isJavaIdentifierStart()) {
-            "$it"
-        } else {
-            ""
-        }
-    }
-    val packageName = firstChar + this.asSequence()
-        .drop(1)
-        .filter { it.isJavaIdentifierPart() || it == '.' }
-        .joinToString("")
-
-    return if (packageName.isEmpty()) {
-        "_"
-    } else {
-        packageName.lowercase(Locale.ENGLISH)
-    }
 }
 
 inline fun <reified T> Iterable<*>.firstOfType(): T? {
@@ -393,9 +342,6 @@ inline fun <T> Result<T>.getOrLogException(log: (Throwable) -> Unit): T? {
         log(e)
     }.getOrNull()
 }
-
-fun <T : Throwable> withSuppressed(original: T?, other: T): T =
-    original?.apply { addSuppressed(other) } ?: other
 
 fun <S : CharSequence, R> S.ifNotBlank(block: (S) -> R): R? {
     if (this.isNotBlank()) {

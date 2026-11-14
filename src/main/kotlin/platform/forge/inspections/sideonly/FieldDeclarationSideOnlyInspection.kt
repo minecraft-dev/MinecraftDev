@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,23 +26,12 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class FieldDeclarationSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of @SideOnly in field declaration"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
-    }
-
-    override fun getStaticDescription(): String {
-        return "A field in a class annotated for one side cannot be declared as being in the other side. " +
-            "For example, a class which is annotated as @SideOnly(Side.SERVER) cannot contain a field which is " +
-            "annotated as @SideOnly(Side.CLIENT). Since a class that is annotated with @SideOnly brings " +
-            "everything with it, @SideOnly annotated fields are usually useless"
     }
 
     override fun buildFix(vararg infos: Any): LocalQuickFix? {

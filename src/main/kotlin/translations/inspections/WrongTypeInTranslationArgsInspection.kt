@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,8 +57,6 @@ import org.jetbrains.uast.util.isMethodCall
 import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class WrongTypeInTranslationArgsInspection : TranslationInspection() {
-    override fun getStaticDescription() = "Detect wrong argument types in translation arguments"
-
     private val typesHint: Array<Class<out UElement>> =
         arrayOf(UReferenceExpression::class.java, ULiteralExpression::class.java)
 

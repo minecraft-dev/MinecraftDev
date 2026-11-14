@@ -79,8 +79,6 @@ import org.objectweb.asm.Opcodes
 
 class InvalidInjectorMethodSignatureInspection : MixinInspection() {
 
-    override fun getStaticDescription() = "Reports problems related to the method signature of Mixin injectors"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {

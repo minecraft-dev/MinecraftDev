@@ -53,6 +53,7 @@ class SourceCodeLocationInfo(val index: Int, val lineNumber: Int?, val indexInLi
             private var currentLine: Int? = null
             private var countThisLine = 0
             private var myResult: T? = null
+            private var indexedResult: T? = null
 
             override fun accept(t: T): Boolean {
                 val line = document?.let(t::lineNumber)
@@ -70,6 +71,7 @@ class SourceCodeLocationInfo(val index: Int, val lineNumber: Int?, val indexInLi
                 }
 
                 if (count++ == index) {
+                    indexedResult = t
                     if (lineNumber == null) {
                         myResult = t
                         return true
@@ -79,7 +81,7 @@ class SourceCodeLocationInfo(val index: Int, val lineNumber: Int?, val indexInLi
                 return false
             }
 
-            override val result get() = myResult
+            override val result get() = myResult ?: indexedResult
         }
     }
 }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,21 +27,13 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiLocalVariable
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of local variable declaration annotated with @SideOnly"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
-
-    override fun getStaticDescription() =
-        "A variable whose class declaration is annotated with @SideOnly for one side cannot be declared in a class" +
-            " or method that does not match the same side."
 
     override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[3] as PsiAnnotation

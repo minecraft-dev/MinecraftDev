@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -48,11 +48,6 @@ import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.getContainingUClass
 
 class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
-
-    override fun getDisplayName() = "Parameter's type is not assignable to its @Getter method return type"
-
-    override fun getStaticDescription() =
-        "@Getter requires the parameter's type to be assignable from the annotation's target method return type"
 
     override fun checkMethod(
         method: UMethod,
@@ -111,7 +106,7 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
             val fixes = this.createFixes(methodJava, getterReturnType, i, manager.project)
             problems += manager.createProblemDescriptor(
                 location,
-                this.staticDescription,
+                "@Getter requires the parameter's type to be assignable from the annotation's target method return type",
                 isOnTheFly,
                 fixes,
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,

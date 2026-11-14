@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -43,8 +43,6 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.util.PsiTreeUtil
 
 class WrongOperationParametersInspection : MixinInspection() {
-    override fun getStaticDescription() = "Operation.call called with the wrong parameter types"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
             if (expression.methodExpression.referenceName != "call") {

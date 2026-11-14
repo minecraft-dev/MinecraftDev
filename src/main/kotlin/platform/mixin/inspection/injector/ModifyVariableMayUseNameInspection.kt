@@ -48,8 +48,6 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
     @JvmField
     var ignoreForImplicitLocals = false
 
-    override fun getStaticDescription() = "Reports @ModifyVariable injectors relying on index or ordinal that may use a name instead"
-
     override fun getOptionsPane() = OptPane.pane(
         OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals")
     )

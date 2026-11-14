@@ -57,7 +57,7 @@ open class PaperVersionCreatorProperty(
             paperVersions?.let { return it }
 
             val client = HttpClient()
-            val response = client.get("https://fill.papermc.io/v3/projects/paper", block = {
+            val response = client.request("https://fill.papermc.io/v3/projects/paper", block = {
                 this.header("User-Agent", "minecraft-dev/${PluginUtil.pluginVersion} (https://github.com/minecraft-dev/MinecraftDev)")
             })
             if (response.status.isSuccess()) {

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -39,25 +39,16 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class StackEmptyInspection : BaseInspection() {
     companion object {
         const val STACK_FQ_NAME = "net.minecraft.world.item.ItemStack"
     }
 
-    @Nls
-    override fun getDisplayName() = "ItemStack comparison through ItemStack.EMPTY"
-
     override fun buildErrorString(vararg infos: Any): String {
         val compareExpression = infos[0] as PsiExpression
         return "\"${compareExpression.text}\" compared with ItemStack.EMPTY"
     }
-
-    override fun getStaticDescription() =
-        "Comparing an ItemStack to ItemStack.EMPTY to query stack emptiness can cause unwanted issues." +
-            "When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but" +
-            " the stack should still be considered empty. Instead, isEmpty() should be called."
 
     override fun buildFix(vararg infos: Any): LocalQuickFix {
         val compareExpressionPointer = (infos[0] as PsiExpression).createSmartPointer()

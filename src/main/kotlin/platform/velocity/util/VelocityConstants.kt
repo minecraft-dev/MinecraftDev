@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.platform.velocity.util
 
-import com.demonwav.mcdev.util.SemanticVersion
 
 object VelocityConstants {
 
@@ -28,8 +27,4 @@ object VelocityConstants {
     const val SUBSCRIBE_ANNOTATION = "com.velocitypowered.api.event.Subscribe"
     const val POST_ORDER = "com.velocitypowered.api.event.PostOrder"
     const val KYORI_TEXT_COLOR = "net.kyori.text.format.TextColor"
-
-    val API_2 = SemanticVersion.release(2)
-    val API_3 = SemanticVersion.release(3)
-    val API_4 = SemanticVersion.release(4)
 }

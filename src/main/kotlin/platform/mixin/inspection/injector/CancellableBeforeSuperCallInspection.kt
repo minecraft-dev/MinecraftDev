@@ -34,8 +34,6 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElementVisitor
 
 class CancellableBeforeSuperCallInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when cancellable @Injects are used before a superconstructor call"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {

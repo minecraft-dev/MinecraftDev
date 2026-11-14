@@ -1,0 +1,42 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports when the class passed to a synched entity data definition is not the same as the containing entity class.
+</p>
+<!-- tooltip end -->
+<p>
+    Synched entity data is numbered per entity class, based on how many parameters that class and its superclasses define.
+    Defining a data accessor with a different class can give it an ID that conflicts with another accessor, which breaks entity data
+    syncing.
+</p>
+<pre><code>
+public class MyEntity extends Entity {
+    // bad
+    private static final EntityDataAccessor&lt;Integer&gt; DATA = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
+
+    // good
+    private static final EntityDataAccessor&lt;Integer&gt; DATA = SynchedEntityData.defineId(MyEntity.class, EntityDataSerializers.INT);
+}
+</code></pre>
+</body>
+</html>

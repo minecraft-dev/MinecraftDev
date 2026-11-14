@@ -57,9 +57,6 @@ class UnusedLocalCaptureInspection : MixinInspection() {
         }
     }
 
-    override fun getStaticDescription() =
-        "Reports when an @Inject local capture is unused"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.Annotations.INJECT)) {

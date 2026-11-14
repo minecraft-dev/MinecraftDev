@@ -1,0 +1,42 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    <code>Operation.call</code> called with the wrong parameter types
+</p>
+<!-- tooltip end -->
+<p>
+    <code>Operation.call</code> accepts any arguments at compile time, but at runtime they must match the parameters of the
+    wrapped operation: the receiver, if any, followed by the arguments of the original call. Otherwise the call fails with an
+    exception.
+</p>
+<pre><code>
+// target: this.setHealth(health);
+
+@WrapOperation(method = "foo", at = @At(value = "INVOKE", target = "..."))
+private void wrapSetHealth(Entity entity, float health, Operation&lt;Void&gt; original) {
+    original.call(health);         // bad
+    original.call(entity, health); // good
+}
+</code></pre>
+</body>
+</html>

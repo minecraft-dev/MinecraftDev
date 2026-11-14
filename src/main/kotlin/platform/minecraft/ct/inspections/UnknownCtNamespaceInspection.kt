@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -30,9 +30,6 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 
 class UnknownCtNamespaceInspection : LocalInspectionTool() {
-    override fun getDisplayName() = "Unknown CT namespace"
-    override fun getStaticDescription() = "Reports an unknown namespace in a ClassTweaker header"
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = object : CtVisitor() {
         override fun visitHeaderMixin(header: CtHeaderMixin) {
             val namespace = header.namespaceString ?: return

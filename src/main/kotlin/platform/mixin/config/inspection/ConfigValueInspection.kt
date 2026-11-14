@@ -51,8 +51,6 @@ import com.intellij.psi.util.PsiUtil
 
 class ConfigValueInspection : MixinConfigInspection() {
 
-    override fun getStaticDescription() = "Reports invalid values in Mixin configuration files."
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 
     private class Visitor(private val holder: ProblemsHolder) : JsonElementVisitor() {

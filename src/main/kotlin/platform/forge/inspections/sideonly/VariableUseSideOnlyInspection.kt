@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,21 +25,13 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.impl.source.PsiFieldImpl
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class VariableUseSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of variable annotated with @SideOnly"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
-
-    override fun getStaticDescription() =
-        "Variables which are declared with a @SideOnly annotation can only be used " +
-            "in matching @SideOnly classes and methods."
 
     override fun buildVisitor(): BaseInspectionVisitor {
         return object : BaseInspectionVisitor() {

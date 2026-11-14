@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,8 +36,6 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiType
 
 class ConflictingShareTypeInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when two @Shares of the same variable have different types"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.MixinExtras.SHARE)) {
