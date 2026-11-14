@@ -49,8 +49,6 @@ import org.jetbrains.uast.getContainingUClass
 
 class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
 
-    override fun getDisplayName() = "Parameter's type is not assignable to its @Getter method return type"
-
     override fun checkMethod(
         method: UMethod,
         manager: InspectionManager,

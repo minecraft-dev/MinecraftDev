@@ -69,9 +69,4 @@ class DuplicateAwEntryInspection : LocalInspectionTool() {
     override fun runForWholeFile(): Boolean {
         return true
     }
-
-    override fun getDisplayName(): String {
-        return "Duplicate AW entry"
-    }
-
 }

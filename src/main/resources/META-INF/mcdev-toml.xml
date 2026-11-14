@@ -26,8 +26,9 @@
                                     implementationClass="com.demonwav.mcdev.toml.platform.forge.ModsTomlDocumentationProvider"/>
         <psi.referenceContributor language="TOML"
                                   implementation="com.demonwav.mcdev.toml.platform.forge.reference.ModsTomlReferenceContributor"/>
-        <localInspection displayName="Forge's mods.toml validation"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.mods_toml_validation.name"
+                         groupKey="inspection.group.minecraft_forge"
+                         bundle="messages.MinecraftDevelopment"
                          language="TOML"
                          enabledByDefault="true"
                          level="ERROR"

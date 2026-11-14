@@ -286,10 +286,10 @@
         <postStartupActivity implementation="com.demonwav.mcdev.creator.custom.TemplateProjectFinalizerActivity"/>
         <facetType implementation="com.demonwav.mcdev.facet.MinecraftFacetType"/>
         <postStartupActivity implementation="com.demonwav.mcdev.facet.MinecraftFacetDetector"/>
-        <notificationGroup id="Minecraft project creator" displayType="STICKY_BALLOON"/>
-        <notificationGroup id="Minecraft facet" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Minecraft project creator" key="notification.group.minecraft_project_creator" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Minecraft facet" key="notification.group.minecraft_facet" displayType="STICKY_BALLOON"/>
         <postStartupActivity implementation="com.demonwav.mcdev.update.OutdatedIdeChecker"/>
-        <notificationGroup id="Minecraft Development updates" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Minecraft Development updates" key="notification.group.minecraft_development_updates" displayType="STICKY_BALLOON"/>
 
         <!-- File templates are for project creations -->
         <fileTemplateGroup implementation="com.demonwav.mcdev.util.MinecraftTemplates"/>
@@ -317,15 +317,15 @@
         <deadCode implementation="com.demonwav.mcdev.inspection.PlatformAnnotationEntryPoint"/>
 
         <!-- Application Configurable provides the Minecraft settings page -->
-        <applicationConfigurable displayName="Minecraft Development"
+        <applicationConfigurable key="minecraft.settings.display_name"
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
-        <projectConfigurable displayName="Project-Specific Settings"
+        <projectConfigurable key="minecraft.settings.project.display_name"
                              id="Settings.Minecraft.Project"
                              parentId="Settings.Minecraft"
                              instance="com.demonwav.mcdev.MinecraftProjectConfigurable"/>
-        <projectConfigurable displayName="Language Template"
+        <projectConfigurable key="minecraft.settings.lang_template.display_name"
                              id="Settings.Minecraft.TranslationTemplate"
                              parentId="Settings.Minecraft"
                              instance="com.demonwav.mcdev.translations.sorting.TranslationTemplateConfigurable"/>
@@ -336,8 +336,8 @@
         <fileTypeDetector implementation="com.demonwav.mcdev.nbt.filetype.NbtFileTypeDetector"/>
         <fileEditorProvider implementation="com.demonwav.mcdev.nbt.editor.NbtFileEditorProvider"/>
 
-        <notificationGroup id="NBT Save Error" displayType="STICKY_BALLOON"/>
-        <notificationGroup id="NBT Save Success" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="NBT Save Error" key="notification.group.nbt_save_error" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="NBT Save Success" key="notification.group.nbt_save_success" displayType="STICKY_BALLOON"/>
 
         <!-- Text representation of NBT -->
         <fileType name="NBTT" language="NBTT" implementationClass="com.demonwav.mcdev.nbt.lang.NbttFileType"
@@ -397,8 +397,8 @@
         <renameInputValidator implementation="com.demonwav.mcdev.translations.lang.LangRenameInputValidator"/>
         <editorNotificationProvider
             implementation="com.demonwav.mcdev.translations.TranslationEditorNotificationProvider"/>
-        <notificationGroup id="Translations sorting error" displayType="STICKY_BALLOON"/>
-        <notificationGroup id="Translation support error" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Translations sorting error" key="notification.group.translations_sorting_error" displayType="STICKY_BALLOON"/>
+        <notificationGroup id="Translation support error" key="notification.group.translation_support_error" displayType="STICKY_BALLOON"/>
         <elementDescriptionProvider
             implementation="com.demonwav.mcdev.translations.reference.TranslationDescriptionProvider"/>
         <referencesSearch implementation="com.demonwav.mcdev.translations.reference.TranslationReferenceSearch"/>
@@ -409,7 +409,7 @@
         <intentionAction>
             <language>UAST</language>
             <className>com.demonwav.mcdev.translations.intentions.ConvertToTranslationIntention</className>
-            <category>Minecraft</category>
+            <categoryKey>intention.category.minecraft</categoryKey>
             <descriptionDirectoryName>convertToTranslation</descriptionDirectoryName>
         </intentionAction>
         <codeFoldingOptionsProvider instance="com.demonwav.mcdev.translations.TranslationCodeFoldingOptionsProvider"/>
@@ -779,44 +779,44 @@
         <!---->
 
         <!--region NO PLATFORM INSPECTIONS-->
-        <localInspection displayName="Useless event is cancelled check"
-                         groupName="Minecraft"
+        <localInspection key="inspection.is_cancelled.name"
+                         groupKey="inspection.group.minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.inspection.IsCancelledInspection"/>
-        <localInspection displayName="Missing translations"
-                         groupName="Minecraft"
+        <localInspection key="inspection.no_translation.name"
+                         groupKey="inspection.group.minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.translations.inspections.NoTranslationInspection"/>
-        <localInspection displayName="Missing format arguments"
-                         groupName="Minecraft"
+        <localInspection key="inspection.missing_format.name"
+                         groupKey="inspection.group.minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.translations.inspections.MissingFormatInspection"/>
-        <localInspection displayName="Superfluous format arguments"
-                         groupName="Minecraft"
+        <localInspection key="inspection.superfluous_format.name"
+                         groupKey="inspection.group.minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.translations.inspections.SuperfluousFormatInspection"/>
-        <localInspection displayName="Wrong translation argument types"
-                         groupName="Minecraft"
+        <localInspection key="inspection.wrong_type_in_translation_args.name"
+                         groupKey="inspection.group.minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.translations.inspections.WrongTypeInTranslationArgsInspection"/>
-        <localInspection displayName="Usage of deprecated translation"
-                         groupName="Minecraft"
+        <localInspection key="inspection.deprecated_translation.name"
+                         groupKey="inspection.group.minecraft"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.translations.inspections.DeprecatedTranslationInspection"/>
-        <localInspection displayName="Entity class does not match this entity class"
-                         groupName="Minecraft"
+        <localInspection key="inspection.wrong_entity_data_parameter_class.name"
+                         groupKey="inspection.group.minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -824,8 +824,8 @@
         <!--endregion-->
 
         <!--region BUKKIT INSPECTIONS-->
-        <localInspection displayName="Bukkit @EventHandler in class not implementing Listener"
-                         groupName="Bukkit"
+        <localInspection key="inspection.bukkit_listener_implemented.name"
+                         groupKey="inspection.group.bukkit"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -833,34 +833,34 @@
         <!--endregion-->
 
         <!--region SPONGE INSPECTIONS-->
-        <localInspection displayName="Wrong Sponge logger implementation"
-                         groupName="Sponge"
+        <localInspection key="inspection.sponge_logging.name"
+                         groupKey="inspection.group.sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeLoggingInspection"/>
 
-        <localInspection displayName="@Getter targeted method does not exist"
-                         groupName="Sponge"
+        <localInspection key="inspection.sponge_invalid_getter_target.name"
+                         groupKey="inspection.group.sponge"
                          language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInvalidGetterTargetInspection"/>
-        <localInspection displayName="Parameter's type is not assignable to its @Getter method return type"
-                         groupName="Sponge"
+        <localInspection key="inspection.sponge_wrong_getter_type.name"
+                         groupKey="inspection.group.sponge"
                          language="UAST"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeWrongGetterTypeInspection"/>
 
-        <localInspection displayName="Invalid @Inject usage in Sponge plugin class"
-                         groupName="Sponge"
+        <localInspection key="inspection.sponge_injection.name"
+                         groupKey="inspection.group.sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.sponge.inspection.SpongeInjectionInspection"/>
-        <localInspection displayName="Sponge plugin class validity"
-                         groupName="Sponge"
+        <localInspection key="inspection.sponge_plugin_class.name"
+                         groupKey="inspection.group.sponge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -868,51 +868,51 @@
         <!--endregion-->
 
         <!--region FORGE INSPECTIONS-->
-        <localInspection displayName="Invalid usage of @SideOnly in nested class declaration"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.nested_class_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NestedClassSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of @SideOnly in field declaration"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.field_declaration_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.FieldDeclarationSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of @SideOnly in method declaration"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.method_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of variable annotated with @SideOnly"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.variable_use_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.VariableUseSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of method annotated with @SideOnly"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.method_call_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.MethodCallSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of new object annotated with @SideOnly"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.new_expression_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.NewExpressionSideOnlyInspection"/>
-        <localInspection displayName="Invalid usage of local variable declaration annotated with @SideOnly"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.local_variable_declaration_side_only.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.forge.inspections.sideonly.LocalVariableDeclarationSideOnlyInspection"/>
 
-        <localInspection displayName="IMessage or IMessageHandler implementation without empty constructor"
-                         groupName="MinecraftForge"
+        <localInspection key="inspection.missing_message_constructor.name"
+                         groupKey="inspection.group.minecraft_forge"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -920,16 +920,16 @@
         <!--endregion-->
 
         <!--region FABRIC INSPECTIONS-->
-        <localInspection displayName="Unresolved Fabric mod JSON reference"
+        <localInspection key="inspection.unresolved_fabric_mod_json_reference.name"
                          shortName="UnresolvedFabricModJsonReference"
-                         groupName="Fabric"
+                         groupKey="inspection.group.fabric"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.UnresolvedReferenceInspection"/>
-        <localInspection displayName="Fabric mod JSON entrypoints validation"
+        <localInspection key="inspection.fabric_mod_json_entrypoints_validation.name"
                          shortName="FabricModJsonEntrypointsValidation"
-                         groupName="Fabric"
+                         groupKey="inspection.group.fabric"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
@@ -937,26 +937,26 @@
         <!--endregion-->
 
         <!--region MINECRAFT INSPECTIONS-->
-        <localInspection displayName="Unused access transformer"
-                         groupName="Minecraft"
+        <localInspection key="inspection.at_usage.name"
+                         groupKey="inspection.group.minecraft"
                          language="Access Transformers"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.at.AtUsageInspection"/>
-        <localInspection displayName="Invalid empty ItemStack comparison with ItemStack.EMPTY"
-                         groupName="Minecraft"
+        <localInspection key="inspection.stack_empty.name"
+                         groupKey="inspection.group.minecraft"
                          language="JAVA"
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.inspections.StackEmptyInspection"/>
-        <localInspection displayName="Duplicate access widener"
-                         groupName="Minecraft"
+        <localInspection key="inspection.duplicate_aw_entry.name"
+                         groupKey="inspection.group.minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.DuplicateAwEntryInspection"/>
-        <localInspection displayName="Unknown CT namespace"
-                         groupName="Minecraft"
+        <localInspection key="inspection.unknown_ct_namespace.name"
+                         groupKey="inspection.group.minecraft"
                          language="Class Tweaker"
                          enabledByDefault="true"
                          level="WARNING"
@@ -965,93 +965,93 @@
 
         <!--region MIXIN INSPECTIONS-->
         <!--region Generic -->
-        <localInspection displayName="Mixin is not written in Java"
+        <localInspection key="inspection.non_java_mixin.name"
                          shortName="NonJavaMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="UAST"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.NonJavaMixinInspection"/>
-        <localInspection displayName="Mixin not in a mixin config"
+        <localInspection key="inspection.unused_mixin.name"
                          shortName="UnusedMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.UnusedMixinInspection"/>
-        <localInspection displayName="Mixin annotation outside of @Mixin class"
+        <localInspection key="inspection.annotation_outside_of_mixin.name"
                          shortName="AnnotationOutsideOfMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationsInspection"/>
-        <localInspection displayName="Missing or unused cancellable @Inject"
+        <localInspection key="inspection.cancellable_injection_usage.name"
                          shortName="CancellableInjectionUsage"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.MixinCancellableInspection"/>
-        <localInspection displayName="Mixin parameter names don't match the target class"
+        <localInspection key="inspection.name_doesnt_match_target_class.name"
                          shortName="NameDoesntMatchTargetClass"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.MixinParameterNameInspection"/>
-        <localInspection displayName="Invalid @Mixin Target"
+        <localInspection key="inspection.invalid_mixin_target.name"
                          shortName="InvalidMixinTarget"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinTargetInspection"/>
-        <localInspection displayName="Invalid @Mixin super class"
+        <localInspection key="inspection.mixin_super_class.name"
                          shortName="MixinSuperClass"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinSuperClassInspection"/>
-        <localInspection displayName="Public static member in @Mixin class"
+        <localInspection key="inspection.public_static_mixin_member.name"
                          shortName="PublicStaticMixinMember"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.StaticMemberInspection"/>
-        <localInspection displayName="Switch used on an enum mixin"
+        <localInspection key="inspection.switch_on_enum_mixin.name"
                          shortName="SwitchOnEnumMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.EnumMixinSwitchStatementInspection"/>
-        <localInspection displayName="Mixin instantiated within that same mixin using a constructor which doesn't exist"
+        <localInspection key="inspection.mixin_constructor_doesnt_exist.name"
                          shortName="MixinConstructorDoesntExist"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInstantiationWithinMixinInspection"/>
-        <localInspection displayName="Inner classes in Mixins"
+        <localInspection key="inspection.mixin_inner_class.name"
                          shortName="MixinInnerClass"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinInnerClassInspection"/>
-        <localInspection displayName="Mixin is wrong class type"
+        <localInspection key="inspection.mixin_wrong_class_type.name"
                          shortName="MixinWrongClassType"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.MixinClassTypeInspection"/>
-        <localInspection displayName="Reference to @Mixin class"
+        <localInspection key="inspection.reference_to_mixin.name"
                          shortName="ReferenceToMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -1059,9 +1059,9 @@
         <!--endregion-->
 
         <!--region Annotation handlers -->
-        <localInspection displayName="Unresolved mixin annotation target"
+        <localInspection key="inspection.mixin_annotation_target.name"
                          shortName="MixinAnnotationTarget"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -1069,23 +1069,23 @@
         <!--endregion-->
 
         <!--region Added Members Inspections -->
-        <localInspection displayName="Missing @Unique annotation"
+        <localInspection key="inspection.missing_unique.name"
                          shortName="MissingUnique"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.MissingUniqueAnnotationInspection"/>
-        <localInspection displayName="Name does not match the pattern for added mixin members"
+        <localInspection key="inspection.added_mixin_members_name_pattern.name"
                          shortName="AddedMixinMembersNamePattern"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.addedMembers.AddedMembersNameFormatInspection"/>
-        <localInspection displayName="Name does not match the pattern for added enum constants"
+        <localInspection key="inspection.added_enum_constants_name_pattern.name"
                          shortName="AddedEnumConstantsNamePattern"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -1093,44 +1093,44 @@
         <!--endregion-->
 
         <!--region Implements Inspections -->
-        <localInspection displayName="Soft-implemented method does not override a method in the target interfaces"
+        <localInspection key="inspection.soft_implement_overrides.name"
                          shortName="SoftImplementOverrides"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.SoftImplementOverridesInspection"/>
-        <localInspection displayName="Empty @Implements"
+        <localInspection key="inspection.empty_implements.name"
                          shortName="EmptyImplements"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.EmptyImplementsInspection"/>
-        <localInspection displayName="@Interface is interface"
+        <localInspection key="inspection.interface_is_interface.name"
                          shortName="InterfaceIsInterface"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfaceIsInterfaceInspection"/>
-        <localInspection displayName="Invalid prefix on @Interface"
+        <localInspection key="inspection.invalid_interface_prefix.name"
                          shortName="InvalidInterfacePrefix"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.InterfacePrefixInspection"/>
-        <localInspection displayName="Duplicate @Interface in @Implements"
+        <localInspection key="inspection.duplicate_interface.name"
                          shortName="DuplicateInterface"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.implements.DuplicateInterfaceInspection"/>
-        <localInspection displayName="Duplicate @Interface prefix in @Implements"
+        <localInspection key="inspection.duplicate_interface_prefix.name"
                          shortName="DuplicateInterfacePrefix"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -1138,135 +1138,135 @@
         <!--endregion-->
 
         <!--region Injector Inspections -->
-        <localInspection displayName="Implicit constructor invoker"
+        <localInspection key="inspection.implicit_constructor_invoker.name"
                          shortName="ImplicitConstructorInvoker"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ImplicitConstructorInvokerInspection"/>
-        <localInspection displayName="@Inject could be @Overwrite"
+        <localInspection key="inspection.inject_could_be_overwrite.name"
                          shortName="InjectCouldBeOverwrite"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectCouldBeOverwriteInspection"/>
-        <localInspection displayName="@Inject into Constructor"
+        <localInspection key="inspection.inject_into_constructor.name"
                          shortName="InjectIntoConstructor"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectIntoConstructorInspection"/>
-        <localInspection displayName="Missing or invalid use of opcode"
+        <localInspection key="inspection.missing_or_invalid_opcode.name"
                          shortName="MissingOrInvalidOpcode"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InjectorOpcodeInspection"/>
-        <localInspection displayName="Invalid injector method signature"
+        <localInspection key="inspection.invalid_injector_method_signature.name"
                          shortName="InvalidInjectorMethodSignature"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.InvalidInjectorMethodSignatureInspection"/>
-        <localInspection displayName="@ModifyVariable may be argsOnly = true"
+        <localInspection key="inspection.modify_variable_may_be_args_only.name"
                          shortName="ModifyVariableMayBeArgsOnly"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableArgsOnlyInspection"/>
-        <localInspection displayName="@ModifyVariable may use variable name"
+        <localInspection key="inspection.modify_variable_may_use_name.name"
                          shortName="ModifyVariableMayUseName"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection"/>
-        <localInspection displayName="@Inject before a superconstructor call is cancellable"
+        <localInspection key="inspection.inject_cancellable_before_super_constructor_call.name"
                          shortName="InjectCancellableBeforeSuperConstructorCall"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CancellableBeforeSuperCallInspection"/>
-        <localInspection displayName="CTOR_HEAD is missing unsafe = true"
+        <localInspection key="inspection.ctor_head_no_unsafe.name"
                          shortName="CtorHeadNoUnsafe"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadNoUnsafeInspection"/>
-        <localInspection displayName="CTOR_HEAD is not targeting a constructor"
+        <localInspection key="inspection.ctor_head_used_for_non_constructor.name"
                          shortName="CtorHeadUsedForNonConstructor"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadUsedForNonConstructorInspection"/>
-        <localInspection displayName="Unnecessary unsafe = true"
+        <localInspection key="inspection.unnecessary_unsafe.name"
                          shortName="UnnecessaryUnsafe"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnnecessaryUnsafeInspection"/>
-        <localInspection displayName="CTOR_HEAD with enforce=POST_INIT doesn't target a field"
+        <localInspection key="inspection.ctor_head_post_init.name"
                          shortName="CtorHeadPostInit"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CtorHeadPostInitInspection"/>
-        <localInspection displayName="Usage of discouraged injection point"
+        <localInspection key="inspection.discouraged_injection_point.name"
                          shortName="DiscouragedInjectionPoint"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DiscouragedInjectionPointInspection"/>
-        <localInspection displayName="Usage of discouraged shifting in injection point"
+        <localInspection key="inspection.discouraged_shift.name"
                          shortName="DiscouragedShift"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DiscouragedShiftInspection"/>
-        <localInspection displayName="Usage of disallowed injector target"
+        <localInspection key="inspection.disallowed_target_insn.name"
                          shortName="DisallowedTargetInsn"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.DisallowedTargetInsnInspection"/>
-        <localInspection displayName="Usage of LocalCapture.CAPTURE_FAILEXCEPTION"
+        <localInspection key="inspection.local_capture_fail_exception.name"
                          shortName="LocalCaptureFailException"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.CaptureFailExceptionInspection"/>
-        <localInspection displayName="Unused @Inject local capture"
+        <localInspection key="inspection.unused_inject_local_capture.name"
                          shortName="UnusedInjectLocalCapture"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.UnusedLocalCaptureInspection"/>
-        <localInspection displayName="@Inject local capture can be replaced with @Local"
+        <localInspection key="inspection.inject_local_capture_can_be_replaced_with_local.name"
                          shortName="InjectLocalCaptureCanBeReplacedWithLocal"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.InjectLocalCaptureReplaceWithLocalInspection"/>
-        <localInspection displayName="INVOKE_ASSIGN can be replaced with expression"
+        <localInspection key="inspection.invoke_assign_can_replaced_with_expression.name"
                          shortName="InvokeAssignCanReplacedWithExpression"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -1274,16 +1274,16 @@
         <!--endregion-->
 
         <!--region Overwrite Inspections -->
-        <localInspection displayName="Invalid @Overwrite method modifiers"
+        <localInspection key="inspection.overwrite_modifiers.name"
                          shortName="OverwriteModifiers"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.overwrite.OverwriteModifiersInspection"/>
-        <localInspection displayName="Overwrite lacking @author JavaDoc tag"
+        <localInspection key="inspection.overwrite_author_required.name"
                          shortName="OverwriteAuthorRequired"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
@@ -1291,37 +1291,37 @@
         <!--endregion-->
 
         <!--region Reference Inspections -->
-        <localInspection displayName="Invalid Mixin member reference"
+        <localInspection key="inspection.invalid_member_reference.name"
                          shortName="InvalidMemberReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.InvalidMemberReferenceInspection"/>
-        <localInspection displayName="Unresolved reference"
+        <localInspection key="inspection.unresolved_mixin_reference.name"
                          shortName="UnresolvedMixinReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnresolvedReferenceInspection"/>
-        <localInspection displayName="Ambiguous reference"
+        <localInspection key="inspection.ambiguous_mixin_reference.name"
                          shortName="AmbiguousMixinReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.AmbiguousReferenceInspection"/>
-        <localInspection displayName="Unqualified member reference"
+        <localInspection key="inspection.unqualified_member_reference.name"
                          shortName="UnqualifiedMemberReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.reference.UnqualifiedMemberReferenceInspection"/>
-        <localInspection displayName="Unnecessary qualified member reference"
+        <localInspection key="inspection.unnecessary_qualified_member_reference.name"
                          shortName="UnnecessaryQualifiedMemberReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
@@ -1329,44 +1329,44 @@
         <!--endregion-->
 
         <!--region Shadow Inspections -->
-        <localInspection displayName="Invalid @Shadow modifiers"
+        <localInspection key="inspection.shadow_modifiers.name"
                          shortName="ShadowModifiers"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowModifiersInspection"/>
-        <localInspection displayName="Shadow parameter names don't match the target class"
+        <localInspection key="inspection.shadow_name_doesnt_match_target_class.name"
                          shortName="ShadowNameDoesntMatchTargetClass"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WEAK WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowParameterNameInspection"/>
-        <localInspection displayName="@Shadow field with prefix"
+        <localInspection key="inspection.shadow_field_prefix.name"
                          shortName="ShadowFieldPrefix"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFieldPrefixInspection"/>
-        <localInspection displayName="Unused @Shadow method prefix"
+        <localInspection key="inspection.unused_shadow_method_prefix.name"
                          shortName="UnusedShadowMethodPrefix"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.UnusedShadowMethodPrefixInspection"/>
-        <localInspection displayName="Modification of @Final field"
+        <localInspection key="inspection.shadow_final_modification.name"
                          shortName="ShadowFinalModification"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.shadow.ShadowFinalInspection"/>
-        <localInspection displayName="Missing abstract shadows in enum mixin"
+        <localInspection key="inspection.missing_abstract_shadows_in_enum_mixin.name"
                          shortName="MissingAbstractShadowsInEnumMixin"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
@@ -1374,58 +1374,58 @@
         <!--endregion-->
 
         <!--region Mixin Extras -->
-        <localInspection displayName="Wrong @WrapOperation Operation parameters"
+        <localInspection key="inspection.mixin_extras_operation_parameters.name"
                          shortName="MixinExtrasOperationParameters"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.WrongOperationParametersInspection"/>
-        <localInspection displayName="Unnecessary mutable reference to captured local"
+        <localInspection key="inspection.mixin_extras_unnecessary_mutable_local.name"
                          shortName="MixinExtrasUnnecessaryMutableLocal"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnnecessaryMutableLocalInspection"/>
-        <localInspection displayName="Unresolved @Local capture"
+        <localInspection key="inspection.unresolved_local_capture.name"
                          shortName="UnresolvedLocalCapture"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.UnresolvedLocalCaptureInspection"/>
-        <localInspection displayName="@Local may be argsOnly = true"
+        <localInspection key="inspection.local_may_be_args_only.name"
                          shortName="LocalMayBeArgsOnly"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalArgsOnlyInspection"/>
-        <localInspection displayName="@Local may use name"
+        <localInspection key="inspection.local_may_use_name.name"
                          shortName="LocalMayUseName"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalMayUseNameInspection"/>
-        <localInspection displayName="@Share has conflicting variable type"
+        <localInspection key="inspection.conflicting_share_type.name"
                          shortName="ConflictingShareType"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.ConflictingShareTypeInspection"/>
-        <localInspection displayName="@Share has non-LocalRef type"
+        <localInspection key="inspection.share_non_local_ref.name"
                          shortName="ShareNonLocalRef"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.ShareNonLocalRefInspection"/>
-        <localInspection displayName="@WrapWithCondition targets non-void instruction followed by pop"
+        <localInspection key="inspection.wrap_with_condition_targets_non_void.name"
                          shortName="WrapWithConditionTargetsNonVoid"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -1433,30 +1433,30 @@
         <!--endregion-->
 
         <!--region Configuration -->
-        <localInspection displayName="Unresolved config reference"
+        <localInspection key="inspection.unresolved_config_reference.name"
                          shortName="UnresolvedConfigReference"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.UnresolvedReferenceInspection"/>
-        <localInspection displayName="Invalid config value"
+        <localInspection key="inspection.invalid_config_value.name"
                          shortName="InvalidConfigValue"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.ConfigValueInspection"/>
-        <localInspection displayName="Invalid Mixin registration"
+        <localInspection key="inspection.invalid_mixin_registration.name"
                          shortName="InvalidMixinRegistration"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.mixin.config.inspection.MixinRegistrationInspection"/>
-        <localInspection displayName="Invalid Mixin plugin registration"
+        <localInspection key="inspection.invalid_mixin_plugin_registration.name"
                          shortName="InvalidMixinPluginRegistration"
-                         groupName="Mixin"
+                         groupKey="inspection.group.mixin"
                          language="JSON"
                          enabledByDefault="true"
                          level="ERROR"
@@ -1465,8 +1465,8 @@
         <!--endregion-->
 
         <!--region BUNGEECORD INSPECTIONS-->
-        <localInspection displayName="BungeeCord @EventHandler in class not implementing Listener"
-                         groupName="BungeeCord"
+        <localInspection key="inspection.bungee_cord_listener_implemented.name"
+                         groupKey="inspection.group.bungee_cord"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
@@ -1504,88 +1504,58 @@
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
 
-        <group id="MinecraftDevToolsGroup" popup="true" text="Minecraft Development">
+        <group id="MinecraftDevToolsGroup" popup="true">
             <add-to-group group-id="ToolsMenu"/>
         </group>
-        <action class="com.demonwav.mcdev.update.ConfigurePluginUpdatesAction" id="MinecraftDevConfigureUpdates"
-                text="Configure Minecraft Development Plugin Updates"
-                description="Configure automatic updates for the Minecraft Development plugin">
+        <action class="com.demonwav.mcdev.update.ConfigurePluginUpdatesAction" id="MinecraftDevConfigureUpdates">
             <add-to-group group-id="MinecraftDevToolsGroup"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction" id="FindMixinsAction"
-                text="Find Mixins"
-                description="Find classes which mix into this class">
+        <action class="com.demonwav.mcdev.platform.mixin.action.FindMixinsAction" id="FindMixinsAction">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateShadowAction" id="GenerateShadowAction"
-                text="Shadow Members..."
-                description="Add a @Shadow for the selected members">
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateShadowAction" id="GenerateShadowAction">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateOverwriteAction" id="GenerateOverwriteAction"
-                text="Overwrite Methods..."
-                description="Add an @Overwrite for the selected methods">
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateOverwriteAction" id="GenerateOverwriteAction">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.GenerateSoftImplementsAction"
-                id="GenerateSoftImplementsAction"
-                text="Soft-Implement Methods..."
-                description="Add a soft implementation for the selected methods">
+                id="GenerateSoftImplementsAction">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
         <action class="com.demonwav.mcdev.platform.mixin.action.CopyMixinTargetReferenceAction"
-                id="CopyMixinTargetReferenceAction"
-                text="Mixin Target Reference"
-                description="Copy the reference to the element for use in an injector">
+                id="CopyMixinTargetReferenceAction">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateAccessorAction" id="GenerateAccessorAction"
-                text="Generate Accessor/Invoker"
-                description="Generate an accessor for the selected member">
+        <action class="com.demonwav.mcdev.platform.mixin.action.GenerateAccessorAction" id="GenerateAccessorAction">
             <add-to-group group-id="GenerateGroup" anchor="last"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.mixin.expression.gui.MEShowFlowAction"
-                text="Show MixinExtras Flow Diagram" description="Visualize MixinExtras Expression flow as a diagram"
+        <action class="com.demonwav.mcdev.platform.mixin.expression.gui.MEShowFlowAction" id="MEShowFlowAction"
                 popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.FindSrgMappingAction" id="FindSrgMappingAction"
-                text="Get SRG Name"
-                description="Find the associated SRG mapping for this element">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.FindSrgMappingAction" id="FindSrgMappingAction">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu2"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAtAction" id="CopyATAction"
-                text="AT Entry"
-                description="Copy the reference to clipboard in Access Transformer format">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAtAction" id="CopyATAction">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.GotoAtEntryAction" id="GotoAtEntry"
-                text="AT Entry"
-                description="Go to the relevant Access Transformer entry, if it exists">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.GotoAtEntryAction" id="GotoAtEntry">
             <add-to-group group-id="EditorPopupMenu.GoTo"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyCoremodTargetAction" id="CopyCoremodTargetAction"
-                text="Coremod Target Reference"
-                description="Copy the reference to the element for use in a javascript coremod">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyCoremodTargetAction" id="CopyCoremodTargetAction">
             <add-to-group relative-to-action="CopyReference" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.LookupMemberAction" id="LookupMcpMember"
-                text="Lookup MCP Member"
-                description="Lookup MCP mapping info on a SRG field or method">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.LookupMemberAction" id="LookupMcpMember">
             <keyboard-shortcut first-keystroke="control alt shift M" keymap="$default"/>
         </action>
-        <action class="com.demonwav.mcdev.translations.actions.SortTranslationsAction" id="SortMcTranslationsAction"
-                text="Sort Translations by Specified Order"
-                description="Sorts translations by specified order">
+        <action class="com.demonwav.mcdev.translations.actions.SortTranslationsAction" id="SortMcTranslationsAction">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
-        <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass"
-                text="Minecraft Class" description="Create skeleton classes used in Minecraft Mods">
+        <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
-        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction"
-                text="AW Entry"
-                description="Copy the reference to clipboard in Access Widener format">
+        <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction">
             <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>
         </action>
     </actions>

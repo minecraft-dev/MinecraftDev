@@ -30,13 +30,8 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class MethodCallSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() =
-        "Invalid usage of a @SideOnly method call"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error

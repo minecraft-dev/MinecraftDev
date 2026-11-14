@@ -25,12 +25,8 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.impl.source.PsiFieldImpl
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class VariableUseSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of variable annotated with @SideOnly"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error

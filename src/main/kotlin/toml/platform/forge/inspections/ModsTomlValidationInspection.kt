@@ -49,8 +49,6 @@ import org.toml.lang.psi.ext.name
 
 class ModsTomlValidationInspection : LocalInspectionTool() {
 
-    override fun getDisplayName(): String = "Forge's mods.toml validation"
-
     override fun processFile(file: PsiFile, manager: InspectionManager): List<ProblemDescriptor> {
         if (file.virtualFile.name in ForgeTomlConstants.FILE_NAMES) {
             return super.processFile(file, manager)

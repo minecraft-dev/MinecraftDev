@@ -25,12 +25,8 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class NestedClassSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of @SideOnly in nested class declaration"
 
     override fun buildErrorString(vararg infos: Any) =
         "A nested class cannot declare a side that is different from the parent class." +

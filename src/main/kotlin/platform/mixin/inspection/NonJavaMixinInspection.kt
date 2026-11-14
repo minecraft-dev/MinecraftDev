@@ -29,8 +29,6 @@ import com.intellij.lang.java.JavaLanguage
 import org.jetbrains.uast.UClass
 
 class NonJavaMixinInspection : AbstractBaseUastLocalInspectionTool(UClass::class.java) {
-    override fun getDisplayName() = "Mixin is not written in Java"
-
     override fun checkClass(
         aClass: UClass,
         manager: InspectionManager,

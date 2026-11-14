@@ -30,8 +30,6 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 
 class UnknownCtNamespaceInspection : LocalInspectionTool() {
-    override fun getDisplayName() = "Unknown CT namespace"
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = object : CtVisitor() {
         override fun visitHeaderMixin(header: CtHeaderMixin) {
             val namespace = header.namespaceString ?: return

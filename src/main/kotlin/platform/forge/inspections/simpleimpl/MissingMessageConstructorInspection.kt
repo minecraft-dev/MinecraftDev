@@ -24,12 +24,8 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiClass
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class MissingMessageConstructorInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "IMessage or IMessageHandler implementation without empty constructor"
 
     override fun buildErrorString(vararg infos: Any?) =
         "All implementations of IMessage and IMessageHandler must have an empty constructor"

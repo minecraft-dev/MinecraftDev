@@ -39,15 +39,11 @@ import com.intellij.psi.PsiReferenceExpression
 import com.intellij.psi.createSmartPointer
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class StackEmptyInspection : BaseInspection() {
     companion object {
         const val STACK_FQ_NAME = "net.minecraft.world.item.ItemStack"
     }
-
-    @Nls
-    override fun getDisplayName() = "ItemStack comparison through ItemStack.EMPTY"
 
     override fun buildErrorString(vararg infos: Any): String {
         val compareExpression = infos[0] as PsiExpression

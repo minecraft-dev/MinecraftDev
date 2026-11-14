@@ -23,8 +23,9 @@
         <psi.referenceContributor language="yaml"
                                   implementation="com.demonwav.mcdev.yaml.PluginYmlReferenceContributor"/>
 
-        <localInspection displayName="Bukkit-like plugin.yml validation"
-                         groupName="Minecraft"
+        <localInspection key="inspection.plugin_yml.name"
+                         groupKey="inspection.group.minecraft"
+                         bundle="messages.MinecraftDevelopment"
                          language="yaml"
                          enabledByDefault="true"
                          level="ERROR"

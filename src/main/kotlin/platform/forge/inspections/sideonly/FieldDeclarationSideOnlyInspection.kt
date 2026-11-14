@@ -26,12 +26,8 @@ import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiField
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class FieldDeclarationSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of @SideOnly in field declaration"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error

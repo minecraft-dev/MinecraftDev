@@ -27,12 +27,8 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiNewExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class NewExpressionSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() = "Invalid usage of class annotated with @SideOnly"
 
     override fun buildErrorString(vararg infos: Any) =
         "A class annotated with @SideOnly can only be used in other matching annotated classes and methods"

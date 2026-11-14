@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.inspection
 
-import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.mapFirstNotNull
 import com.intellij.codeInspection.LocalQuickFix
@@ -28,12 +27,8 @@ import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.psi.PsiMethodCallExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class IsCancelledInspection : BaseInspection() {
-    @Nls
-    override fun getDisplayName() = MCDevBundle("inspection.is_cancelled.name")
-
     override fun buildErrorString(vararg infos: Any): String {
         val useless = infos[0] as IsCancelled
         return useless.errorString

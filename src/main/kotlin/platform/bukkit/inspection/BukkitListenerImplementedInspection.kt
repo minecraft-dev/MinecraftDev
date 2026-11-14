@@ -34,10 +34,6 @@ import org.jetbrains.annotations.Nls
 
 class BukkitListenerImplementedInspection : BaseInspection() {
 
-    @Nls
-    override fun getDisplayName() =
-        "Bukkit @EventHandler in class not implementing Listener"
-
     override fun buildErrorString(vararg infos: Any) =
         "This class contains @EventHandler methods but does not implement Listener."
 

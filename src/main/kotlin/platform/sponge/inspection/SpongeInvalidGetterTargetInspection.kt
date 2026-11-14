@@ -31,8 +31,6 @@ import org.jetbrains.uast.UMethod
 
 class SpongeInvalidGetterTargetInspection : AbstractBaseUastLocalInspectionTool() {
 
-    override fun getDisplayName() = "@Getter targeted method does not exist"
-
     override fun checkMethod(
         method: UMethod,
         manager: InspectionManager,
