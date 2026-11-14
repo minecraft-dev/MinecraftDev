@@ -74,7 +74,12 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
         return Pass(file, editor)
     }
 
-    private class Item(val offset: Int, val javadoc: String, val pointer: SmartPsiElementPointer<PsiMember>)
+    private class Item(
+        val target: AnnotaterJavadocTarget,
+        val offset: Int,
+        val javadoc: String,
+        val pointer: SmartPsiElementPointer<PsiMember>,
+    )
 
     private class GutterIcon(val offset: Int, val pointer: SmartPsiElementPointer<PsiMember>)
 
@@ -84,6 +89,7 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
 
         private var showJavadocs = false
         private var items = emptyList<Item>()
+        private var highlights = emptyMap<AnnotaterJavadocTarget, List<AnnotaterJavadocRendering.LineHighlight>>()
         private var gutterIcons = emptyList<GutterIcon>()
         private var folds = emptyList<TextRange>()
 
@@ -96,6 +102,8 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
             val edited = AnnotaterJavadocInlineEditor.current(myProject)?.takeIf { it.hostEditor === editor }?.target
 
             val newItems = mutableListOf<Item>()
+            // A member of each top level class with displayed Javadocs, to highlight a copy of that class with
+            val outerClassMembers = mutableMapOf<String, PsiMember>()
             val newGutterIcons = mutableListOf<GutterIcon>()
             val newFolds = mutableListOf<TextRange>()
             for (member in AnnotaterJavadocTarget.declarations(file)) {
@@ -111,9 +119,18 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
                 if (!showJavadocs || target == edited) {
                     continue
                 }
-                newItems += Item(AnnotaterJavadocRendering.displayOffset(member), javadoc, pointer)
+                newItems += Item(target, AnnotaterJavadocRendering.displayOffset(member), javadoc, pointer)
+                outerClassMembers.putIfAbsent(target.outerClass, member)
             }
             items = newItems
+            highlights = outerClassMembers.values.flatMap { member ->
+                progress.checkCanceled()
+                AnnotaterJavadocRendering.highlightReferences(
+                    member,
+                    checkout.javadocStore::getOrNull,
+                    editor.colorsScheme,
+                ).entries
+            }.associate { it.toPair() }
             gutterIcons = newGutterIcons
             folds = newFolds
         }
@@ -127,7 +144,13 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
 
             editor.getUserData(Const.INLAYS_KEY)?.forEach { it.dispose() }
             val inlays = items.filter { it.offset in 0..length }.mapNotNull { item ->
-                val renderer = AnnotaterJavadocInlayRenderer(editor, item.offset, item.javadoc, item.pointer)
+                val renderer = AnnotaterJavadocInlayRenderer(
+                    editor,
+                    item.offset,
+                    item.javadoc,
+                    highlights[item.target].orEmpty(),
+                    item.pointer,
+                )
                 editor.inlayModel.addBlockElement(item.offset, false, true, 0, renderer)
             }
             editor.putUserData(Const.INLAYS_KEY, inlays.takeIf { it.isNotEmpty() })

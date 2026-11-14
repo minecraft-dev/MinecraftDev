@@ -43,6 +43,7 @@ import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.command.undo.UndoManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.TextEditor
@@ -512,6 +513,22 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
 
         val hidden = AnnotaterJavadocRendering.generateDoc(clampMethod, null)!!
         assertFalse("Existing method docs" in hidden, hidden)
+    }
+
+    @Test
+    @DisplayName("Names that displayed Javadocs refer to are highlighted")
+    fun referenceHighlights() {
+        val javadoc = "Clamps a value.\n\nSee [#clamp(int, int, int)]."
+        val highlights = AnnotaterJavadocRendering.highlightReferences(
+            findMember("net.minecraft.util.Mth", "clamp"),
+            { if (it == clamp) javadoc else null },
+            EditorColorsManager.getInstance().globalScheme,
+        )[clamp].orEmpty()
+        val lines = javadoc.lines().map { if (it.isEmpty()) "///" else "/// $it" }
+        assertEquals(
+            listOf(2 to "clamp"),
+            highlights.map { it.line to lines[it.line].substring(it.startColumn, it.endColumn) },
+        )
     }
 
     // TODO: uncomment in 2026.3

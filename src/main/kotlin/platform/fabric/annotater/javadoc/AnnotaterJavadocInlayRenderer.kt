@@ -40,11 +40,14 @@ import java.awt.Rectangle
 /**
  * Displays an annotater Javadoc above its declaration as the `///` comment it would be in the source, highlighted in
  * the same way as a doc comment in a Java file.
+ *
+ * @param highlights the highlighting of the names that the Javadoc refers to, on top of the lexer's
  */
 class AnnotaterJavadocInlayRenderer(
     private val editor: Editor,
     private val initialOffset: Int,
     private val javadoc: String,
+    private val highlights: List<AnnotaterJavadocRendering.LineHighlight>,
     private val pointer: SmartPsiElementPointer<PsiMember>,
 ) : EditorCustomElementRenderer {
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
@@ -97,25 +100,42 @@ class AnnotaterJavadocInlayRenderer(
         val scheme = editor.colorsScheme
         lines?.takeIf { linesScheme === scheme }?.let { return it }
 
-        val text = javadoc.lines().joinToString("\n") { if (it.isEmpty()) "///" else "/// $it" }
+        val textLines = javadoc.lines().map { if (it.isEmpty()) "///" else "/// $it" }
+        val text = textLines.joinToString("\n")
+        val attributes = arrayOfNulls<TextAttributes>(text.length)
         val highlighter = LexerEditorHighlighter(JavaFileHighlighter(LanguageLevel.HIGHEST), scheme)
         highlighter.setText(text)
-        val lines = mutableListOf<List<Token>>()
-        var tokens = mutableListOf<Token>()
         val iterator = highlighter.createIterator(0)
         while (!iterator.atEnd()) {
-            for ((index, part) in text.substring(iterator.start, iterator.end).split('\n').withIndex()) {
-                if (index > 0) {
-                    lines += tokens
-                    tokens = mutableListOf()
-                }
-                if (part.isNotEmpty()) {
-                    tokens += Token(part, iterator.textAttributes)
-                }
-            }
+            attributes.fill(iterator.textAttributes, iterator.start, iterator.end)
             iterator.advance()
         }
-        lines += tokens
+
+        val lineStarts = textLines.runningFold(0) { start, line -> start + line.length + 1 }
+        for (highlight in highlights) {
+            val line = textLines.getOrNull(highlight.line) ?: continue
+            if (highlight.endColumn > line.length) {
+                continue
+            }
+            val lineStart = lineStarts[highlight.line]
+            for (i in lineStart + highlight.startColumn until lineStart + highlight.endColumn) {
+                attributes[i] = TextAttributes.merge(attributes[i], highlight.attributes)
+            }
+        }
+
+        // Splits each line into runs of the same attributes
+        val lines = textLines.mapIndexed { index, line ->
+            val offset = lineStarts[index]
+            val tokens = mutableListOf<Token>()
+            var start = 0
+            for (end in 1..line.length) {
+                if (end == line.length || attributes[offset + end] != attributes[offset + start]) {
+                    tokens += Token(line.substring(start, end), attributes[offset + start])
+                    start = end
+                }
+            }
+            tokens
+        }
         this.lines = lines
         linesScheme = scheme
         return lines
