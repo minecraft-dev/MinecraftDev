@@ -25,7 +25,7 @@
             toReformat="true"
             toShortenFQNames="true"
             key="live.template.bukkit.event_handler.description"
-            resource-bundle="messages.MinecraftDevelopment">
+            resource-bundle="messages.MinecraftDevelopmentBundle">
         <variable name="NAME" expression="bukkitEventName(EVENT_CLASS)" alwaysStopAt="true"/>
         <variable name="PARAM_NAME" expression="&quot;event&quot;" alwaysStopAt="true"/>
     </template>

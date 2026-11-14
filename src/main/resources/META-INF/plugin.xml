@@ -58,7 +58,7 @@
         includes a text-based NBT editor.
     ]]></description>
 
-    <resource-bundle>messages.MinecraftDevelopment</resource-bundle>
+    <resource-bundle>messages.MinecraftDevelopmentBundle</resource-bundle>
 
     <change-notes><![CDATA[
         Please report issues to <a href="https://github.com/minecraft-dev/MinecraftDev/issues">the issue tracker</a>!

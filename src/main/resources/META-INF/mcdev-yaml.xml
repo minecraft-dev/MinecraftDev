@@ -25,7 +25,7 @@
 
         <localInspection key="inspection.plugin_yml.name"
                          groupKey="inspection.group.minecraft"
-                         bundle="messages.MinecraftDevelopment"
+                         bundle="messages.MinecraftDevelopmentBundle"
                          language="yaml"
                          enabledByDefault="true"
                          level="ERROR"
