@@ -32,6 +32,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
+import com.intellij.util.ThreeState
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -801,6 +802,6 @@ class MEExpressionCompletionTest : BaseMixinTest() {
     }
 
     private object AlwaysMissingLVTChecker : MissingLVTChecker {
-        override fun hasMissingLVT(context: PsiElement, className: String) = true
+        override fun hasMissingLVT(context: PsiElement, className: String) = ThreeState.YES
     }
 }
