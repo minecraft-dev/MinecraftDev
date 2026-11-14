@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -30,22 +30,13 @@ import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiReferenceExpression
 import com.siyeh.ig.BaseInspection
 import com.siyeh.ig.BaseInspectionVisitor
-import org.jetbrains.annotations.Nls
 
 class MethodCallSideOnlyInspection : BaseInspection() {
-
-    @Nls
-    override fun getDisplayName() =
-        "Invalid usage of a @SideOnly method call"
 
     override fun buildErrorString(vararg infos: Any): String {
         val error = infos[0] as Error
         return error.getErrorString(*SideOnlyUtil.getSubArray(infos))
     }
-
-    override fun getStaticDescription() =
-        "Methods which are declared with a @SideOnly annotation can only be " +
-            "used in matching @SideOnly classes and methods."
 
     override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[3] as PsiAnnotation

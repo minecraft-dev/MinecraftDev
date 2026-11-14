@@ -1,0 +1,43 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports missing or invalid usages of opcode
+</p>
+<!-- tooltip end -->
+<p>
+    Some injection points, such as <code>FIELD</code>, match several kinds of instructions, and it's good to specify an opcode
+    to say which kind to target. For example, without an opcode, <code>FIELD</code> matches both reads and writes of the field,
+    which is rarely intended.
+</p>
+<p>
+    Other injection points ignore the opcode, so specifying one there is misleading.
+</p>
+<pre><code>
+// bad
+@At(value = "FIELD", target = "Lcom/example/Foo;bar:I")
+
+// good
+@At(value = "FIELD", target = "Lcom/example/Foo;bar:I", opcode = Opcodes.PUTFIELD)
+</code></pre>
+</body>
+</html>

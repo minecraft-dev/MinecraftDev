@@ -1,0 +1,35 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports targets not supported by an injector
+</p>
+<!-- tooltip end -->
+<p>
+    Each injector can only operate on certain kinds of instructions, and Mixin fails when an injector targets any other kind.
+</p>
+<pre><code>
+// bad: @ModifyArg can only target method invocations
+@ModifyArg(method = "foo", at = @At(value = "FIELD", target = "..."), index = 0)
+</code></pre>
+</body>
+</html>

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -48,8 +48,6 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
         panel.add(checkbox)
         return panel
     }
-
-    override fun getStaticDescription() = "Reports when @At(\"CTOR_HEAD\") is missing unsafe"
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         if (ignoreForFabric) {

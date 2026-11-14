@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -56,5 +56,4 @@ object ForgeModuleType : AbstractModuleType<ForgeModule>("", "") {
 
     val FG23_MC_VERSION = SemanticVersion.release(1, 12)
     val FG3_MC_VERSION = SemanticVersion.release(1, 13)
-    val FG3_FORGE_VERSION = SemanticVersion.release(14, 23, 5, 2851)
 }

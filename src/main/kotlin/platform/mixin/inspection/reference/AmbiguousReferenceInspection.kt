@@ -40,8 +40,6 @@ import com.intellij.psi.PsiBinaryExpression
 
 class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection("method") {
 
-    override fun getStaticDescription() = "Reports ambiguous references in Mixin annotations"
-
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,

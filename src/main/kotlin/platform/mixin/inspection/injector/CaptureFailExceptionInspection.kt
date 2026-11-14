@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -33,13 +33,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiReferenceExpression
 
 class CaptureFailExceptionInspection : MixinInspection() {
-    override fun getStaticDescription() = """
-        Usage of <code>LocalCapture.CAPTURE_FAILEXCEPTION</code> is usually a mistake and should be replaced with
-        <code>LocalCapture.CAPTURE_FAILHARD</code>. <code>CAPTURE_FAILEXCEPTION</code> generates code which throws an
-        exception when the callback is reached, if the locals do not match. If this is really what you want, you can
-        suppress this warning.
-    """.trimIndent()
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitReferenceExpression(expression: PsiReferenceExpression) {
             if (expression.referenceName != "CAPTURE_FAILEXCEPTION") {

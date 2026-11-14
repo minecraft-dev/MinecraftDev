@@ -47,8 +47,6 @@ class LocalMayUseNameInspection : MixinInspection() {
     @JvmField
     var ignoreForImplicitLocals = false
 
-    override fun getStaticDescription() = "Reports @Local relying on index or ordinal that may use a name instead"
-
     override fun getOptionsPane() = OptPane.pane(
         OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals")
     )

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -32,8 +32,6 @@ import org.jetbrains.uast.ULiteralExpression
 import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class MissingFormatInspection : TranslationInspection() {
-    override fun getStaticDescription() = "Detects missing format arguments for translations"
-
     private val typesHint: Array<Class<out UElement>> = arrayOf(UExpression::class.java)
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor =

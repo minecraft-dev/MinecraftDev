@@ -1,0 +1,45 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports instantiations of classes annotated with <code>@SideOnly</code> in classes or methods that are annotated differently,
+    or not at all.
+</p>
+<!-- tooltip end -->
+<p>
+    Code annotated with <code>@SideOnly</code> is removed when running on the other side, so code that runs on both sides can't
+    use it either.
+</p>
+<pre><code>
+// bad: runs on both sides
+public void update() {
+    new GuiMyScreen(); // GuiMyScreen is @SideOnly(Side.CLIENT)
+}
+
+// good
+@SideOnly(Side.CLIENT)
+public void update() {
+    new GuiMyScreen();
+}
+</code></pre>
+</body>
+</html>

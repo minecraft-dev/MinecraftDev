@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -28,9 +28,6 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiMethod
 
 class SoftImplementOverridesInspection : MixinInspection() {
-
-    override fun getStaticDescription() =
-        "Reports soft-implemented methods in Mixins that do not override a method in the target classes."
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = Visitor(holder)
 

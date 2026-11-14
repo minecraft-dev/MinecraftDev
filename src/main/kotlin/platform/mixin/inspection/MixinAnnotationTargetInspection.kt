@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -34,8 +34,6 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.util.parentOfType
 
 class MixinAnnotationTargetInspection : MixinInspection() {
-    override fun getStaticDescription() = "Verifies targets of mixin annotations"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         return object : JavaElementVisitor() {
             override fun visitAnnotation(annotation: PsiAnnotation) {

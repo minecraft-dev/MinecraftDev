@@ -30,8 +30,6 @@ import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElementVisitor
 
 class CtorHeadUsedForNonConstructorInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when CTOR_HEAD is used without targeting a constructor method"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT)) {

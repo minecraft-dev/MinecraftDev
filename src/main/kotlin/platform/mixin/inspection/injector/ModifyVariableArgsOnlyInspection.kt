@@ -40,9 +40,6 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
 class ModifyVariableArgsOnlyInspection : MixinInspection() {
-    override fun getStaticDescription() =
-        "Checks that @ModifyVariable has argsOnly if it targets arguments, which improves performance of the mixin"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor {
         return object : JavaElementVisitor() {
             override fun visitMethod(method: PsiMethod) {

@@ -41,8 +41,6 @@ import com.intellij.psi.tree.TokenSet
 import org.objectweb.asm.Opcodes
 
 class MixinClassTypeInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports when a Mixin uses the wrong class type"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitClass(mixinClass: PsiClass) {
             if (!mixinClass.isMixin) {

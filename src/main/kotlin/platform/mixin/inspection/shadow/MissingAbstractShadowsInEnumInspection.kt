@@ -38,8 +38,6 @@ import com.intellij.psi.PsiMethod
 import org.objectweb.asm.Opcodes
 
 class MissingAbstractShadowsInEnumInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports missing abstract shadows in enum mixins"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitClass(aClass: PsiClass) {
             if (!aClass.isEnum || !aClass.isMixin) {

@@ -1,0 +1,41 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports soft-implemented methods in Mixins that do not override a method in the target classes.
+</p>
+<!-- tooltip end -->
+<p>
+    A method with an <code>@Interface</code> prefix is meant to implement a method of that interface once the prefix is removed.
+    If no such interface method exists, the method doesn't implement anything, which usually means there is a typo in its name or
+    parameter types.
+</p>
+<pre><code>
+@Mixin(Target.class)
+@Implements(@Interface(iface = Foo.class, prefix = "foo$"))
+public class TargetMixin {
+    // Foo has no method getNmae()
+    public String foo$getNmae() { ... }
+}
+</code></pre>
+</body>
+</html>

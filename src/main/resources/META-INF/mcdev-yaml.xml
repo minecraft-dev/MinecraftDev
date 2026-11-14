@@ -3,7 +3,7 @@
 
     https://mcdev.io/
 
-    Copyright (C) 2025 minecraft-dev
+    Copyright (C) 2026 minecraft-dev
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published
@@ -23,12 +23,12 @@
         <psi.referenceContributor language="yaml"
                                   implementation="com.demonwav.mcdev.yaml.PluginYmlReferenceContributor"/>
 
-        <localInspection displayName="Bukkit-like plugin.yml validation"
-                         groupName="Minecraft"
+        <localInspection key="inspection.plugin_yml.name"
+                         groupKey="inspection.group.minecraft"
+                         bundle="messages.MinecraftDevelopmentBundle"
                          language="yaml"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.yaml.PluginYmlInspection"/>
     </extensions>
 </idea-plugin>

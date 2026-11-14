@@ -1,0 +1,49 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports invalid <code>@Mixin</code> super classes.
+</p>
+<!-- tooltip end -->
+<p>
+    The superclass of a mixin gives the mixin access to the members of a superclass of its target. It must therefore be a class in
+    the hierarchy of every target class, and can't be the target class itself. If the superclass is another mixin, it must target a
+    class in the hierarchy of every target class.
+</p>
+<pre><code>
+class Animal {}
+class Dog extends Animal {}
+
+@Mixin(Dog.class)
+class DogMixin extends Animal {}   // good
+
+@Mixin(Dog.class)
+class DogMixin extends AnimalMixin {} // good
+
+@Mixin(Dog.class)
+class DogMixin extends Dog {}      // bad: extends the target class
+
+@Mixin(Dog.class)
+class DogMixin extends Vehicle {}  // bad: not in Dog's hierarchy
+</code></pre>
+</body>
+</html>

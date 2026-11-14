@@ -1,0 +1,44 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports member references in Mixin annotations that Mixin can't parse.
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin fails to apply an annotation whose <code>method</code> or <code>target</code> it can't parse. A member reference
+    consists of an optional owner class, the member name and an optional descriptor, in one of these forms:
+</p>
+<ul>
+    <li><code>Lcom/example/ExampleClass;execute(II)V</code></li> for methods
+    <li><code>Lcom/example/ExampleClass;count:I</code></li> for fields
+</ul>
+<p>
+    The name can be followed by a quantifier such as <code>*</code>. Regex selectors, such as <code>/^execute$/</code>, and dynamic
+    selectors, such as <code>@Desc(id)</code>, are also supported.
+</p>
+<pre><code>
+@At(value = "INVOKE", target = "com.example.ExampleClass#execute")      // bad
+@At(value = "INVOKE", target = "Lcom/example/ExampleClass;execute(II)V") // good
+</code></pre>
+</body>
+</html>

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -37,8 +37,6 @@ import com.intellij.psi.PsiExpression
 import org.objectweb.asm.util.Printer
 
 class InjectorOpcodeInspection : MixinInspection() {
-    override fun getStaticDescription() = "Reports missing or invalid usages of opcode"
-
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
         override fun visitAnnotation(annotation: PsiAnnotation) {
             if (!annotation.hasQualifiedName(MixinConstants.Annotations.AT)) {

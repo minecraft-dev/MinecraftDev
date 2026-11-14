@@ -36,8 +36,6 @@ import com.intellij.psi.PsiArrayInitializerMemberValue
 
 class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection("method") {
 
-    override fun getStaticDescription() = "Reports unnecessary qualified member references in @Inject annotations"
-
     override fun visitAnnotationAttribute(
         annotation: PsiAnnotation,
         value: PsiAnnotationMemberValue,
