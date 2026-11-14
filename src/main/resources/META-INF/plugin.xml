@@ -1187,6 +1187,13 @@
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableMayUseNameInspection"/>
+        <localInspection key="inspection.modify_variable_name_without_lvt.name"
+                         shortName="ModifyVariableNameWithoutLVT"
+                         groupKey="inspection.group.mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.injector.ModifyVariableNameWithoutLVTInspection"/>
         <localInspection key="inspection.inject_cancellable_before_super_constructor_call.name"
                          shortName="InjectCancellableBeforeSuperConstructorCall"
                          groupKey="inspection.group.mixin"
@@ -1409,6 +1416,13 @@
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalMayUseNameInspection"/>
+        <localInspection key="inspection.local_name_without_lvt.name"
+                         shortName="LocalNameWithoutLVT"
+                         groupKey="inspection.group.mixin"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.demonwav.mcdev.platform.mixin.inspection.mixinextras.LocalNameWithoutLVTInspection"/>
         <localInspection key="inspection.conflicting_share_type.name"
                          shortName="ConflictingShareType"
                          groupKey="inspection.group.mixin"

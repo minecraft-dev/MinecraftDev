@@ -57,6 +57,7 @@ import com.intellij.psi.util.InheritanceUtil
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.TypeConversionUtil
+import com.intellij.util.ThreeState
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.ClassNode
 
@@ -313,14 +314,27 @@ val Module.mixinVersion: SemanticVersion?
         return SemanticVersion.tryParse(version)
     }
 
-fun PsiElement.hasNamedLocalVariables(className: String): Boolean {
+/**
+ * Returns [ThreeState.YES] if any [MissingLVTChecker] knows that the given class has no local variable table at runtime,
+ * otherwise [ThreeState.UNSURE] if any checker is unsure, otherwise [ThreeState.NO]. Note that this is unusual in that
+ * [ThreeState.UNSURE] overrides [ThreeState.NO], as [ThreeState.UNSURE] is only supposed to be returned by
+ * [MissingLVTChecker]s that own the class name.
+ */
+fun PsiElement.hasMissingLVT(className: String): ThreeState {
+    var result = ThreeState.NO
     for (checker in MissingLVTChecker.EP_NAME.extensionList) {
-        if (checker.hasMissingLVT(this, className)) {
-            return false
+        when (checker.hasMissingLVT(this, className)) {
+            ThreeState.YES -> return ThreeState.YES
+            ThreeState.UNSURE -> result = ThreeState.UNSURE
+            ThreeState.NO -> {}
         }
     }
 
-    return true
+    return result
+}
+
+fun PsiElement.hasNamedLocalVariables(className: String): Boolean {
+    return hasMissingLVT(className) == ThreeState.NO
 }
 
 fun PsiModifierListOwner.shouldDoMixinAccessChecks(): Boolean {
