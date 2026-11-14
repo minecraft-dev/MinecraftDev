@@ -38,8 +38,6 @@ import com.intellij.psi.util.PsiTreeUtil
  * Annotater requires classes in Javadoc to be referenced by their fully qualified name.
  */
 class AnnotaterJavadocUnqualifiedReferenceInspection : LocalInspectionTool() {
-    override fun getStaticDescription() = MCDevBundle("fabric.annotater.inspection.unqualified.description")
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         if (AnnotaterJavadocVirtualFile.of(holder.file) == null) {
             return PsiElementVisitor.EMPTY_VISITOR

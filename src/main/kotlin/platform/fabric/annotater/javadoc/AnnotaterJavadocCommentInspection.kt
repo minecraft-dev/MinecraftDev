@@ -36,8 +36,6 @@ import com.intellij.psi.util.PsiTreeUtil
  * Annotater only supports Markdown (`///`) Javadoc comments.
  */
 class AnnotaterJavadocCommentInspection : LocalInspectionTool() {
-    override fun getStaticDescription() = MCDevBundle("fabric.annotater.inspection.comment.description")
-
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         if (AnnotaterJavadocVirtualFile.of(holder.file) == null) {
             return PsiElementVisitor.EMPTY_VISITOR

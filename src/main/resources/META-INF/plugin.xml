@@ -322,7 +322,7 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
-        <applicationConfigurable displayName="Annotater"
+        <applicationConfigurable key="fabric.annotater.settings.display_name"
                                  id="Settings.Minecraft.Annotater"
                                  parentId="Settings.Minecraft"
                                  instance="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterConfigurable"/>
@@ -616,7 +616,7 @@
 
         <!-- annotater -->
         <applicationService serviceImplementation="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterSettings"/>
-        <notificationGroup id="Minecraft annotater" displayType="BALLOON"/>
+        <notificationGroup id="Minecraft annotater" key="notification.group.minecraft_annotater" displayType="BALLOON"/>
         <lang.documentationProvider language="JAVA" order="first"
                                     implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocDocumentationProvider"/>
         <highlightingPassFactory
@@ -636,7 +636,7 @@
         <intentionAction>
             <language>JAVA</language>
             <className>com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocIntention</className>
-            <category>Minecraft</category>
+            <categoryKey>intention.category.minecraft</categoryKey>
             <descriptionDirectoryName>EditAnnotaterJavadocIntention</descriptionDirectoryName>
         </intentionAction>
         <!--endregion-->
@@ -968,19 +968,17 @@
         <!--endregion-->
 
         <!--region MINECRAFT INSPECTIONS-->
-        <localInspection displayName="Unqualified class reference in annotater Javadoc"
-                         groupName="Minecraft"
+        <localInspection key="inspection.annotater_javadoc_unqualified_reference.name"
+                         groupKey="inspection.group.minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="WARNING"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqualifiedReferenceInspection"/>
-        <localInspection displayName="Unsupported comment in annotater Javadoc"
-                         groupName="Minecraft"
+        <localInspection key="inspection.annotater_javadoc_comment.name"
+                         groupKey="inspection.group.minecraft"
                          language="JAVA"
                          enabledByDefault="true"
                          level="ERROR"
-                         hasStaticDescription="true"
                          implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCommentInspection"/>
         <localInspection key="inspection.at_usage.name"
                          groupKey="inspection.group.minecraft"
@@ -1619,9 +1617,7 @@
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
         <action class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocAction"
-                id="EditAnnotaterJavadoc"
-                text="Edit Annotater Javadoc"
-                description="Edit the annotater Javadoc of this Minecraft class, field or method">
+                id="EditAnnotaterJavadoc">
             <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction">
