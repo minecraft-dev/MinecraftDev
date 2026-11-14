@@ -934,6 +934,14 @@
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.demonwav.mcdev.platform.fabric.inspection.FabricEntrypointsInspection"/>
+        <localInspection displayName="Fabric mod ID mismatch"
+                         shortName="ModIdMismatch"
+                         groupName="Fabric"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         hasStaticDescription="true"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.inspection.ModIdMismatchInspection"/>
         <!--endregion-->
 
         <!--region MINECRAFT INSPECTIONS-->
