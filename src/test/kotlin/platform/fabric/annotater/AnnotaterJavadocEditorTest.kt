@@ -516,20 +516,35 @@ class AnnotaterJavadocEditorTest : BaseMinecraftTest() {
     }
 
     @Test
-    @DisplayName("Names that displayed Javadocs refer to are highlighted")
-    fun referenceHighlights() {
+    @DisplayName("Displayed Javadocs are highlighted like doc comments in the editor")
+    fun editorHighlights() {
         val javadoc = "Clamps a value.\n\nSee [#clamp(int, int, int)]."
-        val highlights = AnnotaterJavadocRendering.highlightReferences(
-            findMember("net.minecraft.util.Mth", "clamp"),
-            { if (it == clamp) javadoc else null },
-            EditorColorsManager.getInstance().globalScheme,
-        )[clamp].orEmpty()
+        val highlights = decorateJavadoc(javadoc, shortenClassNames = true)?.highlights.orEmpty()
         val lines = javadoc.lines().map { if (it.isEmpty()) "///" else "/// $it" }
         assertEquals(
             listOf(2 to "clamp"),
-            highlights.map { it.line to lines[it.line].substring(it.startColumn, it.endColumn) },
+            highlights.map { it.range }.map { it.line to lines[it.line].substring(it.startColumn, it.endColumn) },
         )
     }
+
+    @Test
+    @DisplayName("Displayed Javadocs can hide the packages of class names")
+    fun shortenedClassNames() {
+        val javadoc = "See [net.minecraft.util.Mth#clamp(int, int, int)] and [net.minecraft.util.Ticker], " +
+            "not [net.minecraft.util]."
+        fun hidden(shortenClassNames: Boolean) = decorateJavadoc(javadoc, shortenClassNames)?.hiddenRanges.orEmpty()
+            .map { "/// $javadoc".substring(it.startColumn, it.endColumn) }
+        assertEquals(listOf("net.minecraft.util.", "net.minecraft.util."), hidden(shortenClassNames = true))
+        assertEquals(emptyList<String>(), hidden(shortenClassNames = false))
+    }
+
+    private fun decorateJavadoc(javadoc: String, shortenClassNames: Boolean) =
+        AnnotaterJavadocRendering.decorateJavadocs(
+            findMember("net.minecraft.util.Mth", "clamp"),
+            { if (it == clamp) javadoc else null },
+            EditorColorsManager.getInstance().globalScheme,
+            shortenClassNames,
+        )[clamp]
 
     // TODO: uncomment in 2026.3
     // @Test

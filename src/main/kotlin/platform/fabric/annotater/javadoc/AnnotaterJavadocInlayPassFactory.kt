@@ -89,20 +89,21 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
 
         private var showJavadocs = false
         private var items = emptyList<Item>()
-        private var highlights = emptyMap<AnnotaterJavadocTarget, List<AnnotaterJavadocRendering.LineHighlight>>()
+        private var decorations = emptyMap<AnnotaterJavadocTarget, AnnotaterJavadocRendering.JavadocDecorations>()
         private var gutterIcons = emptyList<GutterIcon>()
         private var folds = emptyList<TextRange>()
 
         override fun doCollectInformation(progress: ProgressIndicator) {
             val first = file.classes.firstOrNull() ?: return
             val checkout = AnnotaterCheckoutService.instance.checkoutFor(first) ?: return
-            showJavadocs = AnnotaterSettings.instance.showAnnotaterJavadocs
+            val settings = AnnotaterSettings.instance
+            showJavadocs = settings.showAnnotaterJavadocs
             val compiled = file is PsiCompiledElement
             // The Javadoc being edited is displayed by its editor instead
             val edited = AnnotaterJavadocInlineEditor.current(myProject)?.takeIf { it.hostEditor === editor }?.target
 
             val newItems = mutableListOf<Item>()
-            // A member of each top level class with displayed Javadocs, to highlight a copy of that class with
+            // A member of each top level class with displayed Javadocs, to decorate a copy of that class with
             val outerClassMembers = mutableMapOf<String, PsiMember>()
             val newGutterIcons = mutableListOf<GutterIcon>()
             val newFolds = mutableListOf<TextRange>()
@@ -123,12 +124,13 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
                 outerClassMembers.putIfAbsent(target.outerClass, member)
             }
             items = newItems
-            highlights = outerClassMembers.values.flatMap { member ->
+            decorations = outerClassMembers.values.flatMap { member ->
                 progress.checkCanceled()
-                AnnotaterJavadocRendering.highlightReferences(
+                AnnotaterJavadocRendering.decorateJavadocs(
                     member,
                     checkout.javadocStore::getOrNull,
                     editor.colorsScheme,
+                    settings.shortenJavadocClassNames,
                 ).entries
             }.associate { it.toPair() }
             gutterIcons = newGutterIcons
@@ -148,7 +150,7 @@ class AnnotaterJavadocInlayPassFactory : TextEditorHighlightingPassFactoryRegist
                     editor,
                     item.offset,
                     item.javadoc,
-                    highlights[item.target].orEmpty(),
+                    decorations[item.target] ?: AnnotaterJavadocRendering.JavadocDecorations.EMPTY,
                     item.pointer,
                 )
                 editor.inlayModel.addBlockElement(item.offset, false, true, 0, renderer)

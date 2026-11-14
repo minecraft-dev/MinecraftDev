@@ -34,6 +34,7 @@ class AnnotaterSettings : PersistentStateComponent<AnnotaterSettings.State> {
     data class State(
         var enabled: Boolean = false,
         var showAnnotaterJavadocs: Boolean = true,
+        var shortenJavadocClassNames: Boolean = true,
         var checkoutMode: CheckoutMode = CheckoutMode.MANAGED,
         var managedRoot: String = "",
         var customDirectory: String = "",
@@ -69,6 +70,12 @@ class AnnotaterSettings : PersistentStateComponent<AnnotaterSettings.State> {
         get() = state.showAnnotaterJavadocs
         set(showAnnotaterJavadocs) {
             state.showAnnotaterJavadocs = showAnnotaterJavadocs
+        }
+
+    var shortenJavadocClassNames: Boolean
+        get() = state.shortenJavadocClassNames
+        set(shortenJavadocClassNames) {
+            state.shortenJavadocClassNames = shortenJavadocClassNames
         }
 
     var checkoutMode: CheckoutMode

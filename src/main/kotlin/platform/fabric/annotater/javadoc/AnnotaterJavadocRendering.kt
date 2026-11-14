@@ -28,9 +28,13 @@ import com.intellij.codeInsight.daemon.impl.analysis.HighlightNamesUtil
 import com.intellij.lang.java.JavaDocumentationProvider
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiCompiledElement
+import com.intellij.psi.PsiJavaCodeReferenceElement
 import com.intellij.psi.PsiJavaDocumentedElement
 import com.intellij.psi.PsiMember
+import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.text.CharArrayUtil
 
@@ -68,23 +72,49 @@ object AnnotaterJavadocRendering {
         return JavaDocumentationProvider.generateDocStatic(declaration, null)
     }
 
-    class LineHighlight(val line: Int, val startColumn: Int, val endColumn: Int, val attributes: TextAttributes)
+    class LineRange(val line: Int, val startColumn: Int, val endColumn: Int)
+
+    class LineHighlight(val range: LineRange, val attributes: TextAttributes)
 
     /**
-     * Highlights the names that the annotater Javadocs in the top level class of [element] refer to, such as
-     * parameters and linked methods, in the same way as the editor does in doc comments. The editor only highlights
-     * these after resolving them, so the lexer can't.
+     * Changes to how a displayed Javadoc looks, on top of the lexer's highlighting.
      */
-    fun highlightReferences(
+    class JavadocDecorations(val highlights: List<LineHighlight>, val hiddenRanges: List<LineRange>) {
+        companion object {
+            val EMPTY = JavadocDecorations(emptyList(), emptyList())
+        }
+    }
+
+    /**
+     * Works out how to display the annotater Javadocs in the top level class of [element].
+     *
+     * They're highlighted in the same way as the editor highlights doc comments, such as the parameters and methods
+     * that they link to. The editor only adds this highlighting after resolving the code, so the lexer can't. With
+     * [shortenClassNames], the packages of fully qualified class names are hidden.
+     */
+    fun decorateJavadocs(
         element: PsiMember,
         javadoc: (AnnotaterJavadocTarget) -> String?,
         scheme: EditorColorsScheme,
-    ): Map<AnnotaterJavadocTarget, List<LineHighlight>> {
+        shortenClassNames: Boolean,
+    ): Map<AnnotaterJavadocTarget, JavadocDecorations> {
         val copy = AnnotaterJavadocSourceCopy.create(element, javadoc = javadoc) ?: return emptyMap()
         val file = copy.createPsiFile(element.project) ?: return emptyMap()
         val comments = AnnotaterJavadocTarget.declarations(file).zip(copy.targets).mapNotNull { (member, target) ->
             val comment = (member as PsiJavaDocumentedElement).docComment
             if (target != null && comment != null) target to comment else null
+        }
+
+        val text = file.viewProvider.contents
+        fun lineRange(comment: PsiDocComment, start: Int, end: Int): LineRange? {
+            if (text.subSequence(start, end).contains('\n')) {
+                return null
+            }
+            val line = text.subSequence(comment.textRange.startOffset, start).count { it == '\n' }
+            // Each line of the comment starts with its indentation, except the first, which starts after it
+            val lineStart = text.lastIndexOf('\n', start - 1) + 1
+            val contentStart = CharArrayUtil.shiftForward(text, lineStart, " \t")
+            return LineRange(line, start - contentStart, end - contentStart)
         }
 
         val holder = object : HighlightInfoHolder(file) {
@@ -95,27 +125,54 @@ object AnnotaterJavadocRendering {
                 PsiTreeUtil.processElements(comment) { it.accept(visitor); true }
             }
         }
-
-        val text = file.viewProvider.contents
         val highlights = mutableMapOf<AnnotaterJavadocTarget, MutableList<LineHighlight>>()
         for (i in 0 until holder.size()) {
             val info = holder.get(i)
             val attributes = info.getTextAttributes(null, scheme)?.takeUnless { it.isEmpty } ?: continue
-            val (target, comment) = comments.firstOrNull { it.second.textRange.containsRange(info.startOffset, info.endOffset) } ?: continue
-            if (text.subSequence(info.startOffset, info.endOffset).contains('\n')) {
-                continue
-            }
-            val line = text.subSequence(comment.textRange.startOffset, info.startOffset).count { it == '\n' }
-            // Each line of the comment starts with its indentation, except the first, which starts after it
-            val lineStart = text.lastIndexOf('\n', info.startOffset - 1) + 1
-            val contentStart = CharArrayUtil.shiftForward(text, lineStart, " \t")
-            highlights.getOrPut(target, ::mutableListOf) += LineHighlight(
-                line,
-                info.startOffset - contentStart,
-                info.endOffset - contentStart,
-                attributes,
-            )
+            val (target, comment) = comments.firstOrNull { (_, comment) ->
+                comment.textRange.containsRange(info.startOffset, info.endOffset)
+            } ?: continue
+            val range = lineRange(comment, info.startOffset, info.endOffset) ?: continue
+            highlights.getOrPut(target, ::mutableListOf) += LineHighlight(range, attributes)
         }
-        return highlights
+
+        val hiddenRanges = mutableMapOf<AnnotaterJavadocTarget, MutableList<LineRange>>()
+        if (shortenClassNames) {
+            for ((target, comment) in comments) {
+                for (reference in PsiTreeUtil.findChildrenOfType(comment, PsiJavaCodeReferenceElement::class.java)) {
+                    val qualifier = packageQualifier(reference) ?: continue
+                    val range = lineRange(comment, qualifier.startOffset, qualifier.endOffset) ?: continue
+                    hiddenRanges.getOrPut(target, ::mutableListOf) += range
+                }
+            }
+        }
+
+        return (highlights.keys + hiddenRanges.keys).associateWith {
+            JavadocDecorations(highlights[it].orEmpty(), hiddenRanges[it].orEmpty())
+        }
+    }
+
+    /**
+     * The package that qualifies the class that [reference] refers to, such as `net.minecraft.util.` in
+     * `net.minecraft.util.Mth.Inner`.
+     */
+    private fun packageQualifier(reference: PsiJavaCodeReferenceElement): TextRange? {
+        // Qualifiers are handled along with the reference that they qualify
+        if (reference.parent is PsiJavaCodeReferenceElement) {
+            return null
+        }
+        var outermostClass = reference
+        while (true) {
+            val qualifier = outermostClass.qualifier as? PsiJavaCodeReferenceElement ?: break
+            if (qualifier.resolve() !is PsiClass) {
+                break
+            }
+            outermostClass = qualifier
+        }
+        if (outermostClass.resolve() !is PsiClass) {
+            return null
+        }
+        val nameStart = outermostClass.referenceNameElement?.textRange?.startOffset ?: return null
+        return TextRange(reference.textRange.startOffset, nameStart).takeUnless { it.isEmpty }
     }
 }

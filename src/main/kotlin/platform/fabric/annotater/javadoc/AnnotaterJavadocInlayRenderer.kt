@@ -41,13 +41,13 @@ import java.awt.Rectangle
  * Displays an annotater Javadoc above its declaration as the `///` comment it would be in the source, highlighted in
  * the same way as a doc comment in a Java file.
  *
- * @param highlights the highlighting of the names that the Javadoc refers to, on top of the lexer's
+ * @param decorations the highlighting and hidden text of the Javadoc, on top of the lexer's highlighting
  */
 class AnnotaterJavadocInlayRenderer(
     private val editor: Editor,
     private val initialOffset: Int,
     private val javadoc: String,
-    private val highlights: List<AnnotaterJavadocRendering.LineHighlight>,
+    private val decorations: AnnotaterJavadocRendering.JavadocDecorations,
     private val pointer: SmartPsiElementPointer<PsiMember>,
 ) : EditorCustomElementRenderer {
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
@@ -112,27 +112,42 @@ class AnnotaterJavadocInlayRenderer(
         }
 
         val lineStarts = textLines.runningFold(0) { start, line -> start + line.length + 1 }
-        for (highlight in highlights) {
-            val line = textLines.getOrNull(highlight.line) ?: continue
-            if (highlight.endColumn > line.length) {
-                continue
+        fun offsets(range: AnnotaterJavadocRendering.LineRange): IntRange? {
+            val line = textLines.getOrNull(range.line) ?: return null
+            if (range.endColumn > line.length) {
+                return null
             }
-            val lineStart = lineStarts[highlight.line]
-            for (i in lineStart + highlight.startColumn until lineStart + highlight.endColumn) {
+            val lineStart = lineStarts[range.line]
+            return lineStart + range.startColumn until lineStart + range.endColumn
+        }
+        for (highlight in decorations.highlights) {
+            for (i in offsets(highlight.range) ?: continue) {
                 attributes[i] = TextAttributes.merge(attributes[i], highlight.attributes)
             }
         }
+        val hidden = BooleanArray(text.length)
+        for (range in decorations.hiddenRanges) {
+            offsets(range)?.forEach { hidden[it] = true }
+        }
 
-        // Splits each line into runs of the same attributes
+        // Splits each line into runs of the same attributes, leaving out the hidden text
         val lines = textLines.mapIndexed { index, line ->
-            val offset = lineStarts[index]
             val tokens = mutableListOf<Token>()
-            var start = 0
-            for (end in 1..line.length) {
-                if (end == line.length || attributes[offset + end] != attributes[offset + start]) {
-                    tokens += Token(line.substring(start, end), attributes[offset + start])
-                    start = end
+            val tokenText = StringBuilder()
+            var tokenAttributes: TextAttributes? = null
+            for (i in lineStarts[index] until lineStarts[index] + line.length) {
+                if (hidden[i]) {
+                    continue
                 }
+                if (tokenText.isNotEmpty() && attributes[i] != tokenAttributes) {
+                    tokens += Token(tokenText.toString(), tokenAttributes)
+                    tokenText.clear()
+                }
+                tokenAttributes = attributes[i]
+                tokenText.append(text[i])
+            }
+            if (tokenText.isNotEmpty()) {
+                tokens += Token(tokenText.toString(), tokenAttributes)
             }
             tokens
         }

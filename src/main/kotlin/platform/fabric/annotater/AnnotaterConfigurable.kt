@@ -78,10 +78,18 @@ class AnnotaterConfigurable : Configurable {
             row {
                 text(contributionGuidelinesNote())
             }
+            lateinit var showJavadocs: Cell<JBCheckBox>
             row {
-                checkBox(MCDevBundle("fabric.annotater.settings.show_javadocs"))
+                showJavadocs = checkBox(MCDevBundle("fabric.annotater.settings.show_javadocs"))
                     .bindSelected(settings::showAnnotaterJavadocs)
             }
+            indent {
+                row {
+                    checkBox(MCDevBundle("fabric.annotater.settings.shorten_class_names"))
+                        .bindSelected(settings::shortenJavadocClassNames)
+                        .comment(MCDevBundle("fabric.annotater.settings.shorten_class_names.comment"))
+                }
+            }.enabledIf(showJavadocs.selected)
             separator()
             lateinit var managed: Cell<JBRadioButton>
             lateinit var custom: Cell<JBRadioButton>
