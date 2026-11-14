@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -52,20 +52,19 @@ import com.intellij.openapi.roots.libraries.LibraryKind
 
 enum class PlatformType(
     val type: AbstractModuleType<*>,
-    val versionJson: String? = null,
     private val parent: PlatformType? = null,
 ) {
 
-    BUKKIT(BukkitModuleType, "bukkit.json"),
-    SPIGOT(SpigotModuleType, "spigot.json", BUKKIT),
-    PAPER(PaperModuleType, "paper.json", SPIGOT),
+    BUKKIT(BukkitModuleType),
+    SPIGOT(SpigotModuleType, BUKKIT),
+    PAPER(PaperModuleType, SPIGOT),
     ARCHITECTURY(ArchitecturyModuleType),
     FORGE(ForgeModuleType),
     FABRIC(FabricModuleType),
     SPONGE(SpongeModuleType),
-    BUNGEECORD(BungeeCordModuleType, "bungeecord_v2.json"),
-    WATERFALL(WaterfallModuleType, "waterfall.json", BUNGEECORD),
-    VELOCITY(VelocityModuleType, "velocity.json"),
+    BUNGEECORD(BungeeCordModuleType),
+    WATERFALL(WaterfallModuleType, BUNGEECORD),
+    VELOCITY(VelocityModuleType),
     MIXIN(MixinModuleType),
     NEOFORGE(NeoForgeModuleType),
     MINECRAFT(MinecraftModuleType),

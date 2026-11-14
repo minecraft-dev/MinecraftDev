@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,8 +20,6 @@
 
 package com.demonwav.mcdev.util
 
-import com.intellij.openapi.observable.properties.ObservableProperty
-import com.intellij.openapi.observable.util.bindEnabled
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ComponentValidator
 import com.intellij.openapi.ui.DialogWrapper
@@ -35,7 +33,6 @@ import java.awt.event.HierarchyEvent
 import java.util.function.Supplier
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
-import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
 import kotlin.reflect.KMutableProperty0
 
@@ -45,21 +42,6 @@ fun Component.onShown(func: (HierarchyEvent) -> Unit) {
             func(event)
         }
     }
-}
-
-fun Component.onHidden(func: (HierarchyEvent) -> Unit) {
-    addHierarchyListener { event ->
-        if ((event.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong()) != 0L && !isShowing) {
-            func(event)
-        }
-    }
-}
-
-fun <T : JComponent> Cell<T>.bindEnabled(property: ObservableProperty<Boolean>): Cell<T> {
-    applyToComponent {
-        bindEnabled(property)
-    }
-    return this
 }
 
 fun Cell<JBTextField>.doBindText(property: KMutableProperty0<String>): Cell<JBTextField> {

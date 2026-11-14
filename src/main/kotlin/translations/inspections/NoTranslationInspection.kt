@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -40,10 +40,6 @@ import org.jetbrains.uast.toUElementOfType
 import org.jetbrains.uast.visitor.AbstractUastNonRecursiveVisitor
 
 class NoTranslationInspection : TranslationInspection() {
-    override fun getStaticDescription() =
-        "Checks whether a translation key used in calls to <code>StatCollector.translateToLocal()</code>, " +
-            "<code>StatCollector.translateToLocalFormatted()</code> or <code>I18n.format()</code> exists."
-
     private val typesHint: Array<Class<out UElement>> = arrayOf(ULiteralExpression::class.java)
 
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor =

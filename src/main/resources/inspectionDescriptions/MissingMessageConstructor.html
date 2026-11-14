@@ -1,0 +1,44 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    All implementations of <code>IMessage</code> and <code>IMessageHandler</code> must have an empty constructor
+</p>
+<!-- tooltip end -->
+<p>
+    When a message is received, Forge creates the message and its handler using their empty constructors, before reading the
+    message's contents. Without an empty constructor, this fails.
+</p>
+<pre><code>
+public class MyMessage implements IMessage {
+    private int value;
+
+    public MyMessage() {} // required
+
+    public MyMessage(int value) {
+        this.value = value;
+    }
+    ...
+}
+</code></pre>
+</body>
+</html>

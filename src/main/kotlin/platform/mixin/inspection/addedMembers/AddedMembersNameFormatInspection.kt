@@ -79,8 +79,6 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
     @JvmField
     var reportInheritedMethods = ReportMode.ALWAYS
 
-    override fun getStaticDescription() = "Reports added members not matching the correct name format"
-
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
         if (field !is PsiEnumConstant && reportFields.shouldReport(field.findModule())) {
             visitAdded(holder, field)

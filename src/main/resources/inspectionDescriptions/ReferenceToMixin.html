@@ -1,0 +1,41 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    A Mixin class doesn't exist at runtime, and thus cannot be referenced directly.
+</p>
+<!-- tooltip end -->
+<p>
+    Instead of the mixin class, use the target class, or an interface implemented by the mixin.
+</p>
+<pre><code>
+// bad
+((EntityMixin) (Object) entity).myMod$getData();
+
+// good: EntityMixin implements MyModEntity
+((MyModEntity) entity).myMod$getData();
+</code></pre>
+<p>
+    Accessor mixins, and references from a mixin to its own super mixins, are allowed.
+</p>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports when <code>@Inject</code> local capture can be replaced with <code>@Local</code>
+</p>
+<!-- tooltip end -->
+<p>
+    Local capture requires the injector to declare every local variable up to the ones it needs, in order, so it breaks whenever
+    the local variables of the target method change. <code>@Local</code> captures only the locals that are needed.
+</p>
+<pre><code>
+// bad
+@Inject(method = "foo", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+private void onFoo(CallbackInfo ci, int i, String name, List&lt;String&gt; list) {
+    System.out.println(name);
+}
+
+// good
+@Inject(method = "foo", at = @At("TAIL"))
+private void onFoo(CallbackInfo ci, @Local String name) {
+    System.out.println(name);
+}
+</code></pre>
+</body>
+</html>

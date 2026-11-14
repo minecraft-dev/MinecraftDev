@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -29,8 +29,6 @@ import com.intellij.psi.PsiField
 import com.intellij.psi.PsiMethod
 
 class MissingUniqueAnnotationInspection : AbstractAddedMembersInspection() {
-    override fun getStaticDescription() = "Reports missing @Unique annotations"
-
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
         if (field is PsiEnumConstant) {
             return

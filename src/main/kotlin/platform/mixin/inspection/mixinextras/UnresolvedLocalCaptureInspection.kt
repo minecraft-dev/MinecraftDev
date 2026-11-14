@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -38,8 +38,6 @@ import com.intellij.psi.PsiParameter
 import com.intellij.psi.util.parentOfType
 
 class UnresolvedLocalCaptureInspection : MixinInspection() {
-    override fun getStaticDescription() = "Verifies targets of @Local annotations"
-
     override fun buildVisitor(holder: ProblemsHolder): PsiElementVisitor = object : JavaElementVisitor() {
         override fun visitAnnotation(localAnnotation: PsiAnnotation) {
             if (localAnnotation.qualifiedName != MixinConstants.MixinExtras.LOCAL) {

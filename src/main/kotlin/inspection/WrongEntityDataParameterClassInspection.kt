@@ -40,7 +40,6 @@ import com.intellij.psi.util.InheritanceUtil
 
 class WrongEntityDataParameterClassInspection : AbstractBaseJavaLocalInspectionTool() {
 
-    override fun getStaticDescription() = MCDevBundle("inspection.entity_data_param.description")
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = Visitor(holder)
 
     class Visitor(private val holder: ProblemsHolder) : JavaElementVisitor() {

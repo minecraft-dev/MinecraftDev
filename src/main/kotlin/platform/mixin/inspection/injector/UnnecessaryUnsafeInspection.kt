@@ -44,8 +44,6 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
     @JvmField
     var alwaysUnnecessaryOnFabric = true
 
-    override fun getStaticDescription() = "Reports unnecessary unsafe = true"
-
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
         val checkbox = JCheckBox("Always unnecessary when Fabric Mixin is present", alwaysUnnecessaryOnFabric)

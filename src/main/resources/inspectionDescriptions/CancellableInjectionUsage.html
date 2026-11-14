@@ -1,0 +1,46 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports missing or unused cancellable <code>@Inject</code> usages
+</p>
+<!-- tooltip end -->
+<p>
+    Calling <code>cancel()</code> or <code>setReturnValue()</code> on the callback info of an <code>@Inject</code> that is not
+    marked <code>cancellable = true</code> throws an exception at runtime. Conversely, an <code>@Inject</code> marked
+    <code>cancellable = true</code> that is never canceled makes Mixin generate an unnecessary check in the target method.
+</p>
+<pre><code>
+// bad
+@Inject(method = "foo", at = @At("HEAD"))
+private void onFoo(CallbackInfo ci) {
+    ci.cancel();
+}
+
+// good
+@Inject(method = "foo", at = @At("HEAD"), cancellable = true)
+private void onFoo(CallbackInfo ci) {
+    ci.cancel();
+}
+</code></pre>
+</body>
+</html>

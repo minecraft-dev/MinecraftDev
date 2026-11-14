@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.MinecraftDevelopment"
+private const val BUNDLE = "messages.MinecraftDevelopmentBundle"
 
 object MCDevBundle {
 

@@ -1,0 +1,43 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports problems related to the method signature of Mixin injectors
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin expects specific parameters and return type, depending on the injector and its target. Mixin fails to apply an
+    injector whose signature doesn't match.
+</p>
+<pre><code>
+// target: public int getCount(String name)
+
+// bad
+@Inject(method = "getCount", at = @At("HEAD"))
+private void onGetCount(CallbackInfo ci) { ... }
+
+// good
+@Inject(method = "getCount", at = @At("HEAD"))
+private void onGetCount(String name, CallbackInfoReturnable&lt;Integer&gt; cir) { ... }
+</code></pre>
+</body>
+</html>

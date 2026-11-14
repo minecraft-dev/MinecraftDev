@@ -20,21 +20,6 @@
 
 <html>
 <body>
-<p>
-    Reports local variable declarations that are followed by an assignment and can be combined into a single statement.
-</p>
-<p>
-    Joining declarations and assignments helps simplify the code and clarifies the scope of variables.
-</p>
-<p>Example:</p>
-<pre><code>
-String s;
-s = "foo";
-</code></pre>
-<p>After the fix:</p>
-<pre><code>
-String s = "foo";
-</code></pre>
-<!-- tooltip end -->
+Copy of the built-in join declaration and assignment inspection, so that it can be used internally for cleanup
 </body>
 </html>

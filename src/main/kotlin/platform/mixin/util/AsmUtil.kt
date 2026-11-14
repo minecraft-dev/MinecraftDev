@@ -1028,6 +1028,9 @@ fun MethodNode.findSourceElement(
         return psiClass.childrenOfType<PsiClassInitializer>().firstOrNull { it.hasModifierProperty(PsiModifier.STATIC) }
             ?: psiClass
     }
+    if (hasAccess(Opcodes.ACC_SYNTHETIC) && psiClass !is PsiCompiledElement) {
+        findAssociatedLambda(project, scope, clazz, this)?.let { return it }
+    }
     psiClass.findMethods(memberReference).firstOrNull()?.let { return it }
     if (psiClass is PsiCompiledElement) {
         // don't walk into stub compiled elements to look for lambdas

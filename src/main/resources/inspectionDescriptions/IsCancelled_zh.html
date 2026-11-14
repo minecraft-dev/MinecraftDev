@@ -1,0 +1,41 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    报告无用的 event 取消检查
+</p>
+<!-- tooltip end -->
+<p>
+    某些事件监听器只会收到未被取消的事件，因此检查事件是否已取消总是得到相同的结果。在 Bukkit 上，这适用于带有
+    <code>ignoreCancelled = true</code> 的处理器。在 Sponge 上，除非标注了 <code>@IsCancelled</code>，监听器只会收到未被取消的事件。
+</p>
+<pre><code>
+@EventHandler(ignoreCancelled = true)
+public void onBreak(BlockBreakEvent event) {
+    if (event.isCancelled()) { // 总是 false
+        return;
+    }
+    ...
+}
+</code></pre>
+</body>
+</html>
