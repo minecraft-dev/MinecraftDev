@@ -20,6 +20,16 @@
 
 <html>
 <body>
-Reports unqualified member references in @At targets
+<p>
+    Reports unqualified member references in <code>@At</code> targets
+</p>
+<!-- tooltip end -->
+<p>
+    <code>@At</code> requires member references to be qualified.
+</p>
+<pre><code>
+@At(value = "INVOKE", target = "bar")                     // bad
+@At(value = "INVOKE", target = "Lcom/example/Foo;bar()V") // good
+</code></pre>
 </body>
 </html>

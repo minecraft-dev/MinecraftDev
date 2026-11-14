@@ -20,6 +20,19 @@
 
 <html>
 <body>
-Reports duplicate @Interface prefixes in an @Implements annotation.
+<p>
+    Reports duplicate <code>@Interface</code> prefixes in an <code>@Implements</code> annotation.
+</p>
+<!-- tooltip end -->
+<p>
+    Methods whose name starts with an <code>@Interface</code> prefix are renamed when the mixin is applied, to soft-implement
+    a method of that interface. If two interfaces share a prefix, it is ambiguous which interface a prefixed method belongs to.
+</p>
+<pre><code>
+@Implements({
+    @Interface(iface = Foo.class, prefix = "foo$"),
+    @Interface(iface = Bar.class, prefix = "foo$") // Duplicate prefix 'foo$'
+})
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,20 @@
 
 <html>
 <body>
-Classes which are annotated with @SideOnly cannot contain any nested classes which are annotated with a different @SideOnly annotation. Since a class that is annotated with @SideOnly brings everything with it, @SideOnly annotated nested classes are usually useless.
+<p>
+    Reports nested classes annotated with a different <code>@SideOnly</code> side than their containing class.
+</p>
+<!-- tooltip end -->
+<p>
+    A class annotated with <code>@SideOnly</code> is removed together with everything in it on the other side, so a nested class
+    can't be for a different side. <code>@SideOnly</code> annotations on nested classes are therefore usually useless.
+</p>
+<pre><code>
+@SideOnly(Side.CLIENT)
+public class Renderer {
+    @SideOnly(Side.SERVER) // bad
+    public static class Data { ... }
+}
+</code></pre>
 </body>
 </html>

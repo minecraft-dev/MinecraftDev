@@ -20,6 +20,14 @@
 
 <html>
 <body>
-Invalid @Inject usage in Sponge plugin class.
+<p>
+    Invalid <code>@Inject</code> usage in Sponge plugin class.
+</p>
+<!-- tooltip end -->
+<p>
+    Sponge injects these values when it creates the plugin, and fails when an injection can't be satisfied. For example,
+    primitive types can't be injected, constructor injections can't be optional, and an injected <code>Asset</code> must be
+    annotated with an <code>@AssetId</code> that refers to an existing file.
+</p>
 </body>
 </html>

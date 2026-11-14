@@ -20,6 +20,17 @@
 
 <html>
 <body>
-@Getter requires the parameter's type to be assignable from the annotation's target method return type
+<p>
+    <code>@Getter</code> requires the parameter's type to be assignable from the annotation's target method return type
+</p>
+<!-- tooltip end -->
+<p>
+    Sponge passes the value returned by the method to the parameter, so the parameter's type must be able to hold it.
+</p>
+<pre><code>
+// event.getPlayer() returns ServerPlayer
+@Getter("getPlayer") String player      // bad
+@Getter("getPlayer") ServerPlayer player // good
+</code></pre>
 </body>
 </html>

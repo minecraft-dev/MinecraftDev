@@ -20,6 +20,21 @@
 
 <html>
 <body>
-For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag.
+<p>
+    For maintainability reasons, the Sponge project requires @Overwrite methods to declare an @author JavaDoc tag.
+</p>
+<!-- tooltip end -->
+<p>
+    An <code>@Overwrite</code> replaces the target method entirely and can conflict with other mods. The <code>@author</code> tag
+    says who to contact about the overwrite, and the <code>@reason</code> tag explains why it was needed.
+</p>
+<pre><code>
+/**
+ * @author MyMod
+ * @reason Fix the speed calculation for slow entities
+ */
+@Overwrite
+public float getSpeed() { ... }
+</code></pre>
 </body>
 </html>

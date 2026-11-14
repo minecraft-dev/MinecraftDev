@@ -20,6 +20,20 @@
 
 <html>
 <body>
-Reports unused prefixes of @Shadow methods
+<p>
+    Reports unused prefixes of <code>@Shadow</code> methods
+</p>
+<!-- tooltip end -->
+<p>
+    The prefix is only removed from method names that start with it, so a prefix that doesn't match the method's name has no
+    effect.
+</p>
+<pre><code>
+@Shadow(prefix = "shadow$")
+public abstract int getCount();        // bad
+
+@Shadow(prefix = "shadow$")
+public abstract int shadow$getCount(); // good
+</code></pre>
 </body>
 </html>

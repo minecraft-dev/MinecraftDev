@@ -20,6 +20,26 @@
 
 <html>
 <body>
-Reports when an @Inject local capture is unused
+<p>
+    Reports when an <code>@Inject</code> local capture is unused
+</p>
+<!-- tooltip end -->
+<p>
+    Local capture depends on the exact local variables of the target method, so it breaks easily when the target method changes.
+    If none of the captured locals are used, remove the capture.
+</p>
+<pre><code>
+// bad
+@Inject(method = "foo", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+private void onFoo(CallbackInfo ci, int count, String name) {
+    System.out.println("foo");
+}
+
+// good
+@Inject(method = "foo", at = @At("TAIL"))
+private void onFoo(CallbackInfo ci) {
+    System.out.println("foo");
+}
+</code></pre>
 </body>
 </html>

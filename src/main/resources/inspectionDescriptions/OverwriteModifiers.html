@@ -20,6 +20,20 @@
 
 <html>
 <body>
-Validates the modifiers of @Overwrite methods
+<p>
+    Validates the modifiers of @Overwrite methods
+</p>
+<!-- tooltip end -->
+<p>
+    An <code>@Overwrite</code> replaces the target method, so it must have the same modifiers, and can't have lower visibility
+    than the target method. Annotations of the target method, such as nullability annotations, should also be present on the
+    overwrite so it keeps the same contract.
+</p>
+<pre><code>
+// target: public static int getMaxCount()
+
+@Overwrite private int getMaxCount() { ... }       // bad
+@Overwrite public static int getMaxCount() { ... } // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,17 @@
 
 <html>
 <body>
-Reports when a @Share parameter is of a non-LocalRef type
+<p>
+    Reports when a @Share parameter is of a non-LocalRef type
+</p>
+<!-- tooltip end -->
+<p>
+    A <code>@Share</code> variable is shared by reference between injectors, so the parameter must be a <code>LocalRef</code>
+    type, such as <code>LocalIntRef</code> or <code>LocalRef&lt;String&gt;</code>.
+</p>
+<pre><code>
+@Share("count") int count         // bad
+@Share("count") LocalIntRef count // good
+</code></pre>
 </body>
 </html>

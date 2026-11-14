@@ -20,6 +20,27 @@
 
 <html>
 <body>
-Unnecessary mutable reference to captured local
+<p>
+    Unnecessary mutable reference to captured local
+</p>
+<!-- tooltip end -->
+<p>
+    Reports <code>@Local</code> parameters of a <code>LocalRef</code> type whose value is only read, never set.
+</p>
+<p>
+    A mutable reference makes MixinExtras wrap the local in a reference object and write its value back afterwards. If the value
+    is never set, capture the local directly.
+</p>
+<pre><code>
+// bad
+private void onFoo(CallbackInfo ci, @Local LocalIntRef count) {
+    System.out.println(count.get());
+}
+
+// good
+private void onFoo(CallbackInfo ci, @Local int count) {
+    System.out.println(count);
+}
+</code></pre>
 </body>
 </html>

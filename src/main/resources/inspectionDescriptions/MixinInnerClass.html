@@ -20,6 +20,13 @@
 
 <html>
 <body>
-Reports invalid usages of inner classes in Mixins.
+<p>
+    Reports invalid usages of inner classes in Mixins.
+</p>
+<!-- tooltip end -->
+<p>
+    A nested mixin is loaded independently, without an instance of the outer class, so it must be static. Mixin copies anonymous
+    classes declared in a mixin into the target, but doesn't support classes nested inside those anonymous classes.
+</p>
 </body>
 </html>

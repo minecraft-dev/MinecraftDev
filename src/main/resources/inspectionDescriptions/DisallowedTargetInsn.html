@@ -20,6 +20,16 @@
 
 <html>
 <body>
-Reports disallowed injector targets
+<p>
+    Reports targets not supported by an injector
+</p>
+<!-- tooltip end -->
+<p>
+    Each injector can only operate on certain kinds of instructions, and Mixin fails when an injector targets any other kind.
+</p>
+<pre><code>
+// bad: @ModifyArg can only target method invocations
+@ModifyArg(method = "foo", at = @At(value = "FIELD", target = "..."), index = 0)
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,19 @@
 
 <html>
 <body>
-Reports ambiguous references in Mixin annotations
+<p>
+    Reports ambiguous references in Mixin annotations
+</p>
+<!-- tooltip end -->
+<p>
+    When a method name matches several overloads in the target class, Mixin targets all the overloads, which is often
+    not intended. Specify the descriptor to target a specific overload, or add the <code>*</code> wildcard to explicitly
+    target all of them.
+</p>
+<pre><code>
+@Inject(method = "add", ...)                     // bad
+@Inject(method = "add(Ljava/lang/String;)V", ...) // good: one overload
+@Inject(method = "add*", ...)                    // if all overloads are intended
+</code></pre>
 </body>
 </html>

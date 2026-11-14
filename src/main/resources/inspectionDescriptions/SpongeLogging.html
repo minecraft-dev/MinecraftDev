@@ -20,6 +20,14 @@
 
 <html>
 <body>
-Sponge provides a org.slf4j.Logger logger implementation using @Inject in your plugin class. You should not use java.util.logging.Logger in your plugin.
+<p>
+    Reports usages of <code>java.util.logging.Logger</code> in Sponge plugins.
+</p>
+<!-- tooltip end -->
+<p>
+    Sponge provides an <code>org.slf4j.Logger</code> for each plugin, which can be injected using <code>@Inject</code> in the plugin
+    class. It is set up by Sponge, so its messages are identified as coming from your plugin and are logged consistently with the
+    rest of the server.
+</p>
 </body>
 </html>

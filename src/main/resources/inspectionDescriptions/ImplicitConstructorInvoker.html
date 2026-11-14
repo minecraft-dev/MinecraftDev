@@ -20,6 +20,20 @@
 
 <html>
 <body>
-Implicit constructor invoker (fails outside of dev)
+<p>
+    Reports implicit constructor invokers (fails outside of dev)
+</p>
+<!-- tooltip end -->
+<p>
+    An <code>@Invoker</code> without a target, whose name starts with <code>create</code> or <code>new</code>, invokes a
+    constructor. This works in the development environment, but fails in production. Specify the constructor explicitly instead.
+</p>
+<pre><code>
+@Invoker              // bad
+static Foo createFoo(int x) { throw new AssertionError(); }
+
+@Invoker("&lt;init&gt;")    // good
+static Foo createFoo(int x) { throw new AssertionError(); }
+</code></pre>
 </body>
 </html>

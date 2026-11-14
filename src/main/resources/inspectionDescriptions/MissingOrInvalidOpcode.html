@@ -20,6 +20,24 @@
 
 <html>
 <body>
-Reports missing or invalid usages of opcode
+<p>
+    Reports missing or invalid usages of opcode
+</p>
+<!-- tooltip end -->
+<p>
+    Some injection points, such as <code>FIELD</code>, match several kinds of instructions, and it's good to specify an opcode
+    to say which kind to target. For example, without an opcode, <code>FIELD</code> matches both reads and writes of the field,
+    which is rarely intended.
+</p>
+<p>
+    Other injection points ignore the opcode, so specifying one there is misleading.
+</p>
+<pre><code>
+// bad
+@At(value = "FIELD", target = "Lcom/example/Foo;bar:I")
+
+// good
+@At(value = "FIELD", target = "Lcom/example/Foo;bar:I", opcode = Opcodes.PUTFIELD)
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,29 @@
 
 <html>
 <body>
-Reports when @WrapWithCondition targets a non-void instruction followed by a pop
+<p>
+    Reports when <code>@WrapWithCondition</code> targets a non-void instruction followed by a pop
+</p>
+<!-- tooltip end -->
+<p>
+    When the condition is false, <code>@WrapWithCondition</code> skips the call, so the call has no return value. This only works
+    because the return value is discarded, and breaks if the target method is changed to use it, including by another Mixin.
+    Use <code>@WrapOperation</code> instead, which can provide a return value.
+</p>
+<pre><code>
+// target: list.add(item);
+
+// bad
+@WrapWithCondition(method = "foo", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+private boolean shouldAdd(List&lt;Item&gt; list, Item item) {
+    return item != null;
+}
+
+// good
+@WrapOperation(method = "foo", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+private boolean add(List&lt;Item&gt; list, Item item, Operation&lt;Boolean&gt; original) {
+    return item != null &amp;&amp; original.call(list, item);
+}
+</code></pre>
 </body>
 </html>

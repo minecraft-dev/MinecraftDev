@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Detect wrong argument types in translation arguments
+<p>
+    Detect wrong argument types in translation arguments
+</p>
+<!-- tooltip end -->
+<p>
+    Translation arguments must be a <code>String</code>, <code>Number</code>, <code>Boolean</code> or <code>Component</code>.
+    Minecraft can't serialize arguments of other types, which causes errors, for example when the component is sent over the
+    network. Convert such arguments to strings, or use <code>Component.translatableEscape</code>.
+</p>
+<pre><code>
+Component.translatable("my_mod.position", pos)                 // bad
+Component.translatable("my_mod.position", String.valueOf(pos)) // good
+</code></pre>
 </body>
 </html>

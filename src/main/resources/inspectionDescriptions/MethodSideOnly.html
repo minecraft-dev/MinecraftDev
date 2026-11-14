@@ -20,6 +20,22 @@
 
 <html>
 <body>
-A method in a class annotated for one side cannot be declared as being in the other side. For example, a class which is annotated as @SideOnly(Side.SERVER) cannot contain a method which is annotated as @SideOnly(Side.CLIENT). Since a class that is annotated with @SideOnly brings everything with it, @SideOnly annotated methods are usually useless
+<p>
+    Reports methods annotated with a different <code>@SideOnly</code> side than their class, and methods returning a type
+    annotated with a different <code>@SideOnly</code> side than the method or its class.
+</p>
+<!-- tooltip end -->
+<p>
+    A class annotated with <code>@SideOnly</code> is removed together with everything in it on the other side, so a method in it
+    can't be for a different side, and <code>@SideOnly</code> annotations on its methods are usually useless. Likewise, a method
+    can't return a type that doesn't exist on its side.
+</p>
+<pre><code>
+@SideOnly(Side.SERVER)
+public class ServerData {
+    @SideOnly(Side.CLIENT) // bad
+    public void render() { ... }
+}
+</code></pre>
 </body>
 </html>

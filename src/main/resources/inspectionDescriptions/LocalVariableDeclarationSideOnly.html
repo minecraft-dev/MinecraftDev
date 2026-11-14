@@ -20,6 +20,25 @@
 
 <html>
 <body>
-A variable whose class declaration is annotated with @SideOnly for one side cannot be declared in a class or method that does not match the same side.
+<p>
+    A variable whose class declaration is annotated with <code>@SideOnly</code> for one side cannot be declared in a class or
+    method that does not match the same side.
+</p>
+<!-- tooltip end -->
+<p>
+    Code annotated with <code>@SideOnly</code> is removed when running on the other side, so code that uses it crashes there.
+</p>
+<pre><code>
+// bad: runs on both sides
+public void update() {
+    Minecraft mc = Minecraft.getMinecraft(); // Minecraft is @SideOnly(Side.CLIENT)
+}
+
+// good
+@SideOnly(Side.CLIENT)
+public void update() {
+    Minecraft mc = Minecraft.getMinecraft();
+}
+</code></pre>
 </body>
 </html>

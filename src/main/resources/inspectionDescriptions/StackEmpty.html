@@ -20,6 +20,17 @@
 
 <html>
 <body>
-Comparing an ItemStack to ItemStack.EMPTY to query stack emptiness can cause unwanted issues.When a stack in an inventory is shrunk, the instance is not replaced with ItemStack.EMPTY, but the stack should still be considered empty. Instead, isEmpty() should be called.
+<p>
+    Reports comparisons of an <code>ItemStack</code> with <code>ItemStack.EMPTY</code>.
+</p>
+<!-- tooltip end -->
+<p>
+    An empty stack isn't always the <code>ItemStack.EMPTY</code> instance. When a stack in an inventory is shrunk, the instance is
+    not replaced with <code>ItemStack.EMPTY</code>, but the stack should still be considered empty.
+</p>
+<pre><code>
+if (stack == ItemStack.EMPTY) { ... } // bad
+if (stack.isEmpty()) { ... }          // good
+</code></pre>
 </body>
 </html>

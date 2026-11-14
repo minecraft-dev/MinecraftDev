@@ -20,6 +20,22 @@
 
 <html>
 <body>
-A Mixin class doesn't exist at runtime, and thus cannot be referenced directly.
+<p>
+    A Mixin class doesn't exist at runtime, and thus cannot be referenced directly.
+</p>
+<!-- tooltip end -->
+<p>
+    Instead of the mixin class, use the target class, or an interface implemented by the mixin.
+</p>
+<pre><code>
+// bad
+((EntityMixin) (Object) entity).myMod$getData();
+
+// good: EntityMixin implements MyModEntity
+((MyModEntity) entity).myMod$getData();
+</code></pre>
+<p>
+    Accessor mixins, and references from a mixin to its own super mixins, are allowed.
+</p>
 </body>
 </html>

@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Detects missing format arguments for translations
+<p>
+    Detects missing format arguments for translations
+</p>
+<!-- tooltip end -->
+<p>
+    If a translation contains more placeholders such as <code>%s</code> than there are arguments, it can't be formatted and isn't
+    displayed correctly.
+</p>
+<pre><code>
+// "my_mod.greeting": "Hello, %s!"
+Component.translatable("my_mod.greeting")       // bad
+Component.translatable("my_mod.greeting", name) // good
+</code></pre>
 </body>
 </html>

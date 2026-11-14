@@ -20,6 +20,14 @@
 
 <html>
 <body>
-Reports unnecessary unsafe = true
+<p>
+    Reports unnecessary <code>unsafe = true</code>
+</p>
+<!-- tooltip end -->
+<p>
+    <code>unsafe = true</code> only relaxes restrictions on injecting into constructors, so it has no effect on injectors that
+    don't target a constructor. Fabric's version of Mixin doesn't have these restrictions at all, so by default
+    <code>unsafe = true</code> is always reported as unnecessary when Fabric Mixin is present.
+</p>
 </body>
 </html>

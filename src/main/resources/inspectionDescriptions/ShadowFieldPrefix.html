@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Reports @Shadow fields with prefixes
+<p>
+    Reports <code>@Shadow</code> fields with prefixes
+</p>
+<!-- tooltip end -->
+<p>
+    The <code>@Shadow</code> prefix allows a shadow method to avoid a name clash with another method in the mixin. Mixin doesn't
+    support prefixes for fields, and fails when applying the mixin.
+</p>
+<pre><code>
+@Shadow private int shadow$count; // bad
+@Shadow(prefix = "myMod$") private int myMod$count; // bad
+@Shadow private int count;        // good
+</code></pre>
 </body>
 </html>

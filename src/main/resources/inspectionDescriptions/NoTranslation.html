@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Checks whether a translation key used in calls to <code>StatCollector.translateToLocal()</code>, <code>StatCollector.translateToLocalFormatted()</code> or <code>I18n.format()</code> exists.
+<p>
+    Reports translation keys that don't have a translation.
+</p>
+<!-- tooltip end -->
+<p>
+    If a translation key doesn't exist, Minecraft displays the key itself instead of a translated text. This is usually caused by
+    a typo in the key, or a translation missing from the language file.
+</p>
+<pre><code>
+// en_us.json: { "my_mod.greeting": "Hello!" }
+Component.translatable("my_mod.greting") // bad
+Component.translatable("my_mod.greeting") // good
+</code></pre>
 </body>
 </html>

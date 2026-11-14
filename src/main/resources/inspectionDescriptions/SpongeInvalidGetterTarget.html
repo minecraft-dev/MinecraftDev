@@ -20,6 +20,17 @@
 
 <html>
 <body>
-@Getter must target a method accessible from the event class of this listener
+<p>
+    <code>@Getter</code> must target a method accessible from the event class of this listener
+</p>
+<!-- tooltip end -->
+<p>
+    Sponge fills in the parameter by calling the method named by <code>@Getter</code> on the event, so the method must exist on
+    the event class.
+</p>
+<pre><code>
+@Listener
+public void onJoin(ServerSideConnectionEvent.Join event, @Getter("getPlayer") ServerPlayer player) { ... } // good
+</code></pre>
 </body>
 </html>

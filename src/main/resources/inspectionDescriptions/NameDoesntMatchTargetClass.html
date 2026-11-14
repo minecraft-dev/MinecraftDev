@@ -20,6 +20,24 @@
 
 <html>
 <body>
-Reports when a parameter name in a Mixin does not match the target class
+<p>
+    Reports when a parameter name in a Mixin does not match the target class
+</p>
+<!-- tooltip end -->
+<p>
+    Naming parameters the same as the corresponding parameters or local variables in the target class makes the injector easier
+    to read. A mismatched name can also indicate that the parameter doesn't refer to the variable it was meant to.
+</p>
+<pre><code>
+// target: public void setHealth(float health)
+
+// bad
+@Inject(method = "setHealth", at = @At("HEAD"))
+private void onSetHealth(float value, CallbackInfo ci) { ... }
+
+// good
+@Inject(method = "setHealth", at = @At("HEAD"))
+private void onSetHealth(float health, CallbackInfo ci) { ... }
+</code></pre>
 </body>
 </html>

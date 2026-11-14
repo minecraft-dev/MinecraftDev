@@ -20,6 +20,33 @@
 
 <html>
 <body>
-Reports when a mixin class is instantiated within that same class using a constructor which doesn't exist in the target class
+<p>
+    Reports when a mixin class is instantiated within that same class using a constructor which doesn't exist in the target class
+</p>
+<!-- tooltip end -->
+<p>
+    A mixin class is merged into its target class, so calls to its constructors become calls to constructors of the target class.
+    If the target class has no constructor with matching parameters, this fails at runtime. For example, this applies to enum
+    constants added by an enum mixin. Add a <code>@Shadow</code> constructor matching a constructor in the target class.
+</p>
+<pre><code>
+enum Color {
+    RED(0xFF0000);
+    Color(int rgb) { ... }
+}
+
+@Mixin(Color.class)
+enum ColorMixin {
+    MYMOD_PURPLE; // bad (calls implicit shadow constructor, which doesn't exist in target class)
+}
+
+@Mixin(Color.class)
+enum ColorMixin {
+    MYMOD_PURPLE(0x800080); // good
+
+    @Shadow
+    ColorMixin(int rgb) {}
+}
+</code></pre>
 </body>
 </html>

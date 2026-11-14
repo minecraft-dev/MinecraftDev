@@ -20,6 +20,17 @@
 
 <html>
 <body>
-A Mixin class must target either one or more classes or provide one or more string targets
+<p>
+    A Mixin class must target either one or more classes or provide one or more string targets
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin needs to know which classes to apply the mixin to.
+</p>
+<pre><code>
+@Mixin                       // bad
+@Mixin(Target.class)         // good
+@Mixin(targets = "a.b.Target") // good, for classes that can't be referenced
+</code></pre>
 </body>
 </html>

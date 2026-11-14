@@ -20,6 +20,23 @@
 
 <html>
 <body>
-Reports when a Mixin uses the wrong class type
+<p>
+    Reports when a Mixin uses the wrong class type
+</p>
+<!-- tooltip end -->
+<p>
+    A mixin is merged into its target class, so it must be the same kind of type. Use an interface mixin to target interfaces, and
+    a class mixin to target classes. Enum mixins are only supported for enum targets. Classes can also be used to target enums and
+    records.
+</p>
+<pre><code>
+interface Target {}
+
+@Mixin(Target.class)
+abstract class TargetMixin {} // bad
+
+@Mixin(Target.class)
+interface TargetMixin {}      // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,26 @@
 
 <html>
 <body>
-A class that is annotated as @SideOnly(Side.CLIENT) or @SideOnly(Side.SERVER) cannot be used in classes or methods which are annotated differently, or not at all. Since the irrelevant code is removed when operating as a server or a client, common code cannot use @SideOnly annotated classes either.
+<p>
+    Reports instantiations of classes annotated with <code>@SideOnly</code> in classes or methods that are annotated differently,
+    or not at all.
+</p>
+<!-- tooltip end -->
+<p>
+    Code annotated with <code>@SideOnly</code> is removed when running on the other side, so code that runs on both sides can't
+    use it either.
+</p>
+<pre><code>
+// bad: runs on both sides
+public void update() {
+    new GuiMyScreen(); // GuiMyScreen is @SideOnly(Side.CLIENT)
+}
+
+// good
+@SideOnly(Side.CLIENT)
+public void update() {
+    new GuiMyScreen();
+}
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,13 @@
 
 <html>
 <body>
-Reports when cancellable @Injects are used before a superconstructor call
+<p>
+    Reports when cancellable <code>@Inject</code>s are used before a delegate constructor call
+</p>
+<!-- tooltip end -->
+<p>
+    A constructor must call the delegate constructor before it returns. Cancelling an injector before that call would return
+    without it, which is not valid bytecode.
+</p>
 </body>
 </html>

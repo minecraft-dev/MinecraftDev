@@ -20,6 +20,17 @@
 
 <html>
 <body>
-Checks that @Local has argsOnly if it targets arguments, which improves performance of the mixin
+<p>
+    Checks that <code>@Local</code> has <code>argsOnly</code> if it targets arguments, which improves performance of the mixin
+</p>
+<!-- tooltip end -->
+<p>
+    With <code>argsOnly = true</code>, MixinExtras only searches the method's parameters, so it doesn't have to analyze the local
+    variables of the target method.
+</p>
+<pre><code>
+@Local String name                  // bad
+@Local(argsOnly = true) String name // good
+</code></pre>
 </body>
 </html>

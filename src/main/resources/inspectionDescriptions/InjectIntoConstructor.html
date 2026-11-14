@@ -20,6 +20,23 @@
 
 <html>
 <body>
-@Inject into Constructor
+<p>
+    <code>@Inject</code> into Constructor
+</p>
+<!-- tooltip end -->
+<p>
+    Reports <code>@Inject</code> injectors that inject into a constructor at an instruction other than <code>RETURN</code>,
+    without <code>unsafe = true</code>.
+</p>
+<p>
+    Sponge Mixin only allows <code>@Inject</code> into constructors at <code>RETURN</code> by default, because injecting earlier
+    risks running code before the object is initialized. Fabric's version of Mixin doesn't have this restriction, so by default
+    it is allowed when Fabric Mixin is present.
+</p>
+<pre><code>
+@Inject(method = "&lt;init&gt;", at = @At(value = "INVOKE", target = "..."))                // bad
+@Inject(method = "&lt;init&gt;", at = @At(value = "INVOKE", target = "...", unsafe = true)) // good
+@Inject(method = "&lt;init&gt;", at = @At("RETURN"))                                         // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,16 @@
 
 <html>
 <body>
-Reports invalid prefixes in @Interface annotations. The prefixes must end with a dollar sign ($).
+<p>
+    Reports invalid prefixes in <code>@Interface</code> annotations. The prefixes must end with a dollar sign (<code>$</code>).
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin rejects such prefixes when the mixin is applied.
+</p>
+<pre><code>
+@Interface(iface = Foo.class, prefix = "foo")  // bad
+@Interface(iface = Foo.class, prefix = "foo$") // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,20 @@
 
 <html>
 <body>
-Validates access modifiers of @Shadow members
+<p>
+    Validates access modifiers of <code>@Shadow</code> members
+</p>
+<!-- tooltip end -->
+<p>
+    A <code>@Shadow</code> member stands for a member of the target class, so its <code>static</code> modifier and access level
+    must match the target member. Shadows of final fields must be annotated with <code>@Final</code>, so that
+    assignments to them are reported.
+</p>
+<pre><code>
+// target: private static final Logger LOGGER
+
+@Shadow public static Logger LOGGER;               // bad
+@Shadow @Final private static Logger LOGGER;       // good
+</code></pre>
 </body>
 </html>

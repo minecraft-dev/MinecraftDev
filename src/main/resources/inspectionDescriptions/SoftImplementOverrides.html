@@ -20,6 +20,22 @@
 
 <html>
 <body>
-Reports soft-implemented methods in Mixins that do not override a method in the target classes.
+<p>
+    Reports soft-implemented methods in Mixins that do not override a method in the target classes.
+</p>
+<!-- tooltip end -->
+<p>
+    A method with an <code>@Interface</code> prefix is meant to implement a method of that interface once the prefix is removed.
+    If no such interface method exists, the method doesn't implement anything, which usually means there is a typo in its name or
+    parameter types.
+</p>
+<pre><code>
+@Mixin(Target.class)
+@Implements(@Interface(iface = Foo.class, prefix = "foo$"))
+public class TargetMixin {
+    // Foo has no method getNmae()
+    public String foo$getNmae() { ... }
+}
+</code></pre>
 </body>
 </html>

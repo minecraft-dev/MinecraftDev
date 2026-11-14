@@ -20,6 +20,28 @@
 
 <html>
 <body>
-Variables which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods.
+<p>
+    Reports uses of fields annotated with <code>@SideOnly</code>, or declared in a class annotated with <code>@SideOnly</code>, in
+    classes or methods that are annotated differently, or not at all.
+</p>
+<!-- tooltip end -->
+<p>
+    Code annotated with <code>@SideOnly</code> is removed when running on the other side, so code that uses it crashes there.
+</p>
+<pre><code>
+@SideOnly(Side.CLIENT)
+private int renderColor;
+
+// bad: runs on both sides
+public int getColor() {
+    return renderColor;
+}
+
+// good
+@SideOnly(Side.CLIENT)
+public int getColor() {
+    return renderColor;
+}
+</code></pre>
 </body>
 </html>

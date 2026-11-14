@@ -20,6 +20,24 @@
 
 <html>
 <body>
-Methods which are declared with a @SideOnly annotation can only be used in matching @SideOnly classes and methods.
+<p>
+    Methods which are declared with a <code>@SideOnly</code> annotation can only be used in matching <code>@SideOnly</code> classes and methods.
+</p>
+<!-- tooltip end -->
+<p>
+    Code annotated with <code>@SideOnly</code> is removed when running on the other side, so code that uses it crashes there.
+</p>
+<pre><code>
+// bad: runs on both sides
+public void update() {
+    getRenderer().render(); // render() is @SideOnly(Side.CLIENT)
+}
+
+// good
+@SideOnly(Side.CLIENT)
+public void update() {
+    getRenderer().render();
+}
+</code></pre>
 </body>
 </html>

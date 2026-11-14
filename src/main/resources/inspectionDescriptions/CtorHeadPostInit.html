@@ -20,6 +20,14 @@
 
 <html>
 <body>
-Reports when CTOR_HEAD with enforce=POST_INIT doesn't target a field
+<p>
+    Reports when <code>CTOR_HEAD</code> with <code>enforce=POST_INIT</code> doesn't target a field
+</p>
+<!-- tooltip end -->
+<p>
+    With <code>enforce=POST_INIT</code>, <code>CTOR_HEAD</code> injects after the field initializers of a constructor. If
+    Mixin's heuristic to detect field initializers fails, it will default to injecting after the delegate constructor call.
+    This inspection reports when this happens.
+</p>
 </body>
 </html>

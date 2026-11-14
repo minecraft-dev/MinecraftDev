@@ -20,6 +20,24 @@
 
 <html>
 <body>
-Reports problems related to the method signature of Mixin injectors
+<p>
+    Reports problems related to the method signature of Mixin injectors
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin expects specific parameters and return type, depending on the injector and its target. Mixin fails to apply an
+    injector whose signature doesn't match.
+</p>
+<pre><code>
+// target: public int getCount(String name)
+
+// bad
+@Inject(method = "getCount", at = @At("HEAD"))
+private void onGetCount(CallbackInfo ci) { ... }
+
+// good
+@Inject(method = "getCount", at = @At("HEAD"))
+private void onGetCount(String name, CallbackInfoReturnable&lt;Integer&gt; cir) { ... }
+</code></pre>
 </body>
 </html>

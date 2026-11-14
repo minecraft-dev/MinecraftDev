@@ -20,6 +20,25 @@
 
 <html>
 <body>
-All implementations of IMessage and IMessageHandler must have an empty constructor
+<p>
+    All implementations of <code>IMessage</code> and <code>IMessageHandler</code> must have an empty constructor
+</p>
+<!-- tooltip end -->
+<p>
+    When a message is received, Forge creates the message and its handler using their empty constructors, before reading the
+    message's contents. Without an empty constructor, this fails.
+</p>
+<pre><code>
+public class MyMessage implements IMessage {
+    private int value;
+
+    public MyMessage() {} // required
+
+    public MyMessage(int value) {
+        this.value = value;
+    }
+    ...
+}
+</code></pre>
 </body>
 </html>

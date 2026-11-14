@@ -20,6 +20,27 @@
 
 <html>
 <body>
-Reports missing or unused cancellable @Inject usages
+<p>
+    Reports missing or unused cancellable <code>@Inject</code> usages
+</p>
+<!-- tooltip end -->
+<p>
+    Calling <code>cancel()</code> or <code>setReturnValue()</code> on the callback info of an <code>@Inject</code> that is not
+    marked <code>cancellable = true</code> throws an exception at runtime. Conversely, an <code>@Inject</code> marked
+    <code>cancellable = true</code> that is never canceled makes Mixin generate an unnecessary check in the target method.
+</p>
+<pre><code>
+// bad
+@Inject(method = "foo", at = @At("HEAD"))
+private void onFoo(CallbackInfo ci) {
+    ci.cancel();
+}
+
+// good
+@Inject(method = "foo", at = @At("HEAD"), cancellable = true)
+private void onFoo(CallbackInfo ci) {
+    ci.cancel();
+}
+</code></pre>
 </body>
 </html>

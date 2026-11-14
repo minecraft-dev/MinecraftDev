@@ -20,6 +20,16 @@
 
 <html>
 <body>
-A mixin class does not exist at runtime, and thus having them not private does not make sense. Make the field/method private instead.
+<p>
+    A mixin class does not exist at runtime, and thus having them not private does not make sense. Make the field/method private instead.
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin rejects non-private static fields and methods when the mixin is applied. <code>@Shadow</code>, <code>@Overwrite</code>,
+    <code>@Accessor</code> and <code>@Invoker</code> members are allowed.
+</p>
+<p>
+    To share static members, move them to a separate class that is not a mixin.
+</p>
 </body>
 </html>

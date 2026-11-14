@@ -20,6 +20,14 @@
 
 <html>
 <body>
-Mixins should be written in Java. See <a href="https://github.com/SpongePowered/Mixin/issues/245">this Mixin issue</a>
+<p>
+    Mixins should be written in Java. See <a href="https://github.com/SpongePowered/Mixin/issues/245">this Mixin issue</a>
+</p>
+<!-- tooltip end -->
+<p>
+    Mixin works directly on the bytecode of mixin classes, and only supports the bytecode produced by the Java compiler.
+    Compilers for other languages, such as Kotlin, generate extra classes, synthetic members and calls to runtime helpers that
+    Mixin can't handle, which causes errors when the mixin is applied.
+</p>
 </body>
 </html>

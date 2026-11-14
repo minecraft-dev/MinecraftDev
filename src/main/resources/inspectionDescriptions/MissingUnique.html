@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Reports missing @Unique annotations
+<p>
+    Reports missing <code>@Unique</code> annotations
+</p>
+<!-- tooltip end -->
+<p>
+    Many mixins can add members to the same target class. Without <code>@Unique</code>, if two mixins add a member with the
+    same name and descriptor, one silently replaces the other. With <code>@Unique</code>, Mixin renames a conflicting private
+    member, and reports an error for a conflicting public member.
+</p>
+<pre><code>
+private int count; // bad
+@Unique private int count; // good
+</code></pre>
 </body>
 </html>

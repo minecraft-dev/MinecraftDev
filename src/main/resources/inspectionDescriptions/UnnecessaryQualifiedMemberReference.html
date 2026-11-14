@@ -20,6 +20,16 @@
 
 <html>
 <body>
-Reports unnecessary qualified member references in @Inject annotations
+<p>
+    Reports unnecessary qualified member references in <code>method = "..."</code>
+</p>
+<!-- tooltip end -->
+<p>
+    An injector always targets methods of the mixin's target classes, so the owner class in the reference is redundant.
+</p>
+<pre><code>
+@Inject(method = "Lcom/example/Foo;bar()V", ...) // bad
+@Inject(method = "bar()V", ...)                  // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Reports @Local relying on index or ordinal that may use a name instead
+<p>
+    Reports <code>@Local</code> relying on index or ordinal that may use a name instead
+</p>
+<!-- tooltip end -->
+<p>
+    The index and ordinal of a local variable change whenever local variables are added to or removed from the target method,
+    while its name usually stays the same. Names are also easier to understand. This is only reported where local variable names
+    are available at runtime.
+</p>
+<pre><code>
+@Local(ordinal = 1) int count        // bad
+@Local(name = "count") int count     // good
+</code></pre>
 </body>
 </html>

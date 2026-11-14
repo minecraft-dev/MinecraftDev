@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Reports when a parameter name in a shadow method does not match the target method
+<p>
+    Reports when a parameter name in a shadow method does not match the target method
+</p>
+<!-- tooltip end -->
+<p>
+    Naming the parameters the same as in the target method makes the shadow easier to read and compare with the target method.
+</p>
+<pre><code>
+// target: public void setHealth(float health)
+
+@Shadow public abstract void setHealth(float value);  // bad
+@Shadow public abstract void setHealth(float health); // good
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,21 @@
 
 <html>
 <body>
-Reports when two @Shares of the same variable have different types
+<p>
+    Reports when two <code>@Share</code>s of the same variable have different types
+</p>
+<!-- tooltip end -->
+<p>
+    All <code>@Share</code> parameters with the same name in the same target method refer to the same variable, so they must have
+    the same type.
+</p>
+<pre><code>
+// bad
+@Inject(method = "foo", at = @At("HEAD"))
+private void before(CallbackInfo ci, @Share("count") LocalIntRef count) { ... }
+
+@Inject(method = "foo", at = @At("TAIL"))
+private void after(CallbackInfo ci, @Share("count") LocalLongRef count) { ... }
+</code></pre>
 </body>
 </html>

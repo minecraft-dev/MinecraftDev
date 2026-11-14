@@ -20,9 +20,18 @@
 
 <html>
 <body>
-Usage of <code>LocalCapture.CAPTURE_FAILEXCEPTION</code> is usually a mistake and should be replaced with
-<code>LocalCapture.CAPTURE_FAILHARD</code>. <code>CAPTURE_FAILEXCEPTION</code> generates code which throws an
-exception when the callback is reached, if the locals do not match. If this is really what you want, you can
-suppress this warning.
+<p>
+    Reports usages of <code>LocalCapture.CAPTURE_FAILEXCEPTION</code>.
+</p>
+<!-- tooltip end -->
+<p>
+    If the captured locals don't match the target method, <code>CAPTURE_FAILEXCEPTION</code> generates code which throws an
+    exception when the callback is reached, instead of failing when the mixin is applied. This hides the problem until that code
+    runs, so it is usually a mistake.
+</p>
+<pre><code>
+@Inject(method = "foo", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILEXCEPTION) // bad
+@Inject(method = "foo", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)      // good
+</code></pre>
 </body>
 </html>

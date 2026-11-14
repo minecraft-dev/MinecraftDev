@@ -20,6 +20,29 @@
 
 <html>
 <body>
-Reports missing abstract shadows in enum mixins
+<p>
+    Reports missing abstract shadows in enum mixins
+</p>
+<!-- tooltip end -->
+<p>
+    If the target enum has abstract methods, every enum constant must implement them. Declaring them as abstract
+    <code>@Shadow</code> methods in the mixin makes the compiler check that the constants added by the mixin implement them.
+    Otherwise, the missing implementations cause errors at runtime. In obfuscated environments, the override will not be
+    remapped if the shadow isn't present.
+</p>
+<pre><code>
+enum Shape {
+    CIRCLE { @Override double area(double r) { ... } };
+    abstract double area(double r);
+}
+
+@Mixin(Shape.class)
+enum ShapeMixin {
+    MYMOD_SQUARE { @Override double area(double r) { ... } };
+
+    @Shadow
+    abstract double area(double r);
+}
+</code></pre>
 </body>
 </html>

@@ -20,6 +20,18 @@
 
 <html>
 <body>
-Reports added members not matching the correct name format
+<p>
+    Reports added members not matching the correct name format
+</p>
+<!-- tooltip end -->
+<p>
+    Members added by mixins share the target class with members added by every other mod. Prefixing their names with the mod id
+    avoids conflicts between mods that add members with the same name. The required pattern and which members are reported can
+    be configured. This should be done when <code>@Unique</code> can't be used.
+</p>
+<pre><code>
+@Override public void doSomething() { ... }       // bad
+@Override public void myMod$doSomething() { ... } // good
+</code></pre>
 </body>
 </html>

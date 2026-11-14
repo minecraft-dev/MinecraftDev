@@ -20,6 +20,23 @@
 
 <html>
 <body>
-Reports useless event cancellation checks
+<p>
+    Reports useless event cancellation checks
+</p>
+<!-- tooltip end -->
+<p>
+    Some event listeners only receive events that are not canceled, so checking whether the event is canceled always gives the
+    same result. On Bukkit, this applies to handlers with <code>ignoreCancelled = true</code>. On Sponge, listeners only receive
+    events that are not canceled, unless annotated with <code>@IsCancelled</code>.
+</p>
+<pre><code>
+@EventHandler(ignoreCancelled = true)
+public void onBreak(BlockBreakEvent event) {
+    if (event.isCancelled()) { // always false
+        return;
+    }
+    ...
+}
+</code></pre>
 </body>
 </html>

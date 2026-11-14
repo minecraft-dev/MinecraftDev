@@ -20,6 +20,25 @@
 
 <html>
 <body>
-Reports discouraged usages of shifting in injection points
+<p>
+    Reports discouraged usages of shifting in injection points
+</p>
+<!-- tooltip end -->
+<p>
+    Shifting moves the injection point by a number of bytecode instructions, which depends on exactly how the target method was
+    compiled and breaks easily when it changes. Shifting is allowed where it is commonly needed, for example shifting
+    <code>INVOKE</code> and <code>FIELD</code> injection points to after the instruction.
+</p>
+<p>
+    A common mistake is to use `Shift.BEFORE` on injection points that already target before, such as `INVOKE`. This results in
+    the injection being shifted one instruction too early.
+</p>
+<pre><code>
+// bad
+@At(value = "INVOKE", target = "...", shift = At.Shift.BY, by = 3)
+
+// good
+@At(value = "INVOKE", target = "...", shift = At.Shift.AFTER)
+</code></pre>
 </body>
 </html>

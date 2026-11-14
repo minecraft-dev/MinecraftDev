@@ -20,6 +20,22 @@
 
 <html>
 <body>
-Checks that @ModifyVariable has argsOnly if it targets arguments, which improves performance of the mixin
+<p>
+    Checks that <code>@ModifyVariable</code> has <code>argsOnly</code> if it targets arguments, which improves performance of the mixin
+</p>
+<!-- tooltip end -->
+<p>
+    With <code>argsOnly = true</code>, Mixin only searches the method's parameters, so it doesn't have to analyze the local
+    variables of the target method.
+</p>
+<pre><code>
+// bad
+@ModifyVariable(method = "setName", at = @At("HEAD"))
+private String modifyName(String name) { ... }
+
+// good
+@ModifyVariable(method = "setName", at = @At("HEAD"), argsOnly = true)
+private String modifyName(String name) { ... }
+</code></pre>
 </body>
 </html>

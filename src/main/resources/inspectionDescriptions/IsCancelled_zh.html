@@ -20,6 +20,22 @@
 
 <html>
 <body>
-报告无用的 event 取消检查
+<p>
+    报告无用的 event 取消检查
+</p>
+<!-- tooltip end -->
+<p>
+    某些事件监听器只会收到未被取消的事件，因此检查事件是否已取消总是得到相同的结果。在 Bukkit 上，这适用于带有
+    <code>ignoreCancelled = true</code> 的处理器。在 Sponge 上，除非标注了 <code>@IsCancelled</code>，监听器只会收到未被取消的事件。
+</p>
+<pre><code>
+@EventHandler(ignoreCancelled = true)
+public void onBreak(BlockBreakEvent event) {
+    if (event.isCancelled()) { // 总是 false
+        return;
+    }
+    ...
+}
+</code></pre>
 </body>
 </html>

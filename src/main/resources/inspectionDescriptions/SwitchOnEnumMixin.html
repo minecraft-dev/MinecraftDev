@@ -20,6 +20,26 @@
 
 <html>
 <body>
-Reports when a switch statement or expression is used on an enum mixin
+<p>
+    Reports when a switch statement or expression is used on an enum mixin
+</p>
+<!-- tooltip end -->
+<p>
+    The Java compiler compiles a switch on an enum into code that uses the ordinals in the enum mixin directly. The ordinals
+    in the enum mixins don't match the ordinals as they will be once merged into the target class. Cast the value to the
+    target class instead.
+</p>
+<pre><code>
+@Mixin(Color.class)
+enum ColorMixin {
+    ;
+    int bad() {
+        switch (this) { ... }
+    }
+    int good() {
+        switch ((Color) (Object) this) { ... }
+    }
+}
+</code></pre>
 </body>
 </html>

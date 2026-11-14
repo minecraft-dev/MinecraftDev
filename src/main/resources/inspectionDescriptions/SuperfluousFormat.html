@@ -20,6 +20,17 @@
 
 <html>
 <body>
-Detect superfluous format arguments for translations
+<p>
+    Detect superfluous format arguments for translations
+</p>
+<!-- tooltip end -->
+<p>
+    Arguments that the translation has no placeholders for are ignored, which usually means the wrong translation key was used or
+    the translation is missing a placeholder.
+</p>
+<pre><code>
+// "my_mod.greeting": "Hello!"
+Component.translatable("my_mod.greeting", name) // bad
+</code></pre>
 </body>
 </html>
