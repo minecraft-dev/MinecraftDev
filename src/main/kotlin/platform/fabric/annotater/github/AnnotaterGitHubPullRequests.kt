@@ -26,6 +26,7 @@ import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterNotifications
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterPullRequests
 import com.demonwav.mcdev.platform.fabric.annotater.git.AnnotaterGitVcs
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocContributions
+import com.demonwav.mcdev.util.McdevHttp
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -272,10 +273,14 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
 
     private class GitHubApi(private val baseUrl: String, private val token: String) {
         private val gson = Gson()
+        private val headers = mapOf(
+            "Authorization" to "Bearer $token",
+            "Accept" to "application/vnd.github+json",
+            "X-GitHub-Api-Version" to "2022-11-28",
+        )
 
         fun post(path: String, body: JsonObject): JsonObject {
-            return HttpRequests.post(baseUrl + path, "application/json")
-                .tuner(::authorize)
+            return McdevHttp.post(baseUrl + path, "application/json", headers)
                 .throwStatusCodeException(false)
                 .connect { request ->
                     request.write(gson.toJson(body))
@@ -284,8 +289,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         }
 
         fun get(path: String): JsonElement {
-            return HttpRequests.request(baseUrl + path)
-                .tuner(::authorize)
+            return McdevHttp.request(baseUrl + path, headers)
                 .throwStatusCodeException(false)
                 .connect { request -> JsonParser.parseString(readResponse(request)) }
         }
@@ -332,12 +336,6 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                 }
             }.orEmpty()
             return if (details.isEmpty()) message else "$message: ${details.joinToString("; ")}"
-        }
-
-        private fun authorize(connection: java.net.URLConnection) {
-            connection.setRequestProperty("Authorization", "Bearer $token")
-            connection.setRequestProperty("Accept", "application/vnd.github+json")
-            connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         }
     }
 
