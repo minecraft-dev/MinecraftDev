@@ -32,67 +32,96 @@ plugins {
     id("org.jetbrains.intellij.platform")
 }
 
+// Copied from PublishPluginTask, where it's private
+fun Throwable.isIdeServicesUploadResponseParsingFailure(): Boolean {
+    val message = message.orEmpty()
+    return (javaClass.name == "com.fasterxml.jackson.databind.exc.InvalidFormatException" &&
+        "Cannot deserialize value of type `int` from String" in message &&
+        """PluginUpdateBean["id"]""" in message) ||
+        cause?.isIdeServicesUploadResponseParsingFailure() == true ||
+        suppressed.any { it.isIdeServicesUploadResponseParsingFailure() }
+}
+
 tasks.publishPlugin {
-    properties["mcdev.deploy.token"]?.let { deployToken ->
-        token.set(deployToken.toString())
+    (findProperty("mcdev.deploy.token") as String?)?.let { deployToken ->
+        token.set(deployToken)
     }
-    channels.add(properties["mcdev.deploy.channel"]?.toString() ?: "Stable")
+    channels.add(findProperty("mcdev.deploy.channel")?.toString() ?: "Stable")
 
     // Overwrite the publish action, to properly set the until version after publishing (otherwise they ignore it).
     // See https://youtrack.jetbrains.com/issue/IJPL-166094/Plugins-Disable-until-build-range-check-by-default
     actions = listOf(Action {
-        if (token.orNull.isNullOrEmpty()) {
+        val resolvedToken = token.orNull
+        if (resolvedToken.isNullOrEmpty()) {
             throw GradleException("No token specified for publishing. Make sure to specify mcdev.deploy.token.")
         }
 
         val log = Logging.getLogger(javaClass)
 
-        val path = archiveFile.get().asFile.toPath().absolute()
+        val paths = archiveFiles.files.map { it.toPath().absolute() }
         val pluginId = "com.demonwav.minecraft-dev"
-        channels.get().forEach { channel ->
-            log.info("Uploading plugin '$pluginId' from '$path' to '${host.get()}', channel: '$channel'")
 
-            try {
-                val repositoryClient = when (ideServices.get()) {
-                    true -> PluginRepositoryFactory.createWithImplementationClass(
-                        host.get(),
-                        token.get(),
-                        "Automation",
-                        IdeServicesPluginRepositoryService::class.java,
+        val resolvedHost = host.get()
+        val useIdeServices = ideServices.get()
+        val isHidden = hidden.get()
+        val resolvedChannels = channels.get()
+        val repositoryClient = when (useIdeServices) {
+            true -> PluginRepositoryFactory.createWithImplementationClass(
+                resolvedHost,
+                resolvedToken,
+                "Automation",
+                IdeServicesPluginRepositoryService::class.java,
+            )
+
+            false -> PluginRepositoryFactory.create(resolvedHost, resolvedToken)
+        }
+
+        paths.forEach { path ->
+            resolvedChannels.forEach { channel ->
+                log.info("Uploading plugin '$pluginId' from '$path' to '$resolvedHost', channel: '$channel'")
+
+                val uploadBean = try {
+                    repositoryClient.uploader.uploadUpdateByXmlIdAndFamily(
+                        id = pluginId,
+                        family = ProductFamily.INTELLIJ,
+                        file = path.toFile(),
+                        channel = channel.takeIf { it != "default" },
+                        notes = null,
+                        isHidden = isHidden,
                     )
-
-                    false -> PluginRepositoryFactory.create(host.get(), token.get())
+                } catch (exception: Exception) {
+                    if (useIdeServices && exception.isIdeServicesUploadResponseParsingFailure()) {
+                        log.warn("Uploaded successfully; ignoring IDE Services upload response parsing failure.")
+                        log.debug("IDE Services upload response parsing failure", exception)
+                        // No upload response to read the version ID from, so the until update can't happen
+                        return@forEach
+                    }
+                    throw GradleException("Failed to upload plugin: ${exception.message}", exception)
                 }
-                val uploadBean = repositoryClient.uploader.uploadUpdateByXmlIdAndFamily(
-                    id = pluginId,
-                    family = ProductFamily.INTELLIJ,
-                    file = path.toFile(),
-                    channel = channel.takeIf { it != "default" },
-                    notes = null,
-                    isHidden = hidden.get(),
-                )
                 log.info("Uploaded successfully as version ID ${uploadBean.id}")
 
-                val since = uploadBean.since
-                log.info("Since is ${since}, until is ${uploadBean.until}")
-                if (since != null && uploadBean.until.isNullOrBlank()) {
-                    val newUntil = since.substringBefore(".") + ".*"
-                    log.info("Updating until to $newUntil")
-                    val request = HttpRequest.newBuilder()
-                        .uri(URI.create("https://plugins.jetbrains.com/api/updates/${uploadBean.id}/since-until"))
-                        .header("Authorization", "Bearer ${token.get()}")
-                        .header("Content-Type", "application/json")
-                        .header("User-Agent", "Minecraft Development Plugin Publisher")
-                        .POST(HttpRequest.BodyPublishers.ofString("{\"since\":\"${uploadBean.since}\",\"until\":\"$newUntil\"}"))
-                        .build()
-                    val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-                    if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                        throw IOException("Updating until failed with status code ${response.statusCode()}, ${response.body()}")
+                try {
+                    val since = uploadBean.since
+                    log.info("Since is ${since}, until is ${uploadBean.until}")
+                    if (since != null && uploadBean.until.isNullOrBlank()) {
+                        val newUntil = since.substringBefore(".") + ".*"
+                        log.info("Updating until to $newUntil")
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create("https://plugins.jetbrains.com/api/updates/${uploadBean.id}/since-until"))
+                            .header("Authorization", "Bearer $resolvedToken")
+                            .header("Content-Type", "application/json")
+                            .header("User-Agent", "Minecraft Development Plugin Publisher")
+                            .POST(HttpRequest.BodyPublishers.ofString("{\"since\":\"$since\",\"until\":\"$newUntil\"}"))
+                            .build()
+                        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                            throw IOException("Updating until failed with status code ${response.statusCode()}, ${response.body()}")
+                        }
+                        log.info("Successful with status code ${response.statusCode()}")
                     }
-                    log.info("Successful with status code ${response.statusCode()}")
+                } catch (exception: Exception) {
+                    throw GradleException("Failed to update until for plugin: ${exception.message}", exception)
                 }
-            } catch (exception: Exception) {
-                throw GradleException("Failed to upload plugin: ${exception.message}", exception)
             }
         }
     })

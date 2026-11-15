@@ -25,25 +25,7 @@ import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.util.net.JdkProxyProvider
-import java.io.IOException
-import java.net.Proxy
-import java.net.URI
 import javax.swing.JComponent
-
-fun selectProxy(urlText: String): Proxy? {
-    val uri = URI(urlText)
-    val url = uri.toURL()
-
-    val proxies = JdkProxyProvider.getInstance().proxySelector.select(uri)
-    for (proxy in proxies) {
-        try {
-            url.openConnection(proxy)
-            return proxy
-        } catch (_: IOException) {}
-    }
-    return null
-}
 
 val WizardContext.contentPanel: JComponent?
     get() = this.getUserData(AbstractWizard.KEY)?.contentPanel

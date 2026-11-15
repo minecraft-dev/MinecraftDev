@@ -5,11 +5,10 @@ kotlin = "2.3.20-RC2"
 coroutines = "1.10.2"
 junit = "6.0.3"
 asm = "9.9.1"
-fuel = "2.3.1"
 licenser = "0.7.5"
 changelog = "2.5.0"
 # https://github.com/JetBrains/intellij-platform-gradle-plugin
-intellij-plugin = "2.13.1"
+intellij-plugin = "2.20.1"
 # https://central.sonatype.com/artifact/org.jetbrains.intellij/plugin-repository-rest-client
 intellij-plugin-repository-rest-client = "2.0.50"
 # https://www.jetbrains.com/intellij-repository/snapshots or https://www.jetbrains.com/intellij-repository/releases/
@@ -62,9 +61,6 @@ asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 gson = "com.google.code.gson:gson:2.13.2"
 jspecify = "org.jspecify:jspecify:1.0.0"
 
-fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuel" }
-fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuel" }
-
 sentry = "io.sentry:sentry:8.37.1"
 
 # Testing
@@ -85,4 +81,3 @@ mixinExtras-common = "io.github.llamalad7:mixinextras-common:0.5.3"
 [bundles]
 coroutines = ["coroutines-swing"]
 asm = ["asm", "asm-tree", "asm-analysis", "asm-util"]
-fuel = ["fuel", "fuel-coroutines"]

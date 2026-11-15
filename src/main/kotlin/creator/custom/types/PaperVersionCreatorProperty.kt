@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -26,17 +26,14 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.McdevHttp
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
+import com.intellij.util.io.HttpRequests
 import com.intellij.util.ui.AsyncProcessIcon
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -49,19 +46,21 @@ open class PaperVersionCreatorProperty(
     context: CreatorContext
 ) : SemanticVersionCreatorProperty(descriptor, context) {
 
-    @OptIn(DelicateCoroutinesApi::class)
     companion object {
         private var paperVersions: List<SemanticVersion>? = null
 
         suspend fun getPaperVersions(): List<SemanticVersion> {
             paperVersions?.let { return it }
 
-            val client = HttpClient()
-            val response = client.request("https://fill.papermc.io/v3/projects/paper", block = {
-                this.header("User-Agent", "minecraft-dev/${PluginUtil.pluginVersion} (https://github.com/minecraft-dev/MinecraftDev)")
-            })
-            if (response.status.isSuccess()) {
-                val element = Json.parseToJsonElement(response.bodyAsText())
+            val body = try {
+                McdevHttp.get("https://fill.papermc.io/v3/projects/paper") {
+                    userAgent("minecraft-dev/${PluginUtil.pluginVersion} (https://github.com/minecraft-dev/MinecraftDev)")
+                }.suspend().connect { readString() }
+            } catch (_: HttpRequests.HttpStatusException) {
+                null
+            }
+            if (body != null) {
+                val element = Json.parseToJsonElement(body)
                 val result = element.jsonObject["versions"]?.jsonObject?.values
                     ?.asSequence()
                     ?.flatMap { it.jsonArray }
