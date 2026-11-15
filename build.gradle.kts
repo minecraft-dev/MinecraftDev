@@ -19,8 +19,6 @@
  */
 
 import io.sentry.android.gradle.extensions.SentryPluginExtension
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.atomics.AtomicInt
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.gradle.ext.settings
@@ -37,10 +35,10 @@ plugins {
     alias(libs.plugins.sentry) apply (System.getenv("CI") == "true" && System.getenv("NO_SENTRY") != "true")
 }
 
-val coreVersion: String by project
+val coreVersion = project.property("coreVersion") as String
 
-val gradleToolingExtension: Configuration by configurations.creating
-val testLibs: Configuration by configurations.creating {
+val gradleToolingExtension = configurations.create("gradleToolingExtension")
+val testLibs = configurations.create("testLibs") {
     isTransitive = false
 }
 
@@ -52,6 +50,7 @@ val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooli
     }
 })
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
+    description = "Package Gradle tooling extension jar"
     from(gradleToolingExtensionSourceSet.output)
     archiveClassifier.set("gradle-tooling-extension")
     exclude("META-INF/plugin.xml")
@@ -78,6 +77,7 @@ val templateSourceSets: List<SourceSet> = (file("templates").listFiles() ?: empt
 }
 
 val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
+    description = "Package external annotations jar"
     from("externalAnnotations")
     destinationDirectory.set(layout.buildDirectory.dir("externalAnnotations"))
     archiveFileName.set("externalAnnotations.jar")
@@ -95,10 +95,6 @@ dependencies {
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
-    implementation(libs.bundles.fuel) {
-        exclude(group = "org.jetbrains.kotlin")
-        exclude(group = "org.jetbrains.kotlinx")
-    }
     implementation(libs.sentry) {
         exclude(group = "org.slf4j")
     }
@@ -202,6 +198,7 @@ val testForks = 6
 val sandboxTestTasks = mutableListOf<TaskProvider<PrepareSandboxTask>>()
 repeat(testForks) {
     sandboxTestTasks += tasks.register<PrepareSandboxTask>("prepareTestSandboxFork$it") {
+        description = "Prepare sandbox for test fork #$it"
         sandboxSuffix.set("-fork-$it")
         doFirst {
             sandboxDirectory.get().asFile.listFiles()
@@ -218,7 +215,8 @@ tasks.prepareTestSandbox {
     }
 }
 
-val cleanTestSandboxForks by tasks.registering(Delete::class) {
+val cleanTestSandboxForks = tasks.register("cleanTestSandboxForks", Delete::class) {
+    description = "Delete all test fork sandboxes"
     doFirst {
         tasks.prepareTestSandbox.flatMap { it.sandboxDirectory }
             .get().asFile.listFiles()
@@ -265,6 +263,7 @@ license {
             .startsWith("src/test/resources")
     }
 
+    @Suppress("UnstableApiUsage")
     tasks {
         register("gradle") {
             files.from(
@@ -299,29 +298,30 @@ license {
     }
 }
 
-val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
-val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtLexer = lexer("generateAtLexer", "AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtParser = parser("generateAtParser", "AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
 
-val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
-val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtLexer = lexer("generateCtLexer", "CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtParser = parser("generateCtParser", "CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
 
-val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
-val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttLexer = lexer("generateNbttLexer", "NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttParser = parser("generateNbttParser", "NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
 
-val generateLangLexer by lexer("LangLexer", "com/demonwav/mcdev/translations/lang/gen")
-val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangLexer = lexer("generateLangLexer", "LangLexer", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangParser = parser("generateLangParser", "LangParser", "com/demonwav/mcdev/translations/lang/gen")
 
-val generateMEExpressionLexer by lexer("MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
-val generateMEExpressionParser by parser("MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
+val generateMEExpressionLexer = lexer("generateMEExpressionLexer", "MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
+val generateMEExpressionParser = parser("generateMEExpressionParser", "MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
 
-val generateTranslationTemplateLexer by lexer(
+val generateTranslationTemplateLexer = lexer(
+    "generateTranslationTemplateLexer",
     "TranslationTemplateLexer",
     "com/demonwav/mcdev/translations/template/gen"
 )
 
-val generate by tasks.registering {
+val generate = tasks.register("generate") {
     group = "minecraft"
-    description = "Generates sources needed to compile the plugin."
+    description = "Generate sources needed to compile the plugin."
     outputs.dir(layout.buildDirectory.dir("gen"))
     dependsOn(
         generateAtLexer,

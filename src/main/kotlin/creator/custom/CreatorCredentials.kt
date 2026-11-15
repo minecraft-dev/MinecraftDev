@@ -22,8 +22,6 @@ package com.demonwav.mcdev.creator.custom
 
 import com.demonwav.mcdev.MinecraftSettings
 import com.demonwav.mcdev.creator.custom.providers.RemoteTemplateProvider.RemoteAuthType
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.extensions.authentication
 import com.intellij.collaboration.auth.ServerAccount
 import com.intellij.collaboration.auth.findAccountOrNull
 import com.intellij.credentialStore.CredentialAttributes
@@ -33,6 +31,7 @@ import com.intellij.ide.passwordSafe.PasswordSafe
 import git4idea.remote.GitHttpAuthDataProvider
 import git4idea.remote.hosting.http.SilentHostedGitHttpAuthDataProvider
 import java.nio.file.Path
+import java.util.Base64
 import java.util.Properties
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPathFactory
@@ -64,21 +63,29 @@ object CreatorCredentials {
         return PasswordSafe.instance[credAttrs]
     }
 
-    suspend fun configureAuthorization(
-        request: Request,
+    fun basicAuthHeader(username: String, password: String): Map<String, String> {
+        val token = Base64.getEncoder().encodeToString("$username:$password".toByteArray(Charsets.UTF_8))
+        return mapOf("Authorization" to "Basic $token")
+    }
+
+    /**
+     * Returns the headers that authenticate a request to [url] with the given [authType], or an empty map if no
+     * credentials are stored for it.
+     */
+    suspend fun authorizationHeaders(
         url: String,
         authType: RemoteAuthType,
         credentials: String
-    ): Request {
+    ): Map<String, String> {
         when (authType) {
-            RemoteAuthType.NONE -> return request
+            RemoteAuthType.NONE -> return emptyMap()
 
             RemoteAuthType.BASIC -> {
                 val creds = getCredentials(url, credentials)
                 val username = creds?.userName
                 val password = creds?.getPasswordAsString()
                 if (username != null && password != null) {
-                    return request.authentication().basic(username, password)
+                    return basicAuthHeader(username, password)
                 }
             }
 
@@ -86,14 +93,14 @@ object CreatorCredentials {
                 val creds = getCredentials(url, null)
                 val password = creds?.getPasswordAsString()
                 if (password != null) {
-                    return request.authentication().bearer(password)
+                    return mapOf("Authorization" to "Bearer $password")
                 }
             }
 
             RemoteAuthType.GIT_HTTP -> {
                 val creds = findGitHttpAuthBearerToken(credentials)
                 if (creds != null) {
-                    return request.authentication().basic(creds.first, creds.second)
+                    return basicAuthHeader(creds.first, creds.second)
                 }
             }
 
@@ -102,12 +109,12 @@ object CreatorCredentials {
                 val username = creds?.userName
                 val password = creds?.getPasswordAsString()
                 if (username != null && password != null) {
-                    return request.header(username, password)
+                    return mapOf(username to password)
                 }
             }
         }
 
-        return request
+        return emptyMap()
     }
 
     fun getGitHttpAuthProviders(): List<SilentHostedGitHttpAuthDataProvider<ServerAccount>> {
@@ -137,6 +144,11 @@ object CreatorCredentials {
         val account = accountManager.findAccountOrNull { account -> account.id == accountId } ?: return null
         val token = accountManager.findCredentials(account) ?: return null
         return account.name to token
+    }
+
+    fun findMavenRepoAuthHeaders(url: String): Map<String, String> {
+        val (username, password) = findMavenRepoCredentials(url) ?: return emptyMap()
+        return basicAuthHeader(username, password)
     }
 
     fun findMavenRepoCredentials(url: String): Pair<String, String>? {

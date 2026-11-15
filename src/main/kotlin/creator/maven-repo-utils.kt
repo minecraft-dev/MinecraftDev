@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,12 +20,8 @@
 
 package com.demonwav.mcdev.creator
 
-import com.demonwav.mcdev.update.PluginUtil
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.requests.suspendable
+import com.demonwav.mcdev.util.McdevHttp
 import java.io.IOException
-import java.util.function.Function
 import java.util.function.Predicate
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.events.XMLEvent
@@ -33,21 +29,11 @@ import javax.xml.stream.events.XMLEvent
 @Throws(IOException::class)
 suspend fun collectMavenVersions(
     url: String,
-    requestCustomizer: Function<Request, Request>? = null,
+    headers: Map<String, String> = emptyMap(),
     filter: Predicate<String> = Predicate { true }
-): List<String> {
-    val manager = FuelManager()
-    manager.proxy = selectProxy(url)
-
-    val response = manager.get(url)
-        .header("User-Agent", PluginUtil.useragent)
-        .allowRedirects(true)
-        .let { requestCustomizer?.apply(it) ?: it }
-        .suspendable()
-        .await()
-
+): List<String> = McdevHttp.get(url, headers).suspend().connect {
     val result = mutableListOf<String>()
-    response.body().toStream().use { stream ->
+    inputStream.use { stream ->
         val inputFactory = XMLInputFactory.newInstance()
 
         @Suppress("UNCHECKED_CAST")
@@ -74,22 +60,13 @@ suspend fun collectMavenVersions(
         }
     }
 
-    return result
+    result
 }
 
 @Throws(IOException::class)
-suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> {
-    val manager = FuelManager()
-    manager.proxy = selectProxy(url)
-
-    val response = manager.get(url)
-        .header("User-Agent", PluginUtil.useragent)
-        .allowRedirects(true)
-        .suspendable()
-        .await()
-
+suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> = McdevHttp.get(url).suspend().connect {
     val result = mutableListOf<String>()
-    response.body().toStream().use { stream ->
+    inputStream.use { stream ->
         val inputFactory = XMLInputFactory.newInstance()
 
         @Suppress("UNCHECKED_CAST")
@@ -116,5 +93,5 @@ suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> {
         }
     }
 
-    return result
+    result
 }

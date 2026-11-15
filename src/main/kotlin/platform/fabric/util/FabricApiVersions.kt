@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,8 @@
 
 package com.demonwav.mcdev.platform.fabric.util
 
-import com.demonwav.mcdev.creator.selectProxy
-import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.SemanticVersion
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.requests.suspendable
+import com.demonwav.mcdev.util.McdevHttp
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import com.intellij.openapi.diagnostic.logger
@@ -39,38 +36,30 @@ class FabricApiVersions(val versions: List<Version>) {
         suspend fun downloadData(): FabricApiVersions? {
             try {
                 val url = "https://api.modrinth.com/v2/project/P7dR8mSH/version"
-                val manager = FuelManager()
-                manager.proxy = selectProxy(url)
-
-                val response = manager.get(url)
-                    .header("User-Agent", PluginUtil.useragent)
-                    .suspendable()
-                    .await()
+                val text = McdevHttp.getString(url)
 
                 val versions = mutableListOf<Version>()
-                response.body().toStream().use { stream ->
-                    val json = JsonParser.parseReader(stream.reader())?.asJsonArray ?: return null
-                    versionLoop@
-                    for (ver in json) {
-                        val version = ver?.asJsonObject ?: return null
-                        val files = version["files"]?.asJsonArray ?: return null
-                        for (file in files) {
-                            val fileObj = file?.asJsonObject ?: return null
-                            val filename = fileObj["filename"]?.asString ?: return null
-                            if (!filename.startsWith("fabric-api-")) {
-                                continue@versionLoop
-                            }
+                val json = JsonParser.parseString(text)?.asJsonArray ?: return null
+                versionLoop@
+                for (ver in json) {
+                    val version = ver?.asJsonObject ?: return null
+                    val files = version["files"]?.asJsonArray ?: return null
+                    for (file in files) {
+                        val fileObj = file?.asJsonObject ?: return null
+                        val filename = fileObj["filename"]?.asString ?: return null
+                        if (!filename.startsWith("fabric-api-")) {
+                            continue@versionLoop
                         }
-                        val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse)
-                            ?: return null
-                        val gameVersions = version["game_versions"]?.asJsonArray ?: return null
-                        val gameVersionsList = mutableListOf<String>()
-                        for (gameVer in gameVersions) {
-                            val gameVersion = gameVer?.asString ?: return null
-                            gameVersionsList += gameVersion
-                        }
-                        versions += Version(gameVersionsList, versionNumber)
                     }
+                    val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse)
+                        ?: return null
+                    val gameVersions = version["game_versions"]?.asJsonArray ?: return null
+                    val gameVersionsList = mutableListOf<String>()
+                    for (gameVer in gameVersions) {
+                        val gameVersion = gameVer?.asString ?: return null
+                        gameVersionsList += gameVersion
+                    }
+                    versions += Version(gameVersionsList, versionNumber)
                 }
                 return FabricApiVersions(versions)
             } catch (e: IOException) {

@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.creator.custom.npm
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.McdevHttp
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -37,7 +37,6 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.NioFiles
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.io.DigestUtil
-import com.intellij.util.io.HttpRequests
 import com.intellij.util.io.URLUtil
 import java.nio.file.Files
 import java.nio.file.Path
@@ -110,9 +109,7 @@ object NpmEnvironment {
     fun fetchPackageInfo(source: NpmPackageSource.Registry): NpmPackageInfo {
         // Scoped packages need their slash to be escaped
         val url = "$REGISTRY_URL/${source.name.replace("/", "%2F")}/${URLUtil.encodeURIComponent(source.version)}"
-        val text = HttpRequests.request(url)
-            .userAgent(PluginUtil.useragent)
-            .readString()
+        val text = McdevHttp.request(url).readString()
         val json = Json.parseToJsonElement(text).jsonObject
 
         fun JsonElement?.personName(): String? = when (this) {

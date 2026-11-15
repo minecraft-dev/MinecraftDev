@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,13 +20,9 @@
 
 package com.demonwav.mcdev.platform.architectury
 
-import com.demonwav.mcdev.creator.selectProxy
-import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.fromJson
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.core.requests.suspendable
-import com.github.kittinunf.fuel.coroutines.awaitString
+import com.demonwav.mcdev.util.McdevHttp
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
@@ -50,13 +46,7 @@ class ArchitecturyVersion private constructor(
         suspend fun downloadData(): ArchitecturyVersion? {
             try {
                 val url = "https://api.modrinth.com/v2/project/architectury-api/version"
-                val manager = FuelManager()
-                manager.proxy = selectProxy(url)
-
-                val response = manager.get(url)
-                    .header("User-Agent", PluginUtil.useragent)
-                    .suspendable()
-                    .awaitString()
+                val response = McdevHttp.getString(url)
 
                 val data = Gson().fromJson<List<ModrinthVersionApi>>(response)
 

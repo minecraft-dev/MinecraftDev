@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,9 +21,8 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.util.SemanticVersion
-import com.github.kittinunf.fuel.core.FuelError
-import com.github.kittinunf.fuel.core.HttpException
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.util.io.HttpRequests
 
 class ParchmentVersion private constructor(val mcVersion: SemanticVersion, val parchmentVersion: String) {
 
@@ -46,7 +45,7 @@ class ParchmentVersion private constructor(val mcVersion: SemanticVersion, val p
                         return versions.subList(0, limit)
                     }
                 } catch (e: Exception) {
-                    if (e !is FuelError || e.exception !is HttpException) {
+                    if (e !is HttpRequests.HttpStatusException) {
                         LOGGER.error("Failed to retrieve Parchment version data from $url", e)
                     }
                 }
@@ -69,7 +68,7 @@ class ParchmentVersion private constructor(val mcVersion: SemanticVersion, val p
                     }
                     .toList()
             } catch (e: Exception) {
-                if (e is FuelError && e.exception is HttpException) {
+                if (e is HttpRequests.HttpStatusException) {
                     return null
                 }
                 LOGGER.error("Failed to list supported Parchment Minecraft versions", e)
