@@ -1,0 +1,14 @@
+{
+  "name": "https://api.modrinth.com/v2/project/architectury-api/version",
+  "request": {
+    "method": "GET",
+    "url": "/api.modrinth.com/v2/project/architectury-api/version"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "api.modrinth.com/v2/project/architectury-api/version",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

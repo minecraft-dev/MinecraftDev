@@ -76,6 +76,9 @@ junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref 
 junit-vintage = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 
+# Shaded, so its Jetty and Jackson can't clash with the IDE's
+wiremock = "org.wiremock:wiremock-standalone:3.13.2"
+
 mixinExtras-common = "io.github.llamalad7:mixinextras-common:0.5.3"
 
 [bundles]

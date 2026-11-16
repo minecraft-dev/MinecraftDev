@@ -76,6 +76,90 @@ val templateSourceSets: List<SourceSet> = (file("templates").listFiles() ?: empt
     }
 }
 
+// Code shared by the test source sets: the HTTP mock server, its fixture loader, and the fixture recorder
+val testSupportSourceSet: SourceSet = sourceSets.create("testSupport")
+val httpFixtureRecorder = configurations.create("httpFixtureRecorder")
+
+val httpFixturesDir: Directory = layout.projectDirectory.dir("src/test/resources/http-fixtures")
+val generatedHttpFixturesDir: Provider<Directory> = layout.buildDirectory.dir("http-fixtures-generated")
+
+// The builtin template provider downloads https://github.com/minecraft-dev/templates/archive/refs/heads/v<N>.zip.
+// Rather than recording it, zip the pinned templates checkout the same way GitHub does, so the mock server always
+// serves the templates the tests run against.
+val builtinTemplatesFormatVersion = Regex("""branch\s*=\s*v(\d+)""")
+    .find(file(".gitmodules").readText())?.groupValues?.get(1)
+    ?: throw GradleException("Couldn't find the templates branch in .gitmodules")
+val builtinTemplatesHttpFixture = tasks.register<Zip>("builtinTemplatesHttpFixture") {
+    description = "Zip the templates checkout as the HTTP mock server's copy of the builtin template download"
+    val version = builtinTemplatesFormatVersion
+    val path = "github.com/minecraft-dev/templates/archive/refs/heads/v$version.zip"
+    val root = generatedHttpFixturesDir
+    val mapping = root.map { it.file("mappings/$path.json") }
+
+    from("templates") {
+        exclude(".git")
+        into("templates-$version")
+    }
+    val destination = root.map { it.dir("__files/${path.substringBeforeLast('/')}") }
+    destinationDirectory.set(destination)
+    archiveFileName.set(path.substringAfterLast('/'))
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+
+    // The same WireMock mapping the recorder would write
+    outputs.file(mapping)
+    // Clear out the files for an older templates format version
+    doFirst {
+        root.get().asFile.deleteRecursively()
+        destination.get().asFile.mkdirs()
+    }
+    doLast {
+        mapping.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+                |{
+                |  "name": "https://$path",
+                |  "request": {
+                |    "method": "GET",
+                |    "url": "/$path"
+                |  },
+                |  "response": {
+                |    "status": 200,
+                |    "bodyFileName": "$path",
+                |    "headers": {
+                |      "Content-Type": "application/zip"
+                |    }
+                |  }
+                |}
+                |""".trimMargin()
+            )
+        }
+    }
+}
+
+tasks.register<JavaExec>("recordHttpFixtures") {
+    group = "minecraft"
+    description = "Record the creator's HTTP fixtures from the live services. " +
+        "Pass -Pmcdev.recordFilter=<a>,<b> to only record URLs containing one of those strings."
+    // The recorder uses a few platform-free classes from the plugin, such as NpmRegistry
+    classpath(testSupportSourceSet.output, sourceSets.main.get().output, httpFixtureRecorder)
+    mainClass.set("com.demonwav.mcdev.framework.http.recorder.HttpFixtureRecorder")
+    val filters = providers.gradleProperty("mcdev.recordFilter")
+    val templatesDir = file("templates")
+    val stagingDir = temporaryDir.resolve("http-fixtures")
+    argumentProviders += CommandLineArgumentProvider {
+        listOf(
+            httpFixturesDir.asFile.absolutePath,
+            "--templates",
+            templatesDir.absolutePath,
+            "--staging",
+            stagingDir.absolutePath,
+        ) +
+            filters.orNull?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
+    }
+}
+
 val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
     description = "Package external annotations jar"
     from("externalAnnotations")
@@ -146,6 +230,17 @@ dependencies {
         }
     }
     testLibs(projects.mixinTestData)
+
+    // The IDE provides these at test time, the recorder runs outside it and needs its own
+    "testSupportCompileOnly"(libs.kotlin.stdlib)
+    "testSupportCompileOnly"(libs.gson)
+    "testSupportCompileOnly"(libs.junit.api)
+    "testSupportCompileOnly"(sourceSets.main.get().output)
+    "testSupportImplementation"(libs.wiremock)
+    testImplementation(testSupportSourceSet.output)
+    testImplementation(libs.wiremock)
+    httpFixtureRecorder(libs.kotlin.stdlib)
+    httpFixtureRecorder(libs.gson)
 
     gradleToolingExtension(libs.gradleToolingExtension)
     gradleToolingExtension(libs.annotations)
@@ -233,6 +328,16 @@ tasks.test {
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     systemProperty("java.awt.headless", "true")
+
+    dependsOn(builtinTemplatesHttpFixture)
+    inputs.files(builtinTemplatesHttpFixture).withPropertyName("builtinTemplatesHttpFixture")
+    systemProperty(
+        "mcdev.test.httpFixtures",
+        listOf(httpFixturesDir.asFile, generatedHttpFixturesDir.get().asFile).joinToString(File.pathSeparator),
+    )
+    // Outside HttpMockExtension, the plugin's requests go to a closed loopback port and fail with "connection refused"
+    // instead of reaching the real services
+    systemProperty("mcdev.test.httpMock", "http://127.0.0.1:1")
 
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",

@@ -38,14 +38,30 @@ class McdevHttpTest {
 
     private val base = "http://127.0.0.1:54321"
 
+    // The test task sets the property, so put it back for the tests after these
+    private val originalProperty: String? = System.getProperty(McdevHttp.MOCK_PROPERTY)
+
     @AfterEach
-    fun clearProperty() {
-        System.clearProperty(McdevHttp.MOCK_PROPERTY)
+    fun restoreProperty() {
+        if (originalProperty == null) {
+            System.clearProperty(McdevHttp.MOCK_PROPERTY)
+        } else {
+            System.setProperty(McdevHttp.MOCK_PROPERTY, originalProperty)
+        }
+    }
+
+    @Test
+    @DisplayName("The test task keeps requests off the real network")
+    fun testTaskBlocksNetwork() {
+        assertTrue(originalProperty?.startsWith("http://127.0.0.1:") == true) {
+            "Expected the test task to set ${McdevHttp.MOCK_PROPERTY} to a loopback URL, was $originalProperty"
+        }
     }
 
     @Test
     @DisplayName("URLs are unchanged when the property is unset")
     fun unsetLeavesUrlsAlone() {
+        System.clearProperty(McdevHttp.MOCK_PROPERTY)
         assertNull(McdevHttp.mockBaseUrl)
         val url = "https://meta.fabricmc.net/v2/versions"
         assertEquals(url, McdevHttp.resolve(url))

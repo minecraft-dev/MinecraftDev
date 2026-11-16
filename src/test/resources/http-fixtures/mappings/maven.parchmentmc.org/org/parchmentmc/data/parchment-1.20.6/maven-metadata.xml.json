@@ -1,0 +1,14 @@
+{
+  "name": "https://maven.parchmentmc.org/org/parchmentmc/data/parchment-1.20.6/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/maven.parchmentmc.org/org/parchmentmc/data/parchment-1.20.6/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "maven.parchmentmc.org/org/parchmentmc/data/parchment-1.20.6/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "application/xml"
+    }
+  }
+}

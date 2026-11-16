@@ -6,3 +6,6 @@ gradlew text eol=lf
 
 *.jar binary
 *.png binary
+
+# Recorded HTTP fixtures are served byte for byte
+src/test/resources/http-fixtures/** -text
