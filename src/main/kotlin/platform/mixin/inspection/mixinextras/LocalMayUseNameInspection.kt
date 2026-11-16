@@ -90,6 +90,10 @@ class LocalMayUseNameInspection : MixinInspection() {
                 fixes += IgnoreForImplicitLocalsFix()
             }
 
+            if (localInfo.argsOnly) {
+                fixes += IgnoreWhenArgsOnlyFix()
+            }
+
             holder.registerProblem(
                 problemElement,
                 MCDevBundle("inspection.local_may_use_name.message"),
@@ -104,6 +108,16 @@ class LocalMayUseNameInspection : MixinInspection() {
         override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
             return ModCommand.updateInspectionOption(descriptor.psiElement, this@LocalMayUseNameInspection) {
                 it.ignoreForImplicitLocals = true
+            }
+        }
+    }
+
+    private inner class IgnoreWhenArgsOnlyFix : ModCommandQuickFix(), LowPriorityAction {
+        override fun getFamilyName() = MCDevBundle("inspection.may_use_name.option.ignore_args_only")
+
+        override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
+            return ModCommand.updateInspectionOption(descriptor.psiElement, this@LocalMayUseNameInspection) {
+                it.ignoreWhenArgsOnly = true
             }
         }
     }
