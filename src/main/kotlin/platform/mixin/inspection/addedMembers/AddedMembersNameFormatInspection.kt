@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
+import com.demonwav.mcdev.platform.minecraft.ct.CtInterfaceInjections
 import com.demonwav.mcdev.util.RegexConverter
 import com.demonwav.mcdev.util.decapitalize
 import com.demonwav.mcdev.util.doBindItem
@@ -41,7 +42,10 @@ import com.intellij.ide.util.SuperMethodWarningUtil
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiEnumConstant
 import com.intellij.psi.PsiField
@@ -50,11 +54,14 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiUtil
+import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.refactoring.rename.RenameProcessor
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.dsl.builder.COLUMNS_SHORT
 import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.xmlb.annotations.Attribute
@@ -79,6 +86,17 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
     @JvmField
     var reportInheritedMethods = ReportMode.ALWAYS
 
+    @JvmField
+    var ignoreInheritedWithProjectTypeInDescriptor = true
+    @JvmField
+    var ignoreInheritedFromTransitivelyInjectedInterfaces = true
+    @JvmField
+    var ignoreInheritedFromApiInterfaces = true
+
+    @Attribute(converter = RegexConverter::class)
+    @JvmField
+    var apiPackageFormat = DEFAULT_API_PACKAGE_FORMAT.toRegex()
+
     override fun visitAddedField(holder: ProblemsHolder, field: PsiField) {
         if (field !is PsiEnumConstant && reportFields.shouldReport(field.findModule())) {
             visitAdded(holder, field)
@@ -99,15 +117,46 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
                 return false
             }
 
-            val superMethods = method.findDeepestSuperMethods()
-            val isWritableInterfaceMethod = superMethods.any {
-                val clazz = it.findContainingClass() ?: return@any false
-                clazz.isInterface && clazz.containingFile?.isWritable == true
+            val writableInterfaces = method.findDeepestSuperMethods().mapNotNull { superMethod ->
+                superMethod.findContainingClass()?.takeIf { it.isInterface && it.containingFile?.isWritable == true }
             }
-            return isWritableInterfaceMethod
+            if (writableInterfaces.isEmpty()) {
+                return false
+            }
+
+            if (ignoreInheritedWithProjectTypeInDescriptor && hasProjectTypeInDescriptor(method)) {
+                return false
+            }
+
+            return writableInterfaces.any { !isIgnoredInterface(it) }
         } else {
             return reportMethods.shouldReport(module)
         }
+    }
+
+    private fun hasProjectTypeInDescriptor(method: PsiMethod): Boolean {
+        val fileIndex = ProjectFileIndex.getInstance(method.project)
+        val types = method.parameterList.parameters.map { it.type } + listOfNotNull(method.returnType)
+        return types.any { type ->
+            val erased = TypeConversionUtil.erasure(type).deepComponentType as? PsiClassType ?: return@any false
+            val file = erased.resolve()?.containingFile?.virtualFile ?: return@any false
+            fileIndex.isInSourceContent(file)
+        }
+    }
+
+    private fun isIgnoredInterface(iface: PsiClass): Boolean {
+        if (ignoreInheritedFromApiInterfaces) {
+            val packageName = PsiUtil.getPackageName(iface)
+            if (packageName != null && apiPackageFormat.matches(packageName)) {
+                return true
+            }
+        }
+
+        if (ignoreInheritedFromTransitivelyInjectedInterfaces && CtInterfaceInjections.isTransitivelyInjected(iface)) {
+            return true
+        }
+
+        return false
     }
 
     private fun visitAdded(holder: ProblemsHolder, added: PsiNameIdentifierOwner) {
@@ -187,7 +236,32 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
                     .applyToComponent { toolTipText = "Reports methods that are inherited from duck interfaces" }
                 comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportInheritedMethods)
             }
+            indent {
+                row {
+                    checkBox("Ignore if a parameter or return type is from the current project")
+                        .bindSelected(::ignoreInheritedWithProjectTypeInDescriptor)
+                }
+                row {
+                    checkBox("Ignore if the interface is transitively injected by a class tweaker")
+                        .bindSelected(::ignoreInheritedFromTransitivelyInjectedInterfaces)
+                }
+                row {
+                    checkBox("Ignore if the interface is in an API package:")
+                        .bindSelected(::ignoreInheritedFromApiInterfaces)
+                    textField()
+                        .doBindText(
+                            { apiPackageFormat.pattern },
+                            { apiPackageFormat = it.toRegexOrDefault(DEFAULT_API_PACKAGE_FORMAT) }
+                        )
+                        .columns(COLUMNS_SHORT)
+                        .regexValidator()
+                }
+            }
         }
+    }
+
+    companion object {
+        private const val DEFAULT_API_PACKAGE_FORMAT = "(.+\\.)?api(\\..+)?"
     }
 
     enum class ReportMode(private val displayName: String) {

@@ -1,0 +1,14 @@
+{
+  "name": "https://api.modrinth.com/v2/project/P7dR8mSH/version",
+  "request": {
+    "method": "GET",
+    "url": "/api.modrinth.com/v2/project/P7dR8mSH/version"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "api.modrinth.com/v2/project/P7dR8mSH/version",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

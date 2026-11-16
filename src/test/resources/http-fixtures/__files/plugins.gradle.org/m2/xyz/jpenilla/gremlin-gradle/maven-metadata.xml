@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+      <groupId>xyz.jpenilla</groupId>
+      <artifactId>gremlin-gradle</artifactId>
+      <version>0.0.9</version>
+      <versioning>
+        <latest>0.0.9</latest>
+        <release>0.0.9</release>
+        <versions>
+          <version>0.0.7</version><version>0.0.8</version><version>0.0.9</version>
+        </versions>
+        <lastUpdated>20250812224104</lastUpdated>
+      </versioning>
+    </metadata>

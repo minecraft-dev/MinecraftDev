@@ -1,0 +1,14 @@
+{
+  "name": "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}

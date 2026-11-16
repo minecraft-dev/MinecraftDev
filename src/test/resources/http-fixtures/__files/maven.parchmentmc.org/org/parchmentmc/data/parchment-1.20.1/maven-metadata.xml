@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.parchmentmc.data</groupId>
+  <artifactId>parchment-1.20.1</artifactId>
+  <versioning>
+    <latest>2023.09.03-nightly-SNAPSHOT</latest>
+    <release>2023.09.03</release>
+    <versions>
+      <version>BLEEDING-SNAPSHOT</version>
+      <version>2023.06.26-nightly-SNAPSHOT</version>
+      <version>2023.06.28-nightly-SNAPSHOT</version>
+      <version>2023.06.30-nightly-SNAPSHOT</version>
+      <version>2023.07.29-nightly-SNAPSHOT</version>
+      <version>2023.07.30</version>
+      <version>2023.07.30-nightly-SNAPSHOT</version>
+      <version>2023.08.18-nightly-SNAPSHOT</version>
+      <version>2023.08.19-nightly-SNAPSHOT</version>
+      <version>2023.08.20</version>
+      <version>2023.09.03</version>
+      <version>2023.09.03-nightly-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20231004043944</lastUpdated>
+  </versioning>
+</metadata>

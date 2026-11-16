@@ -28,8 +28,6 @@ import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.getOrLogException
-import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.extensions.authentication
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.ui.ComboboxSpeedSearch
@@ -39,7 +37,6 @@ import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.ui.AsyncProcessIcon
 import java.util.concurrent.ConcurrentHashMap
-import java.util.function.Function
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -160,11 +157,8 @@ class MavenArtifactVersionCreatorProperty(
             val scope = context.childScope("MavenArtifactVersionCreatorProperty")
             scope.launch(Dispatchers.Default) {
                 val result = withContext(Dispatchers.IO) {
-                    val requestCustomizer = CreatorCredentials.findMavenRepoCredentials(url)?.let { (user, pass) ->
-                        Function<Request, Request> { request -> request.authentication().basic(user, pass) }
-                    }
-
-                    runCatching { collectMavenVersions(url, requestCustomizer) }
+                    val headers = CreatorCredentials.findMavenRepoAuthHeaders(url)
+                    runCatching { collectMavenVersions(url, headers) }
                 }.map { result ->
                     val versions = result.asSequence()
                         .filter(rawVersionFilter)

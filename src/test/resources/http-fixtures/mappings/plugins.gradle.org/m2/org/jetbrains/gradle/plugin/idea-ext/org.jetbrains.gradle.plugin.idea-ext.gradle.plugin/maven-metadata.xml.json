@@ -1,0 +1,14 @@
+{
+  "name": "https://plugins.gradle.org/m2/org/jetbrains/gradle/plugin/idea-ext/org.jetbrains.gradle.plugin.idea-ext.gradle.plugin/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/plugins.gradle.org/m2/org/jetbrains/gradle/plugin/idea-ext/org.jetbrains.gradle.plugin.idea-ext.gradle.plugin/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "plugins.gradle.org/m2/org/jetbrains/gradle/plugin/idea-ext/org.jetbrains.gradle.plugin.idea-ext.gradle.plugin/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "application/xml; charset=UTF-8"
+    }
+  }
+}

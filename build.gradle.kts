@@ -35,10 +35,10 @@ plugins {
     alias(libs.plugins.sentry) apply (System.getenv("CI") == "true" && System.getenv("NO_SENTRY") != "true")
 }
 
-val coreVersion: String by project
+val coreVersion = project.property("coreVersion") as String
 
-val gradleToolingExtension: Configuration by configurations.creating
-val testLibs: Configuration by configurations.creating {
+val gradleToolingExtension = configurations.create("gradleToolingExtension")
+val testLibs = configurations.create("testLibs") {
     isTransitive = false
 }
 
@@ -50,6 +50,7 @@ val gradleToolingExtensionSourceSet: SourceSet = sourceSets.create("gradle-tooli
     }
 })
 val gradleToolingExtensionJar = tasks.register<Jar>(gradleToolingExtensionSourceSet.jarTaskName) {
+    description = "Package Gradle tooling extension jar"
     from(gradleToolingExtensionSourceSet.output)
     archiveClassifier.set("gradle-tooling-extension")
     exclude("META-INF/plugin.xml")
@@ -75,7 +76,92 @@ val templateSourceSets: List<SourceSet> = (file("templates").listFiles() ?: empt
     }
 }
 
+// Code shared by the test source sets: the HTTP mock server, its fixture loader, and the fixture recorder
+val testSupportSourceSet: SourceSet = sourceSets.create("testSupport")
+val httpFixtureRecorder = configurations.create("httpFixtureRecorder")
+
+val httpFixturesDir: Directory = layout.projectDirectory.dir("src/test/resources/http-fixtures")
+val generatedHttpFixturesDir: Provider<Directory> = layout.buildDirectory.dir("http-fixtures-generated")
+
+// The builtin template provider downloads https://github.com/minecraft-dev/templates/archive/refs/heads/v<N>.zip.
+// Rather than recording it, zip the pinned templates checkout the same way GitHub does, so the mock server always
+// serves the templates the tests run against.
+val builtinTemplatesFormatVersion = Regex("""branch\s*=\s*v(\d+)""")
+    .find(file(".gitmodules").readText())?.groupValues?.get(1)
+    ?: throw GradleException("Couldn't find the templates branch in .gitmodules")
+val builtinTemplatesHttpFixture = tasks.register<Zip>("builtinTemplatesHttpFixture") {
+    description = "Zip the templates checkout as the HTTP mock server's copy of the builtin template download"
+    val version = builtinTemplatesFormatVersion
+    val path = "github.com/minecraft-dev/templates/archive/refs/heads/v$version.zip"
+    val root = generatedHttpFixturesDir
+    val mapping = root.map { it.file("mappings/$path.json") }
+
+    from("templates") {
+        exclude(".git")
+        into("templates-$version")
+    }
+    val destination = root.map { it.dir("__files/${path.substringBeforeLast('/')}") }
+    destinationDirectory.set(destination)
+    archiveFileName.set(path.substringAfterLast('/'))
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+
+    // The same WireMock mapping the recorder would write
+    outputs.file(mapping)
+    // Clear out the files for an older templates format version
+    doFirst {
+        root.get().asFile.deleteRecursively()
+        destination.get().asFile.mkdirs()
+    }
+    doLast {
+        mapping.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+                |{
+                |  "name": "https://$path",
+                |  "request": {
+                |    "method": "GET",
+                |    "url": "/$path"
+                |  },
+                |  "response": {
+                |    "status": 200,
+                |    "bodyFileName": "$path",
+                |    "headers": {
+                |      "Content-Type": "application/zip"
+                |    }
+                |  }
+                |}
+                |""".trimMargin()
+            )
+        }
+    }
+}
+
+tasks.register<JavaExec>("recordHttpFixtures") {
+    group = "minecraft"
+    description = "Record the creator's HTTP fixtures from the live services. " +
+        "Pass -Pmcdev.recordFilter=<a>,<b> to only record URLs containing one of those strings."
+    // The recorder uses a few platform-free classes from the plugin, such as NpmRegistry
+    classpath(testSupportSourceSet.output, sourceSets.main.get().output, httpFixtureRecorder)
+    mainClass.set("com.demonwav.mcdev.framework.http.recorder.HttpFixtureRecorder")
+    val filters = providers.gradleProperty("mcdev.recordFilter")
+    val templatesDir = file("templates")
+    val stagingDir = temporaryDir.resolve("http-fixtures")
+    argumentProviders += CommandLineArgumentProvider {
+        listOf(
+            httpFixturesDir.asFile.absolutePath,
+            "--templates",
+            templatesDir.absolutePath,
+            "--staging",
+            stagingDir.absolutePath,
+        ) +
+            filters.orNull?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
+    }
+}
+
 val externalAnnotationsJar = tasks.register<Jar>("externalAnnotationsJar") {
+    description = "Package external annotations jar"
     from("externalAnnotations")
     destinationDirectory.set(layout.buildDirectory.dir("externalAnnotations"))
     archiveFileName.set("externalAnnotations.jar")
@@ -93,10 +179,6 @@ dependencies {
     implementation(libs.mappingIo)
     implementation(libs.bundles.asm)
 
-    implementation(libs.bundles.fuel) {
-        exclude(group = "org.jetbrains.kotlin")
-        exclude(group = "org.jetbrains.kotlinx")
-    }
     implementation(libs.sentry) {
         exclude(group = "org.slf4j")
     }
@@ -125,6 +207,7 @@ dependencies {
         bundledPlugin("org.jetbrains.kotlin")
         bundledPlugin("org.toml.lang")
         bundledPlugin("org.jetbrains.plugins.yaml")
+        bundledPlugin("org.jetbrains.plugins.github")
 
         testFramework(TestFrameworkType.JUnit5)
         testFramework(TestFrameworkType.Platform)
@@ -148,6 +231,17 @@ dependencies {
         }
     }
     testLibs(projects.mixinTestData)
+
+    // The IDE provides these at test time, the recorder runs outside it and needs its own
+    "testSupportCompileOnly"(libs.kotlin.stdlib)
+    "testSupportCompileOnly"(libs.gson)
+    "testSupportCompileOnly"(libs.junit.api)
+    "testSupportCompileOnly"(sourceSets.main.get().output)
+    "testSupportImplementation"(libs.wiremock)
+    testImplementation(testSupportSourceSet.output)
+    testImplementation(libs.wiremock)
+    httpFixtureRecorder(libs.kotlin.stdlib)
+    httpFixtureRecorder(libs.gson)
 
     gradleToolingExtension(gradleApi())
     gradleToolingExtension(libs.gradleToolingExtension)
@@ -201,6 +295,7 @@ val testForks = 6
 val sandboxTestTasks = mutableListOf<TaskProvider<PrepareSandboxTask>>()
 repeat(testForks) {
     sandboxTestTasks += tasks.register<PrepareSandboxTask>("prepareTestSandboxFork$it") {
+        description = "Prepare sandbox for test fork #$it"
         sandboxSuffix.set("-fork-$it")
         doFirst {
             sandboxDirectory.get().asFile.listFiles()
@@ -217,7 +312,8 @@ tasks.prepareTestSandbox {
     }
 }
 
-val cleanTestSandboxForks by tasks.registering(Delete::class) {
+val cleanTestSandboxForks = tasks.register("cleanTestSandboxForks", Delete::class) {
+    description = "Delete all test fork sandboxes"
     doFirst {
         tasks.prepareTestSandbox.flatMap { it.sandboxDirectory }
             .get().asFile.listFiles()
@@ -234,6 +330,16 @@ tasks.test {
     }
     systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     systemProperty("java.awt.headless", "true")
+
+    dependsOn(builtinTemplatesHttpFixture)
+    inputs.files(builtinTemplatesHttpFixture).withPropertyName("builtinTemplatesHttpFixture")
+    systemProperty(
+        "mcdev.test.httpFixtures",
+        listOf(httpFixturesDir.asFile, generatedHttpFixturesDir.get().asFile).joinToString(File.pathSeparator),
+    )
+    // Outside HttpMockExtension, the plugin's requests go to a closed loopback port and fail with "connection refused"
+    // instead of reaching the real services
+    systemProperty("mcdev.test.httpMock", "http://127.0.0.1:1")
 
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",
@@ -264,6 +370,7 @@ license {
             .startsWith("src/test/resources")
     }
 
+    @Suppress("UnstableApiUsage")
     tasks {
         register("gradle") {
             files.from(
@@ -298,29 +405,30 @@ license {
     }
 }
 
-val generateAtLexer by lexer("AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
-val generateAtParser by parser("AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtLexer = lexer("generateAtLexer", "AtLexer", "com/demonwav/mcdev/platform/minecraft/at/gen")
+val generateAtParser = parser("generateAtParser", "AtParser", "com/demonwav/mcdev/platform/minecraft/at/gen")
 
-val generateCtLexer by lexer("CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
-val generateCtParser by parser("CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtLexer = lexer("generateCtLexer", "CtLexer", "com/demonwav/mcdev/platform/minecraft/ct/gen")
+val generateCtParser = parser("generateCtParser", "CtParser", "com/demonwav/mcdev/platform/minecraft/ct/gen")
 
-val generateNbttLexer by lexer("NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
-val generateNbttParser by parser("NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttLexer = lexer("generateNbttLexer", "NbttLexer", "com/demonwav/mcdev/nbt/lang/gen")
+val generateNbttParser = parser("generateNbttParser", "NbttParser", "com/demonwav/mcdev/nbt/lang/gen")
 
-val generateLangLexer by lexer("LangLexer", "com/demonwav/mcdev/translations/lang/gen")
-val generateLangParser by parser("LangParser", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangLexer = lexer("generateLangLexer", "LangLexer", "com/demonwav/mcdev/translations/lang/gen")
+val generateLangParser = parser("generateLangParser", "LangParser", "com/demonwav/mcdev/translations/lang/gen")
 
-val generateMEExpressionLexer by lexer("MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
-val generateMEExpressionParser by parser("MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
+val generateMEExpressionLexer = lexer("generateMEExpressionLexer", "MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
+val generateMEExpressionParser = parser("generateMEExpressionParser", "MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
 
-val generateTranslationTemplateLexer by lexer(
+val generateTranslationTemplateLexer = lexer(
+    "generateTranslationTemplateLexer",
     "TranslationTemplateLexer",
     "com/demonwav/mcdev/translations/template/gen"
 )
 
-val generate by tasks.registering {
+val generate = tasks.register("generate") {
     group = "minecraft"
-    description = "Generates sources needed to compile the plugin."
+    description = "Generate sources needed to compile the plugin."
     outputs.dir(layout.buildDirectory.dir("gen"))
     dependsOn(
         generateAtLexer,

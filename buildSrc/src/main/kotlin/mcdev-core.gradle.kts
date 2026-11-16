@@ -18,9 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import gradle.kotlin.dsl.accessors._74e4e57ecc86fc3500a89165855e3ea0.versionCatalogs
 import org.cadixdev.gradle.licenser.header.HeaderStyle
 import org.cadixdev.gradle.licenser.tasks.LicenseTask
-import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -34,9 +34,9 @@ plugins {
     id("net.neoforged.licenser")
 }
 
-val ideaVersionName: String by project
-val coreVersion: String by project
-val buildNumber: String? by project
+val ideaVersionName = project.property("ideaVersionName") as String
+val coreVersion = project.property("coreVersion") as String
+val buildNumber = project.findProperty("buildNumber") as String?
 
 version = "$ideaVersionName-$coreVersion"
 
@@ -108,20 +108,20 @@ repositories {
     maven("https://repo.denwav.dev/repository/maven-public/")
 }
 
-val libs = the<LibrariesForLibs>()
+val libs = versionCatalogs.named("libs")
 dependencies {
-    compileOnly(libs.kotlin.stdlib)
-    compileOnly(libs.kotlin.reflect)
-    compileOnly(libs.annotations)
-    implementation(libs.bundles.coroutines) {
+    compileOnly(libs.findLibrary("kotlin.stdlib").get())
+    compileOnly(libs.findLibrary("kotlin.reflect").get())
+    compileOnly(libs.findLibrary("annotations").get())
+    implementation(libs.findBundle("coroutines").get()) {
         exclude(module = "kotlinx-coroutines-core-jvm")
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    testImplementation(libs.junit.api)
-    testImplementation(libs.junit.vintage) // Hack to get tests to compile and run
-    testRuntimeOnly(libs.junit.engine)
-    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.findLibrary("junit.api").get())
+    testImplementation(libs.findLibrary("junit.vintage").get()) // Hack to get tests to compile and run
+    testRuntimeOnly(libs.findLibrary("junit.engine").get())
+    testRuntimeOnly(libs.findLibrary("junit.platform.launcher").get())
 }
 
 intellijPlatform {
@@ -193,6 +193,7 @@ idea {
 tasks.runIde {
     maxHeapSize = "2G"
     jvmArgs("--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED")
+    systemProperty("mcdev.annotater.upstream", "Set the mcdev.annotater.upstream system property")
 }
 
 tasks.test {

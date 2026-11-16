@@ -1,0 +1,14 @@
+{
+  "name": "https://maven.parchmentmc.org/org/parchmentmc/data/",
+  "request": {
+    "method": "GET",
+    "url": "/maven.parchmentmc.org/org/parchmentmc/data/"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "maven.parchmentmc.org/org/parchmentmc/data/_index",
+    "headers": {
+      "Content-Type": "text/html"
+    }
+  }
+}

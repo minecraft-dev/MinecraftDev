@@ -1,0 +1,2091 @@
+[
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v13.0.12 for 1.21\nUpdated at **2026-11-14 11:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21)",
+    "date_published": "2026-11-14T11:30:41.018726Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-13.0.12-fabric.jar",
+        "hashes": {
+          "sha1": "40207f77dcce4b19e64d2ad8ec53ecdf53147278",
+          "sha512": "e436b24aa54f9401bd0c3bfff95fd8df1fe44ebb7ea6e41aca0b337e09413265fbf96761065b8d7ebf3fabe45bd0fad0dee43d302efbf43e7bb8853dc9c821af"
+        },
+        "id": "b8xq0QXc",
+        "primary": true,
+        "size": 600949,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/WklfM1A0/architectury-13.0.12-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21",
+      "1.21.1"
+    ],
+    "id": "WklfM1A0",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21] v13.0.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "13.0.12+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v13.0.12 for 1.21\nUpdated at **2026-11-14 11:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21)",
+    "date_published": "2026-11-14T11:30:41.016741Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-13.0.12-neoforge.jar",
+        "hashes": {
+          "sha1": "646dace27624ac08ad8d229fe15f6601a8b7fbb2",
+          "sha512": "286127f99708d1e2723e1dcc9104ebcab258f04db92040fc2394e5b7faf36d731ef3b84e592d94ec0d0f7f899eca84f806b1e012223da4894d4d8af5030ffe0f"
+        },
+        "id": "U4F64l8W",
+        "primary": true,
+        "size": 584731,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/xGfBrBzj/architectury-13.0.12-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21",
+      "1.21.1"
+    ],
+    "id": "xGfBrBzj",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21] v13.0.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "13.0.12+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v22.0.5 for 26.3\nUpdated at **2026-10-09 19:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.3)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:30:17.890953Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-neoforge-22.0.5.jar",
+        "hashes": {
+          "sha1": "3d97172dfd753f70a1ece295af19bc1a8bcd32f6",
+          "sha512": "04e6fb056ada0f0148c002527cdac09a651f275c5fa6b6dbcbcd7d4fd62a4eb6f583d7711030e1c82b00339ba808d8070a588a5432f334903d8b430a0da47ae5"
+        },
+        "id": "DsoaLk2l",
+        "primary": true,
+        "size": 622642,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/dZ7iNvS4/architectury-neoforge-22.0.5.jar"
+      }
+    ],
+    "game_versions": [
+      "26.3"
+    ],
+    "id": "dZ7iNvS4",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 26.3] v22.0.5",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "22.0.5+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v22.0.5 for 26.3\nUpdated at **2026-10-09 19:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.3)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:30:17.890431Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-fabric-22.0.5.jar",
+        "hashes": {
+          "sha1": "8c5f566e32bd47fbb80be4932b9be1cfa97c4e3a",
+          "sha512": "14c61af2088b80b465f06edd3b3005038fa5be1c95a2161ce712c8da408a358038b7cd7ae4acf3198f6d47c693e4fdf65d646dac7e124f7cdd7f32bbc0dcd0ce"
+        },
+        "id": "ZOukte3p",
+        "primary": true,
+        "size": 622542,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1pMaB6So/architectury-fabric-22.0.5.jar"
+      }
+    ],
+    "game_versions": [
+      "26.3"
+    ],
+    "id": "1pMaB6So",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 26.3] v22.0.5",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "22.0.5+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v21.1.12 for 26.2\nUpdated at **2026-10-09 19:22**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.2)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:23:17.877564Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-fabric-21.1.12.jar",
+        "hashes": {
+          "sha1": "13358dcb2fcd29890f9ee73109553c179940c9e6",
+          "sha512": "df244fce6ffe38209e70d88696e05570e261b43780f76bd19e7a1813ffc29e128b21de6776816f3e76e50ffa0dcd32141fc3a09e5c33066f46e35d9d364dc173"
+        },
+        "id": "7niBIV7q",
+        "primary": true,
+        "size": 624143,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ohb3PBGZ/architectury-fabric-21.1.12.jar"
+      }
+    ],
+    "game_versions": [
+      "26.2"
+    ],
+    "id": "ohb3PBGZ",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 26.2] v21.1.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "21.1.12+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v21.1.12 for 26.2\nUpdated at **2026-10-09 19:22**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.2)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:23:17.836512Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-neoforge-21.1.12.jar",
+        "hashes": {
+          "sha1": "5de0cf9d828902e0a02af9d9cbaf84f0544ff911",
+          "sha512": "d66915de8926eb02fa57916446e791615599da4c8cfd107b2e5c937cc093e606b3b0817d6774e13f456ad91c0c8401adc257e3e107dc11183e9b313646a1c3a6"
+        },
+        "id": "EP2KG4E1",
+        "primary": true,
+        "size": 621944,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/tihphFAj/architectury-neoforge-21.1.12.jar"
+      }
+    ],
+    "game_versions": [
+      "26.2"
+    ],
+    "id": "tihphFAj",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 26.2] v21.1.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "21.1.12+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v20.1.17 for 26.1.2\nUpdated at **2026-10-09 19:17**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.1)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:18:26.813179Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-neoforge-20.1.17.jar",
+        "hashes": {
+          "sha1": "94c493ab3b49e6209f5fc5b00e67831adf38dab4",
+          "sha512": "b213c3ef37c0ab369e81e380481dc4b39b14c7ae2e377ef312d0b2a34b783cb394c937b8b3d60ec2077602666c6d74a02bb8fd6c919fd4bd7be6144951126906"
+        },
+        "id": "n2atwulp",
+        "primary": true,
+        "size": 618823,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/fyNzvIcr/architectury-neoforge-20.1.17.jar"
+      }
+    ],
+    "game_versions": [
+      "26.1.2"
+    ],
+    "id": "fyNzvIcr",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 26.1.2] v20.1.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "20.1.17+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v20.1.17 for 26.1.2\nUpdated at **2026-10-09 19:17**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.1)\n- Add back particle register method",
+    "date_published": "2026-10-09T19:18:26.752355Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-fabric-20.1.17.jar",
+        "hashes": {
+          "sha1": "460272ee6acb9ff616cb8b3fb2bf957098695734",
+          "sha512": "8ad5988c4d01c4396d67da1143d812507f515ab8d808147babb404978130662c146e4edad2cd415e928722105fbbae27507fd14eadcf05bc4d0fdc15bc6d4034"
+        },
+        "id": "QzejRuLK",
+        "primary": true,
+        "size": 622900,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/9kMQ7HXI/architectury-fabric-20.1.17.jar"
+      }
+    ],
+    "game_versions": [
+      "26.1.2"
+    ],
+    "id": "9kMQ7HXI",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 26.1.2] v20.1.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "20.1.17+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v20.0.4 for 26.1/26.1.1/26.1.2\nUpdated at **2026-06-03 16:34**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.1)\n- Fix game version",
+    "date_published": "2026-06-03T16:35:10.232796Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-neoforge-20.0.4.jar",
+        "hashes": {
+          "sha1": "56dcade749ed53ac3c52da7bf8760e4bff2d0ebe",
+          "sha512": "abd536f0c72b3d24c881084809a043b8d36b91713df03e7c5d915e6b84ab0e3fbc6731a86959240623d9754f8659358eb0359e30ef56b69a5a643242500b73a9"
+        },
+        "id": "mvoZQyBs",
+        "primary": true,
+        "size": 558931,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/HupR52cO/architectury-neoforge-20.0.4.jar"
+      }
+    ],
+    "game_versions": [
+      "26.1",
+      "26.1.1",
+      "26.1.2"
+    ],
+    "id": "HupR52cO",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 26.1/26.1.1/26.1.2] v20.0.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "20.0.4+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v20.0.4 for 26.1/26.1.1/26.1.2\nUpdated at **2026-06-03 16:34**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/26.1)\n- Fix game version",
+    "date_published": "2026-06-03T16:35:06.923884Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-fabric-20.0.4.jar",
+        "hashes": {
+          "sha1": "39ecbab1132941041e5007f7f1358e483382b798",
+          "sha512": "b3e06deafe05292699777221399a57a8a8890facadc9148a4194947167e968414da7c80138d4133cc681f8d852417fc7130584b69be6325da9c16567c7f0307e"
+        },
+        "id": "RL1Vp6LF",
+        "primary": true,
+        "size": 572494,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/TZJ7aDWD/architectury-fabric-20.0.4.jar"
+      }
+    ],
+    "game_versions": [
+      "26.1",
+      "26.1.1",
+      "26.1.2"
+    ],
+    "id": "TZJ7aDWD",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 26.1/26.1.1/26.1.2] v20.0.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "20.0.4+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v19.0.1 for 1.21.11\nUpdated at **2025-12-16 04:23**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.11)\n- Port to 1.21.11 (#685)",
+    "date_published": "2025-12-16T04:24:43.844528Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-19.0.1-neoforge.jar",
+        "hashes": {
+          "sha1": "dd5f16e90817329d5b1d38de1ffd43afd693c6b6",
+          "sha512": "9862cd53bdcdb01abcf18789dd9ceb11f492e2189577c5a15538f726db0dc5b38591ff3a8f5e59c616422c4e85e46cba9d94bb25bd3d697c5689155d5cd958e2"
+        },
+        "id": "kEbFcRj4",
+        "primary": true,
+        "size": 562565,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/EvL9NK2R/architectury-19.0.1-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.11"
+    ],
+    "id": "EvL9NK2R",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.11] v19.0.1",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "19.0.1+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v19.0.1 for 1.21.11\nUpdated at **2025-12-16 04:23**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.11)\n- Port to 1.21.11 (#685)",
+    "date_published": "2025-12-16T04:24:40.738870Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-19.0.1-fabric.jar",
+        "hashes": {
+          "sha1": "2d40563f7e36f7a03f094031aeaacb175117928e",
+          "sha512": "7ca532844a0ed3d35e8515e13d1e84f8eadfceaae93281b79ad6b4dac253f4634e3dfcc7592f9543871dec117e1a3092c196ba5eae33735162de223be19dc4ad"
+        },
+        "id": "j4FPrLJK",
+        "primary": true,
+        "size": 568474,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/uNdfrcQ8/architectury-19.0.1-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.11"
+    ],
+    "id": "uNdfrcQ8",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.11] v19.0.1",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "19.0.1+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v18.0.8 for 1.21.10\nUpdated at **2025-12-02 11:15**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.10)\n- Push something and let it publish again",
+    "date_published": "2025-12-02T11:15:57.570421Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-18.0.8-neoforge.jar",
+        "hashes": {
+          "sha1": "0e6b718f8623ab1f4a5101114d77c8b250e24d5a",
+          "sha512": "d86630cb62a0bc9248adcfb4fdd92bab5a864179672b139d9a0d40a68b881125a0d4d0a593a190fdbbef5490e101fca5c6b5c9ff90eef95de6316ccf7a6b4efe"
+        },
+        "id": "E02DmvAb",
+        "primary": true,
+        "size": 565219,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Z4ZAg0kG/architectury-18.0.8-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.10"
+    ],
+    "id": "Z4ZAg0kG",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.10] v18.0.8",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "18.0.8+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v18.0.8 for 1.21.10\nUpdated at **2025-12-02 11:15**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.10)\n- Push something and let it publish again",
+    "date_published": "2025-12-02T11:15:54.840799Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-18.0.8-fabric.jar",
+        "hashes": {
+          "sha1": "6df5474fa07d4c1225ee625ecdd7b958a9f5c2b5",
+          "sha512": "38e8c335f04783242d9ded589b8999b85d37620e22afbdfcbbc231c248c7cef7f210c38d63ac7eb01a68a76243b1ae5bcb0a21918f587f83e6a1941f622f2cb7"
+        },
+        "id": "tpWtq8a5",
+        "primary": true,
+        "size": 575956,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/9eRDsZKH/architectury-18.0.8-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.10"
+    ],
+    "id": "9eRDsZKH",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.10] v18.0.8",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "18.0.8+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v18.0.5 for 1.21.9\nUpdated at **2025-10-14 00:16**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.9)\n- Fix: PlayerEvent.DROP_ITEM not working on Fabric 1.21.9 (#668)",
+    "date_published": "2025-10-14T00:17:12.123050Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-18.0.5-neoforge.jar",
+        "hashes": {
+          "sha1": "83f2c174c5be1b3a55df57f755745c59b2bae759",
+          "sha512": "b63f8cacaf6f39d69411db6ed09f5e1f833a5839bbe54d7f3b51e62a65eb3e740fbd6083444697532c02f5aea2413d9f367e6cfd75b673f37a31a08c8ebb4d8b"
+        },
+        "id": "voVnNA18",
+        "primary": true,
+        "size": 564983,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/54QMD2an/architectury-18.0.5-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.10",
+      "1.21.9"
+    ],
+    "id": "54QMD2an",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.9] v18.0.5",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "18.0.5+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v18.0.5 for 1.21.9\nUpdated at **2025-10-14 00:16**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.9)\n- Fix: PlayerEvent.DROP_ITEM not working on Fabric 1.21.9 (#668)",
+    "date_published": "2025-10-14T00:17:09.890836Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-18.0.5-fabric.jar",
+        "hashes": {
+          "sha1": "4c6797e93bb13d4e9ad60af554b69512e96a2014",
+          "sha512": "afbfa5feefd47dd2c4a9ae72ac5b812f134d3d7098662e5cceab6179ca54b450c1fe9a9c949bff81f5cb026ebd186e4c208d6304a8fb363d1ded53187d133b4e"
+        },
+        "id": "fY8ZUJox",
+        "primary": true,
+        "size": 577577,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/qkIZZKUH/architectury-18.0.5-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.10",
+      "1.21.9"
+    ],
+    "id": "qkIZZKUH",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.9] v18.0.5",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "18.0.5+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v17.0.8 for 1.21.7/8\nUpdated at **2025-07-23 15:28**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.7)\n- Mark as compatible for 1.21.8 too",
+    "date_published": "2025-07-23T15:29:09.630398Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-17.0.8-neoforge.jar",
+        "hashes": {
+          "sha1": "8de56ad5cad1e3d86200c70365bc4abfacc02c6b",
+          "sha512": "089f10acd12634791817362a50c7eae6383c26ac648f785b0e4faa1e387acd6a552d2ef39ef8be59fb26d31badcfaaa886c0f8bf6d37ce218d14530ba354c5bc"
+        },
+        "id": "wp3MHCZY",
+        "primary": true,
+        "size": 578391,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/L9u1QLTx/architectury-17.0.8-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.7",
+      "1.21.8"
+    ],
+    "id": "L9u1QLTx",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.7/8] v17.0.8",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "17.0.8+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v17.0.8 for 1.21.7/8\nUpdated at **2025-07-23 15:28**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.7)\n- Mark as compatible for 1.21.8 too",
+    "date_published": "2025-07-23T15:29:07.354795Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-17.0.8-fabric.jar",
+        "hashes": {
+          "sha1": "430b9769809ff34076271114f8dbaf5b2badf10e",
+          "sha512": "7965ed7140c9f50cfcf8cf9b415de90497ae44ea4fb6dfe21704c6eba4210d0a34a4a0b0b6baf8b3e9d3b1cb70d0df79ef1ba93d04b5557f09a754959ac9c8b0"
+        },
+        "id": "z3PBXgJR",
+        "primary": true,
+        "size": 589654,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/XcJm5LH4/architectury-17.0.8-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.7",
+      "1.21.8"
+    ],
+    "id": "XcJm5LH4",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.7/8] v17.0.8",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "17.0.8+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v17.0.6 for 1.21.6\nUpdated at **2025-06-20 01:10**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.6)\n- Fix RenderTypeRegistry.register parameters (#636)",
+    "date_published": "2025-06-20T01:10:51.199306Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-17.0.6-neoforge.jar",
+        "hashes": {
+          "sha1": "aa2f1ddc15212cd30ade786fda2d903037ccdc90",
+          "sha512": "c64f75d901f0e61f1aef46547142cccef16ce524664a425540b8804d969325afe1d80d77adc4ccb7ee521ac64cf895a5f7eb7181463496eb0005c88b25115eea"
+        },
+        "id": "7SWZHE9M",
+        "primary": true,
+        "size": 577681,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/KFBGyMei/architectury-17.0.6-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.6",
+      "1.21.7"
+    ],
+    "id": "KFBGyMei",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.6/7] v17.0.6",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "17.0.6+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v17.0.6 for 1.21.6\nUpdated at **2025-06-20 01:10**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.6)\n- Fix RenderTypeRegistry.register parameters (#636)",
+    "date_published": "2025-06-20T01:10:48.154496Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-17.0.6-fabric.jar",
+        "hashes": {
+          "sha1": "deff589485cc19abc4a83f37789d09061423e866",
+          "sha512": "5abc7591f6f4c538b8f52c4b9fceab057d84d24d3044efa6aa6455a061689c9be39439c260b62231f1b963156dd8f4447c147bb2eea45e16b4f8266a4bde988b"
+        },
+        "id": "TKWGYorH",
+        "primary": true,
+        "size": 589649,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/VxCkJjz7/architectury-17.0.6-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.6",
+      "1.21.7"
+    ],
+    "id": "VxCkJjz7",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.6/7] v17.0.6",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "17.0.6+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v16.1.4 for 1.21.5\nUpdated at **2025-04-10 06:54**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.5)\n- Bump to 16.1, add more transitive access wideners",
+    "date_published": "2025-04-10T06:55:14.586067Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-16.1.4-neoforge.jar",
+        "hashes": {
+          "sha1": "593449b4667e7b3924d74d9f18859e5f8885dba8",
+          "sha512": "9bb30b46b28c00edc8af819014bd0a6341a264ed2a2939aba474a3b6e91597baa16d1ff5e14888ed7e4b8ae352dfeb7c3796ce01f88dd0edcfc2eded520584e1"
+        },
+        "id": "b7pYbNx3",
+        "primary": true,
+        "size": 577347,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/sqGCUsVI/architectury-16.1.4-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.5"
+    ],
+    "id": "sqGCUsVI",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.5] v16.1.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "16.1.4+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v16.1.4 for 1.21.5\nUpdated at **2025-04-10 06:54**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.5)\n- Bump to 16.1, add more transitive access wideners",
+    "date_published": "2025-04-10T06:55:12.101440Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-16.1.4-fabric.jar",
+        "hashes": {
+          "sha1": "7d26d978a4f64800f15363cebea7b26c79a33fa3",
+          "sha512": "2edf94af0b6fc9e72e91b4a094e7168b4c2fedbdc0c0713b01d817e4294e297a75fdd8cd89e6e50a9a559d7bf0ad75fcb93d35e1b0beb62c9d1d814f94b53cdf"
+        },
+        "id": "qHfVBT6b",
+        "primary": true,
+        "size": 589366,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ImZUcNzP/architectury-16.1.4-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.5"
+    ],
+    "id": "ImZUcNzP",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.5] v16.1.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "16.1.4+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v15.0.3 for 1.21.4\nUpdated at **2025-02-18 14:52**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.4)\n- Fix #600 (#602)",
+    "date_published": "2025-02-18T14:53:24.181896Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-15.0.3-neoforge.jar",
+        "hashes": {
+          "sha1": "ab24fc1c199e328ec4d13fe496cb4b7f0263a9f2",
+          "sha512": "f844f220b5547b6b4ff14ec605da08853b56e051fa6f7ff817282ffebadd999f77a24df3991df22ac0149448b7acbb5a1ec094d5aad4ff0c302f7d5f8161cb69"
+        },
+        "id": "XKcMFTC4",
+        "primary": true,
+        "size": 578885,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/qOJoTaPQ/architectury-15.0.3-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.4"
+    ],
+    "id": "qOJoTaPQ",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.4] v15.0.3",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "15.0.3+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v15.0.3 for 1.21.4\nUpdated at **2025-02-18 14:52**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.4)\n- Fix #600 (#602)",
+    "date_published": "2025-02-18T14:53:21.570735Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-15.0.3-fabric.jar",
+        "hashes": {
+          "sha1": "caa5462498018160de9397dd2558f27922b85751",
+          "sha512": "6acc7cfccfc6e93fd8c1895fb2c489cbabd27265f38f7cbad98ddaab2cb2e6d1601633bd12cf26fc0bb100a87949ee06b872f333cf7b8490cccc0082ac586dcb"
+        },
+        "id": "BS9UOB5u",
+        "primary": true,
+        "size": 589645,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/73nlw3WM/architectury-15.0.3-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.4"
+    ],
+    "id": "73nlw3WM",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.4] v15.0.3",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "15.0.3+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v14.0.4 for 1.21.2\nUpdated at **2024-10-27 07:26**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.2)\n- Fix crash (#576)",
+    "date_published": "2024-10-27T07:27:05.849260Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-14.0.4-neoforge.jar",
+        "hashes": {
+          "sha1": "52edbb50b296bf83e629ed248e1e17525a49483b",
+          "sha512": "cb19d97cf0be6124530cebc88d3cef5eefa38f787195175a018bf8cca702aa41dd9b2c426ed8a5e1684b82635e4641172e864018c18cbb629bfa39dc0c988109"
+        },
+        "id": "XArXKsaV",
+        "primary": true,
+        "size": 581564,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/avlNAUxs/architectury-14.0.4-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.2",
+      "1.21.3"
+    ],
+    "id": "avlNAUxs",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.21.2/3] v14.0.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "14.0.4+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v14.0.4 for 1.21.2\nUpdated at **2024-10-27 07:26**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.21.2)\n- Fix crash (#576)",
+    "date_published": "2024-10-27T07:27:03.978837Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-14.0.4-fabric.jar",
+        "hashes": {
+          "sha1": "6f8664e55b37c1be7c415c0811215747329a5898",
+          "sha512": "81e4d80ee4cca362b795ad2b0e673a663d4370c9ff8a5a8eddb2e15775cff4b609ba7b48a165dd0b2f3193ee3ffc64e2b7db1353ec3dee7696d10c526f1f65f3"
+        },
+        "id": "sgQEPUGA",
+        "primary": true,
+        "size": 592902,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/i3y5Sm14/architectury-14.0.4-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.21.2",
+      "1.21.3"
+    ],
+    "id": "i3y5Sm14",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.21.2/3] v14.0.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "14.0.4+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v12.1.4 for 1.20.6\nUpdated at **2024-07-22 09:01**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.6)",
+    "date_published": "2024-07-22T09:02:20.916167Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-12.1.4-neoforge.jar",
+        "hashes": {
+          "sha1": "80ab4d74286ebf2a4c048807e5a74a862a33ccc7",
+          "sha512": "b0f2288b0afadc2b5a2a59b2bdbb4275820605ae84501026ca2b8aab29fbbb3bafe4c4d2647b4fc2eeef55c7c350a943f951a01a29bdedc04198ffc750fefe33"
+        },
+        "id": "wdPxEPnS",
+        "primary": true,
+        "size": 585010,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/whouAO7b/architectury-12.1.4-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.6"
+    ],
+    "id": "whouAO7b",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.20.6] v12.1.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "12.1.4+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v12.1.4 for 1.20.6\nUpdated at **2024-07-22 09:01**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.6)",
+    "date_published": "2024-07-22T09:02:18.861323Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-12.1.4-fabric.jar",
+        "hashes": {
+          "sha1": "e5cbfaeb7956aff350a26323f251261bbafdca43",
+          "sha512": "d622784913c4be3ad045c0c04f2d0af937def79d84070a2724fb486cd47591375115aa929424aca5308d331317afbae9f677c31fd6e9893e419c8b3ba7dca8b2"
+        },
+        "id": "7ZjThwYM",
+        "primary": true,
+        "size": 601612,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/vvN5UGnq/architectury-12.1.4-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.6"
+    ],
+    "id": "vvN5UGnq",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.20.6] v12.1.4",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "12.1.4+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v12.0.29 for 1.20.5\nUpdated at **2024-07-20 00:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.5)\n- Register SpawnEntityPacket on Fabric server (#526)",
+    "date_published": "2024-07-20T00:29:55.514956Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-12.0.29-neoforge.jar",
+        "hashes": {
+          "sha1": "d673d625f2b62c62f5299d3cc7e6e2d843c24fb1",
+          "sha512": "0f6493f0d86acc4c1a5cd8e33ee729523d4cc2f2c48411783d8885830bb2840e2ab504b01f448d88a1395c2931bc92bf65d58d217f2d0004a1f506526c319de5"
+        },
+        "id": "1B09zcIk",
+        "primary": true,
+        "size": 582806,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Th6yhTAa/architectury-12.0.29-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.5"
+    ],
+    "id": "Th6yhTAa",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.20.5] v12.0.29",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "12.0.29+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v12.0.29 for 1.20.5\nUpdated at **2024-07-20 00:29**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.5)\n- Register SpawnEntityPacket on Fabric server (#526)",
+    "date_published": "2024-07-20T00:29:51.686754Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-12.0.29-fabric.jar",
+        "hashes": {
+          "sha1": "35dca339319fd3024422137f599a144e02ee8726",
+          "sha512": "83d65815589703f4806a5fc67ebd62c6a0e6f6d57202aa67a55c320296d4848ceca63c68d9ea1f5ee4602b0767280304bb4984106f57f1d60e0aaadc1ecfbd47"
+        },
+        "id": "nh5x7Fbt",
+        "primary": true,
+        "size": 601618,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/iqKljDnd/architectury-12.0.29-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.5"
+    ],
+    "id": "iqKljDnd",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.20.5] v12.0.29",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "12.0.29+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v10.1.20 for 1.20.2\nUpdated at **2024-03-19 07:32**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.2)\n- Backported fluid stack fix to 1.20.2 (#485)",
+    "date_published": "2024-03-19T07:33:27.619038Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-10.1.20-neoforge.jar",
+        "hashes": {
+          "sha1": "562e720b88cefab38b7c3b3653eaaca538a27c3e",
+          "sha512": "4a00ab4b5040c515c17343225f414dc437f83b73c82418a795bc98a76a5757c4e7d6b694f5d6faae23dff69b6c32b6ba52a5ad16e4c8e7b2fd7ae2ee847f8067"
+        },
+        "id": "ZZLX4qvp",
+        "primary": true,
+        "size": 577299,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/PByNovaH/architectury-10.1.20-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.2"
+    ],
+    "id": "PByNovaH",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.20.2] v10.1.20",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "10.1.20+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v10.1.20 for 1.20.2\nUpdated at **2024-03-19 07:32**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.2)\n- Backported fluid stack fix to 1.20.2 (#485)",
+    "date_published": "2024-03-19T07:33:25.093939Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-10.1.20-minecraftforge.jar",
+        "hashes": {
+          "sha1": "bdf153892ecce71a22b98ba0e71e46397c2c3b9b",
+          "sha512": "62500e22ac510c61844c827090770ebb4e55d8657201991043786b6974c46dcc7a45ee66b64fc70dffb121a5f11ca914896b29389eb1accb7eb460713fe307ea"
+        },
+        "id": "nTCxv8rR",
+        "primary": true,
+        "size": 594194,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/uo9eXNGR/architectury-10.1.20-minecraftforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.2"
+    ],
+    "id": "uo9eXNGR",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[MinecraftForge 1.20.2] v10.1.20",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "10.1.20+minecraftforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v10.1.20 for 1.20.2\nUpdated at **2024-03-19 07:32**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.2)\n- Backported fluid stack fix to 1.20.2 (#485)",
+    "date_published": "2024-03-19T07:33:22.762086Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-10.1.20-fabric.jar",
+        "hashes": {
+          "sha1": "da44fd3468b79df5e9816ad17ceefb16f84731fe",
+          "sha512": "07ca4fc16a53681805d24d7d994efe7e4efc150a00aae56d105f0d1f43f65ccbbc3438c9b841462a80a15951f0bc95094cc6a8222dcb16269ad5b9f7257fd9cd"
+        },
+        "id": "iZb7zvuR",
+        "primary": true,
+        "size": 588539,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/C2sB1Yq5/architectury-10.1.20-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.2"
+    ],
+    "id": "C2sB1Yq5",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.20.2] v10.1.20",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "10.1.20+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v11.1.17 for 1.20.4\nUpdated at **2024-03-11 11:25**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.4)",
+    "date_published": "2024-03-11T11:27:11.110815Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-11.1.17-neoforge.jar",
+        "hashes": {
+          "sha1": "263f0ade174eab37019b0f6bc9ce1f642795e49b",
+          "sha512": "0061c053d714b5c5df547aaafef96c9a0e9a1132a2de26e3a0ad49f51647285b979aba14a1b6f97bccf750baed63c1766f8ea4315ccf3395640011f6023acae0"
+        },
+        "id": "y0mU1VjB",
+        "primary": true,
+        "size": 582572,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1ROEGmfO/architectury-11.1.17-neoforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.4"
+    ],
+    "id": "1ROEGmfO",
+    "loaders": [
+      "neoforge"
+    ],
+    "name": "[NeoForge 1.20.4] v11.1.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "11.1.17+neoforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v11.1.17 for 1.20.4\nUpdated at **2024-03-11 11:25**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.4)",
+    "date_published": "2024-03-11T11:27:08.153417Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-11.1.17-minecraftforge.jar",
+        "hashes": {
+          "sha1": "07a9aaa965a7749390090a73753caf13e3d14035",
+          "sha512": "7bf9ab6110d73a7eb849b3e3ecea7d234d49c7763fdff4dfc58b8349ecd47c7d5cd52ee8af3a8b589cb562369b3381b63e60cce8a873006d71014465ac2dd60a"
+        },
+        "id": "GpWmM493",
+        "primary": true,
+        "size": 597386,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ZFDazCA3/architectury-11.1.17-minecraftforge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.4"
+    ],
+    "id": "ZFDazCA3",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[MinecraftForge 1.20.4] v11.1.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "11.1.17+minecraftforge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v11.1.17 for 1.20.4\nUpdated at **2024-03-11 11:25**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.4)",
+    "date_published": "2024-03-11T11:27:04.119806Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-11.1.17-fabric.jar",
+        "hashes": {
+          "sha1": "578b95d1c3631e614739fa4ac1ca773836950540",
+          "sha512": "294112b2db8b5cef2051fede57dfacfb00cc7fce737cbf7db3c2de8b81f0cd17bd29a3e2849c3e05bd9e801fbfa3d14e5a83b6531b3d37e5d7c650cff4714362"
+        },
+        "id": "ZoQ9HmcF",
+        "primary": true,
+        "size": 587429,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/kVjQWX0l/architectury-11.1.17-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.4"
+    ],
+    "id": "kVjQWX0l",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.20.4] v11.1.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "11.1.17+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v6.6.92 for 1.19.2\nUpdated at **2024-02-26 13:19**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.2)\n- Bump version for release",
+    "date_published": "2024-02-26T13:20:21.020680Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-6.6.92-forge.jar",
+        "hashes": {
+          "sha1": "16fad847d50aa4363180c73afb782e76d53f3656",
+          "sha512": "1c8c33cb52713f1aa20a68f844a8dc11eaf887c2b401f9a336054cfaee84d5e4fae4610aae342b75624bd33ad4b6a868a62f470144bfaf3fc9b78dd273700b34"
+        },
+        "id": "wBoJO0CE",
+        "primary": true,
+        "size": 559099,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/96L7fC9l/architectury-6.6.92-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.2"
+    ],
+    "id": "96L7fC9l",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.19.2] v6.6.92",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "6.6.92+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v6.6.92 for 1.19.2\nUpdated at **2024-02-26 13:19**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.2)\n- Bump version for release",
+    "date_published": "2024-02-26T13:20:03.655032Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-6.6.92-fabric.jar",
+        "hashes": {
+          "sha1": "311131ec6f39cae9a3be0782b7da5d9450119285",
+          "sha512": "85ccfe14d05adf1cbe2575283f55c4cff50cfccbee4745177a487770204e7e4a3ad371947a80370c7fbd61e42ba331a15015383e773ece9f34bc5570bcad81e2"
+        },
+        "id": "Zr4rV5gk",
+        "primary": true,
+        "size": 572428,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/cde9Su0w/architectury-6.6.92-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.2"
+    ],
+    "id": "cde9Su0w",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.19.2] v6.6.92",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "6.6.92+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v9.2.14 for 1.20(.1)\nUpdated at **2024-02-26 13:18**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20)",
+    "date_published": "2024-02-26T13:19:00.816154Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-9.2.14-forge.jar",
+        "hashes": {
+          "sha1": "a52918a500ff421180a1cbd1a0cabee712134ec4",
+          "sha512": "cf67f2050cafa00f0bee42e6d7bef77fdb808ac4f71742f7b4d6d5c1e6ffb49561a5a252f332d2b78a9767bdb5faa284611790dba303fbdc736ae36d794f61c7"
+        },
+        "id": "8klw0xxP",
+        "primary": true,
+        "size": 580602,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/1MKTLiiG/architectury-9.2.14-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20",
+      "1.20.1"
+    ],
+    "id": "1MKTLiiG",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.20(.1)] v9.2.14",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "9.2.14+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v9.2.14 for 1.20(.1)\nUpdated at **2024-02-26 13:18**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20)",
+    "date_published": "2024-02-26T13:18:58.334386Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-9.2.14-fabric.jar",
+        "hashes": {
+          "sha1": "4fa65e32dbf63a871a30fe8ec6fbff9a4b8d007d",
+          "sha512": "4cb8f009fd522d68a795d2cf5a657bdbe248b32ba7c33cd968f5ab521e9d60e198f8a3f6c50e7d960a2b8f50375116be0db1fd44b5710ea758697d8ea70d15de"
+        },
+        "id": "XGKh17BR",
+        "primary": true,
+        "size": 585207,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/WbL7MStR/architectury-9.2.14-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20",
+      "1.20.1"
+    ],
+    "id": "WbL7MStR",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.20(.1)] v9.2.14",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "9.2.14+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v4.12.94 for 1.18.2\nUpdated at **2024-02-26 13:15**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.18.2)\n- Add client commands (#319)",
+    "date_published": "2024-02-26T13:15:29.949795Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-4.12.94-forge.jar",
+        "hashes": {
+          "sha1": "a6705e4ae7acb91870cdb63bc86dadf3dd97ec08",
+          "sha512": "c6e57cb00b5a05fec9ac621a2da49ae755586e48b3ad4d20538b247f843c3accf52adf8f9cf4b66b330c8170c8b1d1b31f949157952da86c12289263ae71d099"
+        },
+        "id": "eZWRV8zZ",
+        "primary": true,
+        "size": 552356,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/3ChyUkZQ/architectury-4.12.94-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.18.2"
+    ],
+    "id": "3ChyUkZQ",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.18.2] v4.12.94",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "4.12.94+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v4.12.94 for 1.18.2\nUpdated at **2024-02-26 13:15**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.18.2)\n- Add client commands (#319)",
+    "date_published": "2024-02-26T13:15:28.018800Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-4.12.94-fabric.jar",
+        "hashes": {
+          "sha1": "71d328e3564a9253400d725e152b2c03ab82eac2",
+          "sha512": "ae824f839f8d7fe1ec2942bc66b2c22b1aeb837cce98e0c412235082dc930653bd076f2dc898d0c9c6d2c30fa5acca5145047418d07b550b942bdc67fb41886d"
+        },
+        "id": "BxpxRgKG",
+        "primary": true,
+        "size": 576984,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ql0OowZw/architectury-4.12.94-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.18.2"
+    ],
+    "id": "ql0OowZw",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.18.2] v4.12.94",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "4.12.94+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v8.2.91 for 1.19.4\nUpdated at **2024-02-06 09:10**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.4)",
+    "date_published": "2024-02-06T09:11:43.669435Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-8.2.91-forge.jar",
+        "hashes": {
+          "sha1": "2f58719fe0e7d3da813075d5753c6074a1a9b826",
+          "sha512": "14675d962e5908bd77b1a27888ca10122f55b4c7e609e35763b34df1ad66c420c7caa1528fd08a1ff32c53c60309a705ab646f7f13ed154945c25cafdd8e8799"
+        },
+        "id": "9Hi8qXvh",
+        "primary": true,
+        "size": 574376,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/RDKM6Ne0/architectury-8.2.91-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.4"
+    ],
+    "id": "RDKM6Ne0",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.19.4] v8.2.91",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "8.2.91+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v8.2.91 for 1.19.4\nUpdated at **2024-02-06 09:10**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.4)",
+    "date_published": "2024-02-06T09:11:40.192937Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-8.2.91-fabric.jar",
+        "hashes": {
+          "sha1": "4317efc269a3fdfaa2cd895d16187e01079df317",
+          "sha512": "e2e11e00804e108d2b064e7908af9042e7620d27d37c06f7c1bf43365b0d53673c399e57f6a5e1c8a23d99d2056175a2e8daad36aa794097dad00194bd7f65b0"
+        },
+        "id": "C3Z4SnnW",
+        "primary": true,
+        "size": 580210,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ibPc02al/architectury-8.2.91-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.4"
+    ],
+    "id": "ibPc02al",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.19.4] v8.2.91",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "8.2.91+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v11.0.11 for 1.20.4\nUpdated at **2024-01-09 17:24**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.4)\n- Simply NeoForge registrar eventbus",
+    "date_published": "2024-01-09T17:26:23.512794Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-11.0.11-fabric.jar",
+        "hashes": {
+          "sha1": "47ff89c1c1db390a4071c37df032b73c333846b5",
+          "sha512": "44606a685bc5e7c7d8c054cc95a57b1f427f43396ee8fb253066718ac4a0be9e594b8eaf7d4889e71b5e82a395d09cbf463308ec8af2114deb281b4ca989f1b2"
+        },
+        "id": "XK92wBZF",
+        "primary": true,
+        "size": 578615,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/7a4IcC0B/architectury-11.0.11-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.4"
+    ],
+    "id": "7a4IcC0B",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.20.4] v11.0.11",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "11.0.11+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v10.0.17 for 1.20.2\nUpdated at **2023-12-08 13:15**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.20.2)\n- Remove references to ForgeRegistries left",
+    "date_published": "2023-12-08T13:17:00.028181Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-10.0.17-fabric.jar",
+        "hashes": {
+          "sha1": "e2e57880a525d614d898f066cce9831c8765e69f",
+          "sha512": "4afb2d7c523831ff0c2e4b1eb5641665db4022c75eedfc8106c3e3f48a4ec9ee8859a17af5f36df3c49632f62fabbc0eeea6539816919c16b568bd5c0e69d455"
+        },
+        "id": "BMlcUGpG",
+        "primary": true,
+        "size": 579719,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/VFiyBfxr/architectury-10.0.17-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.20.2"
+    ],
+    "id": "VFiyBfxr",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.20.2] v10.0.17",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "10.0.17+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v7.1.86 for 1.19.3\nUpdated at **2023-05-28 10:44**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.3)",
+    "date_published": "2023-05-28T10:45:53.894325Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-7.1.86-forge.jar",
+        "hashes": {
+          "sha1": "c5b67433970d33c0c35887cdfc3ffc84f97189e4",
+          "sha512": "11e5adddd1f3fb354b58dd28f1eaa63f35f9133e1b01b44c7a78cf2f4873bd2c4572536689baaa3687f970537176117cfa576a47e952250e2fb3047123a06828"
+        },
+        "id": "PL65bbZL",
+        "primary": true,
+        "size": 564202,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/lReYANwU/architectury-7.1.86-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.3"
+    ],
+    "id": "lReYANwU",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.19.3] v7.1.86",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "7.1.86+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v5.14.84 for 1.19\nUpdated at **2023-05-28 10:44**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19)",
+    "date_published": "2023-05-28T10:45:51.827977Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-5.14.84-forge.jar",
+        "hashes": {
+          "sha1": "ae05f50f22c973938b6b2911c4c093d0504a725c",
+          "sha512": "a7265c8870ee657598788585bfd92de6f474ecde6c0d40eb6b19bf4c433e125a3ba1c976c1010351ffc9cb7ffdb2699fd2bf80fe138f0e9b7989174981344af9"
+        },
+        "id": "g44FbCTG",
+        "primary": true,
+        "size": 547617,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/NxbWyaxs/architectury-5.14.84-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19"
+    ],
+    "id": "NxbWyaxs",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.19] v5.14.84",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "5.14.84+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v7.1.86 for 1.19.3\nUpdated at **2023-05-28 10:44**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.3)",
+    "date_published": "2023-05-28T10:45:46.854607Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-7.1.86-fabric.jar",
+        "hashes": {
+          "sha1": "d3c31f3a64d088df220022da70825f0cb9764045",
+          "sha512": "b3a956511669d82f81625b7219d35f49f79b2f79ae97c1e9d2b40af91b8973290ab6f8b8d7ceca6891f09ae398cfdd8ffcfd7663c7186ea02aa088adf92f48f2"
+        },
+        "id": "w6JQL3LZ",
+        "primary": true,
+        "size": 572752,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/OFLHUcGo/architectury-7.1.86-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.3"
+    ],
+    "id": "OFLHUcGo",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.19.3] v7.1.86",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "7.1.86+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v5.14.84 for 1.19\nUpdated at **2023-05-28 10:44**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19)",
+    "date_published": "2023-05-28T10:45:46.393656Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-5.14.84-fabric.jar",
+        "hashes": {
+          "sha1": "5fde5a7539a6a6de838cc7914734b9d8498aa342",
+          "sha512": "091bd9092fc21ebae9870eb3d055153f6530560f0a85e0c891639669728610851bf0778fb7748fcb655c3062eb6f8fe16218a1043a098c7c6294dc31d05477ba"
+        },
+        "id": "p8e2Dvoo",
+        "primary": true,
+        "size": 569304,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/cysqWrDN/architectury-5.14.84-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19"
+    ],
+    "id": "cysqWrDN",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.19] v5.14.84",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "5.14.84+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v1.32.68 for 1.16.5</h2>Updated at <b>2023-05-04 08:12</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.16\">Click here for changelog</a><br>- Backport bugfix for block place event to 1.16... again",
+    "date_published": "2023-05-04T08:13:30.947407Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-1.32.68.jar",
+        "hashes": {
+          "sha1": "ebd266dd51de8f4dd99c9b4731e35b8340734cda",
+          "sha512": "dc4299258fbce4a0006f541aaf0dc62e74007dea8fd4924319f6feeb3fbe1fa8ca9ce925434b75ea106c5c78e044050dc72a6e9811ea76fda1f9797ef6f0f4e2"
+        },
+        "id": "Np7YjQi4",
+        "primary": true,
+        "size": 551889,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Zw57dVyl/architectury-1.32.68.jar"
+      }
+    ],
+    "game_versions": [
+      "1.16.5"
+    ],
+    "id": "Zw57dVyl",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.16.5] v1.32.68",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "1.32.68+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v1.32.68 for 1.16.5</h2>Updated at <b>2023-05-04 08:12</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.16\">Click here for changelog</a><br>- Backport bugfix for block place event to 1.16... again",
+    "date_published": "2023-05-04T08:13:28.576017Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-1.32.68.jar",
+        "hashes": {
+          "sha1": "771f2caa96ba686d4e86e172778bdba8301a19ce",
+          "sha512": "8458c2c184cd6f027f4e8d8ec2bb706cedac0fd9ae7d7dfc0add9bc9220caa260fbf6006b5e1e618340e239bcad493aed1b2623833d21d9ce4e4a67307b8fe78"
+        },
+        "id": "Ul773xoR",
+        "primary": true,
+        "size": 569839,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/ScYnvqdx/architectury-1.32.68.jar"
+      }
+    ],
+    "game_versions": [
+      "1.16.5"
+    ],
+    "id": "ScYnvqdx",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.16.5] v1.32.68",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "1.32.68+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v6.3.56 for 1.19.1/2\nUpdated at **2022-11-22 17:58**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.2)",
+    "date_published": "2022-11-22T17:59:08.744784Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-6.3.56-forge.jar",
+        "hashes": {
+          "sha1": "873cb4f2dc6f686704a4c0b5d2ef1ecad31976c2",
+          "sha512": "d373d17ee8730995669039f588abd75c5e97d23b89396570b72907a53e5719c2ab3699e73ce37777a89e0728b1bff4ee3f0969eb575f93c26654ff255e148518"
+        },
+        "id": "9PkWAD77",
+        "primary": true,
+        "size": 545075,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/d5oFBHkM/architectury-6.3.56-forge.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.1",
+      "1.19.2"
+    ],
+    "id": "d5oFBHkM",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.19.1/2] v6.3.56",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "6.3.56+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "## Architectury v6.3.56 for 1.19.1/2\nUpdated at **2022-11-22 17:58**.\n[Click here for changelog](https://www.github.com/architectury/architectury/commits/1.19.2)",
+    "date_published": "2022-11-22T17:59:05.096694Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH",
+        "version_id": "hfsU4hXq"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-6.3.56-fabric.jar",
+        "hashes": {
+          "sha1": "7ab3aa9894a9b5314e978e1f2ad10c5a163a186c",
+          "sha512": "4d3a5bfe0f9095a79e8695950749a2c4a71d789c20ca06139ea709dc465fd19538911fff30bfea8aceec56cdb89ae04b16a557e2cd8e817217c3a06db56d9401"
+        },
+        "id": "wowSVs74",
+        "primary": true,
+        "size": 562569,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/MGP3b9Aq/architectury-6.3.56-fabric.jar"
+      }
+    ],
+    "game_versions": [
+      "1.19.1",
+      "1.19.2"
+    ],
+    "id": "MGP3b9Aq",
+    "loaders": [
+      "fabric",
+      "quilt"
+    ],
+    "name": "[Fabric 1.19.1/2] v6.3.56",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "6.3.56+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v2.10.12 for 1.17.1</h2>Updated at <b>2022-05-27 16:46</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.17\">Click here for changelog</a><br>- Update fabric loader to build",
+    "date_published": "2022-05-27T16:47:40.339310Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-2.10.12.jar",
+        "hashes": {
+          "sha1": "28d2afcf0dafae570803e37dbc00b405ae589898",
+          "sha512": "f67c433b414a01b8b2f4331c1cb880c1d105dd73d7d789b539afed58c76d105ea7e1905b40a343ff3a3d154fd512427754ce08ac10472b0b0f6ccea206974822"
+        },
+        "id": "cilfZQ5F",
+        "primary": true,
+        "size": 510680,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/2.10.12%2Bforge/architectury-2.10.12.jar"
+      }
+    ],
+    "game_versions": [
+      "1.17.1"
+    ],
+    "id": "kuKyhx4a",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.17.1] v2.10.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "2.10.12+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v2.10.12 for 1.17.1</h2>Updated at <b>2022-05-27 16:46</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.17\">Click here for changelog</a><br>- Update fabric loader to build",
+    "date_published": "2022-05-27T16:47:39.032145Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-2.10.12.jar",
+        "hashes": {
+          "sha1": "cdf7c5aaabae39e5403b07b84dacdbae99ac7fc8",
+          "sha512": "2bfa4d6548de0a58e7c8b30492094cc21852a39a646b694a27bfb1e2d2dfccbf3d025e7ae75a09952d6c3bbf73a74e3811590c5d07feb07e6f80e96900aaee7e"
+        },
+        "id": "BRHbDTYj",
+        "primary": true,
+        "size": 541938,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/2.10.12%2Bfabric/architectury-2.10.12.jar"
+      }
+    ],
+    "game_versions": [
+      "1.17.1"
+    ],
+    "id": "yekAuTSi",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.17.1] v2.10.12",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "2.10.12+fabric",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v3.9.66 for 1.18(.1)</h2>Updated at <b>2022-05-27 16:37</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.18\">Click here for changelog</a><br>- Add Platform#getFilePaths (#268)",
+    "date_published": "2022-05-27T16:38:08.801320Z",
+    "dependencies": [],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-3.9.66.jar",
+        "hashes": {
+          "sha1": "91032682b0982cb94531bdfd2e3640f31d57d7c3",
+          "sha512": "e9bf668855dc4f28dee4231a1c6813b5d898ce5313a7fef7bf5d68d623f732d5b6f5935468dd1b972bbb4a275076bea2f9a5c0cc3b12b4c16cf329acd96f08df"
+        },
+        "id": "y0HhA4HZ",
+        "primary": true,
+        "size": 531599,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/3.9.66%2Bforge/architectury-3.9.66.jar"
+      }
+    ],
+    "game_versions": [
+      "1.18",
+      "1.18.1"
+    ],
+    "id": "xUSAkGXZ",
+    "loaders": [
+      "forge"
+    ],
+    "name": "[Forge 1.18(.1)] v3.9.66",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "3.9.66+forge",
+    "version_type": "release"
+  },
+  {
+    "author_id": "OQodw31Z",
+    "changelog": "<h2>Architectury v3.9.66 for 1.18(.1)</h2>Updated at <b>2022-05-27 16:37</b>.<br><a href=\"https://www.github.com/architectury/architectury/commits/1.18\">Click here for changelog</a><br>- Add Platform#getFilePaths (#268)",
+    "date_published": "2022-05-27T16:38:07.552782Z",
+    "dependencies": [
+      {
+        "dependency_type": "required",
+        "project_id": "P7dR8mSH"
+      }
+    ],
+    "environment": "client_and_server",
+    "featured": false,
+    "files": [
+      {
+        "filename": "architectury-3.9.66.jar",
+        "hashes": {
+          "sha1": "7613e2f0cf9be178ebf5ac464854e63c9c0ee1ad",
+          "sha512": "bfb27d3f4f932fb08c4192aa22f900cfe632f06d4fb30fa607e774cd34ab7171df03d10895f994f53dfcc5db19ea00ffe1747ac7bfdc8ae0e0cec55d5d32547e"
+        },
+        "id": "zVVa2RYw",
+        "primary": true,
+        "size": 566726,
+        "url": "https://cdn.modrinth.com/data/lhGA9TYQ/versions/3.9.66%2Bfabric/architectury-3.9.66.jar"
+      }
+    ],
+    "game_versions": [
+      "1.18",
+      "1.18.1"
+    ],
+    "id": "468H7PSo",
+    "loaders": [
+      "fabric"
+    ],
+    "name": "[Fabric 1.18(.1)] v3.9.66",
+    "project_id": "lhGA9TYQ",
+    "status": "listed",
+    "version_number": "3.9.66+fabric",
+    "version_type": "release"
+  }
+]

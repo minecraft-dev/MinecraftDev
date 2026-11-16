@@ -1,0 +1,97 @@
+{
+  "_hasShrinkwrap": false,
+  "_id": "@fabricmc/cli@0.1.500",
+  "_nodeVersion": "26.11.1",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/cli_0.1.500_1794041191481_0.06468712667150567"
+  },
+  "_npmUser": {
+    "email": "npm-oidc-no-reply@github.com",
+    "name": "GitHub Actions",
+    "trustedPublisher": {
+      "id": "github",
+      "oidcConfigId": "0a536d5b-7566-4362-be97-9c58e8d309fc"
+    }
+  },
+  "_npmVersion": "12.2.0",
+  "bin": {
+    "fabric": "bundled.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/FabricMC/fabricmc.net/issues"
+  },
+  "description": "Command-line tools for Fabric mod development",
+  "devDependencies": {
+    "@fabricmc/scripts": "0.0.0",
+    "@types/node": "^26.6.5",
+    "@types/opentype.js": "^1.3.10",
+    "@types/pngjs": "^6.0.5",
+    "@types/prompts": "^2.4.9",
+    "@types/wawoff2": "^1.0.2",
+    "chalk": "^6.0.1",
+    "commander": "^14.0.3",
+    "esbuild": "0.28.2",
+    "fast-xml-parser": "5.11.2",
+    "opentype.js": "2.0.0",
+    "pngjs": "7.0.0",
+    "prompts": "^2.4.2",
+    "pureimage": "0.4.20",
+    "typescript": "^7.0.2",
+    "wawoff2": "2.0.1"
+  },
+  "directories": {},
+  "dist": {
+    "attestations": {
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      },
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@fabricmc%2fcli@0.1.500"
+    },
+    "fileCount": 4,
+    "integrity": "sha512-+uqUzU96Ty3ENyrlpS7mb+50GOXUq7FRVzsEcNnhU3gPwTmZ/zWZw4hO/ad++/EBB60qU30q1aQK0xS3eiYq3A==",
+    "shasum": "46b1c68de32f121c3386f9277bc210a79fe30e8a",
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEYCIQCapYArVxGfmfRVhHv3Yu/S0MfDdEMvUHOSZvgZf46uCQIhAMGuTkTT7JtDuR6r2fbQuujVSwlpgfx1K03GiQLLm1rj"
+      },
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQCPhnUeDCo74GJn8h3eeNAb5HUlfYQLJ1Eybuy/d4VPqwIgHT+eY5ayAjDswRS62ppvItLL+GyLQH0NFa1vthgqydM="
+      }
+    ],
+    "tarball": "https://registry.npmjs.org/@fabricmc/cli/-/cli-0.1.500.tgz",
+    "unpackedSize": 888920
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "gitHead": "1038724749d315a82fa532050b65d50d5d157d76",
+  "homepage": "https://github.com/FabricMC/fabricmc.net#readme",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "email": "modmuss50@gmail.com",
+      "name": "modmuss50"
+    }
+  ],
+  "name": "@fabricmc/cli",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "cli",
+    "type": "git",
+    "url": "git+https://github.com/FabricMC/fabricmc.net.git"
+  },
+  "scripts": {
+    "build": "npm run fontgen && npm run check && node bundle.ts",
+    "check": "tsc --noEmit",
+    "fontgen": "node fontgen.ts",
+    "start": "npm run build && node bundled.mjs",
+    "test": "npm run fontgen && npm run check && node bundle.ts test && node --test test-bundled.mjs"
+  },
+  "type": "module",
+  "version": "0.1.500"
+}

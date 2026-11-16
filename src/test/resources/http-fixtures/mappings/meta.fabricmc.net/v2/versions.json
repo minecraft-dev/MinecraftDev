@@ -1,0 +1,14 @@
+{
+  "name": "https://meta.fabricmc.net/v2/versions",
+  "request": {
+    "method": "GET",
+    "url": "/meta.fabricmc.net/v2/versions"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "meta.fabricmc.net/v2/versions",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.parchmentmc.data</groupId>
+  <artifactId>parchment-1.19.4</artifactId>
+  <versioning>
+    <latest>2023.06.26-nightly-SNAPSHOT</latest>
+    <release>2023.06.26</release>
+    <versions>
+      <version>BLEEDING-SNAPSHOT</version>
+      <version>2023.06.26</version>
+      <version>2023.06.26-nightly-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20230626003529</lastUpdated>
+  </versioning>
+</metadata>

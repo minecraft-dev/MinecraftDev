@@ -1,0 +1,14 @@
+{
+  "name": "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}
