@@ -25,6 +25,7 @@ import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterCheckoutService
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterPullRequests
 import com.demonwav.mcdev.platform.fabric.annotater.AnnotaterVcs
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.project.Project
@@ -45,12 +46,33 @@ class AnnotaterJavadocEditorNotificationProvider : EditorNotificationProvider {
         val javadocEditor = AnnotaterJavadocInlineEditor.current(project)?.takeIf { it.checkout.root == checkout.root }
         val error = javadocEditor?.file?.error
         val pullRequests = AnnotaterPullRequests.instance
+        val pullRequest = pullRequests?.currentPullRequest(checkout)
 
         return Function { fileEditor ->
-            val status =
-                if (error != null) EditorNotificationPanel.Status.Error else EditorNotificationPanel.Status.Info
+            val status = when {
+                error != null -> EditorNotificationPanel.Status.Error
+                pullRequest != null -> EditorNotificationPanel.Status.Warning
+                else -> EditorNotificationPanel.Status.Info
+            }
             val panel = EditorNotificationPanel(fileEditor, status)
-            panel.text = error ?: MCDevBundle("fabric.annotater.banner", checkout.version, checkout.root)
+            panel.text = error ?: when {
+                pullRequest == null -> MCDevBundle("fabric.annotater.banner", checkout.version, checkout.root)
+                pullRequest.state == AnnotaterPullRequests.State.MERGED ->
+                    MCDevBundle("fabric.annotater.banner.merged", pullRequest.number)
+                pullRequest.state == AnnotaterPullRequests.State.CLOSED ->
+                    MCDevBundle("fabric.annotater.banner.closed", pullRequest.number)
+                else -> MCDevBundle("fabric.annotater.banner.pull_request", pullRequest.number, checkout.version)
+            }
+            if (pullRequest != null) {
+                panel.createActionLabel(MCDevBundle("fabric.annotater.banner.open_pull_request", pullRequest.number)) {
+                    BrowserUtil.browse(pullRequest.url)
+                }
+            }
+            if (pullRequest?.closed == true) {
+                panel.createActionLabel(MCDevBundle("fabric.annotater.pr.start_new")) {
+                    AnnotaterJavadocContributions.switchContribution(project, checkout, null)
+                }
+            }
             if (javadocEditor != null) {
                 panel.createActionLabel(MCDevBundle("fabric.annotater.javadoc.finish")) {
                     javadocEditor.finish()

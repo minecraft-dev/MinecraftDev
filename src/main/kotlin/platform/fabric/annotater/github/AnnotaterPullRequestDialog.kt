@@ -42,6 +42,7 @@ class AnnotaterPullRequestDialog(
     private val uncommittedChanges: List<String>,
     existingTitle: String?,
     private val update: Boolean, // existing PR or update?
+    private val notice: String?, // about the contribution's previous pull request, if it has one
 ) : DialogWrapper(project) {
     private val accountModel = CollectionComboBoxModel(accounts, defaultAccount ?: accounts.first())
 
@@ -65,6 +66,11 @@ class AnnotaterPullRequestDialog(
     }
 
     override fun createCenterPanel() = panel {
+        if (notice != null) {
+            row {
+                comment(notice)
+            }
+        }
         row(MCDevBundle("fabric.annotater.pr.dialog.account")) {
             comboBox(accountModel, SimpleListCellRenderer.create("") { it.name })
                 .align(AlignX.FILL)

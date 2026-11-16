@@ -117,6 +117,25 @@ data class AnnotaterContribution(val branch: String, val title: String?) {
 interface AnnotaterPullRequests {
     enum class Action { CREATE, UPDATE }
 
+    enum class State { OPEN, CLOSED, MERGED }
+
+    /**
+     * @property state null until it has been looked up, or if it couldn't be
+     */
+    data class PullRequest(val url: String, val state: State?) {
+        val number: String
+            get() = url.substringAfterLast('/')
+
+        val closed: Boolean
+            get() = state == State.CLOSED || state == State.MERGED
+    }
+
+    /**
+     * The pull request of the contribution checked out in [checkout], or null if it doesn't have one. This is cheap
+     * enough to call from any thread. The state is looked up in the background, updating the editor banners.
+     */
+    fun currentPullRequest(checkout: AnnotaterCheckout): PullRequest?
+
     /**
      * Whether a pull request can be created or updated with the changes in [checkout], or null if there's nothing to
      * submit. This is cheap enough to call from any thread, so it may be null until the changes have been looked up.

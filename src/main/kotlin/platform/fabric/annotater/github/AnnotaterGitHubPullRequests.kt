@@ -39,23 +39,54 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.VcsException
+import com.intellij.ui.EditorNotifications
+import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URLEncoder
+import java.util.concurrent.ConcurrentHashMap
 import org.jetbrains.plugins.github.api.GithubServerPath
 import org.jetbrains.plugins.github.authentication.GHAccountsUtil
 import org.jetbrains.plugins.github.authentication.accounts.GithubAccount
 import org.jetbrains.plugins.github.util.GHCompatibilityUtil
 
 class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
+    /**
+     * The states of pull requests by URL, cached so that the editor banner can show them without blocking.
+     */
+    private val states = ConcurrentHashMap<String, CachedState>()
+
+    private val pendingStates = ConcurrentHashMap.newKeySet<String>()
+
+    private val stateExecutor = AppExecutorUtil.createBoundedApplicationPoolExecutor("Annotater pull request state", 1)
+
+    private class CachedState(val state: AnnotaterPullRequests.State?, val time: Long)
+
     override fun availableAction(checkout: AnnotaterCheckout): AnnotaterPullRequests.Action? {
-        val status = AnnotaterGitVcs.instance?.pushStatus(checkout)?.takeIf { it.hasUnpushedChanges } ?: return null
-        return if (status.pullRequestUrl != null) {
+        AnnotaterGitVcs.instance?.pushStatus(checkout)?.takeIf { it.hasUnpushedChanges } ?: return null
+        val pullRequest = currentPullRequest(checkout)
+        return if (pullRequest != null && !pullRequest.closed) {
             AnnotaterPullRequests.Action.UPDATE
         } else {
             AnnotaterPullRequests.Action.CREATE
         }
+    }
+
+    override fun currentPullRequest(checkout: AnnotaterCheckout): AnnotaterPullRequests.PullRequest? {
+        val url = AnnotaterGitVcs.instance?.pushStatus(checkout)?.pullRequestUrl ?: return null
+        val cached = states[url]
+        if ((cached == null || System.currentTimeMillis() - cached.time > STATE_CACHE_MS) && pendingStates.add(url)) {
+            stateExecutor.execute {
+                try {
+                    lookUpState(url)
+                } finally {
+                    pendingStates.remove(url)
+                }
+            }
+        }
+        return AnnotaterPullRequests.PullRequest(url, cached?.state)
     }
 
     override fun submit(project: Project, checkout: AnnotaterCheckout) {
@@ -68,6 +99,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
             private var branch: String? = null
             private var existingTitle: String? = null
             private var existingUrl: String? = null
+            private var existingState: AnnotaterPullRequests.State? = null
 
             override fun run(indicator: ProgressIndicator) {
                 changes = git.mappingFilesChangedSinceUpstream(project, checkout)
@@ -76,6 +108,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                 branch = git.currentContribution(checkout)?.branch
                 existingTitle = branch?.let { git.pullRequestTitle(project, checkout, it) }
                 existingUrl = branch?.let { git.pullRequestUrl(project, checkout, it) }
+                existingState = existingUrl?.let { lookUpState(it) }
             }
 
             override fun onSuccess() {
@@ -88,7 +121,17 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                     )
                     return
                 }
-                showDialog(project, checkout, git, branch, changes, uncommittedChanges, existingTitle, existingUrl)
+                showDialog(
+                    project,
+                    checkout,
+                    git,
+                    branch,
+                    changes,
+                    uncommittedChanges,
+                    existingTitle,
+                    existingUrl,
+                    existingState,
+                )
             }
 
             override fun onThrowable(error: Throwable) {
@@ -105,8 +148,12 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         changes: List<String>,
         uncommittedChanges: List<String>,
         existingTitle: String?,
-        existingUrl: String?,
+        previousUrl: String?,
+        previousState: AnnotaterPullRequests.State?,
     ) {
+        // A closed pull request can't be updated, so a new one is opened instead
+        val previous = previousUrl?.let { AnnotaterPullRequests.PullRequest(it, previousState) }
+        val existingUrl = previous?.takeUnless { it.closed }?.url
         if (GHAccountsUtil.accounts.isEmpty()) {
             GHAccountsUtil.requestNewAccount(GithubServerPath.DEFAULT_SERVER, null, project) ?: return
         }
@@ -129,6 +176,13 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
             uncommittedChanges,
             existingTitle,
             update = existingUrl != null,
+            notice = previousUrl?.let { url ->
+                when (previousState) {
+                    AnnotaterPullRequests.State.MERGED -> MCDevBundle("fabric.annotater.pr.dialog.merged", url)
+                    AnnotaterPullRequests.State.CLOSED -> MCDevBundle("fabric.annotater.pr.dialog.closed", url)
+                    else -> MCDevBundle("fabric.annotater.pr.dialog.existing", url)
+                }
+            },
         )
         if (!dialog.showAndGet()) {
             return
@@ -139,7 +193,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         }
         val token = GHCompatibilityUtil.getOrRequestToken(account, project) ?: return
 
-        val request = PullRequest(dialog.prTitle, dialog.prDescription, dialog.commitMessage, branch, existingUrl)
+        val request = Submission(dialog.prTitle, dialog.prDescription, dialog.commitMessage, branch, existingUrl)
         val title = if (existingUrl != null) "fabric.annotater.pr.updating" else "fabric.annotater.pr.creating"
         object : Task.Backgroundable(project, MCDevBundle(title), false) {
             private var url: String? = null
@@ -148,6 +202,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                 val url =
                     submit(project, checkout, git, account, token, request, uncommittedChanges.isNotEmpty(), indicator)
                 this.url = url
+                states[url] = CachedState(AnnotaterPullRequests.State.OPEN, System.currentTimeMillis())
                 git.setPullRequest(project, checkout, request.branch, url)
                 if (existingUrl == null) {
                     // Label the contribution with its pull request, for switching back to it later
@@ -184,7 +239,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
     /**
      * @property existingUrl the URL of the pull request to update, or null to create one
      */
-    private class PullRequest(
+    private class Submission(
         val title: String,
         val body: String,
         val commitMessage: String,
@@ -202,7 +257,7 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         git: AnnotaterGitVcs,
         account: GithubAccount,
         token: String,
-        request: PullRequest,
+        request: Submission,
         hasChanges: Boolean,
         indicator: ProgressIndicator,
     ): String {
@@ -227,8 +282,13 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
         val cloneUrl = fork.get("clone_url").asString
         waitForFork(api, forkName, indicator)
 
+        // Name the fork's owner in the URL, so git credential helpers and the GitHub plugin authenticate the push as
+        // the selected account, rather than whichever account they'd use for github.com by default
+        val pushUrl = URI(cloneUrl).let { uri ->
+            URI(uri.scheme, forkOwner, uri.host, uri.port, uri.path, uri.query, uri.fragment).toString()
+        }
         indicator.text = MCDevBundle("fabric.annotater.pr.pushing")
-        git.push(project, checkout, cloneUrl, request.branch)
+        git.push(project, checkout, pushUrl, request.branch)
         if (request.existingUrl != null) {
             return request.existingUrl
         }
@@ -257,6 +317,34 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
     }
 
     /**
+     * Looks up the state of the upstream pull request at [url] and caches it, updating the editor banners if it
+     * changed. Returns null if it can't be looked up, for example when offline or rate limited, in which case the
+     * previously cached state is kept. Pull requests are public, so this doesn't need an account.
+     */
+    private fun lookUpState(url: String): AnnotaterPullRequests.State? {
+        val state = fetchState(url)
+        val old = states[url]?.state
+        states[url] = CachedState(state ?: old, System.currentTimeMillis())
+        if (state != null && state != old) {
+            EditorNotifications.updateAll()
+        }
+        return state
+    }
+
+    private fun fetchState(url: String): AnnotaterPullRequests.State? {
+        val number = url.substringAfterLast("/pull/", "").toIntOrNull() ?: return null
+        val pullRequest = runCatching {
+            GitHubApi(GithubServerPath.DEFAULT_SERVER.toApiUrl(), null)
+                .get("/repos/${AnnotaterGitVcs.upstreamRepository}/pulls/$number").asJsonObject
+        }.getOrNull() ?: return null
+        return when {
+            pullRequest.get("merged")?.asBoolean == true -> AnnotaterPullRequests.State.MERGED
+            pullRequest.get("state")?.asString == "open" -> AnnotaterPullRequests.State.OPEN
+            else -> AnnotaterPullRequests.State.CLOSED
+        }
+    }
+
+    /**
      * Forks are created asynchronously, so wait until GitHub has finished creating it before pushing.
      */
     private fun waitForFork(api: GitHubApi, forkName: String, indicator: ProgressIndicator) {
@@ -271,13 +359,16 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
 
     private class GitHubApiException(val statusCode: Int, message: String) : IOException(message)
 
-    private class GitHubApi(private val baseUrl: String, private val token: String) {
+    /**
+     * @param token the account's token, or null to make unauthenticated requests
+     */
+    private class GitHubApi(private val baseUrl: String, token: String?) {
         private val gson = Gson()
-        private val headers = mapOf(
-            "Authorization" to "Bearer $token",
+        private val headers = listOfNotNull(
+            token?.let { "Authorization" to "Bearer $it" },
             "Accept" to "application/vnd.github+json",
             "X-GitHub-Api-Version" to "2022-11-28",
-        )
+        ).toMap()
 
         fun post(path: String, body: JsonObject): JsonObject {
             return McdevHttp.post(baseUrl + path, "application/json", headers)
@@ -342,6 +433,11 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
     companion object {
         private const val FORK_POLL_ATTEMPTS = 30
         private const val FORK_POLL_DELAY_MS = 2000L
+
+        /**
+         * How long a pull request's state is shown before it's looked up again.
+         */
+        private const val STATE_CACHE_MS = 5 * 60 * 1000L
         private const val HTTP_UNPROCESSABLE_ENTITY = 422
     }
 }
