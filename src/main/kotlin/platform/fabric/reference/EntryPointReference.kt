@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.demonwav.mcdev.util.manipulator
@@ -183,7 +184,7 @@ object EntryPointReference : PsiReferenceProvider() {
         var isFinalPart = false
             internal set
 
-        override val description = "entry point '%s'"
+        override fun unresolvedMessage(name: String) = MCDevBundle("reference.unresolved.entry_point", name)
         override val unresolved = resolve() == null
 
         override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {

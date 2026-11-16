@@ -59,7 +59,7 @@ class UnresolvedReferenceInspection : LocalInspectionTool() {
                 if (reference.unresolved) {
                     holder.registerProblem(
                         literal,
-                        "Cannot resolve ${reference.description}".format(reference.canonicalText),
+                        reference.unresolvedMessage(reference.canonicalText),
                         ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
                         reference.rangeInElement,
                     )

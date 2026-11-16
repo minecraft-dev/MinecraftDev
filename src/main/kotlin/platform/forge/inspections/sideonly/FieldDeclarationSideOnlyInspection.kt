@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
@@ -40,7 +41,7 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from field"
+                MCDevBundle("inspection.field_declaration_side_only.fix")
             )
         } else {
             null
@@ -110,17 +111,29 @@ class FieldDeclarationSideOnlyInspection : BaseInspection() {
     enum class Error {
         CLASS_UNANNOTATED {
             override fun getErrorString(vararg infos: Any): String {
-                return "Field with type annotation ${infos[1]} cannot be declared in an un-annotated class"
+                return MCDevBundle(
+                    "inspection.field_declaration_side_only.message.class_unannotated",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         CLASS_CROSS_ANNOTATED {
             override fun getErrorString(vararg infos: Any): String {
-                return "Field annotated with ${infos[0]} cannot be declared inside a class annotated with ${infos[1]}."
+                return MCDevBundle(
+                    "inspection.field_declaration_side_only.message.class_cross_annotated",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         FIELD_CROSS_ANNOTATED {
             override fun getErrorString(vararg infos: Any): String {
-                return "Field with type annotation ${infos[0]} cannot be declared as ${infos[1]}."
+                return MCDevBundle(
+                    "inspection.field_declaration_side_only.message.field_cross_annotated",
+                    infos[0],
+                    infos[1],
+                )
             }
         }, ;
 

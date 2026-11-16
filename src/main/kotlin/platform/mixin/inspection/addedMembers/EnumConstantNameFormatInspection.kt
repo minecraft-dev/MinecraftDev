@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.RegexConverter
 import com.demonwav.mcdev.util.doBindText
@@ -81,13 +82,13 @@ class EnumConstantNameFormatInspection : AbstractAddedMembersInspection() {
         if (fixed != null && StringUtil.isJavaIdentifier(fixed) && validNameFormat.matches(fixed)) {
             holder.registerProblem(
                 field.nameIdentifier,
-                "Name does not match the pattern for added mixin members: \"${this.validNameFormat}\"",
+                MCDevBundle("inspection.added_mixin_members_name_pattern.message", this.validNameFormat),
                 RenameFix(fixed)
             )
         } else {
             holder.registerProblem(
                 field.nameIdentifier,
-                "Name does not match the pattern for added mixin members: \"${this.validNameFormat}\"",
+                MCDevBundle("inspection.added_mixin_members_name_pattern.message", this.validNameFormat),
             )
         }
     }
@@ -133,8 +134,8 @@ class EnumConstantNameFormatInspection : AbstractAddedMembersInspection() {
     override fun createOptionsPanel(): JComponent {
         return panel {
             row {
-                val toolTip = "\"{MODID}\" is replaced with the mod ID, converted to SCREAMING_SNAKE_CASE."
-                label("Valid name format:")
+                val toolTip = MCDevBundle("inspection.added_enum_constants_name_pattern.option.modid_tooltip")
+                label(MCDevBundle("inspection.added_mixin_members_name_pattern.option.format"))
                     .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
                     .applyToComponent { icon = AllIcons.General.ContextHelp }
                     .applyToComponent { toolTipText = toolTip }
@@ -142,17 +143,15 @@ class EnumConstantNameFormatInspection : AbstractAddedMembersInspection() {
                     .doBindText(::validNameFormat)
                     .columns(COLUMNS_SHORT)
             }
-            row("Valid name fix search:") {
+            row(MCDevBundle("inspection.added_mixin_members_name_pattern.option.fix_search")) {
                 textField()
                     .doBindText({ validNameFixSearch.pattern }, { validNameFixSearch = it.toRegexOrDefault("^.+$") })
                     .columns(COLUMNS_SHORT)
                     .regexValidator()
             }
             row {
-                val toolTip =
-                    "Uses regex replacement syntax after matching from the regex in the option above.<br/>" +
-                        "\"{MODID}\" is replaced with the mod ID, converted to SCREAMING_SNAKE_CASE."
-                label("Valid name fix replace:")
+                val toolTip = MCDevBundle("inspection.added_enum_constants_name_pattern.option.fix_replace.tooltip")
+                label(MCDevBundle("inspection.added_mixin_members_name_pattern.option.fix_replace"))
                     .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
                     .applyToComponent { icon = AllIcons.General.ContextHelp }
                     .applyToComponent { toolTipText = toolTip }

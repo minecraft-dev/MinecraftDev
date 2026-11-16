@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMember
@@ -52,7 +53,7 @@ class MixinCustomJavaDocTagProvider : CustomJavadocTagProvider {
             override fun getName() = "author"
 
             override fun checkTagValue(value: PsiDocTagValue?): String? {
-                return "The @author JavaDoc tag must be filled in.".takeIf { value?.text.isNullOrBlank() }
+                return MCDevBundle("mixin.javadoc.author_required").takeIf { value?.text.isNullOrBlank() }
             }
         }
 
@@ -60,7 +61,7 @@ class MixinCustomJavaDocTagProvider : CustomJavadocTagProvider {
             override fun getName() = "reason"
 
             override fun checkTagValue(value: PsiDocTagValue?): String? {
-                return "The @reason JavaDoc tag must be filled in.".takeIf { value?.text.isNullOrBlank() }
+                return MCDevBundle("mixin.javadoc.reason_required").takeIf { value?.text.isNullOrBlank() }
             }
         }
     }

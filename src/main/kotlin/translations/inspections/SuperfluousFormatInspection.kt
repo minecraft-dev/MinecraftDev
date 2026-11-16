@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.demonwav.mcdev.translations.identification.TranslationInstance.FormattingError
@@ -62,7 +63,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
                         result.foldingElement.createUastSmartPointer<UCallExpression>(),
                         result.superfluousVarargStart,
                     ),
-                    ChangeTranslationQuickFix("Use a different translation"),
+                    ChangeTranslationQuickFix(MCDevBundle("translations.fix.use_different")),
                 )
             }
 
@@ -76,7 +77,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
         ) {
             holder.registerProblem(
                 expression.sourcePsi!!,
-                "There are missing formatting arguments to satisfy '${result.text}'",
+                MCDevBundle("inspection.superfluous_format.message", result.text),
                 *quickFixes,
             )
         }
@@ -86,7 +87,7 @@ class SuperfluousFormatInspection : TranslationInspection() {
         private val call: UastSmartPointer<UCallExpression>,
         private val position: Int,
     ) : LocalQuickFix {
-        override fun getName() = "Remove superfluous arguments"
+        override fun getName() = MCDevBundle("inspection.superfluous_format.fix")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             try {

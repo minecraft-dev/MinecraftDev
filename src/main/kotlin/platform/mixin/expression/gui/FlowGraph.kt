@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.expression.FlowMap
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
 import com.intellij.openapi.application.readAction
@@ -46,10 +47,10 @@ data class FlowMatchResult(val status: FlowMatchStatus, val attempted: Expressio
     fun toString(prefix: String, suffix: String, transform: (String) -> String): String {
         val attempted = prefix + transform(StringUtil.escapeStringCharacters(attempted.toString())) + suffix
         return when (status) {
-            FlowMatchStatus.IGNORED -> "Ignored"
-            FlowMatchStatus.FAIL -> "Failed to match $attempted"
-            FlowMatchStatus.PARTIAL -> "Partially matched $attempted"
-            FlowMatchStatus.SUCCESS -> "Successfully matched $attempted"
+            FlowMatchStatus.IGNORED -> MCDevBundle("mixin.flow_diagram.status.ignored")
+            FlowMatchStatus.FAIL -> MCDevBundle("mixin.flow_diagram.status.failed", attempted)
+            FlowMatchStatus.PARTIAL -> MCDevBundle("mixin.flow_diagram.status.partial", attempted)
+            FlowMatchStatus.SUCCESS -> MCDevBundle("mixin.flow_diagram.status.success", attempted)
         }
     }
 }

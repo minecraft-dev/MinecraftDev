@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
@@ -49,7 +50,7 @@ abstract class InsnInjectorAnnotationHandler : InjectorAnnotationHandler() {
         targetMethod: MethodNode
     ): InsnResolutionInfo.Failure? {
         val results = annotation.findAttributeValue(getAtKey(annotation))?.findAnnotations()
-            .ifNullOrEmpty { return InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE) }
+            .ifNullOrEmpty { return InsnResolutionInfo.Failure(AtResolver.defaultUnresolvedMessage) }
             .map { AtResolver(it, targetClass, targetMethod).isUnresolved() }
         return if (null in results) null else results.firstNotNullOf { it }
     }
@@ -132,7 +133,8 @@ abstract class InsnInjectorAnnotationHandler : InjectorAnnotationHandler() {
         return true
     }
 
-    open val allowedInsnDescription = "all instructions"
+    open fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.default")
 
     open val isShiftAlwaysDiscouraged = true
 

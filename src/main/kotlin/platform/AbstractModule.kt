@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.inspection.IsCancelled
@@ -83,7 +84,7 @@ abstract class AbstractModule(protected val facet: MinecraftFacet) {
     open fun isEventClassValid(eventClass: PsiClass, method: PsiMethod?) = false
 
     open fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
-        "Parameter does not extend the proper Event Class!"
+        MCDevBundle("insight.event_listener.wrong_event.generic")
 
     open fun shouldShowPluginIcon(element: PsiElement?) = false
 

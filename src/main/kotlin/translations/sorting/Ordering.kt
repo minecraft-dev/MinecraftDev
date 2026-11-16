@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,16 @@
 
 package com.demonwav.mcdev.translations.sorting
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.TranslationConstants
+import java.util.function.Supplier
 
-enum class Ordering(val text: String) {
-    ASCENDING("Ascending"),
-    DESCENDING("Descending"),
-    LIKE_DEFAULT("Like default (${TranslationConstants.DEFAULT_LOCALE})"),
-    TEMPLATE("Use Project Template"),
+enum class Ordering(private val textSupplier: Supplier<String>) {
+    ASCENDING(MCDevBundle.pointer("translation_sort.order.ascending")),
+    DESCENDING(MCDevBundle.pointer("translation_sort.order.descending")),
+    LIKE_DEFAULT(MCDevBundle.pointer("translation_sort.order.like_default", TranslationConstants.DEFAULT_LOCALE)),
+    TEMPLATE(MCDevBundle.pointer("translation_sort.order.template"));
+
+    val text
+        get() = textSupplier.get()
 }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct.fixes
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction
@@ -57,9 +58,9 @@ class CopyAwAccessibleEntryFix(val target: PsiElement, val element: PsiElement) 
 
     override fun startInWriteAction(): Boolean = false
 
-    override fun getText(): String = "Copy AW entry"
+    override fun getText(): String = MCDevBundle("minecraft.ct.fix.copy_aw_entry")
 
-    override fun getFamilyName(): String = "Copy AW entry for inaccessible element"
+    override fun getFamilyName(): String = MCDevBundle("minecraft.ct.fix.copy_aw_entry.family")
 
     override fun isAvailable(project: Project, editor: Editor?, file: PsiFile?): Boolean = true
 

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
@@ -67,7 +68,7 @@ object MethodReference : AbstractMethodReference() {
             ),
         )
 
-    override val description = "method '%s' in target class"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.target_method", name)
 
     override fun isValidAnnotation(name: String, project: Project) =
         MixinAnnotationHandler.forMixinAnnotation(name, project) is InjectorAnnotationHandler

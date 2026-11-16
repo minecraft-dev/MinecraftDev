@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.desugar.DesugarContext
@@ -178,7 +179,8 @@ class AtResolver(
             }
         }
 
-        const val DEFAULT_UNRESOLVED_MESSAGE = "Cannot resolve any instructions in target"
+        val defaultUnresolvedMessage: String
+            get() = MCDevBundle("mixin.at.unresolved")
     }
 
     fun isUnresolved(): InsnResolutionInfo.Failure? {
@@ -195,11 +197,11 @@ class AtResolver(
         )
         if (collectVisitor == null) {
             // syntax error in target
-            val stringValue = targetAttr?.constantStringValue ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
+            val stringValue = targetAttr?.constantStringValue ?: return InsnResolutionInfo.Failure(defaultUnresolvedMessage)
             return if (isMiscDynamicSelector(at.project, stringValue)) {
                 null
             } else {
-                InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
+                InsnResolutionInfo.Failure(defaultUnresolvedMessage)
             }
         }
         return when (val result = collectVisitor.visit(targetMethod)) {
@@ -209,7 +211,7 @@ class AtResolver(
                 if (result.results.countIsAtLeast(minMatches)) {
                     null
                 } else {
-                    InsnResolutionInfo.Failure("Quantifier requires at least $minMatches matches")
+                    InsnResolutionInfo.Failure(MCDevBundle("mixin.at.quantifier_min_matches", minMatches))
                 }
             }
         }
@@ -222,12 +224,12 @@ class AtResolver(
     }
 
     fun getInstructionResolutionInfo(mode: CollectVisitor.Mode = CollectVisitor.Mode.RESOLUTION): InsnResolutionInfo<*> {
-        val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
+        val injectionPoint = getInjectionPoint(at) ?: return InsnResolutionInfo.Failure(defaultUnresolvedMessage)
         val targetAttr = at.findAttributeValue("target")
         val target = targetAttr?.let { parseMixinSelector(it) }
 
         val collectVisitor = injectionPoint.createCollectVisitor(at, target, getTargetClass(target), mode)
-            ?: return InsnResolutionInfo.Failure(DEFAULT_UNRESOLVED_MESSAGE)
+            ?: return InsnResolutionInfo.Failure(defaultUnresolvedMessage)
 
         return collectVisitor.visit(targetMethod)
     }

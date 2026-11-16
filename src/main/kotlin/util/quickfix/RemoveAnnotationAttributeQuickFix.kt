@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.util.quickfix
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.annotationFromValue
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -27,7 +28,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotationMemberValue
 
 class RemoveAnnotationAttributeQuickFix(val annotation: String, private val attribute: String) : LocalQuickFix {
-    override fun getFamilyName() = "Remove $attribute from $annotation"
+    override fun getFamilyName() = MCDevBundle("util.fix.remove_annotation_attribute", attribute, annotation)
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         descriptor.psiElement.annotationFromValue?.setDeclaredAttributeValue<PsiAnnotationMemberValue?>(attribute, null)

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.intentions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
 import com.intellij.openapi.editor.Editor
@@ -28,9 +29,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 
 class RemoveUnmatchedEntryIntention(element: PsiElement) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
-    override fun getText() = "Remove translation"
+    override fun getText() = MCDevBundle("translations.intention.remove_unmatched")
 
-    override fun getFamilyName() = "Minecraft"
+    override fun getFamilyName() = MCDevBundle("intention.category.minecraft")
 
     override fun invoke(
         project: Project,

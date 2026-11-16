@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.isPropertyValue
 import com.intellij.json.psi.JsonArray
@@ -53,17 +54,23 @@ class FabricReferenceContributor : PsiReferenceContributor() {
         val mixinConfigPattern = StandardPatterns.or(mixinConfigSimplePattern, mixinConfigObjectPattern)
         registrar.registerReferenceProvider(
             mixinConfigPattern,
-            ResourceFileReference("mixin config '%s'", Regex("(.+)\\.mixins\\.json"))
+            ResourceFileReference(
+                { MCDevBundle("reference.unresolved.mixin_config", it) },
+                Regex("(.+)\\.mixins\\.json"),
+            )
         )
 
         registrar.registerReferenceProvider(
             stringInModJson.isPropertyValue("accessWidener"),
-            ResourceFileReference("class tweaker '%s'", Regex("(.+)\\.(accesswidener|aw|classtweaker|ct)")),
+            ResourceFileReference(
+                { MCDevBundle("reference.unresolved.class_tweaker", it) },
+                Regex("(.+)\\.(accesswidener|aw|classtweaker|ct)"),
+            ),
         )
 
         registrar.registerReferenceProvider(
             stringInModJson.isPropertyValue("icon"),
-            ResourceFileReference("icon '%s'"),
+            ResourceFileReference({ MCDevBundle("reference.unresolved.icon", it) }),
         )
 
         registrar.registerReferenceProvider(stringInModJson.isPropertyValue("license"), LicenseReference)

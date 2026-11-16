@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.lang.colors
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.translations.lang.LangLexerAdapter
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -33,7 +34,7 @@ class LangColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap() = emptyMap<String, TextAttributesKey>()
     override fun getAttributeDescriptors() = Const.DESCRIPTORS
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
-    override fun getDisplayName() = "Minecraft Localization"
+    override fun getDisplayName() = MCDevBundle("translations.color_settings.display_name")
     override fun getDemoText() =
         """
         # This is a comment
@@ -42,10 +43,16 @@ class LangColorSettingsPage : ColorSettingsPage {
 
     private object Const {
         val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Key", LangSyntaxHighlighter.KEY),
-            AttributesDescriptor("Separator", LangSyntaxHighlighter.EQUALS),
-            AttributesDescriptor("Value", LangSyntaxHighlighter.VALUE),
-            AttributesDescriptor("Comments", LangSyntaxHighlighter.COMMENT),
+            AttributesDescriptor(MCDevBundle.pointer("translations.color_settings.key"), LangSyntaxHighlighter.KEY),
+            AttributesDescriptor(
+                MCDevBundle.pointer("translations.color_settings.separator"),
+                LangSyntaxHighlighter.EQUALS,
+            ),
+            AttributesDescriptor(MCDevBundle.pointer("translations.color_settings.value"), LangSyntaxHighlighter.VALUE),
+            AttributesDescriptor(
+                MCDevBundle.pointer("translations.color_settings.comments"),
+                LangSyntaxHighlighter.COMMENT,
+            ),
         )
     }
 }

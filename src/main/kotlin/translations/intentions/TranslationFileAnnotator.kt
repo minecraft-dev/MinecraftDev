@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.intentions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationIndex
@@ -39,7 +40,7 @@ class TranslationFileAnnotator : Annotator {
             checkEntryMatchesDefault(element, translation, annotations)
         }
         if (element.node.elementType == LangTypes.DUMMY) {
-            annotations.newAnnotation(HighlightSeverity.ERROR, "Translations must not contain incomplete entries.")
+            annotations.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("translations.annotator.incomplete_entry"))
                 .range(element)
                 .create()
         }
@@ -47,7 +48,7 @@ class TranslationFileAnnotator : Annotator {
 
     private fun checkEntryKey(element: PsiElement, translation: Translation, annotations: AnnotationHolder) {
         if (translation.key != translation.trimmedKey) {
-            annotations.newAnnotation(HighlightSeverity.WARNING, "Translation key contains whitespace at start or end.")
+            annotations.newAnnotation(HighlightSeverity.WARNING, MCDevBundle("translations.annotator.untrimmed_key"))
                 .range(element)
                 .newFix(TrimKeyIntention(element)).universal().registerFix()
                 .create()
@@ -57,7 +58,10 @@ class TranslationFileAnnotator : Annotator {
     private fun checkEntryDuplicates(element: PsiElement, translation: Translation, annotations: AnnotationHolder) {
         val count = TranslationIndex.Util.getTranslations(element.containingFile).count { it.key == translation.key }
         if (count > 1) {
-            annotations.newAnnotation(HighlightSeverity.WARNING, "Duplicate translation keys \"${translation.key}\".")
+            annotations.newAnnotation(
+                HighlightSeverity.WARNING,
+                MCDevBundle("translations.annotator.duplicate_key", translation.key),
+            )
                 .newFix(RemoveDuplicatesIntention(translation, element)).universal().registerFix()
                 .create()
         }
@@ -69,7 +73,7 @@ class TranslationFileAnnotator : Annotator {
         if (defaultEntries.any { it.contains(translation.key) }) {
             return
         }
-        val warningText = "Translation key not included in default localization file."
+        val warningText = MCDevBundle("translations.annotator.not_in_default")
         annotations.newAnnotation(HighlightSeverity.WARNING, warningText)
             .newFix(RemoveUnmatchedEntryIntention(element)).universal().registerFix()
             .create()

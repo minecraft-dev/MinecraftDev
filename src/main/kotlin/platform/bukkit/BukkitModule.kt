@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.bukkit
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.inspection.IsCancelled
@@ -87,8 +88,7 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
     override fun isStaticListenerSupported(method: PsiMethod) = true
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
-        "Parameter is not a subclass of org.bukkit.event.Event\n" +
-            "Compiling and running this listener may result in a runtime exception"
+        MCDevBundle("insight.event_listener.wrong_event.subclass", "org.bukkit.event.Event")
 
     override fun checkUselessCancelCheck(expression: PsiMethodCallExpression): IsCancelled? {
         val method = expression.findContainingMethod() ?: return null
@@ -138,7 +138,7 @@ class BukkitModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, type: T
         }
 
         return IsCancelled(
-            errorString = "Cancellable.isCancelled() check is useless in a method annotated with ignoreCancelled=true.",
+            errorString = MCDevBundle("inspection.is_cancelled.message.bukkit"),
             fix = {
                 expression.replace(
                     JavaPsiFacade.getElementFactory(project).createExpressionFromText(

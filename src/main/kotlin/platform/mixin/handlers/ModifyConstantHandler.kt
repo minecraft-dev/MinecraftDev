@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.ConstantInjectionPoint
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.TargetInsn
@@ -164,7 +165,8 @@ class ModifyConstantHandler : InsnInjectorAnnotationHandler() {
         return insn.opcode in allowedOpcodes
     }
 
-    override val allowedInsnDescription = "constants"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.modify_constant")
 
     override val mixinExtrasExpressionContextType = ExpressionContext.Type.MODIFY_CONSTANT
 }

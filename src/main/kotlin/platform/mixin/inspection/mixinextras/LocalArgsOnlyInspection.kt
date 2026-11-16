@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -60,7 +61,7 @@ class LocalArgsOnlyInspection : MixinInspection() {
             if (ModifyVariableArgsOnlyInspection.Util.shouldReport(localInfo, injector, injectorAnnotation)) {
                 holder.registerProblem(
                     localAnnotation.nameReferenceElement ?: localAnnotation,
-                    "@Local may be argsOnly = true",
+                    MCDevBundle("inspection.local_may_be_args_only.message"),
                     AnnotationAttributeFix(localAnnotation, "argsOnly" to true)
                 )
             }

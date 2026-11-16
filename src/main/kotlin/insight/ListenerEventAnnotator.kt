@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.insight
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.util.runCatchingKtIdeaExceptions
 import com.intellij.lang.annotation.AnnotationHolder
@@ -95,7 +96,7 @@ class ListenerEventAnnotator : Annotator {
         if (method.isStatic && element.toUElement()?.uastParent is UMethod &&
             !instance.isStaticListenerSupported(method.javaPsi)
         ) {
-            holder.newAnnotation(HighlightSeverity.ERROR, "Event listener method must not be static").create()
+            holder.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("insight.event_listener.static")).create()
         }
 
         if (element.getUastParentOfType<UParameter>()?.sourcePsi == eventParameter.sourcePsi &&

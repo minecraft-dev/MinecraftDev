@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -52,7 +53,7 @@ class InjectorOpcodeInspection : MixinInspection() {
                 if (opcode != null) {
                     holder.registerProblem(
                         opcodeAttribute,
-                        "Opcode is ignored by this injection point",
+                        MCDevBundle("inspection.missing_or_invalid_opcode.ignored"),
                         AnnotationAttributeFix(annotation, "opcode" to null)
                     )
                 }
@@ -60,13 +61,13 @@ class InjectorOpcodeInspection : MixinInspection() {
                 if (opcode == null) {
                     holder.registerProblem(
                         annotation.nameReferenceElement ?: annotation,
-                        "Missing opcode",
+                        MCDevBundle("inspection.missing_or_invalid_opcode.missing"),
                         *listOfNotNull(makeSpecifyOpcodeFix(holder.project, annotation)).toTypedArray()
                     )
                 } else if (opcode !in validOpcodes) {
                     holder.registerProblem(
                         opcodeAttribute,
-                        "Invalid opcode for this injection point"
+                        MCDevBundle("inspection.missing_or_invalid_opcode.invalid")
                     )
                 }
             }
@@ -101,7 +102,7 @@ class InjectorOpcodeInspection : MixinInspection() {
         at,
         "opcode" to opcodeValue
     ) {
-        override fun getFamilyName() = "Add opcode = Opcodes.$opcodeName"
-        override fun getText() = "Add opcode = Opcodes.$opcodeName"
+        override fun getFamilyName() = MCDevBundle("inspection.missing_or_invalid_opcode.fix", opcodeName)
+        override fun getText() = MCDevBundle("inspection.missing_or_invalid_opcode.fix", opcodeName)
     }
 }

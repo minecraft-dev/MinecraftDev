@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.getDataFromActionEvent
 import com.demonwav.mcdev.util.internalName
@@ -41,12 +42,12 @@ import java.awt.datatransfer.StringSelection
 class CopyAwAction : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val data = getDataFromActionEvent(e) ?: return showBalloon(e, "Unknown failure")
+        val data = getDataFromActionEvent(e) ?: return showBalloon(e, MCDevBundle("minecraft.actions.unknown_failure"))
         val editor = data.editor
 
         val element = data.element
         if (element !is PsiIdentifier) {
-            showBalloon(e, "Invalid element")
+            showBalloon(e, MCDevBundle("minecraft.actions.invalid_element"))
             return
         }
 
@@ -54,7 +55,7 @@ class CopyAwAction : AnAction() {
             is PsiMember -> parent
             is PsiReference -> parent.resolve()
             else -> null
-        } ?: return showBalloon(e, "Invalid element")
+        } ?: return showBalloon(e, MCDevBundle("minecraft.actions.invalid_element"))
 
         Util.doCopy(target, element, editor, e)
     }
@@ -68,19 +69,22 @@ class CopyAwAction : AnAction() {
                 }
                 is PsiField -> {
                     val containing = target.containingClass?.internalName
-                        ?: return maybeShow(e, "Could not get owner of field")
+                        ?: return maybeShow(e, MCDevBundle("minecraft.actions.no_field_owner"))
                     val desc = target.type.descriptor
                     val text = "accessible field $containing ${target.name} $desc"
                     copyToClipboard(editor, element, text)
                 }
                 is PsiMethod -> {
                     val containing = target.containingClass?.internalName
-                        ?: return maybeShow(e, "Could not get owner of method")
-                    val desc = target.descriptor ?: return maybeShow(e, "Could not get descriptor of method")
+                        ?: return maybeShow(e, MCDevBundle("minecraft.actions.no_method_owner"))
+                    val desc = target.descriptor ?: return maybeShow(
+                        e,
+                        MCDevBundle("minecraft.actions.could_not_get_method_descriptor"),
+                    )
                     val text = "accessible method $containing ${target.internalName} $desc"
                     copyToClipboard(editor, element, text)
                 }
-                else -> maybeShow(e, "Invalid element")
+                else -> maybeShow(e, MCDevBundle("minecraft.actions.invalid_element"))
             }
         }
 
@@ -89,7 +93,7 @@ class CopyAwAction : AnAction() {
             val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
             clpbrd.setContents(stringSelection, null)
             if (editor != null) {
-                showSuccessBalloon(editor, element, "Copied: \"$text\"")
+                showSuccessBalloon(editor, element, MCDevBundle("minecraft.actions.copied_quoted", text))
             }
         }
 

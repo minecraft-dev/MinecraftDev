@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.IMPLEMENTS
 import com.demonwav.mcdev.util.constantStringValue
@@ -43,7 +44,10 @@ class DuplicateInterfacePrefixInspection : MixinAnnotationAttributeInspection(IM
             val prefixValue = iface.findDeclaredAttributeValue("prefix") ?: continue
             val prefix = prefixValue.constantStringValue ?: continue
             if (prefix in prefixes) {
-                holder.registerProblem(prefixValue, "Duplicate prefix '$prefix'")
+                holder.registerProblem(
+                    prefixValue,
+                    MCDevBundle("inspection.duplicate_interface_prefix.message", prefix),
+                )
             } else {
                 prefixes.add(prefix)
             }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
@@ -106,7 +107,7 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
             val fixes = this.createFixes(methodJava, getterReturnType, i, manager.project)
             problems += manager.createProblemDescriptor(
                 location,
-                "@Getter requires the parameter's type to be assignable from the annotation's target method return type",
+                MCDevBundle("inspection.sponge_wrong_getter_type.message"),
                 isOnTheFly,
                 fixes,
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
@@ -169,7 +170,10 @@ class SpongeWrongGetterTypeInspection : AbstractBaseUastLocalInspectionTool() {
         val expectedType: PsiType,
     ) : IntentionAndQuickFixAction() {
 
-        private val myText: String = "Set parameter type to ${expectedType.presentableText}"
+        private val myText: String = MCDevBundle(
+            "inspection.sponge_wrong_getter_type.fix",
+            expectedType.presentableText,
+        )
         private val methodPointer = Supplier<JvmMethod?> { method }
 
         override fun applyFix(project: Project, file: PsiFile, editor: Editor?) {

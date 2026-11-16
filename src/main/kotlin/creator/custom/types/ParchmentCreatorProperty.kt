@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.ParchmentVersion
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.CreatorContext
@@ -94,7 +95,7 @@ class ParchmentCreatorProperty(
     override fun buildUi(panel: Panel) {
         panel.row(descriptor.translatedLabel) {
             @Suppress("DialogTitleCapitalization")
-            checkBox("Use Parchment")
+            checkBox(MCDevBundle("creator.ui.parchment.use.label"))
                 .bindSelected(useParchmentProperty)
 
             comboBox(mcVersionsModel)
@@ -112,12 +113,12 @@ class ParchmentCreatorProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
 
-        panel.row("Include") {
-            checkBox("Older Minecraft versions")
+        panel.row(MCDevBundle("creator.ui.parchment.include.label")) {
+            checkBox(MCDevBundle("creator.ui.parchment.include.older_mc_versions"))
                 .bindSelected(includeOlderMcVersionsProperty)
                 .enabledIf(useParchmentProperty)
 
-            checkBox("Snapshots")
+            checkBox(MCDevBundle("creator.ui.parchment.include.snapshots"))
                 .bindSelected(includeSnapshotsProperty)
                 .enabledIf(useParchmentProperty)
         }.enabled(descriptor.editable != false)

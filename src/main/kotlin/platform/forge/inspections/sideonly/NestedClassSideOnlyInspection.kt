@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
@@ -29,8 +30,7 @@ import com.siyeh.ig.BaseInspectionVisitor
 class NestedClassSideOnlyInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any) =
-        "A nested class cannot declare a side that is different from the parent class." +
-            "\nEither remove the nested class's @SideOnly annotation, or change it to match it's parent's side."
+        MCDevBundle("inspection.nested_class_side_only.message")
 
     override fun buildFix(vararg infos: Any): LocalQuickFix? {
         val annotation = infos[0] as PsiAnnotation
@@ -38,7 +38,7 @@ class NestedClassSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from nested class"
+                MCDevBundle("inspection.nested_class_side_only.fix")
             )
         } else {
             null

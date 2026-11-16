@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
@@ -41,7 +42,7 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from variable class declaration",
+                MCDevBundle("inspection.local_variable_declaration_side_only.fix"),
             )
         } else {
             null
@@ -118,20 +119,28 @@ class LocalVariableDeclarationSideOnlyInspection : BaseInspection() {
     enum class Error {
         VAR_CROSS_ANNOTATED_CLASS {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} " +
-                    "cannot be used in a class annotated with ${infos[1]}"
+                return MCDevBundle(
+                    "inspection.local_variable_declaration_side_only.message.var_cross_annotated_class",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         VAR_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} " +
-                    "cannot be used in a method annotated with ${infos[1]}"
+                return MCDevBundle(
+                    "inspection.local_variable_declaration_side_only.message.var_cross_annotated_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         VAR_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "A local variable whose class is annotated with ${infos[0]} " +
-                    "cannot be used in an un-annotated method."
+                return MCDevBundle(
+                    "inspection.local_variable_declaration_side_only.message.var_unannotated_method",
+                    infos[0],
+                )
             }
         }, ;
 

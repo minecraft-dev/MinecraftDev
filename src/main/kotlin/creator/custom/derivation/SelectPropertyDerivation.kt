@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.PropertyDerivationSelect
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
@@ -57,7 +58,7 @@ class SelectPropertyDerivation(
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (derivation.select == null) {
-                reporter.error("Missing select options")
+                reporter.error(MCDevBundle("creator.template.validation.missing_select_options"))
                 return null
             }
 

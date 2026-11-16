@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -41,5 +41,5 @@ object MCDevBundle : DynamicBundle(BUNDLE) {
     fun pointer(@PropertyKey(resourceBundle = BUNDLE) key: String) = Supplier { invoke(key) }
 
     fun pointer(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any?) =
-        Supplier { invoke(key, params) }
+        Supplier { invoke(key, *params) }
 }

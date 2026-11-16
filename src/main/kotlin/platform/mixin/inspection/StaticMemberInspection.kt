@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.ACCESSOR
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
@@ -60,7 +61,7 @@ class StaticMemberInspection : MixinInspection() {
                 }
                 holder.registerProblem(
                     member.modifierList?.findKeyword(accessModifier) ?: member,
-                    "Non-private static members are not allowed in Mixin classes",
+                    MCDevBundle("inspection.public_static_mixin_member.message"),
                     QuickFixFactory.getInstance().createModifierListFix(member, PsiModifier.PRIVATE, true, false),
                 )
             }

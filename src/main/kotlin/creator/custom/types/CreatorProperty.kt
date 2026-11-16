@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
@@ -135,7 +136,7 @@ abstract class CreatorProperty<T>(
                 null, true -> makeStorageKey()
                 is String -> makeCustomStorageKey(remember)
                 else -> {
-                    reporter.error("Invalid 'remember' value. Must be a boolean or a string")
+                    reporter.error(MCDevBundle("creator.template.validation.invalid_remember"))
                     null
                 }
             }
@@ -149,10 +150,10 @@ abstract class CreatorProperty<T>(
 
         if (descriptor.derives != null) {
             val parents = descriptor.derives.parents
-                ?: return reporter.error("No parents specified in derivation")
+                ?: return reporter.error(MCDevBundle("creator.template.validation.no_derivation_parents"))
             for (parent in parents) {
                 if (!properties.containsKey(parent)) {
-                    return reporter.error("Unknown parent property '$parent' in derivation")
+                    return reporter.error(MCDevBundle("creator.template.validation.unknown_derivation_parent", parent))
                 }
             }
 
@@ -174,7 +175,9 @@ abstract class CreatorProperty<T>(
 
         if (descriptor.inheritFrom != null) {
             val parentProperty = properties[descriptor.inheritFrom]
-                ?: return reporter.error("Unknown parent property '${descriptor.inheritFrom}' in derivation")
+                ?: return reporter.error(
+                    MCDevBundle("creator.template.validation.unknown_derivation_parent", descriptor.inheritFrom),
+                )
 
             @Suppress("UNCHECKED_CAST")
             graphProperty.set(parentProperty.graphProperty.get() as T)
@@ -219,7 +222,7 @@ abstract class CreatorProperty<T>(
         descriptor.derives?.parents?.map { parentName ->
             val property = properties[parentName]
             if (property == null) {
-                reporter?.error("Unknown parent property: $parentName")
+                reporter?.error(MCDevBundle("creator.template.validation.unknown_parent", parentName))
             }
             return@map property
         }
@@ -228,7 +231,7 @@ abstract class CreatorProperty<T>(
         descriptor.derives?.parents?.map { parentName ->
             val property = properties[parentName]
             if (property == null) {
-                reporter?.error("Unknown parent property: $parentName")
+                reporter?.error(MCDevBundle("creator.template.validation.unknown_parent", parentName))
             }
             return@map property?.get()
         }
@@ -280,7 +283,7 @@ abstract class CreatorProperty<T>(
             val dependsOn = property["dependsOn"]
             if (dependsOn !is String && (dependsOn !is List<*> || dependsOn.any { it !is String })) {
                 reporter.error(
-                    "Expected '$name' to have a 'dependsOn' value that is either a string or a list of strings"
+                    MCDevBundle("creator.template.validation.invalid_depends_on", name)
                 )
                 return null
             }
@@ -293,7 +296,7 @@ abstract class CreatorProperty<T>(
             val dependencies = dependenciesNames.mapNotNull {
                 val dependency = properties[it]
                 if (dependency == null) {
-                    reporter.error("'$name' dependency '$it' does not exist")
+                    reporter.error(MCDevBundle("creator.template.validation.unknown_dependency", name, it))
                 }
                 dependency
             }
@@ -314,7 +317,7 @@ abstract class CreatorProperty<T>(
         ): GraphProperty<Boolean> {
             val condition = property["condition"]
             if (condition !is String) {
-                reporter.error("Expected '$name' to have a 'condition' string")
+                reporter.error(MCDevBundle("creator.template.validation.missing_condition", name))
                 return prop
             }
 
@@ -326,7 +329,9 @@ abstract class CreatorProperty<T>(
                 if (exception != null) {
                     if (!didInitialUpdate) {
                         didInitialUpdate = true
-                        reporter.error("Failed to compute initial $name-property: ${exception.message}")
+                        reporter.error(
+                            MCDevBundle("creator.template.validation.initial_value_failed", name, exception.message),
+                        )
                         thisLogger().info("Failed to compute initial $name-property: ${exception.message}", exception)
                     } else {
                         thisLogger().error("Failed to compute initial $name-property: ${exception.message}", exception)
@@ -357,7 +362,7 @@ abstract class CreatorProperty<T>(
             }
 
             if (visibility !is Map<*, *>) {
-                reporter.error("Visibility can only be a boolean or an object")
+                reporter.error(MCDevBundle("creator.template.validation.invalid_visibility"))
                 return prop
             }
 
@@ -380,7 +385,7 @@ abstract class CreatorProperty<T>(
             }
 
             if (forceValue !is Map<*, *>) {
-                reporter.error("ForceValue can only be a boolean or an object")
+                reporter.error(MCDevBundle("creator.template.validation.invalid_force_value"))
                 return out
             }
 
@@ -389,7 +394,7 @@ abstract class CreatorProperty<T>(
 
             val value = forceValue["value"]
             if (value !is String) {
-                reporter.error("Expected 'forceValue' to have a 'value' string")
+                reporter.error(MCDevBundle("creator.template.validation.missing_force_value"))
                 return out
             }
 

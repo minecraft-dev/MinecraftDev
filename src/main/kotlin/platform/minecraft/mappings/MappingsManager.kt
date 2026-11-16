@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.mappings
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.platform.minecraft.srg.SrgType
@@ -38,7 +39,7 @@ import org.jetbrains.concurrency.resolvedPromise
 import org.jetbrains.concurrency.runAsync
 
 abstract class MappingsManager {
-    var mappings: Promise<Mappings> = rejectedPromise("Mappings not loaded")
+    var mappings: Promise<Mappings> = rejectedPromise(MCDevBundle("minecraft.mappings.not_loaded"))
         @Synchronized get
         protected set
 
@@ -84,7 +85,7 @@ abstract class MappingsManager {
             mappings = if (file.isNotBlank()) {
                 val path = Paths.get(file)
                 if (Files.notExists(path)) {
-                    rejectedPromise("No mapping data available at " + path.absolutePathString())
+                    rejectedPromise(MCDevBundle("minecraft.mappings.not_found", path.absolutePathString()))
                 } else {
                     runAsync {
                         // Load SRG map from files
@@ -93,7 +94,7 @@ abstract class MappingsManager {
                 }
             } else {
                 // Path to SRG files is unknown
-                rejectedPromise("No mapping data available: file path is blank")
+                rejectedPromise(MCDevBundle("minecraft.mappings.blank_path"))
             }
         }
     }

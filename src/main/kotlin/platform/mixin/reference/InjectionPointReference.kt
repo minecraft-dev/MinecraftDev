@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InjectionPoint
+import com.demonwav.mcdev.platform.mixin.util.InjectionPointSpecifier
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT_CODE
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.INJECTION_POINT
-import com.demonwav.mcdev.platform.mixin.util.InjectionPointSpecifier
 import com.demonwav.mcdev.util.cached
 import com.demonwav.mcdev.util.constantStringValue
 import com.demonwav.mcdev.util.insideAnnotationAttribute
@@ -58,8 +59,7 @@ object InjectionPointReference : ReferenceResolver(), MixinReference {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> = PsiJavaPatterns.psiLiteral(StandardPatterns.string())
         .insideAnnotationAttribute(AT)
 
-    override val description: String
-        get() = "injection point type '%s'"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.injection_point", name)
 
     override fun isValidAnnotation(name: String, project: Project) = name == AT
 

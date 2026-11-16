@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.toml.platform.forge.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.toml.TomlElementVisitor
 import com.demonwav.mcdev.toml.platform.forge.ForgeTomlConstants
@@ -74,7 +75,11 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                         !ForgeConstants.MOD_ID_REGEX.matches(modId)
                     ) {
                         val endOffset = if (value.text.endsWith('"')) modId.length + 1 else modId.length
-                        holder.registerProblem(value, TextRange(1, endOffset), "Mod ID is invalid")
+                        holder.registerProblem(
+                            value,
+                            TextRange(1, endOffset),
+                            MCDevBundle("inspection.mods_toml_validation.invalid_mod_id"),
+                        )
                     }
                 }
                 "displayTest" -> {
@@ -82,7 +87,11 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     val test = value.stringValue() ?: return
                     if (test != "\"" && test !in ForgeConstants.DISPLAY_TESTS) {
                         val endOffset = if (value.text.endsWith('"')) test.length + 1 else test.length
-                        holder.registerProblem(value, TextRange(1, endOffset), "DisplayTest $test does not exist")
+                        holder.registerProblem(
+                            value,
+                            TextRange(1, endOffset),
+                            MCDevBundle("inspection.mods_toml_validation.unknown_display_test", test),
+                        )
                     }
 
                     val forgeVersion = runCatching {
@@ -90,7 +99,10 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     }.getOrNull()
                     val minVersion = ForgeConstants.DISPLAY_TEST_MANIFEST_VERSION
                     if (forgeVersion != null && forgeVersion < minVersion) {
-                        holder.registerProblem(keyValue.key, "DisplayTest is only available since $minVersion")
+                        holder.registerProblem(
+                            keyValue.key,
+                            MCDevBundle("inspection.mods_toml_validation.display_test_unavailable", minVersion),
+                        )
                     }
                 }
                 "side" -> {
@@ -98,7 +110,11 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     val side = value.stringValue() ?: return
                     if (side != "\"" && side !in ForgeConstants.DEPENDENCY_SIDES) {
                         val endOffset = if (value.text.endsWith('"')) side.length + 1 else side.length
-                        holder.registerProblem(value, TextRange(1, endOffset), "Side $side does not exist")
+                        holder.registerProblem(
+                            value,
+                            TextRange(1, endOffset),
+                            MCDevBundle("inspection.mods_toml_validation.unknown_side", side),
+                        )
                     }
                 }
                 "ordering" -> {
@@ -106,7 +122,11 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     val order = value.stringValue() ?: return
                     if (order != "\"" && order !in ForgeConstants.DEPENDENCY_ORDER) {
                         val endOffset = if (value.text.endsWith('"')) order.length + 1 else order.length
-                        holder.registerProblem(value, TextRange(1, endOffset), "Order $order does not exist")
+                        holder.registerProblem(
+                            value,
+                            TextRange(1, endOffset),
+                            MCDevBundle("inspection.mods_toml_validation.unknown_order", order),
+                        )
                     }
                 }
                 "clientSideOnly" -> {
@@ -115,7 +135,10 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     }.getOrNull()
                     val minVersion = ForgeConstants.CLIENT_ONLY_MANIFEST_VERSION
                     if (forgeVersion != null && forgeVersion < minVersion) {
-                        holder.registerProblem(keyValue.key, "ClientSideOnly is only available since $minVersion")
+                        holder.registerProblem(
+                            keyValue.key,
+                            MCDevBundle("inspection.mods_toml_validation.client_side_only_unavailable", minVersion),
+                        )
                     }
                 }
             }
@@ -133,7 +156,10 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                     .filter { it.header.key?.name == "mods" }
                     .any { it.entries.find { entry -> entry.key.text == "modId" }?.value?.stringValue() == targetId }
                 if (!isDeclaredId) {
-                    holder.registerProblem(keySegment, "Mod $targetId is not declared in this file")
+                    holder.registerProblem(
+                        keySegment,
+                        MCDevBundle("inspection.mods_toml_validation.undeclared_mod", targetId),
+                    )
                 }
             }
         }
@@ -151,7 +177,10 @@ class ModsTomlValidationInspection : LocalInspectionTool() {
                 else -> return
             }
             if (expectedType != null && actualType != null && expectedType != actualType) {
-                holder.registerProblem(value, "Wrong value type, expected ${expectedType.presentableName}")
+                holder.registerProblem(
+                    value,
+                    MCDevBundle("inspection.mods_toml_validation.wrong_type", expectedType.presentableName),
+                )
             }
         }
     }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.injectionPoint
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.reference.MixinSelector
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
 import com.demonwav.mcdev.util.constantValue
@@ -57,7 +58,7 @@ class JumpInjectionPoint : InjectionPoint<PsiElement>() {
         )
     }
 
-    override val discouragedMessage = "Usage of JUMP is discouraged because it is brittle"
+    override val discouragedMessage = MCDevBundle("inspection.discouraged_injection_point.jump")
 
     override val validOpcodes = Const.VALID_OPCODES
 

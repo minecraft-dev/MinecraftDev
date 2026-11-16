@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INTERFACE
 import com.demonwav.mcdev.util.resolveClass
@@ -36,7 +37,7 @@ class InterfaceIsInterfaceInspection : MixinAnnotationAttributeInspection(INTERF
     ) {
         val psiClass = value.resolveClass() ?: return
         if (!psiClass.isInterface) {
-            holder.registerProblem(value, "Interface expected here")
+            holder.registerProblem(value, MCDevBundle("inspection.interface_is_interface.message"))
         }
     }
 }

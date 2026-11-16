@@ -20,10 +20,12 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.LocalVariables
 import com.demonwav.mcdev.platform.mixin.util.shortDescString
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.demonwav.mcdev.platform.mixin.util.textify
+import com.intellij.ide.nls.NlsMessages
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
@@ -46,7 +48,7 @@ import org.objectweb.asm.tree.VarInsnNode
 
 fun FlowValue.shortString(project: Project, clazz: ClassNode, method: MethodNode): String {
     if (isComplex) {
-        return "Complex Flow (type ${type.shortName})"
+        return MCDevBundle("mixin.flow_diagram.complex_flow", type.shortName)
     }
     ExpressionASMUtils.getConstant(insn)?.let { return constantString(it) }
     ExpressionASMUtils.getCastType(insn)?.let { return castString(it) }
@@ -78,7 +80,7 @@ fun FlowValue.shortString(project: Project, clazz: ClassNode, method: MethodNode
 
 fun FlowValue.longString(): String =
     if (isComplex) {
-        "Complex Flow (type ${type.className})"
+        MCDevBundle("mixin.flow_diagram.complex_flow", type.className)
     } else {
         insn.textify()
     }
@@ -88,9 +90,11 @@ private fun shortOwner(owner: String) = Type.getObjectType(owner).shortName
 private fun constantString(cst: Any): String {
     if (cst is Int) {
         return when (cst) {
-            0 -> "0 or false"
-            1 -> "1 or true"
-            in Char.MIN_VALUE.code..Char.MAX_VALUE.code -> "$cst or '${cst.toChar().toString().escape()}'"
+            0 -> NlsMessages.formatOrList(listOf("0", "false"))
+            1 -> NlsMessages.formatOrList(listOf("1", "true"))
+            in Char.MIN_VALUE.code..Char.MAX_VALUE.code ->
+                NlsMessages.formatOrList(listOf(cst.toString(), "'${cst.toChar().toString().escape()}'"))
+
             else -> cst.toString()
         }
     }
@@ -132,7 +136,7 @@ private fun varString(flow: FlowValue, index: Int, project: Project, clazz: Clas
         runCatching {
             LocalVariables.getLocalVariableAt(project, clazz, method, location, index)
         }.getOrNull()
-    }?.name ?: "<local $index>"
+    }?.name ?: MCDevBundle("mixin.flow_diagram.local_variable", index)
     val isStore = flow.insn.opcode in Opcodes.ISTORE..Opcodes.ASTORE
     return localName + if (isStore) " =" else ""
 }
@@ -159,18 +163,20 @@ private fun complexCmpString(opcode: Int, jumpOpcode: Int): String {
     val isG = opcode == Opcodes.FCMPG || opcode == Opcodes.DCMPG
     val isLong = opcode == Opcodes.LCMP
     return when (jumpOpcode) {
-        Opcodes.IFEQ, Opcodes.IFNE -> "== or !="
+        Opcodes.IFEQ, Opcodes.IFNE -> NlsMessages.formatOrList(listOf("==", "!="))
         Opcodes.IFLT, Opcodes.IFGE -> when {
-            isLong -> "< or >="
+            isLong -> NlsMessages.formatOrList(listOf("<", ">="))
             isG -> "<"
             else -> ">="
         }
+
         Opcodes.IFGT, Opcodes.IFLE -> when {
-            isLong -> "<= or >"
+            isLong -> NlsMessages.formatOrList(listOf("<=", ">"))
             isG -> "<="
             else -> ">"
         }
-        else -> "Unknown jump"
+
+        else -> MCDevBundle("mixin.flow_diagram.unknown_jump")
     }
 }
 
@@ -208,9 +214,11 @@ private fun opcodeString(opcode: Int) = when (opcode) {
     Opcodes.IAND, Opcodes.LAND -> "&"
     Opcodes.IOR, Opcodes.LOR -> "|"
     Opcodes.IXOR, Opcodes.LXOR -> "^"
-    Opcodes.IF_ACMPEQ, Opcodes.IF_ICMPEQ, Opcodes.IF_ACMPNE, Opcodes.IF_ICMPNE -> "== or !="
-    Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE -> "< or >="
-    Opcodes.IF_ICMPLE, Opcodes.IF_ICMPGT -> "<= or >"
+    Opcodes.IF_ACMPEQ, Opcodes.IF_ICMPEQ, Opcodes.IF_ACMPNE, Opcodes.IF_ICMPNE ->
+        NlsMessages.formatOrList(listOf("==", "!="))
+
+    Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE -> NlsMessages.formatOrList(listOf("<", ">="))
+    Opcodes.IF_ICMPLE, Opcodes.IF_ICMPGT -> NlsMessages.formatOrList(listOf("<=", ">"))
     Opcodes.ARRAYLENGTH -> ".length"
     in Opcodes.IALOAD..Opcodes.SALOAD -> "[]"
     in Opcodes.IASTORE..Opcodes.SASTORE -> "[] ="

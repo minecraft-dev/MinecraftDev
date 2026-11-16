@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.ct.CtFile
 import com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwEntryMixin
 import com.demonwav.mcdev.platform.minecraft.ct.psi.mixins.CtAwMemberNameMixin
@@ -56,7 +57,7 @@ class DuplicateAwEntryInspection : LocalInspectionTool() {
                         problems += manager.createProblemDescriptor(
                             match,
                             "Duplicate entry for \"${sort.second}  ${(sort.first as PsiNamedElement).name}\"",
-                            RemoveElementQuickFix("Remove duplicate"),
+                            RemoveElementQuickFix(MCDevBundle("inspection.duplicate_aw_entry.fix")),
                             ProblemHighlightType.WARNING,
                             isOnTheFly,
                         )

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
@@ -43,7 +44,8 @@ class ModifyReceiverHandler : MixinExtrasInjectorAnnotationHandler() {
         else -> false
     }
 
-    override val allowedInsnDescription = "non-static method invocations and field references"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.modify_receiver")
 
     override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,

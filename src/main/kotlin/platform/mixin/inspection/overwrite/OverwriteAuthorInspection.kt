@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
@@ -53,7 +54,7 @@ class OverwriteAuthorInspection : OverwriteInspection() {
     private fun registerMissingTag(holder: ProblemsHolder, element: PsiElement, tag: String) {
         holder.registerProblem(
             element,
-            "@Overwrite methods must have an associated JavaDoc with a filled in @$tag tag",
+            MCDevBundle("inspection.overwrite_author_required.message.tag", tag),
             QuickFix(tag),
         )
     }
@@ -61,16 +62,18 @@ class OverwriteAuthorInspection : OverwriteInspection() {
     private fun registerMissingTags(holder: ProblemsHolder, element: PsiElement) {
         holder.registerProblem(
             element,
-            "@Overwrite methods must have an associated JavaDoc with filled in @author and @reason tags",
+            MCDevBundle("inspection.overwrite_author_required.message.all"),
             QuickFix(),
         )
     }
 
     private class QuickFix(val tag: String? = null) : LocalQuickFix {
 
-        override fun getFamilyName() = "Add missing Javadoc tag"
+        override fun getFamilyName() = MCDevBundle("inspection.overwrite_author_required.fix.family")
 
-        override fun getName(): String = if (tag == null) "Add all missing Javadoc tags" else "Add @$tag Javadoc tag"
+        override fun getName(): String = if (tag == null) MCDevBundle(
+            "inspection.overwrite_author_required.fix.all",
+        ) else MCDevBundle("inspection.overwrite_author_required.fix.tag", tag)
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement

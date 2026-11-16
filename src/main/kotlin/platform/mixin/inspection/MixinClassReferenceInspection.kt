@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.demonwav.mcdev.platform.mixin.util.isMixin
@@ -63,7 +64,7 @@ class MixinClassReferenceInspection : MixinInspection() {
                 return
             }
 
-            holder.registerProblem(type, "Mixin class cannot be referenced directly")
+            holder.registerProblem(type, MCDevBundle("inspection.reference_to_mixin.message"))
         }
     }
 }

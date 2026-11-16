@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.bungeecord
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
 import com.demonwav.mcdev.platform.AbstractModule
@@ -74,8 +75,7 @@ class BungeeCordModule<out T : AbstractModuleType<*>>(facet: MinecraftFacet, typ
         BungeeCordConstants.EVENT_CLASS == eventClass.qualifiedName
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
-        "Parameter is not a subclass of net.md_5.bungee.api.plugin.Event\n" +
-            "Compiling and running this listener may result in a runtime exception"
+        MCDevBundle("insight.event_listener.wrong_event.subclass", "net.md_5.bungee.api.plugin.Event")
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         val identifier = element?.toUElementOfType<UIdentifier>()

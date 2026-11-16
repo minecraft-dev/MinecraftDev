@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.COMPATIBILITY_LEVEL
 import com.demonwav.mcdev.util.reference.InspectionReference
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -39,8 +40,7 @@ object CompatibilityLevel : PsiReferenceProvider() {
 
     private class Reference(element: PsiElement) : PsiReferenceBase<PsiElement>(element), InspectionReference {
 
-        override val description
-            get() = "compatibility level '%s'"
+        override fun unresolvedMessage(name: String) = MCDevBundle("reference.unresolved.compatibility_level", name)
 
         override val unresolved
             get() = resolve() == null

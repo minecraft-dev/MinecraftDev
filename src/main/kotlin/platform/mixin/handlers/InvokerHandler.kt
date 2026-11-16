@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
@@ -74,8 +75,9 @@ class InvokerHandler : MixinMemberAnnotationHandler {
 
     override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
-        val targetName = getInvokerTargetName(annotation, method) ?: return "Invalid invoker name ${method.name}"
-        return "Cannot find method $targetName in target class"
+        val targetName = getInvokerTargetName(annotation, method)
+            ?: return MCDevBundle("mixin.handler.invoker.invalid_name", method.name)
+        return MCDevBundle("mixin.handler.invoker.method_not_found", targetName)
     }
 
     private fun getInvokerTargetName(invoker: PsiAnnotation, member: PsiMember): String? {

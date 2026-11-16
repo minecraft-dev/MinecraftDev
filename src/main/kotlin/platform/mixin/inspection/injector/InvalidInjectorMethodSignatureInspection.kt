@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
@@ -141,13 +142,13 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             when {
                 requiredStaticness.size == 2 -> holder.registerProblem(
                     identifier,
-                    "Impossible combination of targets: some require a static handler and others a non-static handler",
+                    MCDevBundle("inspection.invalid_injector_method_signature.impossible_static"),
                 )
 
                 true in requiredStaticness -> if (!method.hasModifierProperty(PsiModifier.STATIC)) {
                     holder.registerProblem(
                         identifier,
-                        "Method must be static",
+                        MCDevBundle("inspection.invalid_injector_method_signature.must_be_static"),
                         QuickFixFactory.getInstance().createModifierListFix(
                             modifiers,
                             PsiModifier.STATIC,
@@ -160,7 +161,7 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
                 false in requiredStaticness -> if (method.hasModifierProperty(PsiModifier.STATIC)) {
                     holder.registerProblem(
                         modifiers.findKeyword(PsiModifier.STATIC) ?: identifier,
-                        "Method must not be static",
+                        MCDevBundle("inspection.invalid_injector_method_signature.must_not_be_static"),
                         QuickFixFactory.getInstance().createModifierListFix(
                             modifiers,
                             PsiModifier.STATIC,
@@ -192,14 +193,14 @@ class InvalidInjectorMethodSignatureInspection : MixinInspection() {
             if (signatureSuggestion == null) {
                 holder.registerProblem(
                     method,
-                    "There are no possible signatures for this injector",
+                    MCDevBundle("inspection.invalid_injector_method_signature.no_signatures"),
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     TextRange.create(declarationStart, declarationEnd),
                 )
             } else {
                 val annotationName = annotation.nameReferenceElement?.referenceName
                 val description =
-                    "Method signature does not match expected signature for $annotationName"
+                    MCDevBundle("inspection.invalid_injector_method_signature.message", annotationName)
                 val quickFix = SignatureQuickFix(method, signatureSuggestion)
 
                 holder.registerProblem(

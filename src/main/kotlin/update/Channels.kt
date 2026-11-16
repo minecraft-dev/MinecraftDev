@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,11 +20,16 @@
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
+import java.util.function.Supplier
 
-enum class Channels(val title: String, val url: String) {
-    NIGHTLY("Nightly", "https://plugins.jetbrains.com/plugins/Nightly/8327"),
+enum class Channels(private val titleSupplier: Supplier<String>, val url: String) {
+    NIGHTLY(MCDevBundle.pointer("update.channel.nightly"), "https://plugins.jetbrains.com/plugins/Nightly/8327"),
     ;
+
+    val title
+        get() = titleSupplier.get()
 
     fun hasChannel(): Boolean {
         return UpdateSettings.getInstance().storedPluginHosts.contains(url)

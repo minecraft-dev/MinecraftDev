@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.translations
 
 import com.demonwav.mcdev.TranslationSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
 import com.demonwav.mcdev.translations.lang.LangFile
@@ -175,10 +176,8 @@ object TranslationFiles {
             DataManager.getInstance().dataContextFromFocusAsync.onSuccess {
                 JBPopupFactory.getInstance()
                     .createPopupChooserBuilder(domains)
-                    .setTitle("Choose Resource Domain")
-                    .setAdText(
-                        "There are multiple resource domains with localization files, choose one for this translation.",
-                    )
+                    .setTitle(MCDevBundle("translations.add.choose_domain.title"))
+                    .setAdText(MCDevBundle("translations.add.choose_domain.message"))
                     .setItemChosenCallback { domain ->
                         write(files.filter { f -> f.mcDomain == domain })
                     }

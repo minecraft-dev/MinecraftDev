@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.codeInsight.intention.AddAnnotationModCommandAction
 import com.intellij.codeInspection.LocalQuickFix
@@ -36,7 +37,7 @@ class MissingUniqueAnnotationInspection : AbstractAddedMembersInspection() {
         if (!field.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
             holder.registerProblem(
                 field.nameIdentifier,
-                "Missing @Unique annotation",
+                MCDevBundle("inspection.missing_unique.message"),
                 LocalQuickFix.from(AddAnnotationModCommandAction(MixinConstants.Annotations.UNIQUE, field))!!,
             )
         }
@@ -46,7 +47,7 @@ class MissingUniqueAnnotationInspection : AbstractAddedMembersInspection() {
         if (!isInherited && !method.hasAnnotation(MixinConstants.Annotations.UNIQUE)) {
             holder.registerProblem(
                 method.nameIdentifier ?: return,
-                "Missing @Unique annotation",
+                MCDevBundle("inspection.missing_unique.message"),
                 LocalQuickFix.from(AddAnnotationModCommandAction(MixinConstants.Annotations.UNIQUE, method))!!
             )
         }

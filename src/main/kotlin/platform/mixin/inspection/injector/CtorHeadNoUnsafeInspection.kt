@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -41,7 +42,10 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Ignore when Fabric Mixin is present", ignoreForFabric)
+        val checkbox = JCheckBox(
+            MCDevBundle("inspection.ctor_head_no_unsafe.option.ignore_for_fabric"),
+            ignoreForFabric,
+        )
         checkbox.addActionListener {
             ignoreForFabric = checkbox.isSelected
         }
@@ -71,7 +75,7 @@ class CtorHeadNoUnsafeInspection : MixinInspection() {
                 }
                 holder.registerProblem(
                     valueElement,
-                    "CTOR_HEAD is missing unsafe = true",
+                    MCDevBundle("inspection.ctor_head_no_unsafe.message"),
                     AnnotationAttributeFix(annotation, "unsafe" to true),
                 )
             }

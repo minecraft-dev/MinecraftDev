@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.sorting.Ordering
 import com.demonwav.mcdev.translations.sorting.TranslationSorter
@@ -73,10 +74,8 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
         project: Project
     ): InfoPanel {
         val panel = InfoPanel()
-        panel.text = "Translation file doesn't match default one (${TranslationConstants.DEFAULT_LOCALE} locale)."
-        panel.createActionLabel(
-            "Add missing default entries (won't reflect changes in original English localization)",
-        ) {
+        panel.text = MCDevBundle("translations.notification.mismatch", TranslationConstants.DEFAULT_LOCALE)
+        panel.createActionLabel(MCDevBundle("translations.notification.add_missing")) {
             val psi = PsiManager.getInstance(project).findFile(file) ?: return@createActionLabel
             psi.applyWriteAction {
                 val fileEntries = missingTranslations.map {
@@ -91,22 +90,24 @@ class TranslationEditorNotificationProvider : EditorNotificationProvider {
                 return@createActionLabel
             }
 
-            val sort = MessageDialogBuilder.yesNo("Sort Translations", "Would you like to sort all translations now?")
-                .ask(project)
+            val sort = MessageDialogBuilder.yesNo(
+                MCDevBundle("translations.notification.sort.title"),
+                MCDevBundle("translations.notification.sort.message"),
+            ).ask(project)
             if (sort) {
                 try {
                     TranslationSorter.query(project, psi, true, Ordering.LIKE_DEFAULT)
                 } catch (e: Exception) {
                     Notification(
                         "Translations sorting error",
-                        "Error sorting translations",
+                        MCDevBundle("translations.sort.error.title"),
                         e.message ?: e.stackTraceToString(),
                         NotificationType.WARNING,
                     ).notify(project)
                 }
             }
         }
-        panel.createActionLabel("Hide notification") {
+        panel.createActionLabel(MCDevBundle("translations.notification.hide")) {
             panel.isVisible = false
             show = false
         }

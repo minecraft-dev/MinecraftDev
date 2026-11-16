@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.vanillagradle
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.findModule
 import com.demonwav.mcdev.util.runGradleTaskWithCallback
 import com.intellij.codeInsight.AttachSourcesProvider
@@ -55,7 +56,7 @@ class VanillaGradleDecompileSourceProvider : AttachSourcesProvider {
 
     private class DecompileAction(val decompileTaskName: String) : AttachSourcesProvider.AttachSourcesAction {
 
-        override fun getName(): String = "Decompile Minecraft"
+        override fun getName(): String = MCDevBundle("minecraft.decompile.minecraft")
 
         override fun getBusyText(): String = @Suppress("DialogTitleCapitalization") "Decompiling Minecraft..."
 

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
@@ -54,7 +55,8 @@ class WrapWithConditionHandler : MixinExtrasInjectorAnnotationHandler() {
         }
     }
 
-    override val allowedInsnDescription = "void method invocations and field assignments"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.wrap_with_condition")
 
     fun getValidTargetType(insn: AbstractInsnNode): Type? {
         if (!isInsnAllowed(insn, emptyMap())) {

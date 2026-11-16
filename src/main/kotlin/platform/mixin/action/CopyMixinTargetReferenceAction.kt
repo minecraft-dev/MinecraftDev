@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.QualifiedMember
 import com.demonwav.mcdev.util.findReferencedMember
 import com.demonwav.mcdev.util.getQualifiedMemberReference
@@ -61,6 +62,8 @@ class CopyMixinTargetReferenceAction : AnAction() {
         }
 
         CopyPasteManager.getInstance().setContents(StringSelection(targetReference.toMixinString()))
-        WindowManager.getInstance().getStatusBar(project).info = "Mixin target reference has been copied."
+        WindowManager.getInstance().getStatusBar(project).info = MCDevBundle(
+            "mixin.action.copy_target_reference.copied",
+        )
     }
 }

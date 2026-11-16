@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_CONFIG
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_SERIALIZED_NAME
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.SERIALIZED_NAME
@@ -128,8 +129,7 @@ object ConfigProperty : PsiReferenceProvider() {
         PsiReferenceBase<JsonStringLiteral>(element),
         InspectionReference {
 
-        override val description: String
-            get() = "config property '%s'"
+        override fun unresolvedMessage(name: String) = MCDevBundle("reference.unresolved.config_property", name)
 
         override val unresolved: Boolean
             get() = resolve() == null

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.CreatorCredentials
@@ -96,7 +97,7 @@ class GradlePluginSelectorCreatorProperty(
             checkboxUpdater.update(forceValueProperty?.get())
             forceValueProperty?.afterChange(checkboxUpdater::update)
 
-            label("Version:").gap(RightGap.SMALL)
+            label(MCDevBundle("creator.ui.gradle_plugin.version.label")).gap(RightGap.SMALL)
             val combobox = comboBox(versionsModel.get())
                 .bindItem(versionProperty)
                 .enabled(descriptor.editable != false)
@@ -130,14 +131,14 @@ class GradlePluginSelectorCreatorProperty(
 
         val url = descriptor.parameters?.get("sourceUrl") as? String
         if (url == null) {
-            reporter.error("Expected string parameter 'sourceUrl'")
+            reporter.error(MCDevBundle("creator.template.validation.expected_source_url"))
             return
         }
 
         val rawVersionFilterCondition = descriptor.parameters["rawVersionFilter"]
         if (rawVersionFilterCondition != null) {
             if (rawVersionFilterCondition !is String) {
-                reporter.error("'rawVersionFilter' must be a string")
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "rawVersionFilter"))
             } else {
                 rawVersionFilter = { version ->
                     val props = mapOf("version" to version)
@@ -150,7 +151,7 @@ class GradlePluginSelectorCreatorProperty(
         val versionFilterCondition = descriptor.parameters["versionFilter"]
         if (versionFilterCondition != null) {
             if (versionFilterCondition !is String) {
-                reporter.error("'versionFilter' must be a string")
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "versionFilter"))
             } else {
                 versionFilter = { version ->
                     val props = mapOf("version" to version)

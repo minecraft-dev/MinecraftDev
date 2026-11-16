@@ -20,9 +20,11 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.fix
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.createLiteralExpression
 import com.intellij.codeInsight.intention.FileModifier.SafeFieldForPreview
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
+import com.intellij.ide.nls.NlsMessages
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiAnnotation
@@ -53,37 +55,14 @@ open class AnnotationAttributeFix(
             .filter { (_, value) -> value == null }
             .map { (key, _) -> key }
 
-        buildString {
-            if (added.isNotEmpty()) {
-                append("Add ")
-                for ((i, add) in added.withIndex()) {
-                    if (i != 0) {
-                        if (i == added.size - 1) {
-                            append(" and ")
-                        } else {
-                            append(", ")
-                        }
-                    }
-                    append(add)
-                }
-                if (removed.isNotEmpty()) {
-                    append(", and remove ")
-                }
-            } else if (removed.isNotEmpty()) {
-                append("Remove ")
-            }
-            if (removed.isNotEmpty()) {
-                for ((i, rem) in removed.withIndex()) {
-                    if (i != 0) {
-                        if (i == removed.size - 1) {
-                            append(" and ")
-                        } else {
-                            append(", ")
-                        }
-                    }
-                    append(rem)
-                }
-            }
+        when {
+            added.isNotEmpty() && removed.isNotEmpty() -> MCDevBundle(
+                "mixin.fix.annotation_attribute.add_and_remove",
+                NlsMessages.formatAndList(added),
+                NlsMessages.formatAndList(removed),
+            )
+            added.isNotEmpty() -> MCDevBundle("mixin.fix.annotation_attribute.add", NlsMessages.formatAndList(added))
+            else -> MCDevBundle("mixin.fix.annotation_attribute.remove", NlsMessages.formatAndList(removed))
         }
     }
 

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.ACCESSOR
@@ -71,8 +72,9 @@ class AccessorHandler : MixinMemberAnnotationHandler {
 
     override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val method = annotation.parentOfType<PsiMethod>() ?: return null
-        val accessorInfo = getAccessorInfo(annotation, method) ?: return "Invalid accessor name ${method.name}"
-        return "Cannot find field ${accessorInfo.name} in target class"
+        val accessorInfo = getAccessorInfo(annotation, method)
+            ?: return MCDevBundle("mixin.handler.accessor.invalid_name", method.name)
+        return MCDevBundle("mixin.handler.accessor.field_not_found", accessorInfo.name)
     }
 
     private fun getAccessorInfo(accessor: PsiAnnotation, member: PsiMember): AccessorInfo? {

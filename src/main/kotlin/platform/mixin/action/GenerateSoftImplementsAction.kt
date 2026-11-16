@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.findSoftImplements
 import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findMatchingMethod
@@ -70,12 +71,12 @@ class GenerateSoftImplementsAction : MixinCodeInsightAction() {
         }
 
         if (methods.isEmpty()) {
-            HintManager.getInstance().showErrorHint(editor, "No methods to soft-implement have been found")
+            HintManager.getInstance().showErrorHint(editor, MCDevBundle("mixin.action.soft_implement.none"))
             return
         }
 
         val chooser = MemberChooser(methods.keys.toTypedArray(), false, true, project)
-        chooser.title = "Select Methods to Soft-Implement"
+        chooser.title = MCDevBundle("mixin.action.soft_implement.title")
         chooser.show()
 
         val elements = (chooser.selectedElements ?: return).ifEmpty { return }

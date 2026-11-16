@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.hasAccess
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
 import com.demonwav.mcdev.platform.mixin.util.isFabricMixin
@@ -73,32 +74,56 @@ class MixinClassTypeInspection : MixinInspection() {
 
             if (mixinClass.isEnum) {
                 if (!mixinClass.isFabricMixin) {
-                    holder.registerProblem(problemElement, "Enum Mixins are not supported on this platform", *fixes.toTypedArray())
+                    holder.registerProblem(
+                        problemElement,
+                        MCDevBundle("inspection.mixin_wrong_class_type.enum_unsupported"),
+                        *fixes.toTypedArray(),
+                    )
                     return
                 }
                 if (!canBeEnum) {
-                    holder.registerProblem(problemElement, "Enum Mixin targets a non-enum class", *fixes.toTypedArray())
+                    holder.registerProblem(
+                        problemElement,
+                        MCDevBundle("inspection.mixin_wrong_class_type.enum_targets_non_enum"),
+                        *fixes.toTypedArray(),
+                    )
                     return
                 }
             }
 
             if (mixinClass.isAnnotationType) {
-                holder.registerProblem(problemElement, "Mixins cannot be annotation types", *fixes.toTypedArray())
+                holder.registerProblem(
+                    problemElement,
+                    MCDevBundle("inspection.mixin_wrong_class_type.annotation"),
+                    *fixes.toTypedArray(),
+                )
                 return
             }
 
             if (mixinClass.isRecord) {
-                holder.registerProblem(problemElement, "Mixins cannot be records", *fixes.toTypedArray())
+                holder.registerProblem(
+                    problemElement,
+                    MCDevBundle("inspection.mixin_wrong_class_type.record"),
+                    *fixes.toTypedArray(),
+                )
                 return
             }
 
             if (mixinClass.isInterface) {
                 if (needsToBeClass) {
-                    holder.registerProblem(problemElement, "Interface Mixin targets a class", *fixes.toTypedArray())
+                    holder.registerProblem(
+                        problemElement,
+                        MCDevBundle("inspection.mixin_wrong_class_type.interface_targets_class"),
+                        *fixes.toTypedArray(),
+                    )
                 }
             } else {
                 if (needsToBeInterface) {
-                    holder.registerProblem(problemElement, "Class Mixin targets an interface", *fixes.toTypedArray())
+                    holder.registerProblem(
+                        problemElement,
+                        MCDevBundle("inspection.mixin_wrong_class_type.class_targets_interface"),
+                        *fixes.toTypedArray(),
+                    )
                 }
             }
         }
@@ -117,8 +142,8 @@ class MixinClassTypeInspection : MixinInspection() {
         classKeywordElement: PsiElement,
         private val newKeyword: String
     ) : LocalQuickFixOnPsiElement(classKeywordElement) {
-        override fun getFamilyName() = "Change class type to $newKeyword"
-        override fun getText() = "Change class type to $newKeyword"
+        override fun getFamilyName() = MCDevBundle("inspection.mixin_wrong_class_type.fix", newKeyword)
+        override fun getText() = MCDevBundle("inspection.mixin_wrong_class_type.fix", newKeyword)
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val factory = JavaPsiFacade.getElementFactory(project)

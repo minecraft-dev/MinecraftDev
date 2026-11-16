@@ -77,7 +77,7 @@ import java.awt.event.ItemEvent
 import javax.swing.JComponent
 import org.jetbrains.java.generate.exception.GenerateCodeException
 
-class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/Invoker") {
+class GenerateAccessorHandler : GenerateMembersHandlerBase(MCDevBundle("action.GenerateAccessorAction.text")) {
 
     companion object {
         private val log = logger<GenerateAccessorHandler>()
@@ -124,7 +124,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
                             members,
                         )
                     } catch (e: GenerateCodeException) {
-                        val message = e.message ?: "Unknown error"
+                        val message = e.message ?: MCDevBundle("mixin.action.accessor.unknown_error")
                         ApplicationManager.getApplication().invokeLater(
                             {
                                 if (!mixinEditor.isDisposed) {
@@ -246,9 +246,8 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
 
         if (config == null) {
             // TODO: generate the mixin configuration file (modding platform dependent)
-            val message = "There is no matching Mixin configuration file found in the project. " +
-                "Please create one and try again."
-            Messages.showInfoMessage(project, message, "Generate Accessor/Invoker")
+            val message = MCDevBundle("mixin.action.accessor.no_config")
+            Messages.showInfoMessage(project, message, MCDevBundle("action.GenerateAccessorAction.text"))
             return null
         }
 
@@ -258,7 +257,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
 
         val dialog = CreateClassDialog(
             project,
-            "Create Accessor Mixin",
+            MCDevBundle("mixin.action.accessor.create.title"),
             defaultName,
             defaultPkg,
             CreateClassKind.CLASS,
@@ -272,7 +271,7 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
         val name = dialog.className
 
         return WriteCommandAction.writeCommandAction(project)
-            .withName("Generate Accessor/Invoker")
+            .withName(MCDevBundle("action.GenerateAccessorAction.text"))
             .withGroupId("Generate Accessor/Invoker")
             .compute<PsiClass, RuntimeException> {
                 IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
@@ -332,8 +331,8 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private fun chooseAccessorMixin(project: Project, mixins: List<PsiClass>): PsiClass? {
-        val title = "Choose Accessor Mixin"
-        val description = "Select an Accessor Mixin to generate the accessor members in"
+        val title = MCDevBundle("mixin.action.accessor.choose.title")
+        val description = MCDevBundle("mixin.action.accessor.choose.description")
         val chooser = object : ChooseElementsDialog<PsiClass>(project, mixins, title, description) {
             init {
                 myChooser.setSingleSelectionMode()
@@ -484,8 +483,8 @@ class GenerateAccessorHandler : GenerateMembersHandlerBase("Generate Accessor/In
     }
 
     private class HeaderPanel : JComponent() {
-        val gettersCheckbox = JBCheckBox("Generate getter accessors")
-        val settersCheckbox = JBCheckBox("Generate setter accessors")
+        val gettersCheckbox = JBCheckBox(MCDevBundle("mixin.action.accessor.getters"))
+        val settersCheckbox = JBCheckBox(MCDevBundle("mixin.action.accessor.setters"))
 
         init {
             gettersCheckbox.isSelected = true

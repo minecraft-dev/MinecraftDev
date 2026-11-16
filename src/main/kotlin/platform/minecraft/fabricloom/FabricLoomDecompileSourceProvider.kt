@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.fabricloom
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.util.findModule
@@ -71,9 +72,9 @@ class FabricLoomDecompileSourceProvider : AttachSourcesProvider {
     private class DecompileAction(val decompiler: FabricLoomData.Decompiler) :
         AttachSourcesProvider.AttachSourcesAction {
 
-        override fun getName(): String = "Decompile with ${decompiler.name}"
+        override fun getName(): String = MCDevBundle("minecraft.decompile.with", decompiler.name)
         @Suppress("DialogTitleCapitalization") // Minecraft is a proper noun
-        override fun getBusyText(): String = "Decompiling Minecraft..."
+        override fun getBusyText(): String = MCDevBundle("minecraft.decompile.busy")
 
         override fun perform(orderEntriesContainingFile: List<LibraryOrderEntry>): ActionCallback {
             val project = orderEntriesContainingFile.firstOrNull()?.ownerModule?.project

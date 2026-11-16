@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -44,23 +45,25 @@ class ReplaceInFileFinalizer : CreatorFinalizer {
 
     override fun validate(reporter: TemplateValidationReporter, properties: Map<String, Any>) {
         if (properties["file"] !is String) {
-            reporter.error("Missing 'file' to replace text in")
+            reporter.error(MCDevBundle("creator.template.validation.replace_missing_file"))
         }
 
         val find = properties["find"]
         if (find !is String || find.isEmpty()) {
-            reporter.error("Missing 'find' text")
+            reporter.error(MCDevBundle("creator.template.validation.replace_missing_find"))
         } else if (properties["regex"] == true) {
-            runCatching { Regex(find) }.onFailure { reporter.error("Invalid 'find' regex: ${it.message}") }
+            runCatching { Regex(find) }.onFailure {
+                reporter.error(MCDevBundle("creator.template.validation.replace_invalid_regex", it.message))
+            }
         }
 
         if (properties["replace"] !is String) {
-            reporter.error("Missing 'replace' text")
+            reporter.error(MCDevBundle("creator.template.validation.replace_missing_replace"))
         }
 
         val regex = properties["regex"]
         if (regex != null && regex !is Boolean) {
-            reporter.error("'regex' must be a boolean")
+            reporter.error(MCDevBundle("creator.template.validation.replace_regex_boolean"))
         }
     }
 

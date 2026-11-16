@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
@@ -64,7 +65,7 @@ class UnresolvedLocalCaptureInspection : MixinInspection() {
                 if (matchingLocals.size != 1) {
                     holder.registerProblem(
                         localAnnotation.nameReferenceElement ?: localAnnotation,
-                        "@Local does not match any or matched multiple local variables in the target method"
+                        MCDevBundle("inspection.unresolved_local_capture.message")
                     )
                     return
                 }

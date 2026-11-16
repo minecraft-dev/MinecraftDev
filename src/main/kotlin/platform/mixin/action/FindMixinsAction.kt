@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.cached
@@ -67,7 +68,7 @@ class FindMixinsAction : AnAction() {
                     GlobalSearchScope.allScope(project),
                 )
                     .filter {
-                        indicator?.text = "Checking ${it.name}..."
+                        indicator?.text = MCDevBundle("mixin.action.find_mixins.checking", it.name)
 
                         it.mixinTargets.any { c ->
                             c.name == targetInternalName
@@ -86,7 +87,7 @@ class FindMixinsAction : AnAction() {
         ) {
             ApplicationManager.getApplication().assertIsDispatchThread()
 
-            runBackgroundableTask("Searching for Mixins", project, true) run@{ indicator ->
+            runBackgroundableTask(MCDevBundle("mixin.action.find_mixins.progress"), project, true) run@{ indicator ->
                 indicator.isIndeterminate = true
 
                 val classes = runReadActionBlocking {
@@ -113,7 +114,10 @@ class FindMixinsAction : AnAction() {
                             mixinClass.navigate(true)
                         }
                     } else {
-                        getPsiElementPopup(classes.toTypedArray<PsiElement>(), "Choose mixin").showPopup()
+                        getPsiElementPopup(
+                            classes.toTypedArray<PsiElement>(),
+                            MCDevBundle("mixin.action.find_mixins.choose"),
+                        ).showPopup()
                     }
                 }
             }

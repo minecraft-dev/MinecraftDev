@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.platform.minecraft.mappings.MappingsManager
@@ -112,6 +113,6 @@ class GotoAtEntryAction : AnAction() {
     }
 
     private fun showBalloon(e: AnActionEvent) {
-        showBalloon(e, "No access transformer entry found")
+        showBalloon(e, MCDevBundle("minecraft.actions.no_at_entry"))
     }
 }

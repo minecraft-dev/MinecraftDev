@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CtorHeadInjectionPoint
@@ -67,7 +68,7 @@ class CtorHeadPostInitInspection : MixinInspection() {
             ) {
                 holder.registerProblem(
                     atArgs,
-                    "CTOR_HEAD with enforce=POST_INIT doesn't target a field",
+                    MCDevBundle("inspection.ctor_head_post_init.message"),
                     AnnotationAttributeFix(annotation, "args" to null)
                 )
             }

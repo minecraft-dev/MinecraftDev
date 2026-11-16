@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.options.colors.AttributesDescriptor
@@ -52,24 +53,63 @@ class CtColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
     override fun getAttributeDescriptors() = Const.DESCRIPTORS
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
-    override fun getDisplayName() = "Class Tweakers"
+    override fun getDisplayName() = MCDevBundle("minecraft.ct.color_settings.display_name")
 
     private object Const {
         val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Header name", CtSyntaxHighlighter.HEADER_NAME),
-            AttributesDescriptor("Header namespace", CtSyntaxHighlighter.HEADER_NAMESPACE),
-            AttributesDescriptor("Access", CtSyntaxHighlighter.ACCESS),
-            AttributesDescriptor("Inject interface", CtSyntaxHighlighter.INJECT_INTERFACE),
-            AttributesDescriptor("Extend enum", CtSyntaxHighlighter.EXTEND_ENUM),
-            AttributesDescriptor("Class element", CtSyntaxHighlighter.CLASS_ELEMENT),
-            AttributesDescriptor("Method element", CtSyntaxHighlighter.METHOD_ELEMENT),
-            AttributesDescriptor("Field element", CtSyntaxHighlighter.FIELD_ELEMENT),
-            AttributesDescriptor("Class name", CtSyntaxHighlighter.CLASS_NAME),
-            AttributesDescriptor("Member name", CtSyntaxHighlighter.MEMBER_NAME),
-            AttributesDescriptor("Class value", CtSyntaxHighlighter.CLASS_VALUE),
-            AttributesDescriptor("Primitive", CtSyntaxHighlighter.PRIMITIVE),
-            AttributesDescriptor("Type variable", CtSyntaxHighlighter.TYPE_VARIABLE),
-            AttributesDescriptor("Comment", CtSyntaxHighlighter.COMMENT),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.header_name"),
+                CtSyntaxHighlighter.HEADER_NAME,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.header_namespace"),
+                CtSyntaxHighlighter.HEADER_NAMESPACE,
+            ),
+            AttributesDescriptor(MCDevBundle.pointer("minecraft.ct.color_settings.access"), CtSyntaxHighlighter.ACCESS),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.inject_interface"),
+                CtSyntaxHighlighter.INJECT_INTERFACE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.extend_enum"),
+                CtSyntaxHighlighter.EXTEND_ENUM,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.class_element"),
+                CtSyntaxHighlighter.CLASS_ELEMENT,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.method_element"),
+                CtSyntaxHighlighter.METHOD_ELEMENT,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.field_element"),
+                CtSyntaxHighlighter.FIELD_ELEMENT,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.class_name"),
+                CtSyntaxHighlighter.CLASS_NAME,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.member_name"),
+                CtSyntaxHighlighter.MEMBER_NAME,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.class_value"),
+                CtSyntaxHighlighter.CLASS_VALUE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.primitive"),
+                CtSyntaxHighlighter.PRIMITIVE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.type_variable"),
+                CtSyntaxHighlighter.TYPE_VARIABLE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.ct.color_settings.comment"),
+                CtSyntaxHighlighter.COMMENT,
+            ),
         )
     }
 }

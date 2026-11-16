@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.util.equivalentTo
@@ -47,7 +48,11 @@ class DuplicateInterfaceInspection : MixinAnnotationAttributeInspection(MixinCon
             val psiClass = iface.findDeclaredAttributeValue("iface")?.resolveClass() ?: continue
 
             if (classes.any { it equivalentTo psiClass }) {
-                holder.registerProblem(iface, "Interface is already implemented", RemoveAnnotationQuickFix(iface, null))
+                holder.registerProblem(
+                    iface,
+                    MCDevBundle("inspection.duplicate_interface.message"),
+                    RemoveAnnotationQuickFix(iface, null),
+                )
             } else {
                 classes.add(psiClass)
             }

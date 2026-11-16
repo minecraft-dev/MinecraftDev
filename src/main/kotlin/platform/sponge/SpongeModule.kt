@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
@@ -69,8 +70,7 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         "org.spongepowered.api.event.Event" == eventClass.qualifiedName
 
     override fun writeErrorMessageForEventParameter(eventClass: PsiClass, method: PsiMethod) =
-        "Parameter is not an instance of org.spongepowered.api.event.Event\n" +
-            "Compiling and running this listener may result in a runtime exception"
+        MCDevBundle("insight.event_listener.wrong_event.instance", "org.spongepowered.api.event.Event")
 
     override fun shouldShowPluginIcon(element: PsiElement?): Boolean {
         val identifier = element?.toUElementOfType<UIdentifier>()
@@ -128,8 +128,7 @@ class SpongeModule(facet: MinecraftFacet) : AbstractModule(facet) {
         }
 
         return IsCancelled(
-            errorString = "Cancellable.isCancelled() check is useless in a method not " +
-                "annotated with @IsCancelled(Tristate.UNDEFINED)",
+            errorString = MCDevBundle("inspection.is_cancelled.message.sponge"),
             fix = {
                 expression.replace(
                     JavaPsiFacade.getElementFactory(project)

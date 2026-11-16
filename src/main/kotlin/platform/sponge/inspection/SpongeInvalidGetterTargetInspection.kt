@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isValidSpongeListener
 import com.demonwav.mcdev.platform.sponge.util.resolveSpongeGetterTarget
@@ -47,7 +48,7 @@ class SpongeInvalidGetterTargetInspection : AbstractBaseUastLocalInspectionTool(
                 getter.findAttributeValue("value")?.sourcePsi?.let { problemAnchor ->
                     problems += manager.createProblemDescriptor(
                         problemAnchor,
-                        "@Getter must target a method accessible from the event class of this listener",
+                        MCDevBundle("inspection.sponge_invalid_getter_target.message"),
                         isOnTheFly,
                         null,
                         ProblemHighlightType.GENERIC_ERROR_OR_WARNING,

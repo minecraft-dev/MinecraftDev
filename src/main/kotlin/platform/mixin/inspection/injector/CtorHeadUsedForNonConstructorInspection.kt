@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -42,7 +43,7 @@ class CtorHeadUsedForNonConstructorInspection : MixinInspection() {
             if (!UnnecessaryUnsafeInspection.Util.mightTargetConstructor(annotation)) {
                 holder.registerProblem(
                     atValue,
-                    "CTOR_HEAD used without targeting a constructor",
+                    MCDevBundle("inspection.ctor_head_used_for_non_constructor.message"),
                     ReplaceWithHeadFix(annotation),
                 )
             }
@@ -51,7 +52,7 @@ class CtorHeadUsedForNonConstructorInspection : MixinInspection() {
 
     private class ReplaceWithHeadFix(at: PsiAnnotation) :
         AnnotationAttributeFix(at, "value" to "HEAD", "unsafe" to null) {
-        override fun getFamilyName() = "Replace with \"HEAD\""
-        override fun getText() = "Replace with \"HEAD\""
+        override fun getFamilyName() = MCDevBundle("inspection.ctor_head_used_for_non_constructor.fix")
+        override fun getText() = MCDevBundle("inspection.ctor_head_used_for_non_constructor.fix")
     }
 }

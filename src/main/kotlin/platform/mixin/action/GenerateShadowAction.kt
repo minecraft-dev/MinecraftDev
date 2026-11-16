@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.action
 
 import com.demonwav.mcdev.MinecraftProjectSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findFields
 import com.demonwav.mcdev.platform.mixin.util.findMethods
@@ -84,12 +85,12 @@ class GenerateShadowAction : MixinCodeInsightAction() {
 
         val members = (fields + methods).toTypedArray()
         if (members.isEmpty()) {
-            HintManager.getInstance().showErrorHint(editor, "No members to shadow have been found")
+            HintManager.getInstance().showErrorHint(editor, MCDevBundle("mixin.action.shadow.none"))
             return
         }
 
         val chooser = MemberChooser<PsiElementClassMember<*>>(members, false, true, project)
-        chooser.title = "Select Members to Shadow"
+        chooser.title = MCDevBundle("mixin.action.shadow.title")
         chooser.setCopyJavadocVisible(false)
         chooser.show()
 

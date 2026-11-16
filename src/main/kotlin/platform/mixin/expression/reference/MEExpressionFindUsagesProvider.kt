@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.expression.gen.psi.MEDeclaration
 import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
@@ -30,7 +31,7 @@ class MEExpressionFindUsagesProvider : FindUsagesProvider {
 
     override fun getHelpId(psiElement: PsiElement) = null
 
-    override fun getType(element: PsiElement) = "Definition"
+    override fun getType(element: PsiElement) = MCDevBundle("mixin.expression.find_usages.definition")
 
     override fun getDescriptiveName(element: PsiElement) = (element as? PsiNamedElement)?.name ?: "null"
 

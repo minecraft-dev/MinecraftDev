@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
@@ -50,17 +51,17 @@ class FetchPaperDependencyVersionForMcVersion : PreparedDerivation {
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (parents.isNullOrEmpty()) {
-                reporter.error("Expected a parent")
+                reporter.error(MCDevBundle("creator.template.validation.expected_parent"))
                 return null
             }
 
             if (!parents[0]!!.acceptsType(SemanticVersion::class.java)) {
-                reporter.error("First parent must produce a semantic version")
+                reporter.error(MCDevBundle("creator.template.validation.first_parent_semantic_version"))
                 return null
             }
 
             if (!parents[1]!!.acceptsType(String::class.java)) {
-                reporter.error("Second parent must produce a string")
+                reporter.error(MCDevBundle("creator.template.validation.second_parent_string"))
                 return null
             }
 

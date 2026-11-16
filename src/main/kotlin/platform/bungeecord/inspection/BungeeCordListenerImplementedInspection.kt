@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.bungeecord.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.bungeecord.util.BungeeCordConstants
 import com.demonwav.mcdev.util.addImplements
 import com.demonwav.mcdev.util.extendsOrImplements
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.Nls
 class BungeeCordListenerImplementedInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any) =
-        "This class contains @EventHandler methods but does not implement Listener"
+        MCDevBundle("inspection.bungee_cord_listener_implemented.message")
 
     override fun buildFix(vararg infos: Any): LocalQuickFix {
         val classPointer = (infos[0] as PsiClass).createSmartPointer()
@@ -45,7 +46,7 @@ class BungeeCordListenerImplementedInspection : BaseInspection() {
             }
 
             @Nls
-            override fun getName() = "Implement Listener"
+            override fun getName() = MCDevBundle("inspection.listener_implemented.fix")
 
             @Nls
             override fun getFamilyName() = name

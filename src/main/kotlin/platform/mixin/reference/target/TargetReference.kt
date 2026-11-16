@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
@@ -58,8 +59,7 @@ object TargetReference : PolyReferenceResolver(), MixinReference {
     val ELEMENT_PATTERN: ElementPattern<PsiLiteral> = PsiJavaPatterns.psiLiteral(StandardPatterns.string())
         .insideAnnotationAttribute(AT, "target")
 
-    override val description: String
-        get() = "target reference '%s'"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.target", name)
 
     override fun isValidAnnotation(name: String, project: Project) = name == AT
 

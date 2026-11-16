@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.fabric.reference.EntryPointReference
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.util.equivalentTo
@@ -71,7 +72,7 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                 if (resolved.size > 1) {
                     holder.registerProblem(
                         literal,
-                        "Ambiguous member reference",
+                        MCDevBundle("inspection.fabric_mod_json_entrypoints_validation.ambiguous_reference"),
                         ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                         reference.rangeInElement,
                     )
@@ -89,7 +90,11 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         ) {
                             holder.registerProblem(
                                 literal,
-                                "'$propertyKey' entrypoints must implement $expectedType",
+                                MCDevBundle(
+                                    "inspection.fabric_mod_json_entrypoints_validation.must_implement",
+                                    propertyKey,
+                                    expectedType,
+                                ),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )
@@ -98,7 +103,9 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         ) {
                             holder.registerProblem(
                                 literal,
-                                "Entrypoint class must have an empty constructor",
+                                MCDevBundle(
+                                    "inspection.fabric_mod_json_entrypoints_validation.class_empty_constructor",
+                                ),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )
@@ -109,7 +116,7 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         if (element.hasParameters()) {
                             holder.registerProblem(
                                 literal,
-                                "Entrypoint method must have no parameters",
+                                MCDevBundle("inspection.fabric_mod_json_entrypoints_validation.method_no_parameters"),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )
@@ -118,7 +125,7 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         if (!element.hasModifierProperty(PsiModifier.PUBLIC)) {
                             holder.registerProblem(
                                 literal,
-                                "Entrypoint method must be public",
+                                MCDevBundle("inspection.fabric_mod_json_entrypoints_validation.method_public"),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )
@@ -131,7 +138,7 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                             ) {
                                 holder.registerProblem(
                                     literal,
-                                    "Entrypoint instance method class must have an empty constructor",
+                                    MCDevBundle("inspection.fabric_mod_json_entrypoints_validation.instance_ctor"),
                                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                     reference.rangeInElement,
                                 )
@@ -143,7 +150,7 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         if (!element.hasModifierProperty(PsiModifier.PUBLIC)) {
                             holder.registerProblem(
                                 literal,
-                                "Entrypoint field must be public",
+                                MCDevBundle("inspection.fabric_mod_json_entrypoints_validation.field_public"),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )
@@ -156,7 +163,11 @@ class FabricEntrypointsInspection : LocalInspectionTool() {
                         ) {
                             holder.registerProblem(
                                 literal,
-                                "'$propertyKey' entrypoints must be of type $expectedType",
+                                MCDevBundle(
+                                    "inspection.fabric_mod_json_entrypoints_validation.must_be_type",
+                                    propertyKey,
+                                    expectedType,
+                                ),
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                                 reference.rangeInElement,
                             )

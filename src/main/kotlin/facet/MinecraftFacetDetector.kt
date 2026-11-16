@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.facet
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.PlatformType
 import com.demonwav.mcdev.platform.architectury.framework.ARCHITECTURY_LIBRARY_KIND
 import com.demonwav.mcdev.platform.architectury.framework.ArchitecturyGradleData
@@ -93,7 +94,7 @@ class MinecraftFacetDetector : ProjectActivity {
         }
 
         suspend fun doCheckUnderProgress(project: Project, detectorService: FacetDetectorScopeProvider) {
-            withBackgroundProgress(project, "Detecting Minecraft Frameworks", cancellable = false) {
+            withBackgroundProgress(project, MCDevBundle("facet.detecting"), cancellable = false) {
                 detectorService.lock.withLock {
                     detectorService.currentJob?.cancelAndJoin()
                     detectorService.currentJob = coroutineContext.job

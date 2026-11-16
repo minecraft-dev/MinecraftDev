@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -51,8 +52,8 @@ class LocalMayUseNameInspection : MixinInspection() {
     var ignoreWhenArgsOnly = false
 
     override fun getOptionsPane() = OptPane.pane(
-        OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals"),
-        OptPane.checkbox("ignoreWhenArgsOnly", "Ignore when argsOnly is true")
+        OptPane.checkbox("ignoreForImplicitLocals", MCDevBundle("inspection.may_use_name.option.ignore_implicit")),
+        OptPane.checkbox("ignoreWhenArgsOnly", MCDevBundle("inspection.local_may_use_name.option.ignore_args_only"))
     )
 
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
@@ -91,14 +92,14 @@ class LocalMayUseNameInspection : MixinInspection() {
 
             holder.registerProblem(
                 problemElement,
-                "@Local can use variable name",
+                MCDevBundle("inspection.local_may_use_name.message"),
                 *fixes.toTypedArray(),
             )
         }
     }
 
     private inner class IgnoreForImplicitLocalsFix : ModCommandQuickFix(), LowPriorityAction {
-        override fun getFamilyName() = "Ignore for implicit locals"
+        override fun getFamilyName() = MCDevBundle("inspection.may_use_name.option.ignore_implicit")
 
         override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
             return ModCommand.updateInspectionOption(descriptor.psiElement, this@LocalMayUseNameInspection) {

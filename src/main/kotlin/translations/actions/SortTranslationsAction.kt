@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationIndex
 import com.demonwav.mcdev.translations.sorting.TranslationSorter
@@ -45,7 +46,7 @@ class SortTranslationsAction : AnAction() {
         } catch (e: Exception) {
             Notification(
                 "Translations sorting error",
-                "Error sorting translations",
+                MCDevBundle("translations.sort.error.title"),
                 e.message ?: e.stackTraceToString(),
                 NotificationType.WARNING,
             ).notify(file.project)

@@ -86,41 +86,49 @@ class RunNpmPackageFinalizer : CreatorFinalizer {
         val repository = properties["repository"]
         when {
             packageName != null && repository != null ->
-                reporter.error("Only one of 'package' or 'repository' is allowed")
-            packageName == null && repository == null -> reporter.error("Missing 'package' or 'repository' string")
-            packageName != null && packageName !is String -> reporter.error("'package' must be a string")
-            repository != null && repository !is String -> reporter.error("'repository' must be a string")
+                reporter.error(MCDevBundle("creator.template.validation.npm.package_or_repository"))
+            packageName == null && repository == null ->
+                reporter.error(MCDevBundle("creator.template.validation.npm.missing_package_or_repository"))
+            packageName != null && packageName !is String ->
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "package"))
+            repository != null && repository !is String ->
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "repository"))
             // It would be passed to git as an option otherwise
-            repository is String && repository.startsWith("-") -> reporter.error("'repository' must be a git URL")
+            repository is String && repository.startsWith("-") ->
+                reporter.error(MCDevBundle("creator.template.validation.npm.repository_git_url"))
         }
 
         for (key in listOf("version", "workingDirectory", "input")) {
             val value = properties[key]
             if (value != null && value !is String) {
-                reporter.error("'$key' must be a string")
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", key))
             }
         }
 
         if (packageName == null && properties["version"] != null) {
-            reporter.error("'version' can only be used with 'package'")
+            reporter.error(MCDevBundle("creator.template.validation.npm.version_requires_package"))
         }
         if (repository == null && properties["build"] != null) {
-            reporter.error("'build' can only be used with 'repository'")
+            reporter.error(MCDevBundle("creator.template.validation.npm.build_requires_repository"))
         }
 
         val command = properties["command"]
         val script = properties["script"]
         when {
-            command != null && script != null -> reporter.error("Only one of 'command' or 'script' is allowed")
-            command == null && script == null -> reporter.error("Missing 'command' or 'script' string")
-            command != null && command !is String -> reporter.error("'command' must be a string")
-            script != null && script !is String -> reporter.error("'script' must be a string")
+            command != null && script != null ->
+                reporter.error(MCDevBundle("creator.template.validation.npm.command_or_script"))
+            command == null && script == null ->
+                reporter.error(MCDevBundle("creator.template.validation.npm.missing_command_or_script"))
+            command != null && command !is String ->
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "command"))
+            script != null && script !is String ->
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string", "script"))
         }
 
         for (key in listOf("args", "build")) {
             val value = properties[key]
             if (value != null && (value !is List<*> || value.any { it !is String })) {
-                reporter.error("'$key' must be a list of strings")
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string_list", key))
             }
         }
     }

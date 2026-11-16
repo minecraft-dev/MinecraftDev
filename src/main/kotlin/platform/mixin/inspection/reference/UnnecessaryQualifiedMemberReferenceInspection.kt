@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
@@ -56,7 +57,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
         if (selector is MemberInfo && selector.qualified) {
             holder.registerProblem(
                 value,
-                "Unnecessary qualified reference to '${selector.name}' in target class",
+                MCDevBundle("inspection.unnecessary_qualified_member_reference.message", selector.name),
                 QuickFix(selector.withoutOwner.toMixinString()),
             )
         }
@@ -64,7 +65,7 @@ class UnnecessaryQualifiedMemberReferenceInspection : MixinAnnotationAttributeIn
 
     private class QuickFix(private val replacement: String) : LocalQuickFix {
 
-        override fun getFamilyName() = "Remove qualifier"
+        override fun getFamilyName() = MCDevBundle("inspection.unnecessary_qualified_member_reference.fix")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement

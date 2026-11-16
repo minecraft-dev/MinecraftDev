@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
@@ -45,7 +46,7 @@ class CaptureFailExceptionInspection : MixinInspection() {
 
             holder.registerProblem(
                 expression,
-                "Suspicious usage of CAPTURE_FAILEXCEPTION",
+                MCDevBundle("inspection.local_capture_fail_exception.message"),
                 ReplaceWithCaptureFailHardFix(expression)
             )
         }
@@ -54,9 +55,9 @@ class CaptureFailExceptionInspection : MixinInspection() {
     private class ReplaceWithCaptureFailHardFix(
         expression: PsiReferenceExpression
     ) : LocalQuickFixOnPsiElement(expression) {
-        override fun getFamilyName() = "Replace with CAPTURE_FAILHARD"
+        override fun getFamilyName() = MCDevBundle("inspection.local_capture_fail_exception.fix")
 
-        override fun getText() = "Replace with CAPTURE_FAILHARD"
+        override fun getText() = MCDevBundle("inspection.local_capture_fail_exception.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val captureFailHardText = "${MixinConstants.Classes.LOCAL_CAPTURE}.CAPTURE_FAILHARD"

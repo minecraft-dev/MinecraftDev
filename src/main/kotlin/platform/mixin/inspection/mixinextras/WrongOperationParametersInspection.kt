@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isAssignable
@@ -94,7 +95,7 @@ class WrongOperationParametersInspection : MixinInspection() {
 
             holder.registerProblem(
                 expression.argumentList,
-                "Operation.call called with the wrong parameter types",
+                MCDevBundle("inspection.mixin_extras_operation_parameters.message"),
                 ReplaceWithMethodParametersFix(expression.argumentList, paramNames)
             )
         }
@@ -104,8 +105,8 @@ class WrongOperationParametersInspection : MixinInspection() {
         element: PsiExpressionList,
         @SafeFieldForPreview private val parameterNames: List<String>
     ) : LocalQuickFixOnPsiElement(element) {
-        override fun getFamilyName() = "Replace with method parameters"
-        override fun getText() = "Replace with method parameters"
+        override fun getFamilyName() = MCDevBundle("inspection.mixin_extras_operation_parameters.fix")
+        override fun getText() = MCDevBundle("inspection.mixin_extras_operation_parameters.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val argumentList = startElement as? PsiExpressionList ?: return

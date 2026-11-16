@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.shortName
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.Service
@@ -66,7 +67,9 @@ class MEFlowWindowService(private val project: Project, private val scope: Corou
         }
 
         val content = chooseContent(toolWindow, clazz, method) ?: return Messages.showErrorDialog(
-            project, "Failed to create flow diagram", "Error"
+            project, MCDevBundle(
+                "mixin.flow_diagram.create_failed",
+            ), MCDevBundle("mixin.flow_diagram.create_failed.title")
         )
         toolWindow.contentManager.setSelectedContent(content)
         toolWindow.activate {
@@ -85,7 +88,7 @@ class MEFlowWindowService(private val project: Project, private val scope: Corou
     }
 
     private suspend fun createContent(clazz: ClassNode, method: MethodNode): Content? =
-        withBackgroundProgress(project, "Creating Flow Diagram") compute@{
+        withBackgroundProgress(project, MCDevBundle("mixin.flow_diagram.creating")) compute@{
             val diagram = withContext(Dispatchers.Default) {
                 FlowDiagram.create(project, scope, clazz, method)
             } ?: return@compute null

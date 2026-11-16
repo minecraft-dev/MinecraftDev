@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.ShareUtil
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -30,6 +31,7 @@ import com.demonwav.mcdev.util.findContainingClass
 import com.demonwav.mcdev.util.findContainingMethod
 import com.demonwav.mcdev.util.fullQualifiedName
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.ide.nls.NlsMessages
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiParameter
@@ -60,19 +62,28 @@ class ConflictingShareTypeInspection : MixinInspection() {
                     val containingMethod = otherShare.findContainingMethod()
                     val containingClass = otherShare.findContainingClass()
                     if (containingClass != null && containingClass != mixinClass) {
-                        differentTypeLocations += "class '${containingClass.fullQualifiedName}'"
+                        differentTypeLocations += MCDevBundle(
+                            "inspection.conflicting_share_type.location.class",
+                            containingClass.fullQualifiedName,
+                        )
                     } else if (containingMethod != null) {
-                        differentTypeLocations += "method '${containingMethod.name}'"
+                        differentTypeLocations += MCDevBundle(
+                            "inspection.conflicting_share_type.location.method",
+                            containingMethod.name,
+                        )
                     }
                 }
             }
 
             if (differentTypes.isNotEmpty()) {
-                val differentTypesStr = differentTypes.joinToString(limit = 3) { it.presentableText }
-                val differentLocationsStr = differentTypeLocations.joinToString(limit = 3)
                 holder.registerProblem(
                     (annotation.parent?.parent as? PsiParameter)?.typeElement ?: annotation,
-                    "@Share type ${expectedType.presentableText} is not compatible with other @Share types $differentTypesStr, found in $differentLocationsStr"
+                    MCDevBundle(
+                        "inspection.conflicting_share_type.message",
+                        expectedType.presentableText,
+                        formatLimitedList(differentTypes.map { it.presentableText }),
+                        formatLimitedList(differentTypeLocations),
+                    ),
                 )
             }
         }
@@ -85,5 +96,20 @@ class ConflictingShareTypeInspection : MixinInspection() {
             return null
         }
         return paramType.unwrapLocalRef()
+    }
+
+    private fun formatLimitedList(items: Collection<String>): String {
+        if (items.size <= LIST_LIMIT) {
+            return NlsMessages.formatAndList(items)
+        }
+        val shown = items.take(LIST_LIMIT) + MCDevBundle(
+            "inspection.conflicting_share_type.more",
+            items.size - LIST_LIMIT,
+        )
+        return NlsMessages.formatAndList(shown)
+    }
+
+    companion object {
+        private const val LIST_LIMIT = 3
     }
 }

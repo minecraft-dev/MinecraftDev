@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.action
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.findMethods
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -60,12 +61,12 @@ class GenerateOverwriteAction : MixinCodeInsightAction() {
             }?.toTypedArray() ?: return
 
         if (methods.isEmpty()) {
-            HintManager.getInstance().showErrorHint(editor, "No methods to overwrite have been found")
+            HintManager.getInstance().showErrorHint(editor, MCDevBundle("mixin.action.overwrite.none"))
             return
         }
 
         val chooser = MemberChooser(methods, false, true, project)
-        chooser.title = "Select Methods to Overwrite"
+        chooser.title = MCDevBundle("mixin.action.overwrite.title")
         chooser.setCopyJavadocVisible(false)
         chooser.show()
 

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.util.showBalloon
@@ -52,9 +53,9 @@ class NoTranslationInspection : TranslationInspection() {
             if (result != null && result.required && result.text == null) {
                 holder.registerProblem(
                     node.sourcePsi!!,
-                    "The given translation key does not exist",
+                    MCDevBundle("inspection.no_translation.message"),
                     CreateTranslationQuickFix,
-                    ChangeTranslationQuickFix("Use existing translation"),
+                    ChangeTranslationQuickFix(MCDevBundle("translations.fix.use_existing")),
                 )
             }
 
@@ -63,7 +64,7 @@ class NoTranslationInspection : TranslationInspection() {
     }
 
     private object CreateTranslationQuickFix : LocalQuickFix {
-        override fun getName() = "Create translation"
+        override fun getName() = MCDevBundle("inspection.no_translation.fix.create")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             try {
@@ -74,8 +75,8 @@ class NoTranslationInspection : TranslationInspection() {
                 val key = translation?.key?.copy(infix = literalValue)?.full ?: literalValue
                 val result = Messages.showInputDialog(
                     project,
-                    "Enter default value for \"$key\":",
-                    "Create Translation",
+                    MCDevBundle("inspection.no_translation.fix.create.prompt", key),
+                    MCDevBundle("inspection.no_translation.fix.create.title"),
                     Messages.getQuestionIcon(),
                 )
                 if (result != null) {
@@ -87,7 +88,7 @@ class NoTranslationInspection : TranslationInspection() {
             } catch (e: Exception) {
                 Notification(
                     "Translation support error",
-                    "Error while adding translation",
+                    MCDevBundle("translations.add.error.title"),
                     e.message ?: e.stackTraceToString(),
                     NotificationType.WARNING,
                 ).notify(project)

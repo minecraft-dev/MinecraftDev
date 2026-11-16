@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator.custom.providers
 
 import com.demonwav.mcdev.MinecraftSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateResourceBundle
 import com.demonwav.mcdev.util.fromJson
@@ -183,7 +184,11 @@ interface TemplateProvider {
             var descriptor = Gson().fromJson<TemplateDescriptor>(descriptorFile.readText())
             if (!TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.contains(descriptor.version)) {
                 thisLogger().warn("Cannot handle template ${descriptorFile.path} of version ${descriptor.version}")
-                return InvalidVersionTemplate(templateRoot, "Invalid Version", descriptor)
+                return InvalidVersionTemplate(
+                    templateRoot,
+                    MCDevBundle("creator.ui.invalid_version_template.label"),
+                    descriptor,
+                )
             }
 
             if (descriptor.hidden == true) {

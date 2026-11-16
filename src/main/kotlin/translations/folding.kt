@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.translations.identification.TranslationInstance
 import com.intellij.application.options.editor.CodeFoldingOptionsProvider
@@ -43,9 +44,9 @@ import org.jetbrains.uast.visitor.AbstractUastVisitor
 class TranslationCodeFoldingOptionsProvider :
     BeanConfigurable<TranslationFoldingSettings>(TranslationFoldingSettings.instance), CodeFoldingOptionsProvider {
     init {
-        title = "Minecraft"
+        title = MCDevBundle("translations.folding.title")
         checkBox(
-            "Translation strings",
+            MCDevBundle("translations.folding.translation_strings"),
             TranslationFoldingSettings.instance::shouldFoldTranslations,
         ) {
             TranslationFoldingSettings.instance.shouldFoldTranslations = it
@@ -125,7 +126,7 @@ class TranslationFoldingBuilder : FoldingBuilderEx() {
                     range,
                     FoldingGroup.newGroup("mc.translation." + translation.key),
                     if (translation.formattingError == TranslationInstance.FormattingError.MISSING) {
-                        "\"Insufficient parameters for formatting '${translation.text}'\""
+                        "\"${MCDevBundle("translations.folding.insufficient_parameters", translation.text)}\""
                     } else {
                         "\"${translation.text}\""
                     },

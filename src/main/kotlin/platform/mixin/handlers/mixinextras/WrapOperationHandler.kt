@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.OperationWrapperSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
@@ -44,7 +45,8 @@ class WrapOperationHandler : MixinExtrasInjectorAnnotationHandler() {
         InstructionType.INSTANTIATION, InstructionType.SIMPLE_OPERATION
     )
 
-    override val allowedInsnDescription = "wrap operation targets (see docs)"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.wrap_operation")
 
     override fun getAtKey(annotation: PsiAnnotation): String {
         return if (annotation.hasAttribute("constant")) "constant" else "at"

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INTERFACE
 import com.demonwav.mcdev.util.constantStringValue
@@ -36,7 +37,7 @@ class InterfacePrefixInspection : MixinAnnotationAttributeInspection(INTERFACE, 
     ) {
         val prefix = value.constantStringValue ?: return
         if (!prefix.endsWith('$')) {
-            holder.registerProblem(value, "@Interface prefix must end with a dollar sign ($)")
+            holder.registerProblem(value, MCDevBundle("inspection.invalid_interface_prefix.message"))
         }
     }
 }

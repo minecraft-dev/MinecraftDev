@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.util.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.manipulator
 import com.demonwav.mcdev.util.packageName
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -40,8 +41,7 @@ import com.intellij.util.ProcessingContext
 
 abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
 
-    protected open val description
-        get() = "package '%s'"
+    protected open fun unresolvedMessage(name: String) = MCDevBundle("reference.unresolved.package", name)
 
     protected open fun getBasePackage(element: PsiElement): String? = null
 
@@ -139,8 +139,7 @@ abstract class PackageNameReferenceProvider : PsiReferenceProvider() {
     private inner class Reference(element: PsiElement, range: TextRange, start: Int, val previous: Reference?) :
         PsiReferenceBase.Poly<PsiElement>(element, range, false), InspectionReference {
 
-        override val description: String
-            get() = this@PackageNameReferenceProvider.description
+        override fun unresolvedMessage(name: String) = this@PackageNameReferenceProvider.unresolvedMessage(name)
 
         private val qualifiedRange = TextRange(start, range.endOffset)
 

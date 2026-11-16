@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isSpongePluginClass
@@ -73,9 +74,15 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                 ctorInjectAnnos.forEach { (injectedMethod, injectAnno) ->
                     holder.registerProblem(
                         injectAnno,
-                        "There can only be one injected constructor.",
-                        quickFixFactory.createDeleteFix(injectAnno, "Remove this @Inject"),
-                        quickFixFactory.createDeleteFix(injectedMethod, "Remove this injected constructor"),
+                        MCDevBundle("inspection.sponge_plugin_class.multiple_injected_constructors"),
+                        quickFixFactory.createDeleteFix(
+                            injectAnno,
+                            MCDevBundle("inspection.sponge_plugin_class.fix.remove_inject"),
+                        ),
+                        quickFixFactory.createDeleteFix(
+                            injectedMethod,
+                            MCDevBundle("inspection.sponge_plugin_class.fix.remove_injected_constructor"),
+                        ),
                     )
                 }
             }
@@ -87,7 +94,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                 if (classIdentifier != null) {
                     holder.registerProblem(
                         classIdentifier,
-                        "Plugin class must have an empty constructor or an @Inject constructor.",
+                        MCDevBundle("inspection.sponge_plugin_class.missing_constructor"),
                         ProblemHighlightType.GENERIC_ERROR,
                         *LocalQuickFix.notNullElements(LocalQuickFix.from(AddDefaultConstructorFix(aClass))),
                     )
@@ -99,7 +106,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
                 if (ctorIdentifier != null) {
                     holder.registerProblem(
                         ctorIdentifier,
-                        "Plugin class empty constructor must not be private.",
+                        MCDevBundle("inspection.sponge_plugin_class.private_constructor"),
                         ProblemHighlightType.GENERIC_ERROR,
                         *LocalQuickFix.notNullElements(
                             LocalQuickFix.from(ModifierFix(emptyCtor, PsiModifier.PACKAGE_LOCAL, true, false)),
@@ -118,8 +125,7 @@ class SpongePluginClassInspection : AbstractBaseJavaLocalInspectionTool() {
             if (!SpongeConstants.ID_PATTERN.matcher(pluginId).matches()) {
                 holder.registerProblem(
                     pluginIdValue,
-                    "Plugin IDs should be lowercase, and only contain characters from a-z, dashes or underscores," +
-                        " start with a lowercase letter, and not exceed 64 characters.",
+                    MCDevBundle("inspection.sponge_plugin_class.invalid_id"),
                 )
             }
         }

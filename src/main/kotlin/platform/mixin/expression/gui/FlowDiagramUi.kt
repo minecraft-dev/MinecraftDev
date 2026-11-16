@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.util.text.StringUtil
@@ -184,13 +185,13 @@ class FlowDiagramUi(
 
     inner class ViewToolbar : JToolBar() {
         private val zoomInButton = JButton("+").apply {
-            toolTipText = "Zoom In"
+            toolTipText = MCDevBundle("mixin.flow_diagram.zoom_in")
             addActionListener {
                 comp.zoomIn()
             }
         }
         private val zoomOutButton = JButton("−").apply {
-            toolTipText = "Zoom Out"
+            toolTipText = MCDevBundle("mixin.flow_diagram.zoom_out")
             addActionListener {
                 comp.zoomOut()
             }
@@ -202,7 +203,7 @@ class FlowDiagramUi(
             add(zoomInButton)
             add(zoomOutButton)
             addSeparator(Dimension(20, 0))
-            add(JLabel("Search: "))
+            add(JLabel(MCDevBundle("mixin.flow_diagram.search")))
             add(searchField)
         }
 
@@ -216,7 +217,7 @@ class FlowDiagramUi(
     }
 
     inner class MatchToolbar : JToolBar() {
-        private val helpLabel = JLabel("Showing matches for:").apply {
+        private val helpLabel = JLabel(MCDevBundle("mixin.flow_diagram.showing_matches")).apply {
             border = BorderFactory.createEmptyBorder(0, 6, 0, 0)
         }
 
@@ -225,8 +226,11 @@ class FlowDiagramUi(
             border = BorderFactory.createEmptyBorder(0, 15, 0, 5)
         }
 
-        private val refreshButton = makeButton(AllIcons.Actions.Refresh, "Re-match Expression")
-        private val clearButton = makeButton(AllIcons.Actions.CloseDarkGrey, "Clear Match Data")
+        private val refreshButton = makeButton(AllIcons.Actions.Refresh, MCDevBundle("mixin.flow_diagram.rematch"))
+        private val clearButton = makeButton(
+            AllIcons.Actions.CloseDarkGrey,
+            MCDevBundle("mixin.flow_diagram.clear_match"),
+        )
 
         private val buttonPanel = JPanel().apply {
             layout = FlowLayout(FlowLayout.RIGHT, 3, 3)

@@ -57,7 +57,7 @@ class DisallowedTargetInsnInspection : MixinInspection() {
             if (hasInvalidInstructions) {
                 holder.registerProblem(
                     annotation,
-                    "This injector can only target ${injector.allowedInsnDescription}"
+                    injector.disallowedTargetMessage()
                 )
             }
         }

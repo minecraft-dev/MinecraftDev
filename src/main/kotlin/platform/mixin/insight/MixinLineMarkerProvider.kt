@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.insight
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.util.findSourceClass
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
@@ -38,7 +39,7 @@ import java.awt.event.MouseEvent
 
 class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
 
-    override fun getName() = "Mixin line marker"
+    override fun getName() = MCDevBundle("mixin.line_marker.name")
     override fun getIcon() = MixinAssets.MIXIN_CLASS_ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
@@ -61,10 +62,10 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
             identifier,
             identifier.textRange,
             icon,
-            { "Go to target class" },
+            { MCDevBundle("mixin.line_marker.tooltip") },
             this,
             GutterIconRenderer.Alignment.LEFT,
-            { "mixin class indicator" },
+            MCDevBundle.pointer("mixin.line_marker.accessible_name"),
         )
     }
 
@@ -80,7 +81,7 @@ class MixinLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNaviga
                 singleTarget.navigate(true)
             }
         } else if (targets.isNotEmpty()) {
-            getPsiElementPopup(targets.toTypedArray<PsiElement>(), "Choose target class of $name")
+            getPsiElementPopup(targets.toTypedArray<PsiElement>(), MCDevBundle("mixin.line_marker.choose_target", name))
                 .show(RelativePoint(e))
         }
     }

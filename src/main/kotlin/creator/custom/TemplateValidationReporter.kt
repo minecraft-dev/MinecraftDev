@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -57,7 +57,7 @@ class TemplateValidationReporterImpl : TemplateValidationReporter {
     }
 
     override fun fatal(message: String, cause: Throwable?): Nothing {
-        error("Fatal validation error: $message")
+        error(MCDevBundle("creator.template.validation.fatal", message))
         throw TemplateValidationException(message, cause)
     }
 
@@ -84,7 +84,7 @@ class TemplateValidationReporterImpl : TemplateValidationReporter {
 
         for ((subjectName, items) in validationItems) {
             panel.row {
-                label("$subjectName:")
+                label(MCDevBundle("creator.template.validation.subject", subjectName))
             }
 
             panel.indent {

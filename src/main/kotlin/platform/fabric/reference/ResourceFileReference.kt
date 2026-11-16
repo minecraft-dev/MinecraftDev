@@ -45,14 +45,14 @@ import com.intellij.util.ProcessingContext
 import org.jetbrains.jps.model.java.JavaResourceRootType
 
 class ResourceFileReference(
-    private val description: String,
+    private val unresolvedMessage: (String) -> String,
     private val filenamePattern: Regex? = null
 ) : PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-        return arrayOf(Reference(description, element as JsonStringLiteral))
+        return arrayOf(Reference(element as JsonStringLiteral))
     }
 
-    private inner class Reference(desc: String, element: JsonStringLiteral) :
+    private inner class Reference(element: JsonStringLiteral) :
         PsiReferenceBase<JsonStringLiteral>(element),
         InspectionReference {
 
@@ -63,7 +63,7 @@ class ResourceFileReference(
             inTestSourceContent
         }
 
-        override val description = desc
+        override fun unresolvedMessage(name: String) = this@ResourceFileReference.unresolvedMessage(name)
         override val unresolved = resolve() == null
 
         override fun resolve(): PsiElement? {

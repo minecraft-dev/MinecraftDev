@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -117,7 +117,7 @@ class ErrorReporter : ErrorReportSubmitter() {
 
         sentryEvent.setExtra("last_action", IdeaLogger.ourLastActionId)
 
-        val task = object : Task.Backgroundable(project, "Submitting error report", true) {
+        val task = object : Task.Backgroundable(project, MCDevBundle("error_reporter.submit.progress"), true) {
             override fun run(indicator: ProgressIndicator) {
                 val opts = SentryOptions().apply { dsn = "https://e4e537f6f896904a3ec0586bce8c9a57@sentry.mcdev.io/1" }
                 // Marked internal, but I have no idea what the intended way to do this, everything I can find online
@@ -145,7 +145,11 @@ class ErrorReporter : ErrorReportSubmitter() {
                     NotificationType.INFORMATION,
                 ).setImportant(false).notify(project)
 
-                val reportInfo = SubmittedReportInfo(null, "Event $id", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE)
+                val reportInfo = SubmittedReportInfo(
+                    null,
+                    MCDevBundle("error_reporter.report.link", id.toString()),
+                    SubmittedReportInfo.SubmissionStatus.NEW_ISSUE,
+                )
                 consumer.consume(reportInfo)
             }
         }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.mappings.Mappings
 import com.demonwav.mcdev.util.ActionData
 import com.demonwav.mcdev.util.descriptor
@@ -41,10 +42,13 @@ class CopyCoremodTargetAction : SrgActionBase() {
     override fun withSrgTarget(parent: PsiElement, srgMap: Mappings?, e: AnActionEvent, data: ActionData) {
         when (parent) {
             is PsiField -> {
-                val containing = parent.containingClass ?: return showBalloon(e, "No containing class")
+                val containing = parent.containingClass ?: return showBalloon(
+                    e,
+                    MCDevBundle("minecraft.actions.no_containing_class"),
+                )
                 val classSrg = srgMap?.getIntermediaryClass(containing) ?: containing.fullQualifiedName ?: return showBalloon(
                     e,
-                    "No containing class found"
+                    MCDevBundle("minecraft.actions.no_containing_class_found")
                 )
                 val srg = srgMap?.getIntermediaryField(parent)?.name ?: parent.name
                 copyToClipboard(
@@ -56,16 +60,19 @@ class CopyCoremodTargetAction : SrgActionBase() {
                 )
             }
             is PsiMethod -> {
-                val containing = parent.containingClass ?: return showBalloon(e, "No containing class")
+                val containing = parent.containingClass ?: return showBalloon(
+                    e,
+                    MCDevBundle("minecraft.actions.no_containing_class"),
+                )
                 val classSrg = srgMap?.getIntermediaryClass(containing) ?: containing.fullQualifiedName ?: return showBalloon(
                     e,
-                    "No containing class found"
+                    MCDevBundle("minecraft.actions.no_containing_class_found")
                 )
                 val (srgName, srgDescriptor) = srgMap?.getIntermediaryMethod(parent)?.let {
                     it.name to it.descriptor
                 } ?: (parent.name to parent.descriptor)
                 if (srgDescriptor == null) {
-                    return showBalloon(e, "No method descriptor found")
+                    return showBalloon(e, MCDevBundle("minecraft.actions.no_method_descriptor"))
                 }
                 copyToClipboard(
                     data.editor,
@@ -79,7 +86,7 @@ class CopyCoremodTargetAction : SrgActionBase() {
             is PsiClass -> {
                 val classSrg = srgMap?.getIntermediaryClass(parent) ?: parent.fullQualifiedName ?: return showBalloon(
                     e,
-                    "No FQN found"
+                    MCDevBundle("minecraft.actions.no_fqn")
                 )
                 copyToClipboard(
                     data.editor,
@@ -88,7 +95,7 @@ class CopyCoremodTargetAction : SrgActionBase() {
                     Pair("name", classSrg),
                 )
             }
-            else -> showBalloon(e, "Not a valid element")
+            else -> showBalloon(e, MCDevBundle("minecraft.actions.not_valid_element"))
         }
     }
 
@@ -97,6 +104,6 @@ class CopyCoremodTargetAction : SrgActionBase() {
         val stringSelection = StringSelection(text)
         val clpbrd = Toolkit.getDefaultToolkit().systemClipboard
         clpbrd.setContents(stringSelection, null)
-        showSuccessBalloon(editor, element, "Copied Coremod Target Reference")
+        showSuccessBalloon(editor, element, MCDevBundle("minecraft.actions.copied_coremod_target"))
     }
 }

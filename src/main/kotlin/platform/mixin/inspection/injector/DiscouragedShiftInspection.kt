@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
@@ -46,7 +47,7 @@ class DiscouragedShiftInspection : MixinInspection() {
             val shift = AtResolver.getShift(annotation)
             if (isShiftDiscouraged(shift, annotation, injector, atCode)) {
                 val shiftElement = annotation.findDeclaredAttributeValue("shift") ?: return
-                holder.registerProblem(shiftElement, "Shifting like this is discouraged because it's brittle")
+                holder.registerProblem(shiftElement, MCDevBundle("inspection.discouraged_shift.message"))
             }
         }
     }

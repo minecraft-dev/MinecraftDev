@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClassType
@@ -41,7 +42,7 @@ class MethodSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable && error === Error.METHOD_IN_WRONG_CLASS) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from method"
+                MCDevBundle("inspection.method_side_only.fix")
             )
         } else {
             null
@@ -114,20 +115,21 @@ class MethodSideOnlyInspection : BaseInspection() {
     enum class Error {
         METHOD_IN_WRONG_CLASS {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] +
-                    " cannot be declared inside a class annotated with " + infos[1] + "."
+                return MCDevBundle("inspection.method_side_only.message.method_in_wrong_class", infos[0], infos[1])
             }
         },
         RETURN_TYPE_ON_WRONG_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] +
-                    " cannot return a type annotated with " + infos[1] + "."
+                return MCDevBundle(
+                    "inspection.method_side_only.message.return_type_on_wrong_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         RETURN_TYPE_IN_WRONG_CLASS {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method in a class annotated with " + infos[0] +
-                    " cannot return a type annotated with " + infos[1] + "."
+                return MCDevBundle("inspection.method_side_only.message.return_type_in_wrong_class", infos[0], infos[1])
             }
         }, ;
 

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
 import com.demonwav.mcdev.platform.mixin.reference.parseMixinSelector
@@ -46,12 +47,12 @@ class UnqualifiedMemberReferenceInspection : MixinAnnotationAttributeInspection(
         // Only plain member references need to be qualified, other selectors (e.g. regex) have their own rules
         val selector = parseMixinSelector(value) as? MemberInfo ?: return
         if (!selector.qualified) {
-            holder.registerProblem(value, "Unqualified member reference in @At target")
+            holder.registerProblem(value, MCDevBundle("inspection.unqualified_member_reference.message"))
             return
         }
 
         if (selector.methodDescriptor == null && selector.fieldDescriptor == null) {
-            holder.registerProblem(value, "Method/field descriptor is required for member reference in @At target")
+            holder.registerProblem(value, MCDevBundle("inspection.unqualified_member_reference.missing_descriptor"))
         }
     }
 }

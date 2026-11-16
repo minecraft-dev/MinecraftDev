@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.insight
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.isMixin
@@ -46,7 +47,7 @@ import java.awt.event.MouseEvent
 
 class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
 
-    override fun getName() = "Mixin element line marker"
+    override fun getName() = MCDevBundle("mixin.element_line_marker.name")
     override fun getIcon() = MixinAssets.MIXIN_ELEMENT_ICON
 
     override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<PsiIdentifier>? {
@@ -64,10 +65,10 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
                 identifier,
                 identifier.textRange,
                 MixinAssets.MIXIN_ENUM_CONSTANT_ICON,
-                { "Mixin-added enum constant" },
+                { MCDevBundle("mixin.element_line_marker.enum_constant.tooltip") },
                 null,
                 GutterIconRenderer.Alignment.LEFT,
-                { "mixin enum constant indicator" },
+                MCDevBundle.pointer("mixin.element_line_marker.enum_constant.accessible_name"),
             )
         }
 
@@ -89,10 +90,10 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
             identifier,
             identifier.textRange,
             handler.icon,
-            { "Go to the $simpleName target" },
+            { MCDevBundle("mixin.element_line_marker.tooltip", simpleName) },
             MixinGutterIconNavigationHandler(identifier.createSmartPointer(), annotation.createSmartPointer(), handler),
             GutterIconRenderer.Alignment.LEFT,
-            { "mixin $simpleName target indicator" },
+            MCDevBundle.pointer("mixin.element_line_marker.accessible_name", simpleName),
         )
     }
 
@@ -114,7 +115,7 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
                     if (editor != null) {
                         HintManager.getInstance().showErrorHint(
                             editor,
-                            "Cannot find corresponding element in source code",
+                            MCDevBundle("mixin.element_line_marker.source_not_found"),
                         )
                     }
                 }
@@ -123,10 +124,16 @@ class MixinElementLineMarkerProvider : LineMarkerProviderDescriptor() {
                 }
                 else -> {
                     if (editor != null) {
-                        getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                        getPsiElementPopup(
+                            targets.toTypedArray(),
+                            MCDevBundle("mixin.element_line_marker.choose_target"),
+                        )
                             .showInBestPositionFor(editor)
                     } else {
-                        getPsiElementPopup(targets.toTypedArray(), "Choose Target")
+                        getPsiElementPopup(
+                            targets.toTypedArray(),
+                            MCDevBundle("mixin.element_line_marker.choose_target"),
+                        )
                             .show(RelativePoint(e))
                     }
                 }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INJECT
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.CALLBACK_INFO
@@ -92,14 +93,14 @@ class MixinCancellableInspection : MixinInspection() {
 
                 holder.registerProblem(
                     method.nameIdentifier ?: method,
-                    "@Inject must be marked as cancellable in order to be cancelled",
+                    MCDevBundle("inspection.cancellable_injection_usage.missing"),
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     *fixes.toTypedArray(),
                 )
             } else if (!definitelyUsesCancel && !mayUseCancel && isCancellable) {
                 holder.registerProblem(
                     cancellableAttribute.parent,
-                    "@Inject is cancellable but is never cancelled",
+                    MCDevBundle("inspection.cancellable_injection_usage.unused"),
                     ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                     RemoveInjectCancellableFix(injectAnnotation),
                 )
@@ -110,7 +111,7 @@ class MixinCancellableInspection : MixinInspection() {
     private class MakeInjectCancellableFix(element: PsiAnnotation) :
         LocalQuickFixAndIntentionActionOnPsiElement(element) {
 
-        override fun getFamilyName(): String = "Mark as cancellable"
+        override fun getFamilyName(): String = MCDevBundle("inspection.cancellable_injection_usage.fix.add")
 
         override fun getText(): String = familyName
 
@@ -130,7 +131,7 @@ class MixinCancellableInspection : MixinInspection() {
     class RemoveInjectCancellableFix(element: PsiAnnotation) :
         LocalQuickFixAndIntentionActionOnPsiElement(element) {
 
-        override fun getFamilyName(): String = "Remove cancellable attribute"
+        override fun getFamilyName(): String = MCDevBundle("inspection.cancellable_injection_usage.fix.remove")
 
         override fun getText(): String = familyName
 

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -29,6 +30,7 @@ import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.demonwav.mcdev.util.findMatchingMethod
 import com.intellij.codeInspection.LocalQuickFixOnPsiElement
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.ide.nls.NlsMessages
 import com.intellij.openapi.project.Project
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiClass
@@ -49,7 +51,10 @@ class MissingAbstractShadowsInEnumInspection : MixinInspection() {
             if (missingShadows.isNotEmpty()) {
                 holder.registerProblem(
                     aClass.nameIdentifier ?: aClass,
-                    "Missing abstract shadows: ${missingShadows.joinToString { it.name }}",
+                    MCDevBundle(
+                        "inspection.missing_abstract_shadows_in_enum_mixin.message",
+                        NlsMessages.formatAndList(missingShadows.map { it.name }),
+                    ),
                     AddMissingShadowsFix(aClass)
                 )
             }
@@ -57,8 +62,8 @@ class MissingAbstractShadowsInEnumInspection : MixinInspection() {
     }
 
     private class AddMissingShadowsFix(aClass: PsiClass) : LocalQuickFixOnPsiElement(aClass) {
-        override fun getFamilyName() = "Add missing shadows"
-        override fun getText() = "Add missing shadows"
+        override fun getFamilyName() = MCDevBundle("inspection.missing_abstract_shadows_in_enum_mixin.fix")
+        override fun getText() = MCDevBundle("inspection.missing_abstract_shadows_in_enum_mixin.fix")
 
         override fun invoke(project: Project, psiFile: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val aClass = startElement as? PsiClass ?: return

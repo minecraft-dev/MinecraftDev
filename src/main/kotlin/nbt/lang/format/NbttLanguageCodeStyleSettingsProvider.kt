@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -41,7 +41,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
                     "LIST_WRAPPING",
-                    "Wrap list items",
+                    MCDevBundle("nbt.lang.style.wrap_list_items"),
                     CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         CodeStyleSettings.WrapStyle.DO_NOT_WRAP.presentableText,
@@ -57,7 +57,7 @@ class NbttLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider(
                 consumer.showCustomOption(
                     NbttCodeStyleSettings::class.java,
                     "ARRAY_WRAPPING",
-                    "Wrap array items",
+                    MCDevBundle("nbt.lang.style.wrap_array_items"),
                     CodeStyleSettingsCustomizableOptions.getInstance().WRAPPING_BRACES,
                     arrayOf(
                         CodeStyleSettings.WrapStyle.DO_NOT_WRAP.presentableText,

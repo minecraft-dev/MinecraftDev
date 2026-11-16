@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.overwrite
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.OVERWRITE
@@ -61,8 +62,7 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 val currentModifier = PsiUtil.getAccessModifier(currentAccessLevel)
                 holder.registerProblem(
                     modifierList.findKeyword(currentModifier) ?: nameIdentifier,
-                    "$currentModifier @Overwrite cannot reduce visibility of " +
-                        "${PsiUtil.getAccessModifier(targetAccessLevel)} target method",
+                    MCDevBundle("inspection.overwrite_modifiers.reduced_visibility", currentModifier, targetModifier),
                     QuickFixFactory.getInstance().createModifierListFix(modifierList, targetModifier, true, false),
                 )
             }
@@ -88,10 +88,10 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 val marker: PsiElement
                 val message = if (targetModifier) {
                     marker = nameIdentifier
-                    "Method must be '$modifier'"
+                    MCDevBundle("inspection.overwrite_modifiers.missing_modifier", modifier)
                 } else {
                     marker = modifierList.findKeyword(modifier) ?: nameIdentifier
-                    "'$modifier' modifier does not match target method"
+                    MCDevBundle("inspection.overwrite_modifiers.modifier_mismatch", modifier)
                 }
 
                 holder.registerProblem(
@@ -114,14 +114,20 @@ class OverwriteModifiersInspection : OverwriteInspection() {
                 if (targetAnnPsi != null) {
                     holder.registerProblem(
                         nameIdentifier,
-                        "Missing @${internalNameToShortName(internalName)} annotation",
+                        MCDevBundle(
+                            "inspection.overwrite_modifiers.missing_annotation",
+                            internalNameToShortName(internalName),
+                        ),
                         ProblemHighlightType.WARNING,
                         LocalQuickFix.from(AddAnnotationModCommandAction(qualifiedName, method, targetAnnPsi.parameterList.attributes))!!,
                     )
                 } else {
                     holder.registerProblem(
                         nameIdentifier,
-                        "Missing @${internalNameToShortName(internalName)} annotation",
+                        MCDevBundle(
+                            "inspection.overwrite_modifiers.missing_annotation",
+                            internalNameToShortName(internalName),
+                        ),
                         ProblemHighlightType.WARNING,
                     )
                 }

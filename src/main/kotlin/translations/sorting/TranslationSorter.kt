@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.sorting
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.actions.TranslationSortOrderDialog
@@ -88,7 +89,7 @@ object TranslationSorter {
                 else -> {
                     val template = TranslationFiles.buildSortingTemplateFromDefault(file, domain).getOrElse { e ->
                         return showBalloon(project, null, null, e.message)
-                    } ?: return showBalloon(project, null, null, "Could not generate template from default translation file")
+                    } ?: return showBalloon(project, null, null, MCDevBundle("translations.sort.error.no_template"))
                     sortByTemplate(
                         project,
                         locale,

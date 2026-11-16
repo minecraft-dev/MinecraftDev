@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.action.insertShadows
 import com.demonwav.mcdev.platform.mixin.util.findMethod
 import com.demonwav.mcdev.platform.mixin.util.findOrConstructSourceMethod
@@ -114,13 +115,17 @@ class MixinInstantiationWithinMixinInspection : MixinInspection() {
                 return
             }
 
-            holder.registerProblem(problemElement, "Constructor does not exist in target class", *quickFixGenerator())
+            holder.registerProblem(
+                problemElement,
+                MCDevBundle("inspection.mixin_constructor_doesnt_exist.message"),
+                *quickFixGenerator(),
+            )
         }
     }
 
     private class AddShadowConstructorFix(constructedClass: PsiClass, private val desc: String, private val presentableParams: String) : LocalQuickFixOnPsiElement(constructedClass) {
-        override fun getFamilyName() = "Add shadow constructor with parameters $presentableParams"
-        override fun getText() = "Add shadow constructor with parameters $presentableParams"
+        override fun getFamilyName() = MCDevBundle("inspection.mixin_constructor_doesnt_exist.fix", presentableParams)
+        override fun getText() = MCDevBundle("inspection.mixin_constructor_doesnt_exist.fix", presentableParams)
 
         override fun invoke(project: Project, psiFile: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val constructedClass = startElement as? PsiClass ?: return

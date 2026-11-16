@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.LocalInfo
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MODIFY_VARIABLE
@@ -44,7 +45,7 @@ class ModifyVariableNameWithoutLVTInspection : MixinInspection() {
             val problemElement = Util.getProblemElement(localInfo, modifyVariable, modifyVariable) ?: return
             holder.registerProblem(
                 problemElement,
-                "@ModifyVariable uses a variable name, but the target class has no local variable names at runtime",
+                MCDevBundle("inspection.modify_variable_name_without_lvt.message"),
             )
         }
     }

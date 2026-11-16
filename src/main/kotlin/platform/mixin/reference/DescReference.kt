@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.DESC
 import com.demonwav.mcdev.platform.mixin.util.canonicalName
@@ -56,7 +57,7 @@ object DescReference : AbstractMethodReference() {
             StandardPatterns.string().equalTo(DESC),
         )
 
-    override val description = "method '%s'"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.desc_method", name)
 
     override fun isValidAnnotation(name: String, project: Project) = name == DESC
 

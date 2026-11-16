@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MIXIN
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.JavaElementVisitor
@@ -40,7 +41,7 @@ class MixinTargetInspection : MixinInspection() {
                 mixin.findDeclaredAttributeValue("value") == null &&
                 mixin.findDeclaredAttributeValue("targets") == null
             ) {
-                holder.registerProblem(mixin, "@Mixin is missing a valid target class")
+                holder.registerProblem(mixin, MCDevBundle("inspection.invalid_mixin_target.message"))
             }
         }
     }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -92,7 +92,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
                 }
             },
             GutterIconRenderer.Alignment.RIGHT,
-            { "$colorName color indicator" },
+            MCDevBundle.pointer("insight.color.marker.accessible_name", colorName),
         ) {
             this.color = color
         }
@@ -104,7 +104,7 @@ class ColorLineMarkerProvider : LineMarkerProvider {
             FunctionUtil.nullConstant<Any, String>(),
             handler,
             GutterIconRenderer.Alignment.RIGHT,
-            { "color indicator" },
+            MCDevBundle.pointer("insight.color.marker.accessible_name.unnamed"),
         ) {
             this.color = color
         }

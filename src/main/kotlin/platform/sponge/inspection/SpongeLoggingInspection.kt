@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.util.Constants
 import com.demonwav.mcdev.util.fullQualifiedName
@@ -64,7 +65,7 @@ class SpongeLoggingInspection : AbstractBaseJavaLocalInspectionTool() {
 
             holder.registerProblem(
                 element,
-                "Sponge plugins should use ${Constants.SLF4J_LOGGER} rather than ${Constants.JAVA_UTIL_LOGGER}.",
+                MCDevBundle("inspection.sponge_logging.message", Constants.SLF4J_LOGGER, Constants.JAVA_UTIL_LOGGER),
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
             )
         }

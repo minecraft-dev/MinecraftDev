@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.insight.target
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.action.FindMixinsAction
 import com.demonwav.mcdev.platform.mixin.util.isAccessorMixin
@@ -34,7 +35,7 @@ import com.intellij.ui.awt.RelativePoint
 import java.awt.event.MouseEvent
 
 class MixinAccessorTargetLineMarkerProvider : LineMarkerProviderDescriptor(), GutterIconNavigationHandler<PsiIdentifier> {
-    override fun getName() = "Accessor mixin target line marker"
+    override fun getName() = MCDevBundle("mixin.accessor_target_line_marker.name")
     override fun getIcon() = MixinAssets.MIXIN_TARGET_ACCESSOR_MIXIN_ICON
 
     override fun getLineMarkerInfo(element: PsiElement) = null
@@ -59,10 +60,10 @@ class MixinAccessorTargetLineMarkerProvider : LineMarkerProviderDescriptor(), Gu
                 identifier,
                 identifier.textRange,
                 icon,
-                { "Go to accessor mixins" },
+                { MCDevBundle("mixin.accessor_target_line_marker.tooltip") },
                 this,
                 GutterIconRenderer.Alignment.LEFT,
-                { "accessor mixin target class indicator" },
+                MCDevBundle.pointer("mixin.accessor_target_line_marker.accessible_name"),
             )
         }
     }

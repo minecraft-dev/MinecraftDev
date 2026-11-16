@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.collectSignatures
@@ -34,7 +35,8 @@ import org.objectweb.asm.tree.MethodNode
 class ModifyReturnValueHandler : MixinExtrasInjectorAnnotationHandler() {
     override val supportedInstructionTypes = listOf(InstructionType.RETURN)
 
-    override val allowedInsnDescription = "return instructions"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.modify_return_value")
 
     override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.reference.target
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.reference.MixinReference
@@ -148,7 +149,7 @@ object FieldDefinitionReference : AbstractDefinitionReference() {
     override fun referenceToString(memberReference: MemberReference) =
         "L${memberReference.owner?.replace('.', '/')};${memberReference.name}:${memberReference.descriptor}"
 
-    override val description = "defined field '%s'"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.defined_field", name)
 }
 
 object MethodDefinitionReference : AbstractDefinitionReference() {
@@ -178,5 +179,5 @@ object MethodDefinitionReference : AbstractDefinitionReference() {
     override fun referenceToString(memberReference: MemberReference) =
         "L${memberReference.owner?.replace('.', '/')};${memberReference.name}${memberReference.descriptor}"
 
-    override val description = "defined method '%s'"
+    override fun unresolvedMessage(name: String?) = MCDevBundle("reference.unresolved.defined_method", name)
 }

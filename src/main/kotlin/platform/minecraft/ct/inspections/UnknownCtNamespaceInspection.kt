@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.minecraft.ct.gen.psi.CtHeader
@@ -40,7 +41,7 @@ class UnknownCtNamespaceInspection : LocalInspectionTool() {
             if (namespace !in fabricModule.mappingNamespaces) {
                 holder.registerProblem(
                     (header as CtHeader).namespaceElement ?: header,
-                    "Unrecognized namespace"
+                    MCDevBundle("inspection.unknown_ct_namespace.message")
                 )
             }
         }

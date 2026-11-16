@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.completion
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.action.createShadowMembers
 import com.demonwav.mcdev.platform.mixin.action.disableAnnotationWrapping
 import com.demonwav.mcdev.platform.mixin.action.insertShadows
@@ -112,7 +113,7 @@ private fun insertShadow(context: InsertionContext, shadow: MixinTargetMember, e
         context.setLaterRunnable {
             HintManager.getInstance().showInformationHint(
                 context.editor,
-                "Added @Shadow for '${element.name}' to super Mixin ${mixinClass.shortName}",
+                MCDevBundle("mixin.completion.added_shadow", element.name, mixinClass.shortName),
             )
         }
     }

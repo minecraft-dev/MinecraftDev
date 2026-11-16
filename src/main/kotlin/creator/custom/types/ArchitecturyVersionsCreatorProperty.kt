@@ -166,7 +166,7 @@ class ArchitecturyVersionsCreatorProperty(
             label(MCDevBundle("creator.ui.versions_download.label"))
         }.visibleIf(loadingVersionsProperty)
 
-        panel.row("Minecraft Version:") {
+        panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionModel)
                 .bindItem(mcVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
@@ -175,7 +175,7 @@ class ArchitecturyVersionsCreatorProperty(
         }.enabled(descriptor.editable != false)
             .visibleIf(!loadingVersionsProperty)
 
-        panel.row("Forge Version:") {
+        panel.row(MCDevBundle("creator.ui.architectury.forge_version.label")) {
             comboBox(forgeVersionsModel)
                 .bindItem(forgeVersionProperty)
                 .enabledIf(isForgeAvailableProperty)
@@ -184,7 +184,7 @@ class ArchitecturyVersionsCreatorProperty(
         }.enabled(descriptor.editable != false)
             .visibleIf(!loadingVersionsProperty)
 
-        panel.row("NeoForge Version:") {
+        panel.row(MCDevBundle("creator.ui.architectury.neoforge_version.label")) {
             comboBox(nfVersionsModel)
                 .bindItem(nfVersionProperty)
                 .enabledIf(isNfAvailableProperty)
@@ -202,7 +202,7 @@ class ArchitecturyVersionsCreatorProperty(
         //         .also { ComboboxSpeedSearch.installOn(it.component) }
         // }.enabled(descriptor.editable != false)
 
-        panel.row("Loader Version:") {
+        panel.row(MCDevBundle("creator.ui.loader_version.label")) {
             comboBox(loaderVersionModel)
                 .bindItem(loaderVersionProperty)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
@@ -228,7 +228,7 @@ class ArchitecturyVersionsCreatorProperty(
         //         .component.foreground = JBColor.YELLOW
         // }.enabled(descriptor.editable != false)
 
-        panel.row("Fabric API Version:") {
+        panel.row(MCDevBundle("creator.ui.fabricapi_version.label")) {
             comboBox(fabricApiVersionModel)
                 .bindItem(fabricApiVersionProperty)
                 .enabledIf(useFabricApiVersionProperty)
@@ -236,14 +236,14 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use Fabric API")
+            checkBox(MCDevBundle("creator.ui.use_fabricapi.label"))
                 .bindSelected(useFabricApiVersionProperty)
-            label("Unable to match API versions to Minecraft version")
+            label(MCDevBundle("creator.ui.warn.no_fabricapi_to_mc_match"))
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.visibleIf(!loadingVersionsProperty)
 
-        panel.row("Architectury API Version:") {
+        panel.row(MCDevBundle("creator.ui.architectury.api_version.label")) {
             comboBox(architecturyApiVersionModel)
                 .bindItem(architecturyApiVersionProperty)
                 .enabledIf(useArchitecturyApiVersionProperty)
@@ -251,9 +251,9 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            checkBox("Use Architectury API")
+            checkBox(MCDevBundle("creator.ui.architectury.use_api.label"))
                 .bindSelected(useArchitecturyApiVersionProperty)
-            label("Unable to match API versions to Minecraft version")
+            label(MCDevBundle("creator.ui.warn.no_fabricapi_to_mc_match"))
                 .visibleIf(architecturyApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)

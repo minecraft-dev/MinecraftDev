@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.demonwav.mcdev.util.constantStringValue
@@ -44,7 +45,7 @@ class UnusedShadowMethodPrefixInspection : MixinInspection() {
             if (!method.name.startsWith(prefix)) {
                 holder.registerProblem(
                     prefixValue,
-                    "Unused @Shadow prefix",
+                    MCDevBundle("inspection.unused_shadow_method_prefix.message"),
                     RemoveAnnotationAttributeQuickFix("@Shadow", "prefix"),
                 )
             }

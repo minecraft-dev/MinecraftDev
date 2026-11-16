@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.McdevHttp
 import com.demonwav.mcdev.util.McdevReflection
 import com.demonwav.mcdev.util.forEachNotNull
@@ -60,7 +61,7 @@ object PluginUpdater {
             val finalUpdate = updateStatus
             ApplicationManager.getApplication().invokeLater({ callback(finalUpdate) }, ModalityState.any())
         } catch (_: Exception) {
-            PluginUpdateStatus.CheckFailed("Minecraft Development plugin update check failed")
+            PluginUpdateStatus.CheckFailed(MCDevBundle("update.check_failed.generic"))
         }
     }
 
@@ -80,17 +81,17 @@ object PluginUpdater {
             }
 
             null
-        } ?: return PluginUpdateStatus.CheckFailed("Unexpected plugin repository response")
+        } ?: return PluginUpdateStatus.CheckFailed(MCDevBundle("update.check_failed.unexpected_response"))
 
         if (responseDoc.name != "plugin-repository") {
-            return PluginUpdateStatus.CheckFailed("Unexpected plugin repository response")
+            return PluginUpdateStatus.CheckFailed(MCDevBundle("update.check_failed.unexpected_response"))
         }
         if (responseDoc.children.isEmpty()) {
             return PluginUpdateStatus.LatestVersionInstalled
         }
 
         val newVersion = responseDoc.getChild("category")?.getChild("idea-plugin")?.getChild("version")?.text
-            ?: return PluginUpdateStatus.CheckFailed("Couldn't find plugin version in repository response")
+            ?: return PluginUpdateStatus.CheckFailed(MCDevBundle("update.check_failed.no_version"))
 
         val plugin = PluginManagerCore.getPlugin(PluginUtil.PLUGIN_ID)!!
         val pluginNode = PluginNode(PluginUtil.PLUGIN_ID)
@@ -110,7 +111,7 @@ object PluginUpdater {
             RepositoryHelper.loadPluginModels(host, null, null)
                 .map { it.getDescriptor() }
         } catch (_: IOException) {
-            return PluginUpdateStatus.CheckFailed("Checking custom plugin repository $host  failed")
+            return PluginUpdateStatus.CheckFailed(MCDevBundle("update.check_failed.custom_repo", host))
         }
 
         val minecraftPlugin = plugins.firstOrNull { plugin -> plugin.pluginId == PluginUtil.PLUGIN_ID }
@@ -130,7 +131,7 @@ object PluginUpdater {
         val plugin = update.pluginDescriptor
         val downloader = PluginDownloader.createDownloader(plugin, update.hostToInstallFrom, null)
         ProgressManager.getInstance().run(
-            object : Task.Backgroundable(null, "Downloading plugin", true) {
+            object : Task.Backgroundable(null, MCDevBundle("update.downloading"), true) {
                 override fun run(indicator: ProgressIndicator) {
                     try {
                         val status = downloader.prepareToInstall(indicator)

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
@@ -49,7 +50,7 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
     var ignoreForImplicitLocals = false
 
     override fun getOptionsPane() = OptPane.pane(
-        OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals")
+        OptPane.checkbox("ignoreForImplicitLocals", MCDevBundle("inspection.may_use_name.option.ignore_implicit"))
     )
 
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
@@ -76,7 +77,7 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
 
             holder.registerProblem(
                 problemElement,
-                "@ModifyVariable can use variable name",
+                MCDevBundle("inspection.modify_variable_may_use_name.message"),
                 *fixes.toTypedArray(),
             )
         }
@@ -86,12 +87,12 @@ class ModifyVariableMayUseNameInspection : MixinInspection() {
         annotation: PsiAnnotation,
         private val variableName: String,
     ) : AnnotationAttributeFix(annotation, "name" to variableName, "ordinal" to null, "index" to null) {
-        override fun getText() = "Use variable name '$variableName'"
-        override fun getFamilyName() = "Use variable name '$variableName'"
+        override fun getText() = MCDevBundle("inspection.may_use_name.fix", variableName)
+        override fun getFamilyName() = MCDevBundle("inspection.may_use_name.fix", variableName)
     }
 
     private inner class IgnoreForImplicitLocalsFix : ModCommandQuickFix(), LowPriorityAction {
-        override fun getFamilyName() = "Ignore for implicit locals"
+        override fun getFamilyName() = MCDevBundle("inspection.may_use_name.option.ignore_implicit")
 
         override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
             return ModCommand.updateInspectionOption(descriptor.psiElement, this@ModifyVariableMayUseNameInspection) {

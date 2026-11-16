@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -46,7 +47,10 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Always unnecessary when Fabric Mixin is present", alwaysUnnecessaryOnFabric)
+        val checkbox = JCheckBox(
+            MCDevBundle("inspection.unnecessary_unsafe.option.always_on_fabric"),
+            alwaysUnnecessaryOnFabric,
+        )
         checkbox.addActionListener {
             alwaysUnnecessaryOnFabric = checkbox.isSelected
         }
@@ -81,7 +85,7 @@ class UnnecessaryUnsafeInspection : MixinInspection() {
                 if (alwaysUnnecessary || !Util.mightTargetConstructor(annotation)) {
                     holder.registerProblem(
                         unsafeValue,
-                        "Unnecessary unsafe = true",
+                        MCDevBundle("inspection.unnecessary_unsafe.message"),
                         AnnotationAttributeFix(annotation, "unsafe" to null)
                     )
                 }

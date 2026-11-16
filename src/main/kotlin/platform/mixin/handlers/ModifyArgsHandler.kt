@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.TargetInsn
 import com.demonwav.mcdev.platform.mixin.inspection.injector.BasicSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ExpectedSignatures
@@ -43,7 +44,8 @@ class ModifyArgsHandler : InsnInjectorAnnotationHandler() {
         return insn is MethodInsnNode
     }
 
-    override val allowedInsnDescription = "method invocations"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.modify_args")
 
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,

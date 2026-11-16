@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.fabricloom
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.intellij.openapi.module.ModuleManager
@@ -46,7 +47,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
 
     private val symbolPattern = Regex("(([\\w$]+\\.)*(class_\\d+\\$?)+)|((?:field|method)_\\d+)")
 
-    override fun getPresentableName() = "Remap Tiny names"
+    override fun getPresentableName() = MCDevBundle("minecraft.unscrambler.tiny")
 
     class SettingsComponent(mappings: Map<String, Path>) : JPanel(GridLayoutManager(1, 2)) {
 
@@ -60,7 +61,7 @@ class TinyUnscrambler : UnscrambleSupport<TinyUnscrambler.SettingsComponent> {
                 label.text = "[$value] $path"
             }
             add(
-                JBLabel("Mappings: "),
+                JBLabel(MCDevBundle("minecraft.unscrambler.mappings")),
                 GridConstraints(
                     0,
                     0,

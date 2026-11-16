@@ -410,8 +410,9 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
 
         private fun describeError(statusCode: Int, body: String): String {
             val json = runCatching { JsonParser.parseString(body).asJsonObject }.getOrNull()
-                ?: return "GitHub returned HTTP $statusCode: $body"
-            val message = json.get("message")?.takeIf { it.isJsonPrimitive }?.asString ?: "HTTP $statusCode"
+                ?: return MCDevBundle("fabric.annotater.github.error.http_body", statusCode, body)
+            val message = json.get("message")?.takeIf { it.isJsonPrimitive }?.asString
+                ?: MCDevBundle("fabric.annotater.github.error.http", statusCode)
             val details = json.get("errors")?.takeIf { it.isJsonArray }?.asJsonArray?.mapNotNull { error ->
                 when {
                     error.isJsonPrimitive -> error.asString
@@ -426,7 +427,11 @@ class AnnotaterGitHubPullRequests : AnnotaterPullRequests {
                     else -> null
                 }
             }.orEmpty()
-            return if (details.isEmpty()) message else "$message: ${details.joinToString("; ")}"
+            return if (details.isEmpty()) {
+                message
+            } else {
+                MCDevBundle("fabric.annotater.github.error.details", message, details.joinToString("; "))
+            }
         }
     }
 

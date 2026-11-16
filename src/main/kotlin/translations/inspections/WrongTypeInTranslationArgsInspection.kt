@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedClass
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethod
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
@@ -124,7 +125,7 @@ class WrongTypeInTranslationArgsInspection : TranslationInspection() {
                     }
                     holder.registerProblem(
                         arg.sourcePsi!!,
-                        "Translation argument is not a 'String', 'Number', 'Boolean' or 'Component'",
+                        MCDevBundle("inspection.wrong_type_in_translation_args.message"),
                         *fixes
                     )
                 }
@@ -139,7 +140,7 @@ class WrongTypeInTranslationArgsInspection : TranslationInspection() {
         @FileModifier.SafeFieldForPreview
         private val identifierPointer = identifier.createUastSmartPointer()
 
-        override fun getFamilyName() = "Replace with 'Component.translatableEscaped'"
+        override fun getFamilyName() = MCDevBundle("inspection.wrong_type_in_translation_args.fix.translatable_escaped")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val identifier = identifierPointer.element ?: return
@@ -155,8 +156,8 @@ class WrongTypeInTranslationArgsInspection : TranslationInspection() {
     }
 
     private class WrapWithStringValueOfFix(element: PsiElement) : LocalQuickFixOnPsiElement(element) {
-        override fun getFamilyName() = "Wrap with 'String.valueOf()'"
-        override fun getText() = "Wrap with 'String.valueOf()'"
+        override fun getFamilyName() = MCDevBundle("inspection.wrong_type_in_translation_args.fix.value_of")
+        override fun getText() = MCDevBundle("inspection.wrong_type_in_translation_args.fix.value_of")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val ct = CommentTracker()

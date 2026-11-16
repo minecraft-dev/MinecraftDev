@@ -203,7 +203,7 @@ class CustomPlatformStep(
             noTemplatesAvailable = label(MCDevBundle("creator.step.generic.no_templates_available.message"))
                 .visible(false)
                 .apply { component.foreground = JBColor.RED }
-            invalidTemplateVersion = label("Invalid template version.")
+            invalidTemplateVersion = label(MCDevBundle("creator.ui.error.invalid_template_version"))
                 .visible(false)
                 .apply { component.foreground = JBColor.RED }
             templatePropertyPlaceholder = placeholder().align(AlignX.FILL)
@@ -295,8 +295,11 @@ class CustomPlatformStep(
 
     private fun checkInvalidVersionTemplate(template: LoadedTemplate): Boolean {
         if (template is InvalidVersionTemplate) {
-            invalidTemplateVersion.component.text = "Invalid template version: ${template.descriptor.version}. Supported " +
-                "versions: [${TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.joinToString(", ")}]"
+            invalidTemplateVersion.component.text = MCDevBundle(
+                "creator.ui.error.invalid_template_version.details",
+                template.descriptor.version,
+                TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.joinToString(", "),
+            )
             return true;
         }
         return false

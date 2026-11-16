@@ -381,7 +381,7 @@ abstract class CollectVisitor<T : PsiElement>(protected val mode: Mode) {
             .map { it.first }
             .zip(numRetained.asSequence().zipWithNext(Int::minus))
             .toMap()
-        return InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE, filterStats)
+        return InsnResolutionInfo.Failure(AtResolver.defaultUnresolvedMessage, filterStats)
     }
 
     fun addResultFilter(name: String, filter: CollectResultFilter<T>) {

@@ -106,10 +106,17 @@ class TranslationTemplateConfigurable(private val project: Project) : Configurab
 
     private fun init() {
         if (project.isDefault) {
-            cmbScheme.model = DefaultComboBoxModel(arrayOf("Global"))
+            cmbScheme.model = DefaultComboBoxModel(
+                arrayOf(MCDevBundle("minecraft.settings.lang_template.scheme.global")),
+            )
             cmbScheme.selectedIndex = 0
         } else {
-            cmbScheme.model = DefaultComboBoxModel(arrayOf("Global", "Project"))
+            cmbScheme.model = DefaultComboBoxModel(
+                arrayOf(
+                    MCDevBundle("minecraft.settings.lang_template.scheme.global"),
+                    MCDevBundle("minecraft.settings.lang_template.scheme.project"),
+                ),
+            )
         }
         cmbScheme.addActionListener {
             setupEditor()

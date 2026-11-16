@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.insight
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.intellij.codeInspection.reference.RefElement
@@ -37,8 +38,8 @@ class MixinEntryPoint : EntryPointWithVisibilityLevel() {
     var mixinEntryPoint = true
 
     override fun getId() = "mixin"
-    override fun getDisplayName() = "Mixin injectors"
-    override fun getTitle() = "Suggest private visibility level for Mixin injectors"
+    override fun getDisplayName() = MCDevBundle("mixin.entry_point.display_name")
+    override fun getTitle() = MCDevBundle("mixin.entry_point.title")
 
     override fun isEntryPoint(element: PsiElement) = false
 

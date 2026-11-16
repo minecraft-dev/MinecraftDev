@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.config.reference.ConfigProperty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.json.psi.JsonArray
@@ -74,14 +75,17 @@ class ConfigValueInspection : MixinConfigInspection() {
             }
 
             if (!valid) {
-                holder.registerProblem(value, "Expected value of type '${type.presentableText}'")
+                holder.registerProblem(
+                    value,
+                    MCDevBundle("inspection.mixin_config_value.wrong_type", type.presentableText),
+                )
             }
         }
 
         @Suppress("SameReturnValue")
         private fun checkArray(childType: PsiType, value: JsonValue): Boolean {
             if (value !is JsonArray) {
-                holder.registerProblem(value, "Array expected")
+                holder.registerProblem(value, MCDevBundle("inspection.mixin_config_value.array_expected"))
                 return true
             }
 

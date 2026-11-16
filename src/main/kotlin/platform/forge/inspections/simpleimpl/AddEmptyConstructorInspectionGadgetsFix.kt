@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.simpleimpl
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -33,7 +34,7 @@ object AddEmptyConstructorInspectionGadgetsFix : LocalQuickFix {
         clazz.addBefore(JavaPsiFacade.getElementFactory(project).createConstructor(), clazz.methods[0])
     }
 
-    override fun getName() = "Add empty constructor"
+    override fun getName() = MCDevBundle("inspection.missing_message_constructor.fix")
 
     override fun getFamilyName() = name
 }

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.demonwav.mcdev.translations.identification.TranslationInstance.FormattingError
 import com.intellij.codeInspection.LocalQuickFix
@@ -45,7 +46,7 @@ class MissingFormatInspection : TranslationInspection() {
         }
 
         override fun visitLiteralExpression(node: ULiteralExpression): Boolean {
-            visit(node, ChangeTranslationQuickFix("Use a different translation"))
+            visit(node, ChangeTranslationQuickFix(MCDevBundle("translations.fix.use_different")))
             return true
         }
 
@@ -54,7 +55,7 @@ class MissingFormatInspection : TranslationInspection() {
             if (result != null && result.required && result.formattingError == FormattingError.MISSING) {
                 holder.registerProblem(
                     expression.sourcePsi!!,
-                    "There are missing formatting arguments to satisfy '${result.text}'",
+                    MCDevBundle("inspection.missing_format.message", result.text),
                     *quickFixes,
                 )
             }

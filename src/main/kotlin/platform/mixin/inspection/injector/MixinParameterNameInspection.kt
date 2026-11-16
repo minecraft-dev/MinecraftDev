@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
@@ -39,6 +40,7 @@ import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.options.OptPane
+import com.intellij.ide.nls.NlsMessages
 import com.intellij.modcommand.ModCommand
 import com.intellij.modcommand.ModCommandQuickFix
 import com.intellij.openapi.module.Module
@@ -56,8 +58,11 @@ class MixinParameterNameInspection : MixinInspection() {
     var reportForLocal = true
 
     override fun getOptionsPane() = OptPane.pane(
-        OptPane.checkbox("reportForMainSignature", "Report for main signature"),
-        OptPane.checkbox("reportForLocal", "Report for @Local parameters")
+        OptPane.checkbox(
+            "reportForMainSignature",
+            MCDevBundle("inspection.name_doesnt_match_target_class.option.main_signature"),
+        ),
+        OptPane.checkbox("reportForLocal", MCDevBundle("inspection.name_doesnt_match_target_class.option.local"))
     )
 
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
@@ -96,7 +101,10 @@ class MixinParameterNameInspection : MixinInspection() {
 
                     holder.registerProblem(
                         parameters[index].nameIdentifier ?: parameters[index],
-                        "Parameter name does not match name ${names.joinToString(" / ") { "'$it'" } } in target class",
+                        MCDevBundle(
+                            "inspection.name_doesnt_match_target_class.message",
+                            NlsMessages.formatOrList(names.map { "'$it'" }),
+                        ),
                         *fixes.toTypedArray()
                     )
                 }
@@ -242,7 +250,9 @@ class MixinParameterNameInspection : MixinInspection() {
     }
 
     private inner class DontReportForMainSignatureFix : ModCommandQuickFix(), LowPriorityAction {
-        override fun getFamilyName() = "Don't report for main signature"
+        override fun getFamilyName() = MCDevBundle(
+            "inspection.name_doesnt_match_target_class.fix.ignore_main_signature",
+        )
 
         override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
             return ModCommand.updateInspectionOption(descriptor.psiElement, this@MixinParameterNameInspection) {
@@ -252,7 +262,7 @@ class MixinParameterNameInspection : MixinInspection() {
     }
 
     private inner class DontReportForLocalFix : ModCommandQuickFix(), LowPriorityAction {
-        override fun getFamilyName() = "Don't report for @Local parameters"
+        override fun getFamilyName() = MCDevBundle("inspection.name_doesnt_match_target_class.fix.ignore_local")
 
         override fun perform(project: Project, descriptor: ProblemDescriptor): ModCommand {
             return ModCommand.updateInspectionOption(descriptor.psiElement, this@MixinParameterNameInspection) {

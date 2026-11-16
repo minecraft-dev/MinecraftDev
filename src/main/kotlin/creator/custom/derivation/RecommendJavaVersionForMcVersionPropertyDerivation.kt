@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.HasMinecraftVersion
@@ -46,25 +47,25 @@ class RecommendJavaVersionForMcVersionPropertyDerivation(val default: Int) : Pre
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (parents.isNullOrEmpty()) {
-                reporter.error("Expected one parent")
+                reporter.error(MCDevBundle("creator.template.validation.expected_one_parent"))
                 return null
             }
 
             if (parents.size > 1) {
-                reporter.warn("More than one parent defined")
+                reporter.warn(MCDevBundle("creator.template.validation.more_than_one_parent"))
             }
 
             val parentValue = parents[0]!!
             if (!parentValue.acceptsType(SemanticVersion::class.java) &&
                 !parentValue.acceptsType(HasMinecraftVersion::class.java)
             ) {
-                reporter.error("Parent must produce a semantic version or a value that has a Minecraft version")
+                reporter.error(MCDevBundle("creator.template.validation.parent_semantic_or_mc_version"))
                 return null
             }
 
             val default = (derivation.default as? Number)?.toInt()
             if (default == null) {
-                reporter.error("Default value is required and must be an integer")
+                reporter.error(MCDevBundle("creator.template.validation.default_integer_required"))
                 return null
             }
 

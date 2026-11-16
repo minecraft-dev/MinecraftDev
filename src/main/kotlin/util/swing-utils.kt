@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.util
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ComponentValidator
 import com.intellij.openapi.ui.DialogWrapper
@@ -82,7 +83,7 @@ fun Cell<JBTextField>.regexValidator(): Cell<JBTextField> {
                         Pattern.compile(component.text)
                         null
                     } catch (_: PatternSyntaxException) {
-                        ValidationInfoBuilder(component).error("Invalid regex")
+                        ValidationInfoBuilder(component).error(MCDevBundle("util.invalid_regex"))
                     }
                 }
             ).andRegisterOnDocumentListener(component).installOn(component)

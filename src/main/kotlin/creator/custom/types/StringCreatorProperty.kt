@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
@@ -60,7 +61,9 @@ class StringCreatorProperty(
             try {
                 validationRegex = regexString.toRegex()
             } catch (t: Throwable) {
-                reporter.error("Invalid validator regex: '$regexString': ${t.message}")
+                reporter.error(
+                    MCDevBundle("creator.template.validation.invalid_validator_regex", regexString, t.message),
+                )
             }
         }
     }

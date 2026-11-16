@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
 import com.demonwav.mcdev.MinecraftProjectSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -76,7 +77,7 @@ class InvokeAssignReplaceWithExpressionInspection : MixinInspection() {
 
                 holder.registerProblem(
                     atValue,
-                    "INVOKE_ASSIGN could be replaced with expression",
+                    MCDevBundle("inspection.invoke_assign_replace_with_expression.message"),
                     ReplaceWithExpressionFix(
                         annotation,
                         methodInsn.name.toJavaIdentifier(),
@@ -128,8 +129,8 @@ class InvokeAssignReplaceWithExpressionInspection : MixinInspection() {
         private val isStatic: Boolean,
         private val argCount: Int,
     ) : LocalQuickFixOnPsiElement(at) {
-        override fun getFamilyName() = "Replace with expression"
-        override fun getText() = "Replace with expression"
+        override fun getFamilyName() = MCDevBundle("inspection.invoke_assign_replace_with_expression.fix")
+        override fun getText() = MCDevBundle("inspection.invoke_assign_replace_with_expression.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val at = startElement as? PsiAnnotation ?: return

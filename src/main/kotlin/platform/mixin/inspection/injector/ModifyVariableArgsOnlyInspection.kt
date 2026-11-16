@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.CollectVisitor
@@ -52,7 +53,7 @@ class ModifyVariableArgsOnlyInspection : MixinInspection() {
                 val localInfo = LocalInfo.fromAnnotation(localType, modifyVariable)
 
                 if (Util.shouldReport(localInfo, injector, modifyVariable)) {
-                    val description = "@ModifyVariable may be argsOnly = true"
+                    val description = MCDevBundle("inspection.modify_variable_may_be_args_only.message")
                     holder.registerProblem(
                         problemElement,
                         description,

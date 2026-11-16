@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
@@ -51,12 +52,12 @@ open class ExtractVersionMajorMinorPropertyDerivation : PreparedDerivation {
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (parents.isNullOrEmpty()) {
-                reporter.error("Expected a parent")
+                reporter.error(MCDevBundle("creator.template.validation.expected_parent"))
                 return null
             }
 
             if (!parents[0]!!.acceptsType(SemanticVersion::class.java)) {
-                reporter.error("First parent must produce a semantic version")
+                reporter.error(MCDevBundle("creator.template.validation.first_parent_semantic_version"))
                 return null
             }
 

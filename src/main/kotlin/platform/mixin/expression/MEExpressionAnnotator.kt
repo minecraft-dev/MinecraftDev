@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -331,7 +331,7 @@ class MEExpressionAnnotator : Annotator {
     private class AddDefinitionFix(name: MEName) : LocalQuickFixAndIntentionActionOnPsiElement(name) {
         private val id = name.text
 
-        override fun getFamilyName(): String = "Add @Definition"
+        override fun getFamilyName(): String = MCDevBundle("mixin.expression.fix.add_definition")
 
         override fun getText(): String = "$familyName(id = \"$id\")"
 

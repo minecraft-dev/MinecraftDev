@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.isSoftImplementMissingParent
 import com.intellij.codeInspection.ProblemsHolder
@@ -37,7 +38,7 @@ class SoftImplementOverridesInspection : MixinInspection() {
             if (method.isSoftImplementMissingParent()) {
                 holder.registerProblem(
                     method.nameIdentifier ?: method,
-                    "Method does not soft-implement a method from its interfaces",
+                    MCDevBundle("inspection.soft_implement_overrides.message"),
                 )
             }
         }

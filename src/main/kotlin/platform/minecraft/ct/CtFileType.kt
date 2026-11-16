@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
 
@@ -27,7 +28,7 @@ object CtFileType : LanguageFileType(CtLanguage) {
 
     override fun getName() = "Class Tweaker"
 
-    override fun getDescription() = "Class tweaker"
+    override fun getDescription() = MCDevBundle("minecraft.ct.file_type.description")
 
     override fun getDefaultExtension() = "classtweaker"
 

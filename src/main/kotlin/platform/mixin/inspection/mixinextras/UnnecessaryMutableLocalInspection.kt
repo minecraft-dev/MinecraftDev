@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapOperationHandler
@@ -126,7 +127,7 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
         }
         holder.registerProblem(
             originalParam.typeElement ?: originalParam,
-            "@Local could be captured immutably",
+            MCDevBundle("inspection.mixin_extras_unnecessary_mutable_local.message"),
             SwitchToImmutableCaptureFix(originalParam)
         )
     }
@@ -160,8 +161,8 @@ class UnnecessaryMutableLocalInspection : MixinInspection() {
     }
 
     private class SwitchToImmutableCaptureFix(param: PsiParameter) : LocalQuickFixOnPsiElement(param) {
-        override fun getFamilyName() = "Switch to immutable capture"
-        override fun getText() = "Switch to immutable capture"
+        override fun getFamilyName() = MCDevBundle("inspection.mixin_extras_unnecessary_mutable_local.fix")
+        override fun getText() = MCDevBundle("inspection.mixin_extras_unnecessary_mutable_local.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val param = startElement as? PsiParameter ?: return

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.INVOKER
 import com.demonwav.mcdev.util.constantStringValue
@@ -45,7 +46,7 @@ class ImplicitConstructorInvokerInspection : MixinInspection() {
                     if (method.name.let { it.startsWith("create") || it.startsWith("new") }) {
                         holder.registerProblem(
                             invokerAnnotation.nameReferenceElement ?: return,
-                            "Implicit constructor invokers should be explicit (fails outside of dev)",
+                            MCDevBundle("inspection.implicit_constructor_invoker.message"),
                             ImplicitConstructorInvokerQuickFix(invokerAnnotation),
                         )
                     }
@@ -57,8 +58,8 @@ class ImplicitConstructorInvokerInspection : MixinInspection() {
     private class ImplicitConstructorInvokerQuickFix(
         annotation: PsiAnnotation,
     ) : LocalQuickFixOnPsiElement(annotation) {
-        override fun getFamilyName() = "Make constructor invoker explicit"
-        override fun getText() = "Make constructor invoker explicit"
+        override fun getFamilyName() = MCDevBundle("inspection.implicit_constructor_invoker.fix")
+        override fun getText() = MCDevBundle("inspection.implicit_constructor_invoker.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val annotation = startElement as? PsiAnnotation ?: return

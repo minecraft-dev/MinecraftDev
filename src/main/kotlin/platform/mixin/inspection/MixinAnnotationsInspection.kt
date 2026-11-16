@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.findContainingClass
@@ -49,7 +50,10 @@ class MixinAnnotationsInspection : MixinInspection() {
             if (!containingClass.isMixin) {
                 holder.registerProblem(
                     annotation,
-                    "@${annotation.nameReferenceElement?.text} can be only used in a @Mixin class",
+                    MCDevBundle(
+                        "inspection.annotation_outside_of_mixin.message",
+                        annotation.nameReferenceElement?.text,
+                    ),
                     RemoveAnnotationQuickFix(annotation, null),
                 )
             }

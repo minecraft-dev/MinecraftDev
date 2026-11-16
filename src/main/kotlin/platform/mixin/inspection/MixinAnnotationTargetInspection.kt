@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
@@ -28,6 +29,9 @@ import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.AT
 import com.demonwav.mcdev.util.ifEmpty
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RemoveAnnotationQuickFix
+import com.intellij.ide.nls.NlsMessages
+import com.intellij.openapi.util.text.HtmlBuilder
+import com.intellij.openapi.util.text.HtmlChunk
 import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiElementVisitor
@@ -63,43 +67,70 @@ class MixinAnnotationTargetInspection : MixinInspection() {
                                 .map {
                                     AtResolver(annotation, it.clazz, it.method).isUnresolved() ?: return@classLoop null
                                 }
-                                .reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure("Could not resolve @At target")
+                                .reduceOrNull(InsnResolutionInfo.Failure::combine)
+                                ?: InsnResolutionInfo.Failure(
+                                    MCDevBundle("inspection.mixin_annotation_target.unresolved_at"),
+                                )
                         }
                         .reduceOrNull(InsnResolutionInfo.Failure::combine)
                     if (failure != null) {
-                        addProblem(annotation, "Could not resolve @At target", failure)
+                        addProblem(
+                            annotation,
+                            listOf(MCDevBundle("inspection.mixin_annotation_target.unresolved_at")),
+                            failure,
+                        )
                     }
                 } else {
                     val handler = MixinAnnotationHandler.forMixinAnnotation(qName, annotation.project) ?: return
                     val failure = handler.isUnresolved(annotation)
                     if (failure != null) {
-                        addProblem(annotation, failure.messages.joinToString("; "), failure)
+                        addProblem(annotation, failure.messages, failure)
                     }
                 }
             }
 
-            private fun addProblem(annotation: PsiAnnotation, message: String, failure: InsnResolutionInfo.Failure) {
+            private fun addProblem(
+                annotation: PsiAnnotation,
+                messages: Collection<String>,
+                failure: InsnResolutionInfo.Failure,
+            ) {
                 val nameElement = annotation.nameReferenceElement ?: return
-                val betterMessage = addFilterMessage(message, failure.filterStats)
+                val betterMessage = if (messages.size == 1) {
+                    addFilterMessage(messages.single(), failure.filterStats)
+                } else {
+                    // One failure per line, the inspection tooltip renders messages starting with <html> as HTML
+                    val summary = addFilterMessage(
+                        MCDevBundle("inspection.mixin_annotation_target.unresolved_multiple"),
+                        failure.filterStats,
+                    )
+                    HtmlBuilder()
+                        .append(summary)
+                        .append(HtmlChunk.ul().children(messages.map { HtmlChunk.li().addText(it) }))
+                        .wrapWith("html")
+                        .toString()
+                }
                 val quickFix = RemoveAnnotationQuickFix(annotation, annotation.parentOfType())
                 holder.registerProblem(nameElement, betterMessage, quickFix)
             }
 
             private fun addFilterMessage(message: String, stats: Map<String, Int>): String {
-                val statsItr = stats.entries.asSequence().filter { it.value != 0 }.iterator()
-                if (!statsItr.hasNext()) {
+                val nonZeroStats = stats.entries.filter { it.value != 0 }
+                if (nonZeroStats.isEmpty()) {
                     return message
                 }
 
-                return buildString {
-                    append(message)
-                    append(" (")
-                    append(statsItr.next().let { (k, v) -> "$v filtered out by $k" })
-                    for ((k, v) in statsItr) {
-                        append(", $v more by $k")
+                val parts = nonZeroStats.mapIndexed { i, (filter, count) ->
+                    if (i == 0) {
+                        MCDevBundle("inspection.mixin_annotation_target.filter_stats.first", count, filter)
+                    } else {
+                        MCDevBundle("inspection.mixin_annotation_target.filter_stats.more", count, filter)
                     }
-                    append(')')
                 }
+                return MCDevBundle(
+                    "inspection.mixin_annotation_target.filter_stats",
+                    message,
+                    NlsMessages.formatAndList(parts),
+                )
             }
         }
     }

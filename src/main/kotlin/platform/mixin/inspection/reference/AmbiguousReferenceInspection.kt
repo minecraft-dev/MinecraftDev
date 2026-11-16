@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinAnnotationAttributeInspection
@@ -64,13 +65,13 @@ class AmbiguousReferenceInspection : MixinAnnotationAttributeInspection("method"
         }
         holder.registerProblem(
             value,
-            "Ambiguous reference to method in target class",
+            MCDevBundle("inspection.ambiguous_mixin_reference.message"),
             QuickFix,
         )
     }
 
     private object QuickFix : LocalQuickFix {
-        override fun getFamilyName() = "Add * wildcard"
+        override fun getFamilyName() = MCDevBundle("inspection.ambiguous_mixin_reference.fix")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val element = descriptor.psiElement ?: return

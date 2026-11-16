@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.forge.util.ForgeConstants
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.LocalQuickFix
@@ -44,7 +45,7 @@ class MethodCallSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from method declaration"
+                MCDevBundle("inspection.method_call_side_only.fix")
             )
         } else {
             null
@@ -186,37 +187,54 @@ class MethodCallSideOnlyInspection : BaseInspection() {
     enum class Error {
         ANNOTATED_METHOD_IN_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] + " cannot be referenced in an un-annotated method."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_method_in_unannotated_method",
+                    infos[0],
+                )
             }
         },
         ANNOTATED_CLASS_METHOD_IN_UNANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method declared in a class annotated with " + infos[0] +
-                    " cannot be referenced in an un-annotated method."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_class_method_in_unannotated_method",
+                    infos[0],
+                )
             }
         },
         ANNOTATED_METHOD_IN_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] +
-                    " cannot be referenced in a method annotated with " + infos[1] + "."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_method_in_cross_annotated_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method declared in a class annotated with " + infos[0] +
-                    " cannot be referenced in a method annotated with " + infos[1] + "."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_class_method_in_cross_annotated_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         ANNOTATED_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method annotated with " + infos[0] +
-                    " cannot be referenced in a class annotated with " + infos[1] + "."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_method_in_cross_annotated_class_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         },
         ANNOTATED_CLASS_METHOD_IN_CROSS_ANNOTATED_CLASS_METHOD {
             override fun getErrorString(vararg infos: Any): String {
-                return "Method declared in a class annotated with " + infos[0] +
-                    " cannot be referenced in a class annotated with " + infos[1] + "."
+                return MCDevBundle(
+                    "inspection.method_call_side_only.message.annotated_class_method_in_cross_annotated_class_method",
+                    infos[0],
+                    infos[1],
+                )
             }
         }, ;
 

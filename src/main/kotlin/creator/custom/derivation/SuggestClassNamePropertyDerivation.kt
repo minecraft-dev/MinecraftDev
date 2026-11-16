@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.BuildSystemCoordinates
@@ -47,21 +48,21 @@ class SuggestClassNamePropertyDerivation : PreparedDerivation {
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (parents == null || parents.size < 2) {
-                reporter.error("Expected 2 parents")
+                reporter.error(MCDevBundle("creator.template.validation.expected_two_parents"))
                 return null
             }
 
             if (parents.size > 2) {
-                reporter.warn("More than two parents defined")
+                reporter.warn(MCDevBundle("creator.template.validation.more_than_two_parents"))
             }
 
             if (!parents[0]!!.acceptsType(BuildSystemCoordinates::class.java)) {
-                reporter.error("First parent must produce a build system coordinates")
+                reporter.error(MCDevBundle("creator.template.validation.first_parent_build_coordinates"))
                 return null
             }
 
             if (!parents[1]!!.acceptsType(String::class.java)) {
-                reporter.error("Second parent must produce a string value")
+                reporter.error(MCDevBundle("creator.template.validation.second_parent_string_value"))
                 return null
             }
 

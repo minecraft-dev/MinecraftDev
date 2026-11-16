@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -49,7 +50,7 @@ class CancellableBeforeSuperCallInspection : MixinInspection() {
             if (Util.doesInjectBeforeSuperConstructorCall(annotation)) {
                 holder.registerProblem(
                     cancellableAttr,
-                    "@Inject is cancellable before a superconstructor call",
+                    MCDevBundle("inspection.inject_cancellable_before_super_constructor_call.message"),
                     MixinCancellableInspection.RemoveInjectCancellableFix(annotation)
                 )
             }

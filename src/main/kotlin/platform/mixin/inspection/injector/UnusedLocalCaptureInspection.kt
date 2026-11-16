@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.inspection.fix.AnnotationAttributeFix
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
@@ -97,7 +98,7 @@ class UnusedLocalCaptureInspection : MixinInspection() {
             if (!hasAnyUsedLocals) {
                 holder.registerProblem(
                     localsValue,
-                    "Unused @Inject local capture",
+                    MCDevBundle("inspection.unused_inject_local_capture.message"),
                     RemoveLocalCaptureFix(annotation, callbackInfoIndex)
                 )
             }
@@ -108,9 +109,9 @@ class UnusedLocalCaptureInspection : MixinInspection() {
         injectAnnotation: PsiAnnotation,
         private val callbackInfoIndex: Int
     ) : LocalQuickFixOnPsiElement(injectAnnotation) {
-        override fun getFamilyName() = "Remove @Inject local capture"
+        override fun getFamilyName() = MCDevBundle("inspection.unused_inject_local_capture.fix")
 
-        override fun getText() = "Remove @Inject local capture"
+        override fun getText() = MCDevBundle("inspection.unused_inject_local_capture.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val injectAnnotation = startElement as? PsiAnnotation ?: return

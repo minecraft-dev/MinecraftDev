@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.implements
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.IMPLEMENTS
 import com.demonwav.mcdev.util.findAnnotations
@@ -44,7 +45,7 @@ class EmptyImplementsInspection : MixinInspection() {
             if (interfaces.isNullOrEmpty()) {
                 holder.registerProblem(
                     annotation,
-                    "@Implements is redundant",
+                    MCDevBundle("inspection.empty_implements.message"),
                     RemoveAnnotationQuickFix(annotation, null),
                 )
             }

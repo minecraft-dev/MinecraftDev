@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.simpleimpl
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiClass
 import com.siyeh.ig.BaseInspection
@@ -28,7 +29,7 @@ import com.siyeh.ig.BaseInspectionVisitor
 class MissingMessageConstructorInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any?) =
-        "All implementations of IMessage and IMessageHandler must have an empty constructor"
+        MCDevBundle("inspection.missing_message_constructor.message")
 
     override fun buildFix(vararg infos: Any?): LocalQuickFix? {
         val messageClass = infos[0] as PsiClass

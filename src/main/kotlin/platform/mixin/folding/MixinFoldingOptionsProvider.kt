@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.folding
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.application.options.editor.CodeFoldingOptionsProvider
 import com.intellij.openapi.options.BeanConfigurable
 
@@ -27,42 +28,46 @@ class MixinFoldingOptionsProvider :
     BeanConfigurable<MixinFoldingSettings.State>(MixinFoldingSettings.instance.state), CodeFoldingOptionsProvider {
 
     init {
-        title = "Mixin"
+        title = MCDevBundle("mixin.folding.title")
 
         val settings = MixinFoldingSettings.instance
         checkBox(
-            "Target descriptors",
+            MCDevBundle("mixin.folding.target_descriptors"),
             { settings.state.foldTargetDescriptors },
             { b -> settings.state.foldTargetDescriptors = b },
         )
-        checkBox("Object casts", { settings.state.foldObjectCasts }, { b -> settings.state.foldObjectCasts = b })
         checkBox(
-            "Invoker casts",
+            MCDevBundle("mixin.folding.object_casts"),
+            { settings.state.foldObjectCasts },
+            { b -> settings.state.foldObjectCasts = b },
+        )
+        checkBox(
+            MCDevBundle("mixin.folding.invoker_casts"),
             { settings.state.foldInvokerCasts },
             { b -> settings.state.foldInvokerCasts = b },
         )
         checkBox(
-            "Invoker method calls",
+            MCDevBundle("mixin.folding.invoker_method_calls"),
             { settings.state.foldInvokerMethodCalls },
             { b -> settings.state.foldInvokerMethodCalls = b },
         )
         checkBox(
-            "Accessor casts",
+            MCDevBundle("mixin.folding.accessor_casts"),
             { settings.state.foldAccessorCasts },
             { b -> settings.state.foldAccessorCasts = b },
         )
         checkBox(
-            "Accessor method calls",
+            MCDevBundle("mixin.folding.accessor_method_calls"),
             { settings.state.foldAccessorMethodCalls },
             { b -> settings.state.foldAccessorMethodCalls = b },
         )
         checkBox(
-            "Fold MixinExtras expression definitions",
+            MCDevBundle("mixin.folding.expression_definitions"),
             { settings.state.foldDefinitions },
             { b -> settings.state.foldDefinitions = b },
         )
         checkBox(
-            "Fold MixinExtras expression definition fields and methods",
+            MCDevBundle("mixin.folding.expression_definition_members"),
             { settings.state.foldDefinitionFieldsAndMethods },
             { b -> settings.state.foldDefinitionFieldsAndMethods = b },
         )

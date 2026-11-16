@@ -94,7 +94,7 @@ open class RemoteTemplateProvider : TemplateProvider {
         authType: RemoteAuthType,
         credentials: String
     ): Boolean {
-        indicator.text2 = "Updating remote repository $repoName"
+        indicator.text2 = MCDevBundle("creator.ui.custom.remote.updating", repoName)
 
         val repoUrl = replaceVariables(originalRepoUrl, TemplateDescriptor.LATEST_FORMAT_VERSION)
 
@@ -280,7 +280,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(basicAuthUsernameProperty)
-                    .addValidationRule("Must not be blank") { field ->
+                    .addValidationRule(MCDevBundle("creator.validation.blank")) { field ->
                         authTypeProperty.get() == RemoteAuthType.BASIC && field.text.isBlank()
                     }
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.BASIC))
@@ -297,7 +297,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(bearerTokenProperty)
-                    .addValidationRule("Must not be blank") { field ->
+                    .addValidationRule(MCDevBundle("creator.validation.blank")) { field ->
                         authTypeProperty.get() == RemoteAuthType.BEARER && field.password.all { it.isWhitespace() }
                     }
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.BEARER))
@@ -308,7 +308,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .bindItem(gitAuthProviderProperty)
                     .validationOnApply { box ->
                         if (authTypeProperty.get() == RemoteAuthType.GIT_HTTP && box.item == null) {
-                            error("A provider must be selected")
+                            error(MCDevBundle("creator.ui.custom.remote.git_http_provider.required"))
                         } else null
                     }
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.GIT_HTTP))
@@ -319,7 +319,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .bindItem(gitAuthAccountProperty)
                     .validationOnApply { box ->
                         if (authTypeProperty.get() == RemoteAuthType.GIT_HTTP && box.item == null) {
-                            error("An account must be selected")
+                            error(MCDevBundle("creator.ui.custom.remote.git_http_account.required"))
                         } else null
                     }
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.GIT_HTTP))
@@ -329,7 +329,7 @@ open class RemoteTemplateProvider : TemplateProvider {
                     .align(AlignX.FILL)
                     .columns(COLUMNS_LARGE)
                     .bindText(headerNameProperty)
-                    .addValidationRule("Must not be blank") { field ->
+                    .addValidationRule(MCDevBundle("creator.validation.blank")) { field ->
                         authTypeProperty.get() == RemoteAuthType.HEADER && field.text.all { it.isWhitespace() }
                     }
             }.visibleIf(authTypeProperty.equalsTo(RemoteAuthType.HEADER))

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.json.JsonLanguage
 import com.intellij.json.json5.Json5Language
@@ -44,7 +45,7 @@ interface MixinConfigFileType : FileTypeIdentifiableByVirtualFile {
 
         override fun getFilenameRegex(): Regex = filenameRegex
         override fun getName() = "Mixin Json Configuration"
-        override fun getDescription() = "Mixin Json configuration"
+        override fun getDescription() = MCDevBundle("mixin.config.file_type.description")
     }
 
     object Json5 : LanguageFileType(Json5Language.INSTANCE), MixinConfigFileType {
@@ -52,6 +53,6 @@ interface MixinConfigFileType : FileTypeIdentifiableByVirtualFile {
 
         override fun getFilenameRegex(): Regex = filenameRegex
         override fun getName() = "Mixin Json5 Configuration"
-        override fun getDescription() = "Mixin Json5 configuration"
+        override fun getDescription() = MCDevBundle("mixin.config.file_type.description.json5")
     }
 }

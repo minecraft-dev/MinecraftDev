@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.AtResolver
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -48,7 +49,10 @@ class InjectIntoConstructorInspection : MixinInspection() {
 
     override fun createOptionsPanel(): JComponent {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        val checkbox = JCheckBox("Allow @Inject into constructors when Fabric Mixin is present", allowOnFabric)
+        val checkbox = JCheckBox(
+            MCDevBundle("inspection.inject_into_constructor.option.allow_on_fabric"),
+            allowOnFabric,
+        )
         checkbox.addActionListener {
             allowOnFabric = checkbox.isSelected
         }
@@ -91,7 +95,7 @@ class InjectIntoConstructorInspection : MixinInspection() {
 
                             holder.registerProblem(
                                 problemElement,
-                                "Cannot inject into constructors at non-return instructions",
+                                MCDevBundle("inspection.inject_into_constructor.message"),
                                 *quickFixes,
                             )
                             return

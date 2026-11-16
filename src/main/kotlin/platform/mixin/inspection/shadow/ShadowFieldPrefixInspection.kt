@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.SHADOW
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.DEFAULT_SHADOW_PREFIX
@@ -48,7 +49,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             val shadow = field.findAnnotation(SHADOW) ?: return
             val prefix = shadow.findDeclaredAttributeValue("prefix")
             if (prefix != null) {
-                holder.registerProblem(prefix, "Cannot use prefix for @Shadow fields", QuickFix)
+                holder.registerProblem(prefix, MCDevBundle("inspection.shadow_field_prefix.message"), QuickFix)
                 return
             }
 
@@ -57,7 +58,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
             if (fieldName.startsWith(DEFAULT_SHADOW_PREFIX)) {
                 holder.registerProblem(
                     field.nameIdentifier,
-                    "Cannot use prefix for @Shadow fields",
+                    MCDevBundle("inspection.shadow_field_prefix.message"),
                     QuickFixFactory.getInstance().createRenameElementFix(
                         field,
                         fieldName.removePrefix(DEFAULT_SHADOW_PREFIX),
@@ -69,7 +70,7 @@ class ShadowFieldPrefixInspection : MixinInspection() {
 
     private object QuickFix : LocalQuickFix {
 
-        override fun getFamilyName() = "Remove @Shadow prefix"
+        override fun getFamilyName() = MCDevBundle("inspection.shadow_field_prefix.fix")
         override fun startInWriteAction() = false
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {

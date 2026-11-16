@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.sponge.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.sponge.SpongeModuleType
 import com.demonwav.mcdev.platform.sponge.util.SpongeConstants
 import com.demonwav.mcdev.platform.sponge.util.isInSpongePluginClass
@@ -103,9 +104,12 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                 if (annotation != null && isInjectOptional(annotation)) {
                     holder.registerProblem(
                         annotation.parameterList,
-                        "Constructor injection cannot be optional.",
+                        MCDevBundle("inspection.sponge_injection.optional_constructor"),
                         ProblemHighlightType.GENERIC_ERROR,
-                        RemoveAnnotationParameters(annotation, "Remove 'optional' parameter"),
+                        RemoveAnnotationParameters(
+                            annotation,
+                            MCDevBundle("inspection.sponge_injection.fix.remove_optional"),
+                        ),
                     )
                 }
             }
@@ -118,7 +122,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             if (variable.type is PsiPrimitiveType) {
                 holder.registerProblem(
                     typeElement,
-                    "Primitive types cannot be injected by Sponge.",
+                    MCDevBundle("inspection.sponge_injection.primitive"),
                     ProblemHighlightType.GENERIC_ERROR,
                 )
                 return
@@ -157,7 +161,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
             if (assetId == null) {
                 holder.registerProblem(
                     variable.nameIdentifier ?: variable,
-                    "Injected Assets must be annotated with @AssetId.",
+                    MCDevBundle("inspection.sponge_injection.asset_missing_asset_id"),
                     ProblemHighlightType.GENERIC_ERROR,
                     LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.ASSET_ID_ANNOTATION, annotationsOwner))!!,
                 )
@@ -176,7 +180,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     if (assetFile?.isDirectory == true || relativeAssetPath.endsWith('/')) {
                         holder.registerProblem(
                             assetPathAttributeValue,
-                            "AssetId must reference a file.",
+                            MCDevBundle("inspection.sponge_injection.asset_id_not_file"),
                             ProblemHighlightType.GENERIC_ERROR,
                         )
                         return@let
@@ -192,13 +196,13 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         if (fix == null) {
                             holder.registerProblem(
                                 assetPathAttributeValue,
-                                "Asset '$assetPath' does not exist.",
+                                MCDevBundle("inspection.sponge_injection.asset_not_found", assetPath),
                                 ProblemHighlightType.GENERIC_ERROR,
                             )
                         } else {
                             holder.registerProblem(
                                 assetPathAttributeValue,
-                                "Asset '$assetPath' does not exist.",
+                                MCDevBundle("inspection.sponge_injection.asset_not_found", assetPath),
                                 ProblemHighlightType.GENERIC_ERROR,
                                 fix,
                             )
@@ -223,15 +227,21 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         val quickFixFactory = QuickFixFactory.getInstance()
                         holder.registerProblem(
                             variable.nameIdentifier ?: variable,
-                            "@ConfigDir and @DefaultConfig cannot be used on the same field.",
+                            MCDevBundle("inspection.sponge_injection.config_dir_and_default_config"),
                             ProblemHighlightType.GENERIC_ERROR,
-                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
-                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig"),
+                            quickFixFactory.createDeleteFix(
+                                configDir,
+                                MCDevBundle("inspection.sponge_injection.fix.remove_config_dir"),
+                            ),
+                            quickFixFactory.createDeleteFix(
+                                defaultConfig,
+                                MCDevBundle("inspection.sponge_injection.fix.remove_default_config"),
+                            ),
                         )
                     } else if (configDir == null && defaultConfig == null) {
                         holder.registerProblem(
                             variable.nameIdentifier ?: variable,
-                            "An injected ${classType.name} must be annotated with either @ConfigDir or @DefaultConfig.",
+                            MCDevBundle("inspection.sponge_injection.missing_config_annotation", classType.name),
                             ProblemHighlightType.GENERIC_ERROR,
                             LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.CONFIG_DIR_ANNOTATION, annotationsOwner))!!,
                             LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner))!!,
@@ -244,7 +254,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     if (defaultConfig == null) {
                         holder.registerProblem(
                             variable.nameIdentifier ?: variable,
-                            "Injected ${classType.name} must be annotated with @DefaultConfig.",
+                            MCDevBundle("inspection.sponge_injection.missing_default_config", classType.name),
                             ProblemHighlightType.GENERIC_ERROR,
                             LocalQuickFix.from(AddAnnotationModCommandAction(SpongeConstants.DEFAULT_CONFIG_ANNOTATION, annotationsOwner))!!,
                         )
@@ -253,9 +263,12 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                     if (configDir != null) {
                         holder.registerProblem(
                             configDir,
-                            "Injected ${classType.name} cannot be annotated with @ConfigDir.",
+                            MCDevBundle("inspection.sponge_injection.config_dir_not_allowed", classType.name),
                             ProblemHighlightType.GENERIC_ERROR,
-                            QuickFixFactory.getInstance().createDeleteFix(configDir, "Remove @ConfigDir"),
+                            QuickFixFactory.getInstance().createDeleteFix(
+                                configDir,
+                                MCDevBundle("inspection.sponge_injection.fix.remove_config_dir"),
+                            ),
                         )
                     }
 
@@ -263,7 +276,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                         val ref = classType.reference
                         holder.registerProblem(
                             ref,
-                            "Injected ${classType.name} must have a generic parameter.",
+                            MCDevBundle("inspection.sponge_injection.missing_generic_parameter", classType.name),
                             ProblemHighlightType.GENERIC_ERROR,
                             MissingConfLoaderTypeParamFix(ref),
                         )
@@ -278,8 +291,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                                 val ref = param.reference
                                 holder.registerProblem(
                                     ref,
-                                    "Injected ConfigurationLoader generic parameter must be " +
-                                        "CommentedConfigurationNode.",
+                                    MCDevBundle("inspection.sponge_injection.wrong_loader_generic_parameter"),
                                     ProblemHighlightType.GENERIC_ERROR,
                                     WrongConfLoaderTypeParamFix(classType.className, ref),
                                 )
@@ -294,7 +306,10 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             configDir,
                             "${classType.name} cannot be annotated with @ConfigDir.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            quickFixFactory.createDeleteFix(configDir, "Remove @ConfigDir"),
+                            quickFixFactory.createDeleteFix(
+                                configDir,
+                                MCDevBundle("inspection.sponge_injection.fix.remove_config_dir"),
+                            ),
                         )
                     }
 
@@ -303,7 +318,10 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
                             defaultConfig,
                             "${classType.name} cannot be annotated with @DefaultConfig.",
                             ProblemHighlightType.GENERIC_ERROR,
-                            quickFixFactory.createDeleteFix(defaultConfig, "Remove @DefaultConfig"),
+                            quickFixFactory.createDeleteFix(
+                                defaultConfig,
+                                MCDevBundle("inspection.sponge_injection.fix.remove_default_config"),
+                            ),
                         )
                     }
                 }
@@ -373,7 +391,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun getFamilyName(): String = name
 
-        override fun getText(): String = "Set to CommentedConfigurationNode"
+        override fun getText(): String = MCDevBundle("inspection.sponge_injection.fix.commented_configuration_node")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val newRef = JavaPsiFacade.getElementFactory(project).createReferenceFromText(
@@ -392,7 +410,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         override fun getFamilyName(): String = name
 
-        override fun getText(): String = "Insert generic parameter"
+        override fun getText(): String = MCDevBundle("inspection.sponge_injection.fix.insert_generic_parameter")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val newRef: PsiElement = if (
@@ -425,7 +443,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
 
         private val dirPointer = directory.createSmartPointer()
 
-        override fun getFamilyName(): String = "Create asset file"
+        override fun getFamilyName(): String = MCDevBundle("inspection.sponge_injection.fix.create_asset")
 
         override fun startInWriteAction(): Boolean = false
 
@@ -453,7 +471,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
     }
 
     inner class AddToKnownInjectableTypes(private val typeFqn: String) : LocalQuickFix {
-        override fun getFamilyName(): String = "Add to known injectable types"
+        override fun getFamilyName(): String = MCDevBundle("inspection.sponge_injection.fix.add_injectable_type")
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             injectableTypesList.add(typeFqn)
@@ -461,7 +479,7 @@ class SpongeInjectionInspection : AbstractBaseJavaLocalInspectionTool() {
     }
 
     override fun getOptionsPane(): OptPane = OptPane.pane(
-        OptPane.stringList("injectableTypesList", "Injectable types")
+        OptPane.stringList("injectableTypesList", MCDevBundle("inspection.sponge_injection.option.injectable_types"))
     )
 
     override fun readSettings(node: Element) {

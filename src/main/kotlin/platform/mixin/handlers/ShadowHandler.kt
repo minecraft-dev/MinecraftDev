@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.MixinAssets
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.InsnResolutionInfo
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
@@ -74,12 +75,12 @@ class ShadowHandler : MixinMemberAnnotationHandler {
 
     override fun createUnresolvedMessage(annotation: PsiAnnotation): String? {
         val member = annotation.parentOfType<PsiMember>() ?: return null
-        val type = when (member) {
-            is PsiMethod -> "method"
-            is PsiField -> "field"
-            else -> return null
+        val name = getEffectiveName(annotation, member)
+        return when (member) {
+            is PsiMethod -> MCDevBundle("mixin.handler.unresolved_method", name)
+            is PsiField -> MCDevBundle("mixin.handler.unresolved_field", name)
+            else -> null
         }
-        return "Unresolved $type ${getEffectiveName(annotation, member)} in target class"
     }
 
     fun findFirstShadowTargetForNavigation(member: PsiMember): SmartPsiElementPointer<PsiElement>? {

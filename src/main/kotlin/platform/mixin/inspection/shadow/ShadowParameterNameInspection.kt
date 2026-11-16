@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MethodTargetMember
@@ -56,7 +57,7 @@ class ShadowParameterNameInspection : MixinInspection() {
                     val problemElement = param.nameIdentifier ?: param
                     holder.registerProblem(
                         problemElement,
-                        "Parameter name does not match name '$correctName' in target class",
+                        MCDevBundle("inspection.shadow_name_doesnt_match_target_class.message", correctName),
                         RenameFix(correctName, false, false)
                     )
                 }

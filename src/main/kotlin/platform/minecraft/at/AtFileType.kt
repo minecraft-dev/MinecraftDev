@@ -20,13 +20,14 @@
 
 package com.demonwav.mcdev.platform.minecraft.at
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
 
 object AtFileType : LanguageFileType(AtLanguage) {
 
     override fun getName() = "Access Transformers"
-    override fun getDescription() = "Access transformers"
+    override fun getDescription() = MCDevBundle("minecraft.at.file_type.description")
     override fun getDefaultExtension() = ""
     override fun getIcon() = PlatformAssets.MINECRAFT_ICON
 }

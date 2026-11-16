@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge.inspections.sideonly
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.psi.PsiAnnotation
@@ -31,7 +32,7 @@ import com.siyeh.ig.BaseInspectionVisitor
 class NewExpressionSideOnlyInspection : BaseInspection() {
 
     override fun buildErrorString(vararg infos: Any) =
-        "A class annotated with @SideOnly can only be used in other matching annotated classes and methods"
+        MCDevBundle("inspection.new_expression_side_only.message")
 
     override fun buildFix(vararg infos: Any?): LocalQuickFix? {
         val annotation = infos[0] as? PsiAnnotation ?: return null
@@ -39,7 +40,7 @@ class NewExpressionSideOnlyInspection : BaseInspection() {
         return if (annotation.isWritable) {
             RemoveAnnotationInspectionGadgetsFix(
                 annotation.qualifiedName ?: return null,
-                "Remove @SideOnly annotation from class declaration"
+                MCDevBundle("inspection.new_expression_side_only.fix")
             )
         } else {
             null

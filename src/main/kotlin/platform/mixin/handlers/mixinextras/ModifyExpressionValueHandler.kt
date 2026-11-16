@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.injector.GeneralSignatures
 import com.demonwav.mcdev.platform.mixin.inspection.injector.MethodSignature
 import com.demonwav.mcdev.platform.mixin.inspection.injector.SuggestedSignature
@@ -60,7 +61,8 @@ class ModifyExpressionValueHandler : MixinExtrasInjectorAnnotationHandler() {
         return returnType != Type.VOID_TYPE
     }
 
-    override val allowedInsnDescription = "instructions that return a value"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.modify_expression_value")
 
     override fun expectedMethodSignatureImpl(
         annotation: PsiAnnotation,

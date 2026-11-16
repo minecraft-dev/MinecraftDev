@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -58,7 +59,7 @@ class LocalNameWithoutLVTInspection : MixinInspection() {
             ) ?: return
             holder.registerProblem(
                 problemElement,
-                "@Local uses a variable name, but the target class has no local variable names at runtime",
+                MCDevBundle("inspection.local_name_without_lvt.message"),
             )
         }
     }

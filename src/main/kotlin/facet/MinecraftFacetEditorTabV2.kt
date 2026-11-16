@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -62,9 +62,9 @@ class MinecraftFacetEditorTabV2(private val configuration: MinecraftFacetConfigu
     override fun createComponent(): JComponent = panel {
         indent {
             row {
-                label("Platform")
-                label("Enabled")
-                label("Auto detect")
+                label(MCDevBundle("facet.editor.header.platform"))
+                label(MCDevBundle("facet.editor.header.enabled"))
+                label(MCDevBundle("facet.editor.header.auto_detect"))
             }.layout(RowLayout.PARENT_GRID)
 
             createRow(

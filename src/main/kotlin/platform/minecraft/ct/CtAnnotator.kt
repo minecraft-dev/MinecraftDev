@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.ct
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.fabric.util.FabricConstants
 import com.demonwav.mcdev.platform.minecraft.ct.gen.psi.CtAccess
 import com.demonwav.mcdev.platform.minecraft.ct.gen.psi.CtClassLiteral
@@ -48,23 +49,35 @@ class CtAnnotator : Annotator {
                 val access = element.text
                 val target = PsiTreeUtil.skipSiblingsForward(element, PsiWhiteSpace::class.java)?.text
                 if (!TokenSets.compatibleByAccessMap.get(access).contains(target)) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, "Access '$access' cannot be used on '$target'").create()
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("minecraft.ct.annotator.access_not_allowed", access, target),
+                    ).create()
                 }
 
                 if (element.accessElement.text.startsWith("transitive-") && effectiveVersion < 2) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, "Transitive accesses were introduced in v2").create()
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("minecraft.ct.annotator.transitive_requires_v2"),
+                    ).create()
                 }
             }
             is CtItfEntry -> {
                 if (effectiveVersion < 3) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, "Interface injection was introduced in ClassTweaker v1")
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("minecraft.ct.annotator.interface_injection_requires_v1"),
+                    )
                         .range(element.firstChild)
                         .create()
                 }
             }
             is CtExtendEnumEntry -> {
                 if (effectiveVersion < 4) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, "Enum extension was introduced in ClassTweaker v2")
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("minecraft.ct.annotator.enum_extension_requires_v2"),
+                    )
                         .range(element.firstChild)
                         .create()
                 }
@@ -73,7 +86,10 @@ class CtAnnotator : Annotator {
                 val target = element.text
                 val access = PsiTreeUtil.skipSiblingsBackward(element, PsiWhiteSpace::class.java)?.text
                 if (!TokenSets.compatibleByTargetMap.get(target).contains(access)) {
-                    holder.newAnnotation(HighlightSeverity.ERROR, "'$target' cannot be used with '$access'").create()
+                    holder.newAnnotation(
+                        HighlightSeverity.ERROR,
+                        MCDevBundle("minecraft.ct.annotator.target_not_allowed", target, access),
+                    ).create()
                 }
             }
             is CtHeader -> {
@@ -82,12 +98,18 @@ class CtAnnotator : Annotator {
                 when (element.nameString) {
                     "accessWidener" -> {
                         if (version == null || version < 1 || version > 2) {
-                            holder.newAnnotation(HighlightSeverity.ERROR, "Unrecognized access widener version").range(versionElement).create()
+                            holder.newAnnotation(
+                                HighlightSeverity.ERROR,
+                                MCDevBundle("minecraft.ct.annotator.unknown_aw_version"),
+                            ).range(versionElement).create()
                         }
                     }
                     "classTweaker" -> {
                         if (version == null || version < 3 || version > FabricConstants.CLASS_TWEAKER_VERSION) {
-                            holder.newAnnotation(HighlightSeverity.ERROR, "Unrecognized class tweaker version").range(versionElement).create()
+                            holder.newAnnotation(
+                                HighlightSeverity.ERROR,
+                                MCDevBundle("minecraft.ct.annotator.unknown_ct_version"),
+                            ).range(versionElement).create()
                         }
                     }
                 }

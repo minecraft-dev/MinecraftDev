@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.FieldTargetMember
@@ -67,9 +68,9 @@ class ShadowModifiersInspection : MixinInspection() {
             val targetStatic = (target.access and Opcodes.ACC_STATIC) != 0
             if (targetStatic != shadowModifierList.hasModifierProperty(PsiModifier.STATIC)) {
                 val message = if (targetStatic) {
-                    "@Shadow for static method should be also static"
+                    MCDevBundle("inspection.shadow_modifiers.static_method")
                 } else {
-                    "@Shadow target method is not static"
+                    MCDevBundle("inspection.shadow_modifiers.target_not_static")
                 }
 
                 holder.registerProblem(
@@ -94,8 +95,7 @@ class ShadowModifiersInspection : MixinInspection() {
                     val shadowModifier = PsiUtil.getAccessModifier(shadowAccessLevel)
                     holder.registerProblem(
                         shadowModifierList.findKeyword(shadowModifier) ?: annotation,
-                        "Invalid access modifiers, has: $shadowModifier, but target member has: " +
-                            PsiUtil.getAccessModifier(targetAccessLevel),
+                        MCDevBundle("inspection.shadow_modifiers.access_mismatch", shadowModifier, targetModifier),
                         QuickFixFactory.getInstance()
                             .createModifierListFix(shadowModifierList, targetModifier, true, false)
                     )
@@ -119,13 +119,13 @@ class ShadowModifiersInspection : MixinInspection() {
                 if (targetFinal) {
                     holder.registerProblem(
                         annotation,
-                        "@Shadow for final member should be annotated as @Final",
+                        MCDevBundle("inspection.shadow_modifiers.missing_final"),
                         LocalQuickFix.from(AddAnnotationModCommandAction(FINAL, member))!!,
                     )
                 } else {
                     holder.registerProblem(
                         shadowFinal!!,
-                        "Target method is not final",
+                        MCDevBundle("inspection.shadow_modifiers.target_not_final"),
                         RemoveAnnotationQuickFix(shadowFinal, member),
                     )
                 }

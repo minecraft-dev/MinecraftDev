@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 
 interface AddRunConfigFinalizer : CreatorFinalizer {
@@ -36,13 +37,13 @@ interface AddRunConfigFinalizer : CreatorFinalizer {
         @Suppress("UNCHECKED_CAST")
         val executables = properties[executablesName] as? List<String>
         if (executables == null) {
-            reporter.warn("Missing list of '$executables' to execute")
+            reporter.warn(MCDevBundle("creator.template.validation.missing_executables", executables))
         }
 
         @Suppress("UNCHECKED_CAST")
         val name = properties["name"] as? String
         if (name == null) {
-            reporter.warn("Missing task name")
+            reporter.warn(MCDevBundle("creator.template.validation.missing_task_name"))
         }
     }
 }

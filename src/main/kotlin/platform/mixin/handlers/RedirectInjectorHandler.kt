@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.handlers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.injectionPoint.NewInsnInjectionPoint
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.TargetInsn
 import com.demonwav.mcdev.platform.mixin.inspection.injector.ExpectedSignatures
@@ -88,7 +89,8 @@ class RedirectInjectorHandler : InsnInjectorAnnotationHandler() {
         return getRedirectType(insn)?.isInsnAllowed(insn) ?: false
     }
 
-    override val allowedInsnDescription = "redirect targets (see docs)"
+    override fun disallowedTargetMessage(): String =
+        MCDevBundle("inspection.disallowed_target_insn.message.redirect")
 
     override fun expectedMethodSignature(
         annotation: PsiAnnotation,

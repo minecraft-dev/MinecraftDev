@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants
 import com.demonwav.mcdev.platform.mixin.util.isLocalRef
@@ -49,7 +50,7 @@ class ShareNonLocalRefInspection : MixinInspection() {
             if (!parameter.type.isLocalRef) {
                 holder.registerProblem(
                     typeElement,
-                    "@Share parameter must be of type LocalRef",
+                    MCDevBundle("inspection.share_non_local_ref.message"),
                     ReplaceWithLocalRefFix(typeElement),
                 )
             }
@@ -57,9 +58,9 @@ class ShareNonLocalRefInspection : MixinInspection() {
     }
 
     private class ReplaceWithLocalRefFix(typeElement: PsiTypeElement) : LocalQuickFixOnPsiElement(typeElement) {
-        override fun getText() = "Replace with LocalRef"
+        override fun getText() = MCDevBundle("inspection.share_non_local_ref.fix")
 
-        override fun getFamilyName() = "Replace with LocalRef"
+        override fun getFamilyName() = MCDevBundle("inspection.share_non_local_ref.fix")
 
         override fun invoke(
             project: Project,

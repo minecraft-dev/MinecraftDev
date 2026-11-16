@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,12 +20,13 @@
 
 package com.demonwav.mcdev.platform.mixin.expression
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.fileTypes.LanguageFileType
 
 object MEExpressionFileType : LanguageFileType(MEExpressionLanguage) {
     override fun getName() = "MixinExtras Expression File"
-    override fun getDescription() = "MixinExtras expression file"
+    override fun getDescription() = MCDevBundle("mixin.expression.file_type.description")
     override fun getDefaultExtension() = "mixinextrasexpression"
     override fun getIcon() = PlatformAssets.MIXIN_ICON
 }

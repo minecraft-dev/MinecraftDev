@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.reference
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.TranslationConstants
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.intellij.ide.util.gotoByName.ContributorsBasedGotoByModel
@@ -63,13 +64,13 @@ class TranslationGotoModel(project: Project, private val prefix: String, private
         return result.toArray()
     }
 
-    override fun getPromptText() = "Choose translation to use"
+    override fun getPromptText() = MCDevBundle("translations.goto.prompt")
 
-    override fun getNotInMessage() = "Couldn't find translation with that name"
+    override fun getNotInMessage() = MCDevBundle("translations.goto.not_found")
 
-    override fun getNotFoundMessage() = "Couldn't find translation with that name"
+    override fun getNotFoundMessage() = MCDevBundle("translations.goto.not_found")
 
-    override fun getCheckBoxName() = "Include non-project translations"
+    override fun getCheckBoxName() = MCDevBundle("translations.goto.include_non_project")
 
     override fun loadInitialCheckBoxState() = false
 

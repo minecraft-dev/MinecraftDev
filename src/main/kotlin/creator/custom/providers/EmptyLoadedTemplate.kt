@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.providers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 
 /**
@@ -27,8 +28,10 @@ import com.demonwav.mcdev.creator.custom.TemplateDescriptor
  */
 object EmptyLoadedTemplate : LoadedTemplate {
 
-    override val label: String = "Empty template"
-    override val tooltip: String = "Empty template tooltip"
+    override val label: String
+        get() = MCDevBundle("creator.ui.empty_template.label")
+    override val tooltip: String
+        get() = MCDevBundle("creator.ui.empty_template.tooltip")
 
     override val descriptor: TemplateDescriptor
         get() = throw UnsupportedOperationException("The empty template can't have a descriptor")

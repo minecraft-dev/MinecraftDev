@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
@@ -40,11 +41,11 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
 
     private val form = panel {
         row {
-            label("Update channel:")
-            channelBox = comboBox(listOf("Stable"))
+            label(MCDevBundle("update.dialog.channel"))
+            channelBox = comboBox(listOf(MCDevBundle("update.channel.stable")))
         }
         row {
-            button("Check for Updates Now") {
+            button(MCDevBundle("update.dialog.check")) {
                 saveSettings()
                 updateCheckInProgressIcon.component.isVisible = true
                 resetUpdateStatus()
@@ -53,21 +54,24 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
 
                     updateStatusLabel.component.text = when (pluginUpdateStatus) {
                         is PluginUpdateStatus.LatestVersionInstalled ->
-                            "You have the latest version of the plugin (${PluginUtil.pluginVersion}) installed."
+                            MCDevBundle("update.dialog.status.latest", PluginUtil.pluginVersion)
                         is PluginUpdateStatus.Update -> {
                             update = pluginUpdateStatus
                             installButton.component.isVisible = true
-                            "A new version (${pluginUpdateStatus.pluginDescriptor.version}) is available"
+                            MCDevBundle("update.dialog.status.update", pluginUpdateStatus.pluginDescriptor.version)
                         }
                         else -> // CheckFailed
-                            "Update check failed: " + (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message
+                            MCDevBundle(
+                                "update.dialog.status.failed",
+                                (pluginUpdateStatus as PluginUpdateStatus.CheckFailed).message,
+                            )
                     }
 
                     false
                 }
             }
             updateCheckInProgressIcon = icon(AnimatedIcon.Default.INSTANCE)
-            installButton = button("Install Update") {
+            installButton = button(MCDevBundle("update.dialog.install")) {
                 update?.let { update ->
                     close(OK_EXIT_CODE)
                     try {
@@ -86,7 +90,7 @@ class ConfigurePluginUpdatesDialog : DialogWrapper(true) {
     private var initialSelectedChannel: Int = 0
 
     init {
-        title = "Configure Minecraft Development Plugin Updates"
+        title = MCDevBundle("update.dialog.title")
         for (channels in Channels.entries) {
             channelBox.component.addItem(channels.title)
         }

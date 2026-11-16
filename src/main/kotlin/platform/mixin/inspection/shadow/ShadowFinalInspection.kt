@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.shadow
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.FINAL
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Annotations.MUTABLE
@@ -57,7 +58,7 @@ class ShadowFinalInspection : MixinInspection() {
                 if (!isAssignmentInAppropriateInitializer(expression, field, modifiers)) {
                     holder.registerProblem(
                         expression,
-                        "@Final fields cannot be modified",
+                        MCDevBundle("inspection.shadow_final_modification.message"),
                         LocalQuickFix.from(AddAnnotationModCommandAction(MUTABLE, field))!!,
                     )
                 }

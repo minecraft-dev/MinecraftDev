@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.CreatorTemplateProcessor
 import com.demonwav.mcdev.creator.custom.TemplateFile
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
@@ -40,21 +41,21 @@ class GenerateFilesFinalizer : CreatorFinalizer {
     override fun validate(reporter: TemplateValidationReporter, properties: Map<String, Any>) {
         val files = properties["files"] as? List<*>
         if (files == null) {
-            reporter.error("Missing list of 'files' to generate")
+            reporter.error(MCDevBundle("creator.template.validation.missing_files"))
             return
         }
 
         for ((index, file) in files.withIndex()) {
             if (file !is Map<*, *>) {
-                reporter.error("File #$index must be an object")
+                reporter.error(MCDevBundle("creator.template.validation.file_not_object", index))
                 continue
             }
 
             if (file["template"] !is String) {
-                reporter.error("File #$index is missing its 'template'")
+                reporter.error(MCDevBundle("creator.template.validation.file_missing_template", index))
             }
             if (file["destination"] !is String) {
-                reporter.error("File #$index is missing its 'destination'")
+                reporter.error(MCDevBundle("creator.template.validation.file_missing_destination", index))
             }
         }
     }

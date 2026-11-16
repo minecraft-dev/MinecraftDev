@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.yaml
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.bukkit.PaperModuleType
 import com.demonwav.mcdev.platform.bukkit.SpigotModuleType
@@ -63,14 +64,14 @@ class PluginYmlInspection : LocalInspectionTool() {
 
             val resolved = scalar.references.firstNotNullOfOrNull { it.resolve() as? PsiClass }
             if (resolved == null) {
-                holder.registerProblem(scalar, "Unresolved reference")
+                holder.registerProblem(scalar, MCDevBundle("inspection.plugin_yml.unresolved"))
                 return
             }
 
             val pluginClass = JavaPsiFacade.getInstance(holder.project).findClass(pluginClassFqn, scalar.resolveScope)
                 ?: return
             if (!resolved.isInheritor(pluginClass, true)) {
-                holder.registerProblem(scalar, "Class must implement $pluginClassFqn")
+                holder.registerProblem(scalar, MCDevBundle("inspection.plugin_yml.wrong_class", pluginClassFqn))
             }
         }
     }

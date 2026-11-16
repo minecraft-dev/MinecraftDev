@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.fabric.annotater
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocStore
@@ -80,7 +81,7 @@ class AnnotaterCheckoutService {
 
             AnnotaterSettings.CheckoutMode.CUSTOM -> {
                 if (settings.customDirectory.isBlank()) {
-                    return Status.Invalid(Path(""), "No annotater directory selected")
+                    return Status.Invalid(Path(""), MCDevBundle("fabric.annotater.status.no_directory"))
                 }
                 when (val status = load(Path(settings.customDirectory), managed = false)) {
                     is Status.Available -> if (status.checkout.version != version) {

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.config.reference.MixinClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.intellij.codeInspection.ProblemsHolder
@@ -35,12 +36,12 @@ class MixinRegistrationInspection : ConfigPropertyInspection("mixins", "server",
     override fun visitValue(literal: JsonStringLiteral, holder: ProblemsHolder) {
         val mixinClass = MixinClass.resolve(literal) ?: return
         if (mixinClass !is PsiClass) {
-            holder.registerProblem(literal, "Mixin class expected")
+            holder.registerProblem(literal, MCDevBundle("inspection.invalid_mixin_registration.expected"))
             return
         }
 
         if (!mixinClass.isMixin) {
-            holder.registerProblem(literal, "Specified class is not a @Mixin class")
+            holder.registerProblem(literal, MCDevBundle("inspection.invalid_mixin_registration.not_mixin"))
         }
     }
 }

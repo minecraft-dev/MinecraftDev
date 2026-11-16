@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.config.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.config.reference.MixinPlugin
 import com.demonwav.mcdev.platform.mixin.util.MixinConstants.Classes.MIXIN_PLUGIN
 import com.intellij.codeInspection.ProblemsHolder
@@ -33,18 +34,27 @@ class MixinPluginInspection : ConfigPropertyInspection("plugin") {
     override fun visitValue(literal: JsonStringLiteral, holder: ProblemsHolder) {
         val pluginClass = MixinPlugin.resolve(literal) ?: return
         if (pluginClass !is PsiClass) {
-            holder.registerProblem(literal, "Mixin plugin class expected")
+            holder.registerProblem(literal, MCDevBundle("inspection.invalid_mixin_plugin_registration.expected"))
             return
         }
 
         val pluginInterface = MixinPlugin.findInterface(literal) ?: return
         if (!pluginClass.isInheritor(pluginInterface, true)) {
-            holder.registerProblem(literal, "Class does not extend ${PsiNameHelper.getShortClassName(MIXIN_PLUGIN)}")
+            holder.registerProblem(
+                literal,
+                MCDevBundle(
+                    "inspection.invalid_mixin_plugin_registration.wrong_class",
+                    PsiNameHelper.getShortClassName(MIXIN_PLUGIN),
+                ),
+            )
             return
         }
 
         if (!PsiUtil.isInstantiatable(pluginClass)) {
-            holder.registerProblem(literal, "Plugin class is not instantiable")
+            holder.registerProblem(
+                literal,
+                MCDevBundle("inspection.invalid_mixin_plugin_registration.not_instantiable"),
+            )
         }
     }
 }

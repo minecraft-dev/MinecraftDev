@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.intentions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.Translation
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.translations.index.TranslationInverseIndex
@@ -34,9 +35,9 @@ class RemoveDuplicatesIntention(
     private val translation: Translation,
     element: PsiElement
 ) : LocalQuickFixAndIntentionActionOnPsiElement(element) {
-    override fun getText() = "Remove duplicates (keep this translation)"
+    override fun getText() = MCDevBundle("translations.intention.remove_duplicates")
 
-    override fun getFamilyName() = "Minecraft localization"
+    override fun getFamilyName() = MCDevBundle("translations.intention.family")
 
     override fun invoke(
         project: Project,

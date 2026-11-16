@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.derivation
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.PropertyDerivation
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.types.CreatorProperty
@@ -56,40 +57,40 @@ class ReplacePropertyDerivation(
             derivation: PropertyDerivation
         ): PreparedDerivation? {
             if (derivation.parameters == null) {
-                reporter.error("Missing parameters")
+                reporter.error(MCDevBundle("creator.template.validation.missing_parameters"))
                 return null
             }
 
             if (parents.isNullOrEmpty()) {
-                reporter.error("Missing parent value")
+                reporter.error(MCDevBundle("creator.template.validation.missing_parent_value"))
                 return null
             }
 
             if (parents.size > 1) {
-                reporter.warn("More than one parent defined")
+                reporter.warn(MCDevBundle("creator.template.validation.more_than_one_parent"))
             }
 
             if (!parents[0]!!.acceptsType(String::class.java)) {
-                reporter.error("Parent property must produce a string value")
+                reporter.error(MCDevBundle("creator.template.validation.parent_string"))
                 return null
             }
 
             val regexString = derivation.parameters["regex"] as? String
             if (regexString == null) {
-                reporter.error("Missing 'regex' string parameter")
+                reporter.error(MCDevBundle("creator.template.validation.missing_string_parameter", "regex"))
                 return null
             }
 
             val regex = try {
                 Regex(regexString)
             } catch (t: Throwable) {
-                reporter.error("Invalid regex: '$regexString': ${t.message}")
+                reporter.error(MCDevBundle("creator.template.validation.invalid_regex", regexString, t.message))
                 return null
             }
 
             val replacement = derivation.parameters["replacement"] as? String
             if (replacement == null) {
-                reporter.error("Missing 'replacement' string parameter")
+                reporter.error(MCDevBundle("creator.template.validation.missing_string_parameter", "replacement"))
                 return null
             }
 

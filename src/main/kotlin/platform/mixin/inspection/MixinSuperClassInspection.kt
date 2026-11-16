@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.findStubClass
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
@@ -63,12 +64,15 @@ class MixinSuperClassInspection : MixinInspection() {
                 // Super class must be a regular class in the hierarchy of the target class(es)
                 for (targetClass in targetClasses) {
                     if (targetClass.name == superInternalName) {
-                        reportSuperClass(psiClass, "Cannot extend target class")
+                        reportSuperClass(psiClass, MCDevBundle("inspection.mixin_super_class.extends_target"))
                     } else if (targetClass.findStubClass(psiClass.project)?.isInheritor(superClass, true) == false) {
                         reportSuperClass(
                             psiClass,
-                            "Cannot find '${superClass.shortName}' " +
-                                "in the hierarchy of target class '${targetClass.shortName}'",
+                            MCDevBundle(
+                                "inspection.mixin_super_class.not_in_target_hierarchy",
+                                superClass.shortName,
+                                targetClass.shortName,
+                            ),
                         )
                     }
                 }
@@ -82,7 +86,10 @@ class MixinSuperClassInspection : MixinInspection() {
                     ) {
                         reportSuperClass(
                             psiClass,
-                            "Cannot find '${targetClass.shortName}' in the hierarchy of the super mixin",
+                            MCDevBundle(
+                                "inspection.mixin_super_class.not_in_super_mixin_hierarchy",
+                                targetClass.shortName,
+                            ),
                         )
                     }
                 }

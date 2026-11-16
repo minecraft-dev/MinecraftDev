@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.expression.gui
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.expression.MEExpressionMatchUtil
 import com.demonwav.mcdev.util.constantStringValue
 import com.intellij.openapi.application.EDT
@@ -280,7 +281,7 @@ private suspend fun layOutGraph(
         } else {
             val label = graph.insertVertex(
                 null, null,
-                "Line ${group.lineNumber}:",
+                MCDevBundle("mixin.flow_diagram.line", group.lineNumber.toString()),
                 OUTER_PADDING / 2,
                 maxY + INTER_GROUP_SPACING / 2,
                 0.0, 0.0,

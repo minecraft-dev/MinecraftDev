@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedClass
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedField
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethod
@@ -54,7 +55,7 @@ class StackEmptyInspection : BaseInspection() {
         val compareExpressionPointer = (infos[0] as PsiExpression).createSmartPointer()
         val binaryExpressionPointer = (infos[2] as PsiBinaryExpression).createSmartPointer()
         return object : LocalQuickFix {
-            override fun getFamilyName() = "Replace with .isEmpty()"
+            override fun getFamilyName() = MCDevBundle("inspection.stack_empty.fix")
 
             override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
                 val elementFactory = JavaPsiFacade.getElementFactory(project)

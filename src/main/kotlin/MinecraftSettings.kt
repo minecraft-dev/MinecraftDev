@@ -30,6 +30,7 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.Text
 import com.intellij.util.xmlb.annotations.Transient
+import java.util.function.Supplier
 
 @State(name = "MinecraftSettings", storages = [Storage("minecraft_dev.xml")])
 class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
@@ -150,18 +151,18 @@ class MinecraftSettings : PersistentStateComponent<MinecraftSettings.State> {
             state.creatorMavenRepos = creatorMavenRepos.map { it.copy() }
         }
 
-    enum class UnderlineType(private val regular: String, val effectType: EffectType) {
+    enum class UnderlineType(private val translation: Supplier<String>, val effectType: EffectType) {
 
-        NORMAL("Normal", EffectType.LINE_UNDERSCORE),
-        BOLD("Bold", EffectType.BOLD_LINE_UNDERSCORE),
-        DOTTED("Dotted", EffectType.BOLD_DOTTED_LINE),
-        BOXED("Boxed", EffectType.BOXED),
-        ROUNDED_BOXED("Rounded Boxed", EffectType.ROUNDED_BOX),
-        WAVED("Waved", EffectType.WAVE_UNDERSCORE),
+        NORMAL(MCDevBundle.pointer("minecraft.settings.underline_type.normal"), EffectType.LINE_UNDERSCORE),
+        BOLD(MCDevBundle.pointer("minecraft.settings.underline_type.bold"), EffectType.BOLD_LINE_UNDERSCORE),
+        DOTTED(MCDevBundle.pointer("minecraft.settings.underline_type.dotted"), EffectType.BOLD_DOTTED_LINE),
+        BOXED(MCDevBundle.pointer("minecraft.settings.underline_type.boxed"), EffectType.BOXED),
+        ROUNDED_BOXED(MCDevBundle.pointer("minecraft.settings.underline_type.rounded_boxed"), EffectType.ROUNDED_BOX),
+        WAVED(MCDevBundle.pointer("minecraft.settings.underline_type.waved"), EffectType.WAVE_UNDERSCORE),
         ;
 
         override fun toString(): String {
-            return regular
+            return translation.get()
         }
     }
 

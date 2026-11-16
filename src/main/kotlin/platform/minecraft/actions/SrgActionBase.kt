@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.actions
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.MinecraftModuleType
 import com.demonwav.mcdev.platform.minecraft.mappings.Mappings
 import com.demonwav.mcdev.platform.mixin.handlers.ShadowHandler
@@ -36,10 +37,10 @@ import com.intellij.psi.PsiReference
 abstract class SrgActionBase : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val data = getDataFromActionEvent(e) ?: return showBalloon(e, "Unknown failure")
+        val data = getDataFromActionEvent(e) ?: return showBalloon(e, MCDevBundle("minecraft.actions.unknown_failure"))
 
         if (data.element !is PsiIdentifier) {
-            showBalloon(e, "Not a valid element")
+            showBalloon(e, MCDevBundle("minecraft.actions.not_valid_element"))
             return
         }
 
@@ -49,7 +50,7 @@ abstract class SrgActionBase : AnAction() {
         mappingsManager.mappings.onSuccess { srgMap ->
             performWithMappings(e, data, data.element, srgMap)
         }.onError {
-            showBalloon(e, it.message ?: "No MCP data available")
+            showBalloon(e, it.message ?: MCDevBundle("minecraft.actions.no_mcp_data"))
         }
     }
 
@@ -59,7 +60,7 @@ abstract class SrgActionBase : AnAction() {
         element: PsiIdentifier,
         srgMap: Mappings?,
     ) {
-        var parent = element.parent ?: return showBalloon(e, "Not a valid element")
+        var parent = element.parent ?: return showBalloon(e, MCDevBundle("minecraft.actions.not_valid_element"))
 
         if (parent is PsiMember) {
             val shadowTarget = ShadowHandler.Util.getInstance()?.findFirstShadowTargetForReference(parent)?.element
@@ -69,7 +70,7 @@ abstract class SrgActionBase : AnAction() {
         }
 
         if (parent is PsiReference) {
-            parent = parent.resolve() ?: return showBalloon(e, "Not a valid element")
+            parent = parent.resolve() ?: return showBalloon(e, MCDevBundle("minecraft.actions.not_valid_element"))
         }
 
         withSrgTarget(parent, srgMap, e, data)

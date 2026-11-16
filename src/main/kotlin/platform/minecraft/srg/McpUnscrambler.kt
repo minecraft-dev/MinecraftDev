@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.srg
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.mappings.MappingsManager
 import com.intellij.openapi.project.Project
 import com.intellij.unscramble.UnscrambleSupport
@@ -29,7 +30,7 @@ class McpUnscrambler : UnscrambleSupport<JComponent> {
 
     private val srgPattern = Regex("(?:field|func)_\\d+_[a-zA-Z]+_?")
 
-    override fun getPresentableName() = "Remap SRG names"
+    override fun getPresentableName() = MCDevBundle("minecraft.unscrambler.srg")
 
     override fun unscramble(project: Project, text: String, logName: String, settings: JComponent?): String? {
         val srgMap = MappingsManager.findAnyInstance(project)?.mappingsNow ?: return null

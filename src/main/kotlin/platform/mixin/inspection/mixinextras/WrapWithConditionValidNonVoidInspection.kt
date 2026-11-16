@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.mixinextras.WrapWithConditionHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -68,7 +69,7 @@ class WrapWithConditionValidNonVoidInspection : MixinInspection() {
 
                 holder.registerProblem(
                     annotation.nameReferenceElement ?: annotation,
-                    "@WrapWithCondition is targeting a non-void instruction",
+                    MCDevBundle("inspection.wrap_with_condition_targets_non_void.message"),
                     *fixes.toTypedArray()
                 )
             }
@@ -76,8 +77,8 @@ class WrapWithConditionValidNonVoidInspection : MixinInspection() {
     }
 
     private class ReplaceWithWrapOpFix(annotation: PsiAnnotation) : LocalQuickFixOnPsiElement(annotation) {
-        override fun getFamilyName() = "Replace with @WrapOperation"
-        override fun getText() = "Replace with @WrapOperation"
+        override fun getFamilyName() = MCDevBundle("inspection.wrap_with_condition_targets_non_void.fix")
+        override fun getText() = MCDevBundle("inspection.wrap_with_condition_targets_non_void.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val annotation = startElement as? PsiAnnotation ?: return

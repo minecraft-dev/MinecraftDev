@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.Side
 import com.demonwav.mcdev.platform.forge.inspections.sideonly.SideOnlyUtil
 import com.demonwav.mcdev.platform.mixin.MixinModule
@@ -88,9 +89,13 @@ class UnusedMixinInspection : MixinInspection() {
                         }
                         val jsonQuickFixFile = PsiManager.getInstance(holder.project).findFile(bestQuickFixFile) as? JsonFile ?: return
                         val quickFix = QuickFix(jsonQuickFixFile.createSmartPointer(), qualifiedName, side)
-                        holder.registerProblem(problematicElement, "Mixin not found in any mixin config", quickFix)
+                        holder.registerProblem(
+                            problematicElement,
+                            MCDevBundle("inspection.unused_mixin.message"),
+                            quickFix,
+                        )
                     } else {
-                        holder.registerProblem(problematicElement, "Mixin not found in any mixin config")
+                        holder.registerProblem(problematicElement, MCDevBundle("inspection.unused_mixin.message"))
                     }
                 }
             }
@@ -103,13 +108,11 @@ class UnusedMixinInspection : MixinInspection() {
         private val side: Side,
     ) : LocalQuickFix {
 
-        private val sideDisplayName = when (side) {
-            Side.CLIENT -> "client"
-            Side.SERVER -> "server"
-            else -> "common"
+        override fun getName() = when (side) {
+            Side.CLIENT -> MCDevBundle("inspection.unused_mixin.fix.client")
+            Side.SERVER -> MCDevBundle("inspection.unused_mixin.fix.server")
+            else -> MCDevBundle("inspection.unused_mixin.fix.common")
         }
-
-        override fun getName() = "Add to Mixin config ($sideDisplayName side)"
 
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             val psiFile = quickFixFile.element ?: return
@@ -129,7 +132,7 @@ class UnusedMixinInspection : MixinInspection() {
             @Suppress("StatefulEp")
             return object : LocalQuickFixOnPsiElement(root) {
                 override fun getText(): @IntentionName String {
-                    return "Add to Mixin config ($sideDisplayName side)"
+                    return this@QuickFix.getName()
                 }
                 override fun getFamilyName(): @IntentionFamilyName String = text
 

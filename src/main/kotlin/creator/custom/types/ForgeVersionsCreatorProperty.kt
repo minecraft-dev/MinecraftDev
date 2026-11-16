@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -128,14 +128,16 @@ class ForgeVersionsCreatorProperty(
 
         descriptor.parameters?.get("mcVersionFilterParents")?.let { parents ->
             if (parents !is List<*> || parents.any { it !is String }) {
-                reporter.error("mcVersionFilterParents must be a list of strings")
+                reporter.error(MCDevBundle("creator.template.validation.must_be_string_list", "mcVersionFilterParents"))
             } else {
                 @Suppress("UNCHECKED_CAST")
                 this.mcVersionFilterParents = parents as List<String>
                 for (parent in parents) {
                     val parentProp = properties[parent]
                     if (parentProp == null) {
-                        reporter.error("Unknown mcVersionFilter parent $parent")
+                        reporter.error(
+                            MCDevBundle("creator.template.validation.unknown_mc_version_filter_parent", parent),
+                        )
                         continue
                     }
 

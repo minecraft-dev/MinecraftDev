@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.runGradleTaskAndWait
 import com.intellij.ide.util.projectWizard.WizardContext
@@ -35,7 +36,7 @@ class RunGradleTasksFinalizer : CreatorFinalizer {
         @Suppress("UNCHECKED_CAST")
         val tasks = properties["tasks"] as? List<String>
         if (tasks == null) {
-            reporter.warn("Missing list of 'tasks' to execute")
+            reporter.warn(MCDevBundle("creator.template.validation.missing_tasks"))
         }
     }
 

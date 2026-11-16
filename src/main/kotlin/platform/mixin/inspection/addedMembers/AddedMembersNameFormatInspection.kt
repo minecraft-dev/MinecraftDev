@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.addedMembers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.platform.fabric.FabricModuleType
 import com.demonwav.mcdev.platform.minecraft.ct.CtInterfaceInjections
@@ -65,6 +66,7 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.columns
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.xmlb.annotations.Attribute
+import java.util.function.Supplier
 import javax.swing.JComponent
 
 class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
@@ -176,13 +178,13 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
         if (fixed != null && StringUtil.isJavaIdentifier(fixed) && validNameFormat.matches(fixed)) {
             holder.registerProblem(
                 added.nameIdentifier ?: return,
-                "Name does not match the pattern for added mixin members: \"${validNameFormat.pattern}\"",
+                MCDevBundle("inspection.added_mixin_members_name_pattern.message", validNameFormat.pattern),
                 RenameWithInheritanceFix(added, fixed)
             )
         } else {
             holder.registerProblem(
                 added.nameIdentifier ?: return,
-                "Name does not match the pattern for added mixin members: \"${validNameFormat.pattern}\"",
+                MCDevBundle("inspection.added_mixin_members_name_pattern.message", validNameFormat.pattern),
             )
         }
     }
@@ -196,13 +198,13 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
 
     override fun createOptionsPanel(): JComponent {
         return panel {
-            row("Valid name format:") {
+            row(MCDevBundle("inspection.added_mixin_members_name_pattern.option.format")) {
                 textField()
                     .doBindText({ validNameFormat.pattern }, { validNameFormat = it.toRegexOrDefault(".+[_$].+") })
                     .columns(COLUMNS_SHORT)
                     .regexValidator()
             }
-            row("Valid name fix search:") {
+            row(MCDevBundle("inspection.added_mixin_members_name_pattern.option.fix_search")) {
                 textField()
                     .doBindText({ validNameFixSearch.pattern }, { validNameFixSearch = it.toRegexOrDefault(".+") })
                     .columns(COLUMNS_SHORT)
@@ -210,10 +212,8 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
             }
             row {
                 layout(RowLayout.LABEL_ALIGNED)
-                val toolTip =
-                    "Uses regex replacement syntax after matching from the regex in the option above.<br/>" +
-                        "\"MOD_ID\" is replaced with the project name, converted to a valid Java identifier."
-                label("Valid name fix replace:")
+                val toolTip = MCDevBundle("inspection.added_mixin_members_name_pattern.option.fix_replace.tooltip")
+                label(MCDevBundle("inspection.added_mixin_members_name_pattern.option.fix_replace"))
                     .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
                     .applyToComponent { icon = AllIcons.General.ContextHelp }
                     .applyToComponent { toolTipText = toolTip }
@@ -222,31 +222,33 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
 
             separator()
 
-            row("Report fields:") {
+            row(MCDevBundle("inspection.added_mixin_members_name_pattern.option.report_fields")) {
                 comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportFields)
             }
-            row("Report methods:") {
+            row(MCDevBundle("inspection.added_mixin_members_name_pattern.option.report_methods")) {
                 comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportMethods)
             }
             row {
                 layout(RowLayout.LABEL_ALIGNED)
-                label("Report inherited methods:")
+                label(MCDevBundle("inspection.added_mixin_members_name_pattern.option.report_inherited"))
                     .applyToComponent { horizontalTextPosition = JBLabel.LEFT }
                     .applyToComponent { icon = AllIcons.General.ContextHelp }
-                    .applyToComponent { toolTipText = "Reports methods that are inherited from duck interfaces" }
+                    .applyToComponent { toolTipText = MCDevBundle(
+                        "inspection.added_mixin_members_name_pattern.option.report_inherited.tooltip",
+                    ) }
                 comboBox(EnumComboBoxModel(ReportMode::class.java)).doBindItem(::reportInheritedMethods)
             }
             indent {
                 row {
-                    checkBox("Ignore if a parameter or return type is from the current project")
+                    checkBox(MCDevBundle("inspection.added_mixin_members_name_pattern.option.ignore_project_types"))
                         .bindSelected(::ignoreInheritedWithProjectTypeInDescriptor)
                 }
                 row {
-                    checkBox("Ignore if the interface is transitively injected by a class tweaker")
+                    checkBox(MCDevBundle("inspection.added_mixin_members_name_pattern.option.ignore_class_tweaker"))
                         .bindSelected(::ignoreInheritedFromTransitivelyInjectedInterfaces)
                 }
                 row {
-                    checkBox("Ignore if the interface is in an API package:")
+                    checkBox(MCDevBundle("inspection.added_mixin_members_name_pattern.option.ignore_api_package"))
                         .bindSelected(::ignoreInheritedFromApiInterfaces)
                     textField()
                         .doBindText(
@@ -264,10 +266,13 @@ class AddedMembersNameFormatInspection : AbstractAddedMembersInspection() {
         private const val DEFAULT_API_PACKAGE_FORMAT = "(.+\\.)?api(\\..+)?"
     }
 
-    enum class ReportMode(private val displayName: String) {
-        ALWAYS("Always"), ON_FABRIC("On Fabric"), NOT_ON_FABRIC("Not on Fabric"), NEVER("Never");
+    enum class ReportMode(private val displayName: Supplier<String>) {
+        ALWAYS(MCDevBundle.pointer("inspection.added_mixin_members_name_pattern.report_mode.always")),
+        ON_FABRIC(MCDevBundle.pointer("inspection.added_mixin_members_name_pattern.report_mode.on_fabric")),
+        NOT_ON_FABRIC(MCDevBundle.pointer("inspection.added_mixin_members_name_pattern.report_mode.not_on_fabric")),
+        NEVER(MCDevBundle.pointer("inspection.added_mixin_members_name_pattern.report_mode.never"));
 
-        override fun toString() = displayName
+        override fun toString() = displayName.get()
 
         fun shouldReport(module: Module?): Boolean {
             if (this == NEVER) {

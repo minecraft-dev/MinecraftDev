@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.translations.intentions
 
 import com.demonwav.mcdev.TranslationSettings
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.mappings.getMappedMethodCall
 import com.demonwav.mcdev.translations.TranslationFiles
 import com.demonwav.mcdev.util.findModule
@@ -55,9 +56,9 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
         }
 
         val result = Messages.showInputDialogWithCheckBox(
-            "Enter translation key:",
-            "Convert String Literal to Translation",
-            "Replace literal with call to I18n (only works on clients!)",
+            MCDevBundle("translations.intention.convert.prompt"),
+            MCDevBundle("translations.intention.convert.title"),
+            MCDevBundle("translations.intention.convert.replace_literal"),
             true,
             true,
             Messages.getQuestionIcon(),
@@ -65,10 +66,10 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
             object : InputValidatorEx {
                 override fun getErrorText(inputString: String): String? {
                     if (inputString.isEmpty()) {
-                        return "Key must not be empty"
+                        return MCDevBundle("translations.key.empty")
                     }
                     if (inputString.contains('=')) {
-                        return "Key must not contain separator character ('=')"
+                        return MCDevBundle("translations.key.contains_separator")
                     }
                     return null
                 }
@@ -127,7 +128,7 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
         } catch (e: Exception) {
             Notification(
                 "Translation support error",
-                "Error while adding translation",
+                MCDevBundle("translations.add.error.title"),
                 e.message ?: e.stackTraceToString(),
                 NotificationType.WARNING,
             ).notify(project)
@@ -139,9 +140,9 @@ class ConvertToTranslationIntention : PsiElementBaseIntentionAction() {
         return literal?.evaluateString() is String
     }
 
-    override fun getFamilyName() = "Convert string literal to translation"
+    override fun getFamilyName() = MCDevBundle("translations.intention.convert")
 
-    override fun getText() = "Convert string literal to translation"
+    override fun getText() = MCDevBundle("translations.intention.convert")
 
     override fun startInWriteAction() = false
 }

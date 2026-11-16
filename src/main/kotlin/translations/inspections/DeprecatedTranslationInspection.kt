@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.translations.inspections
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.translations.DeprecatedTranslations
 import com.demonwav.mcdev.translations.identification.TranslationIdentifier
 import com.intellij.codeInspection.ProblemsHolder
@@ -44,11 +45,12 @@ class DeprecatedTranslationInspection : TranslationInspection() {
                 val isRemoved = result.key.full in deprecations.removed
                 val isRenamed = result.key.full in deprecations.renamed
                 if (isRemoved || isRenamed) {
-                    val type = if (isRemoved) "removed" else "renamed"
-                    holder.registerProblem(
-                        node.sourcePsi!!,
-                        "Usage of $type translation in deprecated.json"
-                    )
+                    val message = if (isRemoved) {
+                        MCDevBundle("inspection.deprecated_translation.message.removed")
+                    } else {
+                        MCDevBundle("inspection.deprecated_translation.message.renamed")
+                    }
+                    holder.registerProblem(node.sourcePsi!!, message)
                 }
             }
 

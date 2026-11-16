@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.forge
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.demonwav.mcdev.facet.MinecraftFacet
 import com.demonwav.mcdev.insight.generation.EventListenerGenerationSupport
@@ -155,11 +156,10 @@ class ForgeModule internal constructor(facet: MinecraftFacet) : AbstractModule(f
     }
 
     private fun formatWrongEventMessage(expected: String, suggested: String, wrong: Boolean): String {
-        val base = "Parameter is not a subclass of $expected\n"
         if (wrong) {
-            return base + "This method should be annotated with $suggested"
+            return MCDevBundle("insight.event_listener.wrong_event.wrong_annotation", expected, suggested)
         }
-        return base + "Compiling and running this listener may result in a runtime exception"
+        return MCDevBundle("insight.event_listener.wrong_event.subclass", expected)
     }
 
     override fun isStaticListenerSupported(method: PsiMethod) = true

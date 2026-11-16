@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.at
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.asset.PlatformAssets
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.options.colors.AttributesDescriptor
@@ -46,17 +47,38 @@ class AtColorSettingsPage : ColorSettingsPage {
     override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? = null
     override fun getAttributeDescriptors() = Constants.DESCRIPTORS
     override fun getColorDescriptors(): Array<out ColorDescriptor> = ColorDescriptor.EMPTY_ARRAY
-    override fun getDisplayName() = "Access Transformers"
+    override fun getDisplayName() = MCDevBundle("minecraft.at.color_settings.display_name")
 
     private object Constants {
         val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Keyword", AtSyntaxHighlighter.KEYWORD),
-            AttributesDescriptor("Class name", AtSyntaxHighlighter.CLASS_NAME),
-            AttributesDescriptor("Class value", AtSyntaxHighlighter.CLASS_VALUE),
-            AttributesDescriptor("Primitive value", AtSyntaxHighlighter.PRIMITIVE),
-            AttributesDescriptor("Element name", AtSyntaxHighlighter.ELEMENT_NAME),
-            AttributesDescriptor("Asterisk", AtSyntaxHighlighter.ASTERISK),
-            AttributesDescriptor("Comment", AtSyntaxHighlighter.COMMENT),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.keyword"),
+                AtSyntaxHighlighter.KEYWORD,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.class_name"),
+                AtSyntaxHighlighter.CLASS_NAME,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.class_value"),
+                AtSyntaxHighlighter.CLASS_VALUE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.primitive_value"),
+                AtSyntaxHighlighter.PRIMITIVE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.element_name"),
+                AtSyntaxHighlighter.ELEMENT_NAME,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.asterisk"),
+                AtSyntaxHighlighter.ASTERISK,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.at.color_settings.comment"),
+                AtSyntaxHighlighter.COMMENT,
+            ),
         )
     }
 }

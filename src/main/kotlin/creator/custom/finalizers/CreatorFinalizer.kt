@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.creator.custom.finalizers
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.TemplateEvaluator
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
@@ -64,27 +65,29 @@ interface CreatorFinalizer {
             finalizers: List<Map<String, Any>>,
         ) {
             for ((index, properties) in finalizers.withIndex()) {
-                reporter.subject = "Finalizer #$index"
+                reporter.subject = MCDevBundle("creator.template.validation.finalizer_subject", index)
 
                 val type = properties["type"] as? String
                 if (type == null) {
-                    reporter.error("Missing required 'type' value")
+                    reporter.error(MCDevBundle("creator.template.validation.finalizer_missing_type"))
                 }
 
                 val condition = properties["condition"]
                 if (condition != null && condition !is String) {
-                    reporter.error("'condition' must be a string")
+                    reporter.error(MCDevBundle("creator.template.validation.finalizer_condition_string"))
                 }
 
                 if (type != null) {
                     val finalizer = COLLECTOR.findSingle(type)
                     if (finalizer == null) {
-                        reporter.error("Unknown finalizer of type $type")
+                        reporter.error(MCDevBundle("creator.template.validation.finalizer_unknown_type", type))
                     } else {
                         try {
                             finalizer.validate(reporter, properties)
                         } catch (t: Throwable) {
-                            reporter.error("Unexpected error during finalizer validation: ${t.message}")
+                            reporter.error(
+                                MCDevBundle("creator.template.validation.finalizer_unexpected_error", t.message),
+                            )
                             thisLogger().error("Unexpected error during finalizer validation", t)
                         }
                     }

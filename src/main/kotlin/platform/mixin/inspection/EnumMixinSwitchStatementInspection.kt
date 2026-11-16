@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.platform.mixin.util.mixinTargets
 import com.intellij.codeInspection.LocalQuickFix
@@ -60,13 +61,23 @@ class EnumMixinSwitchStatementInspection : MixinInspection() {
             if (targetClass != null) {
                 fixes += AddCastFix(expression, targetClass.name)
             }
-            holder.registerProblem(expression, "Switch used on enum mixin", *fixes.toTypedArray())
+            holder.registerProblem(
+                expression,
+                MCDevBundle("inspection.switch_on_enum_mixin.message"),
+                *fixes.toTypedArray(),
+            )
         }
     }
 
     private class AddCastFix(expression: PsiExpression, private val targetClass: String) : LocalQuickFixOnPsiElement(expression) {
-        override fun getFamilyName() = "Add double cast to ${targetClass.substringAfterLast('/').replace('$', '.')}"
-        override fun getText() = "Add cast to target class ${targetClass.substringAfterLast('/').replace('$', '.')}"
+        override fun getFamilyName() = MCDevBundle(
+            "inspection.switch_on_enum_mixin.fix.family",
+            targetClass.substringAfterLast('/').replace('$', '.'),
+        )
+        override fun getText() = MCDevBundle(
+            "inspection.switch_on_enum_mixin.fix",
+            targetClass.substringAfterLast('/').replace('$', '.'),
+        )
 
         override fun invoke(project: Project, psiFile: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val expression = startElement as? PsiExpression ?: return

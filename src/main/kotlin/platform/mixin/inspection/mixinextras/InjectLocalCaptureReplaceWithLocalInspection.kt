@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.mixinextras
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.InsnInjectorAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
@@ -193,7 +194,7 @@ class InjectLocalCaptureReplaceWithLocalInspection : MixinInspection() {
 
                 holder.registerProblem(
                     localsValue,
-                    "@Inject local capture can be replaced by @Local",
+                    MCDevBundle("inspection.inject_local_capture_can_be_replaced_with_local.message"),
                     ReplaceWithLocalFix(annotation, callbackInfoIndex, localSpecifiers)
                 )
             }
@@ -212,9 +213,9 @@ class InjectLocalCaptureReplaceWithLocalInspection : MixinInspection() {
         private val callbackInfoIndex: Int,
         @SafeFieldForPreview private val localSpecifiers: List<LocalSpecifier>
     ) : LocalQuickFixOnPsiElement(injectAnnotation) {
-        override fun getFamilyName() = "Replace @Inject local capture with @Local"
+        override fun getFamilyName() = MCDevBundle("inspection.inject_local_capture_can_be_replaced_with_local.fix")
 
-        override fun getText() = "Replace @Inject local capture with @Local"
+        override fun getText() = MCDevBundle("inspection.inject_local_capture_can_be_replaced_with_local.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val injectAnnotation = startElement as? PsiAnnotation ?: return

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.util.isMixin
 import com.demonwav.mcdev.util.findContainingClass
 import com.intellij.codeInsight.intention.QuickFixFactory
@@ -43,7 +44,7 @@ class MixinInnerClassInspection : MixinInspection() {
                 if (outerClass is PsiAnonymousClass && outerClass.parentOfType<PsiClass>()?.isMixin == true) {
                     holder.registerProblem(
                         psiClass.nameIdentifier ?: psiClass,
-                        "Inner class not allowed inside anonymous classes inside mixins",
+                        MCDevBundle("inspection.mixin_inner_class.inside_anonymous"),
                     )
                 }
 
@@ -56,7 +57,7 @@ class MixinInnerClassInspection : MixinInspection() {
                 if (!psiClass.hasModifierProperty(PsiModifier.STATIC)) {
                     holder.registerProblem(
                         psiClass.modifierList!!,
-                        "@Mixin inner class must be static",
+                        MCDevBundle("inspection.mixin_inner_class.must_be_static"),
                         QuickFixFactory.getInstance().createModifierListFix(psiClass, PsiModifier.STATIC, true, false),
                     )
                 }
@@ -74,7 +75,7 @@ class MixinInnerClassInspection : MixinInspection() {
 
             holder.registerProblem(
                 psiClass.baseClassReference,
-                "Double nested anonymous classes are not allowed in a @Mixin class"
+                MCDevBundle("inspection.mixin_inner_class.double_nested_anonymous")
             )
         }
     }

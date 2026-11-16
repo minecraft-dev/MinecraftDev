@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -21,6 +21,6 @@
 package com.demonwav.mcdev.util.reference
 
 interface InspectionReference {
-    val description: String
+    fun unresolvedMessage(name: String): String
     val unresolved: Boolean
 }

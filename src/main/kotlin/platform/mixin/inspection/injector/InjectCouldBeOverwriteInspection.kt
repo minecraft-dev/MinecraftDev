@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.mixin.inspection.injector
 
+import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.mixin.handlers.MixinAnnotationHandler
 import com.demonwav.mcdev.platform.mixin.inspection.MixinInspection
 import com.demonwav.mcdev.platform.mixin.util.ClassAndMethodNode
@@ -120,7 +121,7 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
 
             holder.registerProblem(
                 method.nameIdentifier ?: return,
-                "@Inject could be @Overwrite",
+                MCDevBundle("inspection.inject_could_be_overwrite.message"),
                 ReplaceInjectWithOverwriteQuickFix(method, targetMethod)
             )
         }
@@ -194,8 +195,8 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
         method: PsiMethod,
         @SafeFieldForPreview private val targetMethod: ClassAndMethodNode
     ) : LocalQuickFixOnPsiElement(method) {
-        override fun getFamilyName() = "Replace @Inject with @Overwrite"
-        override fun getText() = "Replace @Inject with @Overwrite"
+        override fun getFamilyName() = MCDevBundle("inspection.inject_could_be_overwrite.fix")
+        override fun getText() = MCDevBundle("inspection.inject_could_be_overwrite.fix")
 
         override fun invoke(project: Project, file: PsiFile, startElement: PsiElement, endElement: PsiElement) {
             val oldMethod = startElement as? PsiMethod ?: return
@@ -351,13 +352,13 @@ class InjectCouldBeOverwriteInspection : MixinInspection() {
     private class CleanupJoinDeclarationAndAssignmentInspection :
         JoinDeclarationAndAssignmentJavaInspection(),
         CleanupLocalInspectionTool {
-        override fun getDisplayName() = "Join declarations and assignments"
+        override fun getDisplayName() = MCDevBundle("inspection.inject_could_be_overwrite.join_declarations")
     }
 
     private class CleanupUnnecessaryLocalVariableInspection :
         UnnecessaryLocalVariableInspection(),
         CleanupLocalInspectionTool {
-        override fun getDisplayName() = "Unnecessary local variable"
+        override fun getDisplayName() = MCDevBundle("inspection.inject_could_be_overwrite.unnecessary_local")
     }
 
     private object Util {

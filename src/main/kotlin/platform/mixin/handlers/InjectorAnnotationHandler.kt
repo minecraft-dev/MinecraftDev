@@ -82,7 +82,7 @@ abstract class InjectorAnnotationHandler : MixinAnnotationHandler {
 
         return resolveTarget(annotation, targetClass).map { targetMethod ->
             isUnresolved(annotation, targetClass, targetMethod.classAndMethod.method) ?: return@isUnresolved null
-        }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure(AtResolver.DEFAULT_UNRESOLVED_MESSAGE)
+        }.reduceOrNull(InsnResolutionInfo.Failure::combine) ?: InsnResolutionInfo.Failure(AtResolver.defaultUnresolvedMessage)
     }
 
     protected abstract fun isUnresolved(
