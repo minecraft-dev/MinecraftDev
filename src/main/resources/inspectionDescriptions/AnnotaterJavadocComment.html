@@ -1,0 +1,37 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports comments in the annotater Javadoc editor that are not Markdown documentation comments (<code>///</code>)
+</p>
+<!-- tooltip end -->
+<p>
+    Annotater stores its Javadocs as Markdown, so only Markdown documentation comments can be saved to the annotater checkout.
+    Traditional Javadoc comments (<code>/** */</code>), line comments and block comments are not supported.
+</p>
+<pre><code>
+/** Returns the maximum stack size. */   // bad
+/// Returns the maximum stack size.       // good
+public int getMaxStackSize() {
+</code></pre>
+</body>
+</html>

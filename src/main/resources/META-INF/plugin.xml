@@ -34,6 +34,7 @@
     <depends optional="true" config-file="mcdev-kotlin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="mcdev-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="mcdev-yaml.xml">org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="mcdev-annotater-git.xml">Git4Idea</depends>
 
     <id>com.demonwav.minecraft-dev</id>
     <name>Minecraft Development</name>
@@ -321,6 +322,10 @@
                                  id="Settings.Minecraft"
                                  groupId="language"
                                  instance="com.demonwav.mcdev.MinecraftConfigurable"/>
+        <applicationConfigurable key="fabric.annotater.settings.display_name"
+                                 id="Settings.Minecraft.Annotater"
+                                 parentId="Settings.Minecraft"
+                                 instance="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterConfigurable"/>
         <projectConfigurable key="minecraft.settings.project.display_name"
                              id="Settings.Minecraft.Project"
                              parentId="Settings.Minecraft"
@@ -608,6 +613,32 @@
             implementation="com.demonwav.mcdev.platform.minecraft.navigation.SrgMemberChooseByNameContributor"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.fabricloom.TinyUnscrambler"/>
         <unscrambleSupport implementation="com.demonwav.mcdev.platform.minecraft.srg.McpUnscrambler"/>
+
+        <!-- annotater -->
+        <applicationService serviceImplementation="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterSettings"/>
+        <notificationGroup id="Minecraft annotater" key="notification.group.minecraft_annotater" displayType="BALLOON"/>
+        <lang.documentationProvider language="JAVA" order="first"
+                                    implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocDocumentationProvider"/>
+        <highlightingPassFactory
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocInlayPassFactory"/>
+        <editorNotificationProvider
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocEditorNotificationProvider"/>
+        <codeStyleSettingsModifier
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCodeStyleSettingsModifier"/>
+        <completion.contributor language="JAVA" order="first"
+                                implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCompletionContributor"/>
+        <daemon.intentionActionFilter
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocIntentionActionFilter"/>
+        <vetoRenameCondition
+            implementation="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocVetoRenameCondition"/>
+        <lang.formatter language="JAVA"
+                        implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocFormattingModelBuilder"/>
+        <intentionAction>
+            <language>JAVA</language>
+            <className>com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocIntention</className>
+            <categoryKey>intention.category.minecraft</categoryKey>
+            <descriptionDirectoryName>EditAnnotaterJavadocIntention</descriptionDirectoryName>
+        </intentionAction>
         <!--endregion-->
 
         <!--region MIXIN-->
@@ -937,6 +968,18 @@
         <!--endregion-->
 
         <!--region MINECRAFT INSPECTIONS-->
+        <localInspection key="inspection.annotater_javadoc_unqualified_reference.name"
+                         groupKey="inspection.group.minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocUnqualifiedReferenceInspection"/>
+        <localInspection key="inspection.annotater_javadoc_comment.name"
+                         groupKey="inspection.group.minecraft"
+                         language="JAVA"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocCommentInspection"/>
         <localInspection key="inspection.at_usage.name"
                          groupKey="inspection.group.minecraft"
                          language="Access Transformers"
@@ -1505,6 +1548,10 @@
     <applicationListeners>
         <listener class="com.demonwav.mcdev.translations.TranslationFileListener"
                   topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+        <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
+                  topic="com.demonwav.mcdev.platform.fabric.annotater.AnnotaterListener"/>
+        <listener class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.AnnotaterJavadocRefresher"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListenerBackgroundable"/>
     </applicationListeners>
 
     <projectListeners>
@@ -1568,6 +1615,10 @@
         </action>
         <action class="com.demonwav.mcdev.insight.generation.MinecraftClassCreateAction" id="CreateMinecraftClass">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+        <action class="com.demonwav.mcdev.platform.fabric.annotater.javadoc.EditAnnotaterJavadocAction"
+                id="EditAnnotaterJavadoc">
+            <add-to-group relative-to-action="EditorPopupMenu2" anchor="after" group-id="EditorPopupMenu"/>
         </action>
         <action class="com.demonwav.mcdev.platform.minecraft.actions.CopyAwAction" id="CopyAWAction">
             <add-to-group relative-to-action="CopyATAction" anchor="after" group-id="Copy.Paste.Special"/>

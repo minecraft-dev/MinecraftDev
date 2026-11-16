@@ -1,0 +1,6 @@
+/// Clamps a value between a minimum and a maximum.
+///
+/// @return <spot>the clamped value</spot>
+public static int clamp(int value, int min, int max) {
+    return Math.min(Math.max(value, min), max);
+}

@@ -1,0 +1,38 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports classes referenced in annotater Javadocs without their fully qualified name
+</p>
+<!-- tooltip end -->
+<p>
+    Annotater Javadocs are applied to Minecraft sources that may have different imports to the file they were written in, so
+    annotater requires every class referenced from a Javadoc to be written with its fully qualified name. Fully qualified
+    names can still be shown shortened in the inlay hints, depending on the annotater settings.
+</p>
+<pre><code>
+/// Returns the [ItemStack] in the given slot.                            // bad
+/// Returns the [net.minecraft.world.item.ItemStack] in the given slot.   // good
+public ItemStack getItem(int slot) {
+</code></pre>
+</body>
+</html>

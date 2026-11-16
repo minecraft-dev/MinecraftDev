@@ -65,9 +65,19 @@ object McdevHttp {
         return "$base/$authority$path$query"
     }
 
-    fun request(url: String, headers: Map<String, String> = emptyMap()): RequestBuilder {
+    fun request(url: String, headers: Map<String, String> = emptyMap()): RequestBuilder =
+        build(url, headers) { HttpRequests.request(it) }
+
+    fun post(url: String, contentType: String, headers: Map<String, String> = emptyMap()): RequestBuilder =
+        build(url, headers) { HttpRequests.post(it, contentType) }
+
+    private inline fun build(
+        url: String,
+        headers: Map<String, String>,
+        create: (String) -> RequestBuilder,
+    ): RequestBuilder {
         val resolved = resolve(url)
-        val builder = HttpRequests.request(resolved).userAgent(PluginUtil.useragent)
+        val builder = create(resolved).userAgent(PluginUtil.useragent)
         if (resolved != url) {
             builder.useProxy(false)
         }
