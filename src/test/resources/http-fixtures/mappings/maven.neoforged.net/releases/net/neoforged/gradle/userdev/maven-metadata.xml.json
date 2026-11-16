@@ -1,0 +1,14 @@
+{
+  "name": "https://maven.neoforged.net/releases/net/neoforged/gradle/userdev/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/maven.neoforged.net/releases/net/neoforged/gradle/userdev/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "maven.neoforged.net/releases/net/neoforged/gradle/userdev/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}

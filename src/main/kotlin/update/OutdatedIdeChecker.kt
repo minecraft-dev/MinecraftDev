@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.update
 
 import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.util.McdevHttp
 import com.google.gson.JsonParser
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
@@ -30,7 +31,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.BuildNumber
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.util.io.HttpRequests
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -75,9 +75,7 @@ class OutdatedIdeChecker : ProjectActivity {
     }
 
     private fun fetchLatestReleaseBuild(): BuildNumber? {
-        val text = HttpRequests.request(RELEASES_URL)
-            .userAgent(PluginUtil.useragent)
-            .readString()
+        val text = McdevHttp.request(RELEASES_URL).readString()
         val build = JsonParser.parseString(text).asJsonObject
             .getAsJsonArray(PRODUCT_CODE)
             ?.firstOrNull()

@@ -1,0 +1,14 @@
+{
+  "name": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}

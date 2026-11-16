@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,25 +18,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.gradle.accessors.dm.LibrariesForLibs
-
 plugins {
     idea
 }
 
-val jflex: Configuration by configurations.creating
-val jflexSkeleton: Configuration by configurations.creating
-val grammarKit: Configuration by configurations.creating
+val jflex = configurations.create("jflex")
+val jflexSkeleton = configurations.create("jflexSkeleton")
+val grammarKit = configurations.create("grammarKit")
 
-val libs = the<LibrariesForLibs>()
+val libs = versionCatalogs.named("libs")
 dependencies {
-    jflex(libs.jflex.lib)
-    jflexSkeleton(libs.jflex.skeleton) {
+    jflex(libs.findLibrary("jflex.lib").get())
+    jflexSkeleton(libs.findLibrary("jflex.skeleton").get()) {
         artifact {
             extension = "skeleton"
         }
     }
-    grammarKit(libs.grammarKit)
+    grammarKit(libs.findLibrary("grammarKit").get())
 }
 
 idea {

@@ -21,7 +21,7 @@
 package com.demonwav.mcdev.creator.custom.npm
 
 import com.demonwav.mcdev.asset.MCDevBundle
-import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.McdevHttp
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -37,8 +37,6 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.NioFiles
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.io.DigestUtil
-import com.intellij.util.io.HttpRequests
-import com.intellij.util.io.URLUtil
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
@@ -81,7 +79,6 @@ object NpmEnvironment {
     private val mutex = Mutex()
 
     private const val CUSTOM_NPM_PATH_KEY = "mcdev.creator.npm.path"
-    private const val REGISTRY_URL = "https://registry.npmjs.org"
 
     val directory: Path
         get() = PathManager.getSystemDir().resolve("mcdev-npm")
@@ -108,11 +105,7 @@ object NpmEnvironment {
      * Fetches information about who published the given version (or dist-tag) of a package from the npm registry.
      */
     fun fetchPackageInfo(source: NpmPackageSource.Registry): NpmPackageInfo {
-        // Scoped packages need their slash to be escaped
-        val url = "$REGISTRY_URL/${source.name.replace("/", "%2F")}/${URLUtil.encodeURIComponent(source.version)}"
-        val text = HttpRequests.request(url)
-            .userAgent(PluginUtil.useragent)
-            .readString()
+        val text = McdevHttp.request(NpmRegistry.packageUrl(source.name, source.version)).readString()
         val json = Json.parseToJsonElement(text).jsonObject
 
         fun JsonElement?.personName(): String? = when (this) {

@@ -47,8 +47,12 @@ class LocalMayUseNameInspection : MixinInspection() {
     @JvmField
     var ignoreForImplicitLocals = false
 
+    @JvmField
+    var ignoreWhenArgsOnly = false
+
     override fun getOptionsPane() = OptPane.pane(
-        OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals")
+        OptPane.checkbox("ignoreForImplicitLocals", "Ignore for implicit locals"),
+        OptPane.checkbox("ignoreWhenArgsOnly", "Ignore when argsOnly is true")
     )
 
     override fun buildVisitor(holder: ProblemsHolder) = object : JavaElementVisitor() {
@@ -66,6 +70,10 @@ class LocalMayUseNameInspection : MixinInspection() {
             val localInfo = LocalInfo.fromAnnotation(localType, localAnnotation)
 
             if (ignoreForImplicitLocals && localInfo.isImplicit) {
+                return
+            }
+
+            if (ignoreWhenArgsOnly && localInfo.argsOnly) {
                 return
             }
 

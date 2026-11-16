@@ -1,0 +1,14 @@
+{
+  "name": "https://registry.npmjs.org/@fabricmc%2Fcli/latest",
+  "request": {
+    "method": "GET",
+    "url": "/registry.npmjs.org/@fabricmc%2Fcli/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "registry.npmjs.org/@fabricmc%2Fcli/latest",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

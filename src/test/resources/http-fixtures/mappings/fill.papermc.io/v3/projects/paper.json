@@ -1,0 +1,14 @@
+{
+  "name": "https://fill.papermc.io/v3/projects/paper",
+  "request": {
+    "method": "GET",
+    "url": "/fill.papermc.io/v3/projects/paper"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "fill.papermc.io/v3/projects/paper",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

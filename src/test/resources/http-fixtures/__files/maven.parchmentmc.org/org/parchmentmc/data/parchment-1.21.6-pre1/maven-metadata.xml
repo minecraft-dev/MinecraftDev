@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.parchmentmc.data</groupId>
+  <artifactId>parchment-1.21.6-pre1</artifactId>
+  <versioning>
+    <latest>BLEEDING-SNAPSHOT</latest>
+    <versions>
+      <version>BLEEDING-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20250609171203</lastUpdated>
+  </versioning>
+</metadata>

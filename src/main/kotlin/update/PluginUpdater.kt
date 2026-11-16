@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.update
 
+import com.demonwav.mcdev.util.McdevHttp
 import com.demonwav.mcdev.util.McdevReflection
 import com.demonwav.mcdev.util.forEachNotNull
 import com.demonwav.mcdev.util.invokeLater
@@ -37,7 +38,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.util.io.HttpRequests
 import java.io.IOException
 import java.net.URLEncoder
 import org.jdom.Element
@@ -72,7 +72,7 @@ object PluginUpdater {
             "https://plugins.jetbrains.com/plugins/list?pluginId=8327&build=" +
                 "$buildNumber&pluginVersion=$currentVersion&os=$os"
 
-        val responseDoc = HttpRequests.request(url).connect<Element> { request ->
+        val responseDoc = McdevHttp.request(url).connect<Element> { request ->
             try {
                 return@connect JDOMUtil.load(request.inputStream)
             } catch (e: JDOMException) {

@@ -26,14 +26,9 @@ import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.CreatorCredentials
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.modalityState
-import com.demonwav.mcdev.creator.selectProxy
-import com.demonwav.mcdev.update.PluginUtil
 import com.demonwav.mcdev.util.capitalize
+import com.demonwav.mcdev.util.McdevHttp
 import com.demonwav.mcdev.util.refreshSync
-import com.github.kittinunf.fuel.core.FuelManager
-import com.github.kittinunf.fuel.coroutines.awaitByteArrayResult
-import com.github.kittinunf.result.getOrNull
-import com.github.kittinunf.result.onError
 import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
@@ -67,6 +62,7 @@ import javax.swing.ListCellRenderer
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 import kotlin.io.path.writeBytes
+import kotlinx.coroutines.CancellationException
 
 open class RemoteTemplateProvider : TemplateProvider {
 
@@ -102,22 +98,25 @@ open class RemoteTemplateProvider : TemplateProvider {
 
         val repoUrl = replaceVariables(originalRepoUrl, TemplateDescriptor.LATEST_FORMAT_VERSION)
 
-        val manager = FuelManager()
-        manager.proxy = selectProxy(repoUrl)
-        var request = manager.get(repoUrl)
-            .header("Accept", "application/octet-stream")
-            .header("User-Agent", PluginUtil.useragent)
-            .timeout(10000)
-
-        if (credentials.isNotBlank()) {
-            request = CreatorCredentials.configureAuthorization(request, originalRepoUrl, authType, credentials)
+        val headers = if (credentials.isNotBlank()) {
+            CreatorCredentials.authorizationHeaders(originalRepoUrl, authType, credentials)
+        } else {
+            emptyMap()
         }
 
-        val result = request.awaitByteArrayResult()
-
-        val data = result.onError {
-            thisLogger().warn("Could not fetch remote templates repository update at $repoUrl", it)
-        }.getOrNull() ?: return false
+        val data = try {
+            McdevHttp.get(repoUrl, headers) {
+                accept("application/octet-stream").connectTimeout(10000)
+            }.connect {
+                readBytes(null)
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException || e is ControlFlowException) {
+                throw e
+            }
+            thisLogger().warn("Could not fetch remote templates repository update at $repoUrl", e)
+            return false
+        }
 
         try {
             val zipPath = RemoteTemplateRepo.getDestinationZip(repoName)

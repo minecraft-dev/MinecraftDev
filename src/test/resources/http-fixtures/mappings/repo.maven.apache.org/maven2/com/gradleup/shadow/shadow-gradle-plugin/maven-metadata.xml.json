@@ -1,0 +1,14 @@
+{
+  "name": "https://repo.maven.apache.org/maven2/com/gradleup/shadow/shadow-gradle-plugin/maven-metadata.xml",
+  "request": {
+    "method": "GET",
+    "url": "/repo.maven.apache.org/maven2/com/gradleup/shadow/shadow-gradle-plugin/maven-metadata.xml"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "repo.maven.apache.org/maven2/com/gradleup/shadow/shadow-gradle-plugin/maven-metadata.xml",
+    "headers": {
+      "Content-Type": "text/xml"
+    }
+  }
+}

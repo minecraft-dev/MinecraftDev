@@ -22,4 +22,7 @@ package com.demonwav.mcdev.platform.minecraft.ct.psi.mixins
 
 import com.demonwav.mcdev.platform.minecraft.ct.psi.CtElement
 
-interface CtEntryMixin : CtElement
+interface CtEntryMixin : CtElement {
+
+    val isTransitive: Boolean
+}
