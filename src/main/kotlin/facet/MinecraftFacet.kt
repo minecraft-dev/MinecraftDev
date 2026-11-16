@@ -78,9 +78,9 @@ class MinecraftFacet(
     fun refresh() {
         refreshWritePhase()
         // Refresh the project view separately to not hold the write lock
-        ApplicationManager.getApplication().invokeLater {
+        ApplicationManager.getApplication().invokeLater({
             ProjectView.getInstance(module.project).refresh()
-        }
+        }, module.disposed)
     }
 
     private fun refreshWritePhase() = runWriteActionAndWait {
