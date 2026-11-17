@@ -55,6 +55,11 @@ class BuiltinTemplateProvider : RemoteTemplateProvider() {
         }
     }
 
+    override fun clearCache() {
+        super.clearCache()
+        repoUpdated = false
+    }
+
     override suspend fun loadTemplates(
         context: WizardContext,
         repo: MinecraftSettings.TemplateRepo

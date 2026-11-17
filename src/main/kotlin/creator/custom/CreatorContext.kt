@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -27,7 +27,6 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.asContextElement
 import com.intellij.openapi.observable.properties.PropertyGraph
-import com.intellij.platform.util.coroutines.childScope
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +35,14 @@ data class CreatorContext(
     val graph: PropertyGraph,
     val properties: Map<String, CreatorProperty<*>>,
     val wizardContext: WizardContext,
-    val scope: CoroutineScope
+    val session: CreatorSession,
 ) {
+    /**
+     * The main creator scope, canceled when the creator is closed.
+     */
+    val scope: CoroutineScope
+        get() = session.scope
+
     val modalityState: ModalityState
         get() = wizardContext.modalityState
 
@@ -53,7 +58,7 @@ data class CreatorContext(
     /**
      * A general purpose scope dependent of the main creator scope, cancelled when the creator is closed.
      */
-    fun childScope(name: String): CoroutineScope = scope.childScope(name)
+    fun childScope(name: String): CoroutineScope = session.childScope(name)
 
     @Suppress("UNCHECKED_CAST")
     fun <T> property(name: String): CreatorProperty<T> = properties[name] as CreatorProperty<T>

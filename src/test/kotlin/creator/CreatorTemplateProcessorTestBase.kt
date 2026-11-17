@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,18 +20,25 @@
 
 package com.demonwav.mcdev.creator
 
+import com.demonwav.mcdev.creator.custom.CreatorCaches
+import com.demonwav.mcdev.creator.custom.CreatorSession
 import com.demonwav.mcdev.creator.custom.CreatorTemplateProcessor
 import com.demonwav.mcdev.creator.custom.ExternalTemplatePropertyProvider
 import com.demonwav.mcdev.creator.custom.TemplateDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateService
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporterImpl
 import com.demonwav.mcdev.creator.custom.providers.LoadedTemplate
+import com.demonwav.mcdev.framework.InMemoryPropertiesComponent
 import com.google.gson.Gson
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ide.util.projectWizard.WizardContext
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.testFramework.fixtures.BareTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.replaceService
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -63,6 +70,8 @@ abstract class CreatorTemplateProcessorTestBase {
 
     lateinit var fixture: BareTestFixture
     lateinit var propertyGraph: PropertyGraph
+    lateinit var wizardContext: WizardContext
+    lateinit var session: CreatorSession
     lateinit var processor: CreatorTemplateProcessor
 
     @BeforeEach
@@ -70,11 +79,18 @@ abstract class CreatorTemplateProcessorTestBase {
         fixture = IdeaTestFixtureFactory.getFixtureFactory().createBareFixture()
         fixture.setUp()
 
+        CreatorCaches.clear()
+        // Properties remember their last value across creators, so start each test with nothing remembered
+        ApplicationManager.getApplication()
+            .replaceService(PropertiesComponent::class.java, InMemoryPropertiesComponent(), fixture.testRootDisposable)
+
         propertyGraph = PropertyGraph()
-        val wizardContext = WizardContext(null, fixture.testRootDisposable)
-        val scope = TemplateService.instance.scope("MinecraftDev Creator Test")
+        wizardContext = WizardContext(null, fixture.testRootDisposable)
+        wizardContext.overrideModalityState(ModalityState.nonModal())
+        // Cancelled when the fixture is torn down, so no work leaks into the next test
+        session = TemplateService.instance.openSession("MinecraftDev Creator Test", fixture.testRootDisposable)
         val externalPropertyProvider = TestExternalTemplatePropertyProvider(propertyGraph)
-        processor = CreatorTemplateProcessor(propertyGraph, wizardContext, scope, externalPropertyProvider)
+        processor = CreatorTemplateProcessor(propertyGraph, wizardContext, session, externalPropertyProvider)
         processor.initBuiltinProperties()
     }
 

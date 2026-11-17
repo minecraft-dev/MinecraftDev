@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -307,6 +307,13 @@ class FabricVersionsCreatorProperty(
         private var fabricVersions: FabricVersions? = null
         private var loomVersions: List<SemanticVersion>? = null
         private var fabricApiVersions: FabricApiVersions? = null
+
+        internal fun clearCache() {
+            hasDownloadedVersions = false
+            fabricVersions = null
+            loomVersions = null
+            fabricApiVersions = null
+        }
 
         private fun downloadVersion(context: CreatorContext, uiCallback: () -> Unit) {
             if (hasDownloadedVersions) {

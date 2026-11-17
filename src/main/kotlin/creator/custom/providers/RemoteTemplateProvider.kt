@@ -66,7 +66,7 @@ import kotlinx.coroutines.CancellationException
 
 open class RemoteTemplateProvider : TemplateProvider {
 
-    private var updatedTemplates = mutableSetOf<String>()
+    private val updatedTemplates = mutableSetOf<String>()
 
     override val label: String = MCDevBundle("template.provider.remote.label")
 
@@ -85,6 +85,13 @@ open class RemoteTemplateProvider : TemplateProvider {
                 updatedTemplates.add(remote.url)
             }
         }
+    }
+
+    /**
+     * Makes the next [init] update every repo again.
+     */
+    internal open fun clearCache() {
+        updatedTemplates.clear()
     }
 
     protected suspend fun doUpdateRepo(

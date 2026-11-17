@@ -256,6 +256,11 @@ class ParchmentCreatorProperty(
 
         private var allParchmentVersions: List<ParchmentVersion>? = null
 
+        internal fun clearCache() {
+            hasDownloadedVersions = false
+            allParchmentVersions = null
+        }
+
         private fun downloadVersions(context: CreatorContext, uiCallback: () -> Unit) {
             if (hasDownloadedVersions) {
                 uiCallback()

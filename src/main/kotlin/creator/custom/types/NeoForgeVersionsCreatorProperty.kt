@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -161,6 +161,14 @@ class NeoForgeVersionsCreatorProperty(
         private var ngVersion: NeoGradleVersion? = null
         private var mdVersion: NeoModDevVersion? = null
         private var mcVersions: List<SemanticVersion>? = null
+
+        internal fun clearCache() {
+            hasDownloadedVersions = false
+            nfVersion = null
+            ngVersion = null
+            mdVersion = null
+            mcVersions = null
+        }
 
         private fun downloadVersion(context: CreatorContext, mcVersionFilter: String?, uiCallback: () -> Unit) {
             if (hasDownloadedVersions) {

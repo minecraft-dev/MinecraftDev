@@ -25,7 +25,11 @@ import com.intellij.ide.wizard.AbstractWizard
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.util.Key
 import javax.swing.JComponent
+import org.jetbrains.annotations.TestOnly
+
+private val MODALITY_STATE_OVERRIDE = Key.create<ModalityState>("mcdev.creator.modalityStateOverride")
 
 val WizardContext.contentPanel: JComponent?
     get() = this.getUserData(AbstractWizard.KEY)?.contentPanel
@@ -33,6 +37,8 @@ val WizardContext.contentPanel: JComponent?
 val WizardContext.modalityState: ModalityState
     get() {
         ProgressManager.checkCanceled()
+        getUserData(MODALITY_STATE_OVERRIDE)?.let { return it }
+
         val contentPanel = contentPanel
         if (contentPanel == null) {
             thisLogger().error("Wizard content panel is null, using default modality state")
@@ -41,3 +47,12 @@ val WizardContext.modalityState: ModalityState
 
         return ModalityState.stateForComponent(contentPanel)
     }
+
+/**
+ * Makes the creator use [state] for this wizard instead of the wizard dialog's modality state, so the creator can run
+ * without a dialog.
+ */
+@TestOnly
+fun WizardContext.overrideModalityState(state: ModalityState) {
+    putUserData(MODALITY_STATE_OVERRIDE, state)
+}

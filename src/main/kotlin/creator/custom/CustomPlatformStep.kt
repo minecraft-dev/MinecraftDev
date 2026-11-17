@@ -39,7 +39,6 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.util.transform
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.AlignX
@@ -66,8 +65,8 @@ class CustomPlatformStep(
     parent: NewProjectWizardStep,
 ) : AbstractNewProjectWizardStep(parent) {
 
-    val creatorScope = TemplateService.instance.scope("MinecraftDev Creator")
-    val creatorUiScope = TemplateService.instance.scope("MinecraftDev Creator UI")
+    val session = TemplateService.instance.openSession("MinecraftDev Creator", context.disposable)
+    val creatorUiScope = session.childScope("MinecraftDev Creator UI")
     val templateRepos = MinecraftSettings.instance.creatorTemplateRepos
 
     val templateRepoProperty = propertyGraph.property<MinecraftSettings.TemplateRepo>(
@@ -109,14 +108,7 @@ class CustomPlatformStep(
             get() = data.getUserData(GitNewProjectWizardData.KEY)?.git == true
     }
     private val templateProcessor =
-        CreatorTemplateProcessor(propertyGraph, context, creatorScope, externalPropertyProvider)
-
-    init {
-        Disposer.register(context.disposable) {
-            creatorScope.cancel("The creator got disposed")
-            creatorUiScope.cancel("The creator got disposed")
-        }
-    }
+        CreatorTemplateProcessor(propertyGraph, context, session, externalPropertyProvider)
 
     override fun setupUI(builder: Panel) {
         lateinit var templatePropertyPlaceholder: Placeholder
@@ -300,7 +292,7 @@ class CustomPlatformStep(
                 template.descriptor.version,
                 TemplateDescriptor.SUPPORTED_FORMAT_VERSIONS.joinToString(", "),
             )
-            return true;
+            return true
         }
         return false
     }

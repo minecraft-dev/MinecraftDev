@@ -49,6 +49,10 @@ open class PaperVersionCreatorProperty(
     companion object {
         private var paperVersions: List<SemanticVersion>? = null
 
+        internal fun clearCache() {
+            paperVersions = null
+        }
+
         suspend fun getPaperVersions(): List<SemanticVersion> {
             paperVersions?.let { return it }
 

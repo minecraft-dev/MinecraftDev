@@ -135,7 +135,11 @@ class MavenArtifactVersionCreatorProperty(
 
     companion object {
 
-        private var versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
+        private val versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
+
+        internal fun clearCache() {
+            versionsCache.clear()
+        }
 
         private fun downloadVersions(
             context: CreatorContext,

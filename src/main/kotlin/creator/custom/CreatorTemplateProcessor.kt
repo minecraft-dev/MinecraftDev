@@ -57,8 +57,6 @@ import java.nio.file.Path
 import java.util.function.Consumer
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 interface ExternalTemplatePropertyProvider {
 
@@ -73,7 +71,7 @@ interface ExternalTemplatePropertyProvider {
 class CreatorTemplateProcessor(
     propertyGraph: PropertyGraph,
     wizardContext: WizardContext,
-    scope: CoroutineScope,
+    session: CreatorSession,
     private val externalPropertyProvider: ExternalTemplatePropertyProvider,
 ) {
 
@@ -81,7 +79,7 @@ class CreatorTemplateProcessor(
         private set
 
     private var properties: MutableMap<String, CreatorProperty<*>> = mutableMapOf()
-    var context: CreatorContext = CreatorContext(propertyGraph, properties, wizardContext, scope)
+    var context: CreatorContext = CreatorContext(propertyGraph, properties, wizardContext, session)
 
     fun initBuiltinProperties() {
         val projectNameProperty = externalPropertyProvider.projectNameProperty
@@ -256,7 +254,7 @@ class CreatorTemplateProcessor(
         if (context.wizardContext.isCreatingNewProject) {
             TemplateService.instance.registerFinalizerAction(project, finalizeAction)
         } else {
-            context.scope.launch { finalizeAction() }
+            TemplateService.instance.launchFinalizer(project, context.scope, finalizeAction)
         }
     }
 

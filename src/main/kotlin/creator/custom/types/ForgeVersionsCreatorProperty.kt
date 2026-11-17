@@ -186,6 +186,11 @@ class ForgeVersionsCreatorProperty(
 
         private var forgeVersion: ForgeVersion? = null
 
+        internal fun clearCache() {
+            hasDownloadedVersions = false
+            forgeVersion = null
+        }
+
         private fun downloadVersions(context: CreatorContext, uiCallback: () -> Unit) {
             if (hasDownloadedVersions) {
                 uiCallback()

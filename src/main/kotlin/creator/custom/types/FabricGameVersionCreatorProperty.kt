@@ -91,6 +91,10 @@ class FabricGameVersionCreatorProperty(
     companion object {
         private var gameVersions: GameVersions? = null
 
+        internal fun clearCache() {
+            gameVersions = null
+        }
+
         private suspend fun getGameVersions(): GameVersions {
             gameVersions?.let { return it }
 

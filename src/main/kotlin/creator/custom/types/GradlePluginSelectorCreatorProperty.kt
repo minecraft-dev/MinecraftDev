@@ -182,7 +182,11 @@ class GradlePluginSelectorCreatorProperty(
 
     companion object {
 
-        private var versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
+        private val versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
+
+        internal fun clearCache() {
+            versionsCache.clear()
+        }
 
         fun downloadVersions(
             context: CreatorContext,

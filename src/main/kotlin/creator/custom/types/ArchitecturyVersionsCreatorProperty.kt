@@ -431,6 +431,16 @@ class ArchitecturyVersionsCreatorProperty(
         private var fabricApiVersions: FabricApiVersions? = null
         private var architecturyVersions: ArchitecturyVersion? = null
 
+        internal fun clearCache() {
+            hasDownloadedVersions = false
+            forgeVersions = null
+            neoForgeVersions = null
+            fabricVersions = null
+            loomVersions = null
+            fabricApiVersions = null
+            architecturyVersions = null
+        }
+
         private fun downloadVersions(context: CreatorContext, completeCallback: () -> Unit) {
             if (hasDownloadedVersions) {
                 completeCallback()
