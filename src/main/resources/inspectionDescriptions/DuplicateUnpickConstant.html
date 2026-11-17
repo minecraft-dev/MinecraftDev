@@ -1,0 +1,31 @@
+<!--
+    Minecraft Development for IntelliJ
+
+    https://mcdev.io/
+
+    Copyright (C) 2026 minecraft-dev
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published
+    by the Free Software Foundation, version 3.0 only.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<html>
+<body>
+<p>
+    Reports constants in an unpick group that evaluate to the same value as another constant in the same group and scope
+</p>
+<!-- tooltip end -->
+<p>
+    If two constants in a group have the same value, it is ambiguous which one should replace a literal. Constants in the same group are compared across all unpick files, but only when the group definitions have the same <code>@scope</code> attributes.
+</p>
+</body>
+</html>

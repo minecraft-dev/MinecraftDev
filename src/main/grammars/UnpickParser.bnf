@@ -1,0 +1,330 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2026 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+{
+    parserClass="com.demonwav.mcdev.platform.minecraft.unpick.gen.parser.UnpickParser"
+    parserUtilClass="com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickParserUtil"
+
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="Unpick"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.demonwav.mcdev.platform.minecraft.unpick.gen.psi"
+    psiImplPackage="com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.impl"
+
+    elementTypeHolderClass="com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes"
+    elementTypeClass="com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElementType"
+    tokenTypeClass="com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickTokenType"
+
+    tokens=[
+        SHL="<<"
+        USHR=">>>"
+        SHR=">>"
+        LT="<"
+        GT=">"
+        PIPE="|"
+        CARET="^"
+        AMPERSAND="&"
+        PLUS="+"
+        MINUS="-"
+        STAR="*"
+        SLASH="/"
+        PERCENT="%"
+        TILDE="~"
+        LPAREN="("
+        RPAREN=")"
+        DOT="."
+        COLON=":"
+        AT="@"
+
+        UNPICK_KW="unpick"
+        GROUP_KW="group"
+        TARGET_METHOD_KW="target_method"
+        TARGET_FIELD_KW="target_field"
+        TARGET_ANNOTATION_KW="target_annotation"
+        // Contextual keywords are lexed as identifiers and remapped to this by the parser
+        KEYWORD="KEYWORD"
+
+        IDENTIFIER="IDENTIFIER"
+        INTEGER="INTEGER"
+        LONG="LONG"
+        FLOAT="FLOAT"
+        DOUBLE="DOUBLE"
+        MALFORMED_NUMBER="MALFORMED_NUMBER"
+        CHAR="CHAR"
+        STRING="STRING"
+        FIELD_DESCRIPTOR="FIELD_DESCRIPTOR"
+        METHOD_DESCRIPTOR="METHOD_DESCRIPTOR"
+
+        NEWLINE="NEWLINE"
+        INDENT="INDENT"
+        COMMENT="COMMENT"
+        DOC_COMMENT="DOC_COMMENT"
+        UNSUPPORTED_BODY="UNSUPPORTED_BODY"
+    ]
+
+    extends(".*_expression")=expression
+    extends(".*_attribute")=group_attribute
+    extends(".*_scope")=group_scope
+    extends("group_definition|target_method|target_field|target_annotation")=item
+}
+
+// Following the spec, every line except for the first starts with a newline. Blank lines are not tokenized as
+// newlines, so the parser never sees them.
+unpick_file ::= first_line? (NEWLINE UNSUPPORTED_BODY | top_line*) NEWLINE?
+
+private first_line ::= header | top_item
+private top_line ::= NEWLINE !<<eof>> top_item {pin=2}
+private top_item ::= item {recoverWhile=line_recover}
+private line_recover ::= !NEWLINE
+
+header ::= UNPICK_KW header_rest {
+    pin=1
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickHeaderImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickHeaderMixin"
+    methods=[
+        versionElement="IDENTIFIER"
+    ]
+}
+private header_rest ::= version? {recoverWhile=line_recover}
+private version ::= IDENTIFIER {name="version"}
+
+item ::= group_definition | target_method | target_field | target_annotation {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement"
+}
+
+// --- Group definitions ---
+
+group_definition ::= GROUP_KW group_definition_rest group_line* {
+    pin=1
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickGroupDefinitionImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickGroupDefinitionMixin"
+}
+private group_definition_rest ::= data_type group_name? {recoverWhile=line_recover}
+
+private group_line ::= NEWLINE INDENT group_line_content {pin=2}
+private group_line_content ::= group_attribute | group_constant {recoverWhile=line_recover}
+
+group_name ::= IDENTIFIER {name="group name"}
+
+group_attribute ::= scope_attribute | strict_attribute | flags_attribute | format_attribute | unknown_attribute
+
+scope_attribute ::= "@" scope_kw group_scope {pin=2}
+strict_attribute ::= "@" strict_kw {pin=2}
+flags_attribute ::= "@" flags_kw {pin=2}
+format_attribute ::= "@" format_kw format_name {pin=2}
+unknown_attribute ::= "@" IDENTIFIER? {pin=1}
+
+format_name ::= IDENTIFIER {name="format"}
+
+group_scope ::= package_scope | class_scope | method_scope
+
+package_scope ::= package_kw package_name {pin=1}
+class_scope ::= class_kw class_name {pin=1}
+method_scope ::= method_kw class_name method_name METHOD_DESCRIPTOR {
+    pin=1
+    methods=[
+        methodDescriptor="METHOD_DESCRIPTOR"
+    ]
+}
+
+group_constant ::= expression {
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickGroupConstantImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickGroupConstantMixin"
+}
+
+// --- Expressions ---
+
+expression ::= or_expression
+    | xor_expression
+    | and_expression
+    | shift_expression
+    | additive_expression
+    | multiplicative_expression
+    | unary_group
+    | primary_group {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement"
+}
+
+private unary_group ::= negate_expression | bit_not_expression | cast_expression
+private primary_group ::= paren_expression | field_expression | literal_expression
+
+or_expression ::= expression "|" expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+xor_expression ::= expression "^" expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+and_expression ::= expression "&" expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+shift_expression ::= expression ("<<" | ">>>" | ">>") expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+additive_expression ::= expression ("+" | "-") expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+multiplicative_expression ::= expression ("*" | "/" | "%") expression {
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickBinaryExpressionMixin"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickBinaryExpressionImplMixin"
+    methods=[left="expression[0]" right="expression[1]"]
+}
+
+negate_expression ::= "-" expression {
+    methods=[operand="expression"]
+}
+bit_not_expression ::= "~" expression {
+    methods=[operand="expression"]
+}
+// Like the reference implementation, a parenthesized single identifier is always parsed as a cast
+cast_expression ::= "(" data_type ")" expression {
+    methods=[operand="expression"]
+}
+paren_expression ::= "(" expression ")" {
+    pin=2
+    methods=[operand="expression"]
+}
+
+field_expression ::= field_class_name "." (field_name | "*") field_instance_suffix? field_type_suffix? {
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickFieldExpressionImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickFieldExpressionMixin"
+    methods=[
+        className="class_name"
+        fieldName="field_name"
+        explicitDataType="data_type"
+    ]
+}
+// Stops before the last segment, which is the field name
+field_class_name ::= IDENTIFIER ("." IDENTIFIER &".")* {elementType=class_name}
+private field_instance_suffix ::= ":" instance_kw
+private field_type_suffix ::= ":" data_type
+
+literal_expression ::= INTEGER | LONG | FLOAT | DOUBLE | CHAR | STRING | MALFORMED_NUMBER {
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickLiteralExpressionImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickLiteralExpressionMixin"
+}
+
+// --- Targets ---
+
+target_method ::= TARGET_METHOD_KW target_method_rest target_method_line* {
+    pin=1
+    methods=[
+        className="class_name"
+        methodName="method_name"
+        methodDescriptor="METHOD_DESCRIPTOR"
+    ]
+}
+private target_method_rest ::= class_name method_name METHOD_DESCRIPTOR {pin=1 recoverWhile=line_recover}
+
+private target_method_line ::= NEWLINE INDENT target_method_line_content {pin=2}
+private target_method_line_content ::= target_method_param | target_method_return {recoverWhile=line_recover}
+
+target_method_param ::= param_kw parameter_index group_ref {
+    pin=1
+    methods=[
+        index="INTEGER"
+    ]
+}
+target_method_return ::= return_kw group_ref {pin=1}
+
+target_field ::= TARGET_FIELD_KW target_field_rest {
+    pin=1
+    methods=[
+        className="class_name"
+        fieldName="field_name"
+        fieldDescriptor="FIELD_DESCRIPTOR"
+    ]
+}
+private target_field_rest ::= class_name field_name FIELD_DESCRIPTOR group_ref {pin=1 recoverWhile=line_recover}
+
+target_annotation ::= TARGET_ANNOTATION_KW target_annotation_rest {
+    pin=1
+    methods=[
+        className="class_name"
+    ]
+}
+private target_annotation_rest ::= class_name group_ref {pin=1 recoverWhile=line_recover}
+
+// --- Names ---
+
+data_type ::= IDENTIFIER {
+    name="data type"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickDataTypeImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickDataTypeMixin"
+}
+
+class_name ::= IDENTIFIER ("." IDENTIFIER)* {
+    name="class name"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickClassNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickClassNameMixin"
+}
+
+package_name ::= IDENTIFIER ("." IDENTIFIER)* {
+    name="package name"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickPackageNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickPackageNameMixin"
+}
+
+method_name ::= IDENTIFIER | "<" IDENTIFIER ">" {
+    name="method name"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickMethodNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickMethodNameMixin"
+}
+
+field_name ::= IDENTIFIER {
+    name="field name"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickFieldNameImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickFieldNameMixin"
+}
+
+group_ref ::= IDENTIFIER {
+    name="group name"
+    mixin="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl.UnpickGroupRefImplMixin"
+    implements="com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickGroupRefMixin"
+}
+
+private parameter_index ::= INTEGER {name="parameter index"}
+
+// --- Contextual keywords ---
+
+private scope_kw ::= <<keyword "scope">> {name="'scope'"}
+private strict_kw ::= <<keyword "strict">> {name="'strict'"}
+private flags_kw ::= <<keyword "flags">> {name="'flags'"}
+private format_kw ::= <<keyword "format">> {name="'format'"}
+private package_kw ::= <<keyword "package">> {name="'package'"}
+private class_kw ::= <<keyword "class">> {name="'class'"}
+private method_kw ::= <<keyword "method">> {name="'method'"}
+private instance_kw ::= <<keyword "instance">> {name="'instance'"}
+private param_kw ::= <<keyword "param">> {name="'param'"}
+private return_kw ::= <<keyword "return">> {name="'return'"}
+
+// Unused rules to generate token types only used by the lexer
+//noinspection BnfUnusedRule
+private lexer_only_tokens ::= COMMENT | DOC_COMMENT | KEYWORD

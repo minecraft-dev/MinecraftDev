@@ -1,0 +1,5 @@
+unpick v3
+target_field foo.Bar baz Ljava/lang/String;g
+target_method foo.Bar baz()V
+group String
+ ""+1/(2+(int)foo.Bar.baz:byte)

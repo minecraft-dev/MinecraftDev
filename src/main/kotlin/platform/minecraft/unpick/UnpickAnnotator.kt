@@ -1,0 +1,247 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2026 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.demonwav.mcdev.platform.minecraft.unpick
+
+import com.demonwav.mcdev.asset.MCDevBundle
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickClassName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickDataType
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldExpression
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFlagsAttribute
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFormatAttribute
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFormatName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupConstant
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupDefinition
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupRef
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickHeader
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickLiteralExpression
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickMethodName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickPackageName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickStrictAttribute
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotation
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickUnknownAttribute
+import com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickHeaderMixin
+import com.intellij.lang.annotation.AnnotationHolder
+import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
+import org.jetbrains.annotations.Nls
+
+/**
+ * Reports the errors that the reference unpick reader would reject a file for, and adds semantic highlighting.
+ */
+class UnpickAnnotator : Annotator {
+
+    override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        when (element) {
+            is UnpickFile -> annotateFile(element, holder)
+            is UnpickHeader -> annotateHeader(element, holder)
+            is UnpickTargetAnnotation -> {
+                val version = element.containingFile.let { (it as? UnpickFile)?.version }
+                if (version != null && version < 4) {
+                    holder.error(
+                        MCDevBundle("minecraft.unpick.annotator.target_annotation_requires_v4"),
+                        element.firstChild,
+                    )
+                }
+            }
+            is UnpickDataType -> annotateDataType(element, holder)
+            is UnpickFormatName -> annotateFormat(element, holder)
+            is UnpickUnknownAttribute -> {
+                val name = element.node.findChildByType(UnpickTypes.IDENTIFIER)
+                if (name == null) {
+                    holder.error(MCDevBundle("minecraft.unpick.annotator.expected_attribute"), element)
+                } else {
+                    holder.error(MCDevBundle("minecraft.unpick.annotator.unknown_attribute", name.text), name.psi)
+                }
+            }
+            is UnpickFlagsAttribute -> annotateFlags(element, holder)
+            is UnpickGroupDefinition -> annotateGroupDefinition(element, holder)
+            is UnpickGroupConstant -> {
+                val wildcards = PsiTreeUtil.findChildrenOfType(element, UnpickFieldExpression::class.java)
+                    .mapNotNull { it.wildcardElement }
+                for (wildcard in wildcards.drop(1)) {
+                    holder.error(MCDevBundle("minecraft.unpick.annotator.multiple_wildcards"), wildcard)
+                }
+            }
+            is UnpickTargetMethod -> annotateTargetMethod(element, holder)
+            is UnpickMethodName -> {
+                element.highlight(holder, UnpickSyntaxHighlighter.METHOD_NAME)
+                if (element.node.findChildByType(UnpickTypes.LT) != null) {
+                    val name = element.node.findChildByType(UnpickTypes.IDENTIFIER)
+                    if (name != null && name.text != "init" && name.text != "clinit") {
+                        holder.error(MCDevBundle("minecraft.unpick.annotator.invalid_special_method"), name.psi)
+                    }
+                }
+            }
+            is UnpickLiteralExpression -> {
+                val result = element.parseResult
+                if (result is UnpickLiterals.Result.Error) {
+                    holder.error(result.message, element)
+                }
+            }
+            is UnpickGroupName, is UnpickGroupRef -> element.highlight(holder, UnpickSyntaxHighlighter.GROUP_NAME)
+            is UnpickClassName, is UnpickPackageName -> element.highlight(holder, UnpickSyntaxHighlighter.CLASS_NAME)
+            is UnpickFieldName -> element.highlight(holder, UnpickSyntaxHighlighter.FIELD_NAME)
+            else -> when (element.elementType) {
+                UnpickTypes.KEYWORD -> element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
+                UnpickTypes.METHOD_DESCRIPTOR -> UnpickDescriptors.validateMethod(element.text)?.let {
+                    holder.error(it, element)
+                }
+                UnpickTypes.FIELD_DESCRIPTOR -> UnpickDescriptors.validateField(element.text)?.let {
+                    holder.error(it, element)
+                }
+            }
+        }
+    }
+
+    private fun annotateFile(file: UnpickFile, holder: AnnotationHolder) {
+        if (file.textLength == 0) {
+            return
+        }
+        val text = file.text
+        val firstLineEnd = text.indexOfAny(charArrayOf('\r', '\n')).let { if (it == -1) text.length else it }
+        val firstLine = text.substring(0, firstLineEnd)
+        val header = file.header
+        if (header == null) {
+            holder.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("minecraft.unpick.annotator.missing_header"))
+                .range(TextRange(0, firstLine.length.coerceIn(1, file.textLength)))
+                .create()
+            return
+        }
+
+        // The reference implementation requires the first line to match exactly
+        val version = header.version ?: return
+        if (version in UnpickHeaderMixin.SUPPORTED_VERSIONS && firstLine != "unpick v$version") {
+            holder.newAnnotation(
+                HighlightSeverity.ERROR,
+                MCDevBundle("minecraft.unpick.annotator.malformed_header", "unpick v$version"),
+            ).range(TextRange(0, firstLine.length)).create()
+        }
+    }
+
+    private fun annotateHeader(header: UnpickHeader, holder: AnnotationHolder) {
+        val version = header.version
+        if (version == null) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.missing_version"), header.versionElement ?: header)
+            return
+        }
+        if (version !in UnpickHeaderMixin.SUPPORTED_VERSIONS) {
+            holder.newAnnotation(
+                HighlightSeverity.WARNING,
+                MCDevBundle("minecraft.unpick.annotator.unsupported_version", header.versionElement!!.text),
+            ).range(header).create()
+        }
+    }
+
+    private fun annotateDataType(element: UnpickDataType, holder: AnnotationHolder) {
+        val dataType = element.dataType
+        if (dataType == null) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.unknown_data_type", element.text), element)
+            return
+        }
+        element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
+        if (element.parent is UnpickGroupDefinition && !dataType.isValidGroupType) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.invalid_group_data_type", element.text), element)
+        }
+    }
+
+    private fun annotateFormat(element: UnpickFormatName, holder: AnnotationHolder) {
+        val format = GroupFormat.fromKeyword(element.text)
+        if (format == null) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.unknown_format", element.text), element)
+            return
+        }
+        element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
+        val dataType = PsiTreeUtil.getParentOfType(element, UnpickGroupDefinition::class.java)?.dataType ?: return
+        if (dataType.dataType?.isValidGroupType == true && !format.isApplicableTo(dataType.dataType!!)) {
+            holder.error(
+                MCDevBundle("minecraft.unpick.annotator.format_not_applicable", element.text, dataType.text),
+                element,
+            )
+        }
+    }
+
+    private fun annotateFlags(element: UnpickFlagsAttribute, holder: AnnotationHolder) {
+        val group = element.parent as? UnpickGroupDefinition ?: return
+        val dataType = group.dataType?.dataType
+        if (dataType != null && dataType.isValidGroupType && dataType != DataType.INT && dataType != DataType.LONG) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.flags_not_applicable"), element)
+        }
+        if (group.isDefaultGroup) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.flags_default_group"), element)
+        }
+    }
+
+    private fun annotateGroupDefinition(group: UnpickGroupDefinition, holder: AnnotationHolder) {
+        val attributes = group.groupAttributeList
+        val duplicates = listOf(
+            attributes.filterIsInstance<UnpickFlagsAttribute>() to "minecraft.unpick.annotator.duplicate_flags",
+            attributes.filterIsInstance<UnpickStrictAttribute>() to "minecraft.unpick.annotator.duplicate_strict",
+            attributes.filterIsInstance<UnpickFormatAttribute>() to "minecraft.unpick.annotator.duplicate_format",
+        )
+        for ((attributesOfType, key) in duplicates) {
+            for (duplicate in attributesOfType.drop(1)) {
+                holder.error(MCDevBundle(key), duplicate)
+            }
+        }
+
+        val firstConstantOffset = group.groupConstantList.firstOrNull()?.textOffset ?: return
+        for (attribute in attributes) {
+            if (attribute.textOffset > firstConstantOffset) {
+                holder.error(MCDevBundle("minecraft.unpick.annotator.attribute_after_constant"), attribute)
+            }
+        }
+    }
+
+    private fun annotateTargetMethod(target: UnpickTargetMethod, holder: AnnotationHolder) {
+        val seenParams = HashSet<Int>()
+        for (param in target.targetMethodParamList) {
+            val indexElement = param.index ?: continue
+            val index = UnpickLiterals.parseInt(indexElement.text)
+            if (index == null) {
+                holder.error(MCDevBundle("minecraft.unpick.literal.integer_out_of_bounds"), indexElement)
+                continue
+            }
+            if (!seenParams.add(index)) {
+                holder.error(MCDevBundle("minecraft.unpick.annotator.duplicate_param", index), param)
+            }
+        }
+        for (duplicate in target.targetMethodReturnList.drop(1)) {
+            holder.error(MCDevBundle("minecraft.unpick.annotator.duplicate_return"), duplicate)
+        }
+    }
+
+    private fun AnnotationHolder.error(@Nls message: String, element: PsiElement) {
+        newAnnotation(HighlightSeverity.ERROR, message).range(element).create()
+    }
+
+    private fun PsiElement.highlight(holder: AnnotationHolder, key: TextAttributesKey) {
+        holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(this).textAttributes(key).create()
+    }
+}

@@ -1,0 +1,3 @@
+unpick v3
+target_method foo.Bar baz ()V
+target_method foo.Bar baz ([[[Ljava/lang/Object;IIIDDZZLjava/lang/Object;[[[[[I)Ljava/lang/Thread;

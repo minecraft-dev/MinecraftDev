@@ -1,0 +1,29 @@
+unpick v3
+
+#:foo
+group int
+
+#: bar
+group int
+
+#: boo
+#: and
+#: foo
+group int
+
+group int
+
+#:
+#: some
+#:
+#: blank
+#:
+#:
+#: lines
+#:
+group int
+
+# : not a doc comment
+group int
+
+#: trailing doc comment

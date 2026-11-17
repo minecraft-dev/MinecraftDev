@@ -1,0 +1,10 @@
+unpick v4
+
+#: Some docs
+#: more docs
+group int g # trailing comment
+    # indented comment
+
+	1.5+3 << 0x1F
+    'a' "str\"ing" 'unterminated
+    0x 1.0e+ 09 12abc

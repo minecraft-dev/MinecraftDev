@@ -1,0 +1,4 @@
+unpick v3
+group String
+    "Hello '\u00A7\b\t\n\f\r\'\"\\\0\12\123\1234\74\747\08"
+    ""

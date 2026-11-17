@@ -1,0 +1,5 @@
+unpick v3
+target_field Foo bar I g
+target_field foo.Bar baz I g
+target_field foo.Bar$Baz quux I g
+target_field foo.Bar$1 baz I g

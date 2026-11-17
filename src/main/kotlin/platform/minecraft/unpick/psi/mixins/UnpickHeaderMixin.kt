@@ -1,0 +1,37 @@
+/*
+ * Minecraft Development for IntelliJ
+ *
+ * https://mcdev.io/
+ *
+ * Copyright (C) 2026 minecraft-dev
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, version 3.0 only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins
+
+import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement
+
+interface UnpickHeaderMixin : UnpickElement {
+    /**
+     * The declared version number, which may not be a supported version, or `null` if it is missing or malformed.
+     */
+    val version: Int?
+
+    val isSupportedVersion: Boolean
+        get() = version.let { it == null || it in SUPPORTED_VERSIONS }
+
+    companion object {
+        val SUPPORTED_VERSIONS = 3..4
+    }
+}

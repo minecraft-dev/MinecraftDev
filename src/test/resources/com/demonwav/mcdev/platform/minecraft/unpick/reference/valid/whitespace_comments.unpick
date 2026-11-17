@@ -1,0 +1,5 @@
+unpick v3
+# this is a comment
+  # this is a second comment
+target_field foo.Bar baz I g# this is an end of line comment with no preceding space
+target_field foo.Bar baz I g  # this is an end of line comment with preceding spaces

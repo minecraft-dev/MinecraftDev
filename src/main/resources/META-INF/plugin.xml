@@ -607,6 +607,24 @@
         <codeInsight.unresolvedReferenceQuickFixProvider
             implementation="com.demonwav.mcdev.platform.minecraft.ct.fixes.CopyAwAccessibleEntryFix$Provider"/>
 
+        <!-- unpick file type -->
+        <fileType name="Unpick" language="Unpick"
+                  implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickFileType" fieldName="INSTANCE"
+                  extensions="unpick"/>
+        <lang.parserDefinition language="Unpick"
+                               implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Unpick"
+                                       implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.demonwav.mcdev.platform.minecraft.unpick.UnpickColorSettingsPage"/>
+        <lang.commenter language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickCommenter"/>
+        <lang.braceMatcher language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickBraceMatcher"/>
+        <annotator language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickAnnotator"/>
+        <completion.contributor language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickCompletionContributor"/>
+        <lang.findUsagesProvider language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickFindUsagesProvider"/>
+        <lang.documentationProvider language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickDocumentationProvider"/>
+        <renamePsiElementProcessor implementation="com.demonwav.mcdev.platform.minecraft.unpick.UnpickRenameGroupProcessor"/>
+        <fileBasedIndex implementation="com.demonwav.mcdev.platform.minecraft.unpick.index.UnpickGroupIndex"/>
+
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.minecraft.MinecraftModuleSettings"/>
 
         <gotoSymbolContributor
@@ -1004,6 +1022,54 @@
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.demonwav.mcdev.platform.minecraft.ct.inspections.UnknownCtNamespaceInspection"/>
+        <localInspection key="inspection.unpick_unresolved_reference.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnresolvedUnpickReferenceInspection"/>
+        <localInspection key="inspection.unknown_unpick_group.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnknownUnpickGroupInspection"/>
+        <localInspection key="inspection.unpick_group_type_conflict.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnpickGroupTypeConflictInspection"/>
+        <localInspection key="inspection.invalid_unpick_constant_field.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.InvalidUnpickConstantFieldInspection"/>
+        <localInspection key="inspection.unpick_expression_type.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnpickExpressionTypeInspection"/>
+        <localInspection key="inspection.unpick_division_by_zero.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnpickDivisionByZeroInspection"/>
+        <localInspection key="inspection.duplicate_unpick_constant.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.DuplicateUnpickConstantInspection"/>
+        <localInspection key="inspection.unpick_target_mismatch.name"
+                         groupKey="inspection.group.minecraft"
+                         language="Unpick"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.inspections.UnpickTargetMismatchInspection"/>
         <!--endregion-->
 
         <!--region MIXIN INSPECTIONS-->
