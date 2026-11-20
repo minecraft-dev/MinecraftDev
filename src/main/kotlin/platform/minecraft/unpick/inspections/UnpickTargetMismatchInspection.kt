@@ -33,34 +33,36 @@ import com.demonwav.mcdev.util.descriptor
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import org.objectweb.asm.Type
 
 class UnpickTargetMismatchInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
         object : UnpickVisitor() {
             override fun visitTargetMethod(element: UnpickTargetMethod) {
-                val descriptor = element.methodDescriptor?.text ?: return
-                val parsed = UnpickDescriptors.parseMethod(descriptor) ?: return
+                val descriptor = element.methodDescriptor?.text?.takeIf(UnpickDescriptors::isValidMethod) ?: return
+                val parameters = Type.getArgumentTypes(descriptor)
+                val returnType = Type.getReturnType(descriptor)
 
                 for (param in element.targetMethodParamList) {
                     val indexElement = param.index ?: continue
                     val index = UnpickLiterals.parseInt(indexElement.text) ?: continue
-                    if (index < 0 || index >= parsed.parameters.size) {
+                    if (index < 0 || index >= parameters.size) {
                         holder.registerProblem(
                             indexElement,
                             MCDevBundle(
                                 "inspection.unpick_target_mismatch.param_out_of_bounds",
                                 index,
-                                parsed.parameters.size,
+                                parameters.size,
                             ),
                         )
                         continue
                     }
-                    val paramDescriptor = parsed.parameters[index]
-                    checkCompatible(param.groupRef, paramDescriptor) { groupName, groupType ->
+                    val paramType = parameters[index]
+                    checkCompatible(param.groupRef, paramType) { groupName, groupType ->
                         MCDevBundle(
                             "inspection.unpick_target_mismatch.param_incompatible",
                             index,
-                            UnpickDescriptors.toJavaName(paramDescriptor),
+                            paramType.className,
                             groupName,
                             groupType.keyword,
                         )
@@ -68,17 +70,17 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
                 }
 
                 for (ret in element.targetMethodReturnList) {
-                    if (parsed.returnType == "V") {
+                    if (returnType.sort == Type.VOID) {
                         holder.registerProblem(
                             ret.firstChild,
                             MCDevBundle("inspection.unpick_target_mismatch.void_return"),
                         )
                         continue
                     }
-                    checkCompatible(ret.groupRef, parsed.returnType) { groupName, groupType ->
+                    checkCompatible(ret.groupRef, returnType) { groupName, groupType ->
                         MCDevBundle(
                             "inspection.unpick_target_mismatch.return_incompatible",
-                            UnpickDescriptors.toJavaName(parsed.returnType),
+                            returnType.className,
                             groupName,
                             groupType.keyword,
                         )
@@ -89,9 +91,10 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
             override fun visitTargetField(element: UnpickTargetField) {
                 val descriptorElement = element.fieldDescriptor ?: return
                 val descriptor = descriptorElement.text
-                if (UnpickDescriptors.validateField(descriptor) != null) {
+                if (!UnpickDescriptors.isValidField(descriptor)) {
                     return
                 }
+                val type = Type.getType(descriptor)
 
                 val field = element.fieldName?.resolveField()
                 val actualDescriptor = field?.descriptor
@@ -102,10 +105,10 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
                     )
                 }
 
-                checkCompatible(element.groupRef, descriptor) { groupName, groupType ->
+                checkCompatible(element.groupRef, type) { groupName, groupType ->
                     MCDevBundle(
                         "inspection.unpick_target_mismatch.field_incompatible",
-                        UnpickDescriptors.toJavaName(descriptor),
+                        type.className,
                         groupName,
                         groupType.keyword,
                     )
@@ -125,11 +128,11 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
 
             private inline fun checkCompatible(
                 groupRef: UnpickGroupRef?,
-                targetDescriptor: String,
+                target: Type,
                 message: (String, DataType) -> String,
             ) {
                 groupRef ?: return
-                val targetType = DataType.fromDescriptor(targetDescriptor)
+                val targetType = DataType.fromDescriptor(target.descriptor)
                 val groupTypes = groupRef.resolveDefinitions().mapNotNull { it.dataType?.dataType }.distinct()
                 for (groupType in groupTypes) {
                     if (targetType == null || !targetType.isTargetCompatibleWith(groupType)) {

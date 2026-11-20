@@ -28,6 +28,7 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldName
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFlagsAttribute
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFormatAttribute
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFormatName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupAttribute
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupConstant
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupDefinition
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupName
@@ -41,7 +42,6 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotati
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickUnknownAttribute
-import com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickHeaderMixin
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -58,6 +58,9 @@ import org.jetbrains.annotations.Nls
 class UnpickAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
+        if (element is UnpickGroupAttribute) {
+            highlightAttributeName(element, holder)
+        }
         when (element) {
             is UnpickFile -> annotateFile(element, holder)
             is UnpickHeader -> annotateHeader(element, holder)
@@ -91,7 +94,7 @@ class UnpickAnnotator : Annotator {
             }
             is UnpickTargetMethod -> annotateTargetMethod(element, holder)
             is UnpickMethodName -> {
-                element.highlight(holder, UnpickSyntaxHighlighter.METHOD_NAME)
+                holder.highlight(element, UnpickSyntaxHighlighter.METHOD_NAME)
                 if (element.node.findChildByType(UnpickTypes.LT) != null) {
                     val name = element.node.findChildByType(UnpickTypes.IDENTIFIER)
                     if (name != null && name.text != "init" && name.text != "clinit") {
@@ -105,16 +108,19 @@ class UnpickAnnotator : Annotator {
                     holder.error(result.message, element)
                 }
             }
-            is UnpickGroupName, is UnpickGroupRef -> element.highlight(holder, UnpickSyntaxHighlighter.GROUP_NAME)
-            is UnpickClassName, is UnpickPackageName -> element.highlight(holder, UnpickSyntaxHighlighter.CLASS_NAME)
-            is UnpickFieldName -> element.highlight(holder, UnpickSyntaxHighlighter.FIELD_NAME)
+            is UnpickGroupName, is UnpickGroupRef -> holder.highlight(element, UnpickSyntaxHighlighter.GROUP_NAME)
+            is UnpickClassName, is UnpickPackageName -> holder.highlight(element, UnpickSyntaxHighlighter.CLASS_NAME)
+            is UnpickFieldName -> holder.highlight(element, UnpickSyntaxHighlighter.FIELD_NAME)
             else -> when (element.elementType) {
-                UnpickTypes.KEYWORD -> element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
-                UnpickTypes.METHOD_DESCRIPTOR -> UnpickDescriptors.validateMethod(element.text)?.let {
-                    holder.error(it, element)
+                // Attribute names are highlighted with the attribute
+                UnpickTypes.KEYWORD -> if (element.parent !is UnpickGroupAttribute) {
+                    holder.highlight(element, UnpickSyntaxHighlighter.KEYWORD)
                 }
-                UnpickTypes.FIELD_DESCRIPTOR -> UnpickDescriptors.validateField(element.text)?.let {
-                    holder.error(it, element)
+                UnpickTypes.METHOD_DESCRIPTOR -> if (!UnpickDescriptors.isValidMethod(element.text)) {
+                    holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_method"), element)
+                }
+                UnpickTypes.FIELD_DESCRIPTOR -> if (!UnpickDescriptors.isValidField(element.text)) {
+                    holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_field"), element)
                 }
             }
         }
@@ -124,24 +130,25 @@ class UnpickAnnotator : Annotator {
         if (file.textLength == 0) {
             return
         }
-        val text = file.text
+        val text = file.viewProvider.contents
         val firstLineEnd = text.indexOfAny(charArrayOf('\r', '\n')).let { if (it == -1) text.length else it }
-        val firstLine = text.substring(0, firstLineEnd)
+        val firstLine = text.subSequence(0, firstLineEnd)
         val header = file.header
         if (header == null) {
             holder.newAnnotation(HighlightSeverity.ERROR, MCDevBundle("minecraft.unpick.annotator.missing_header"))
-                .range(TextRange(0, firstLine.length.coerceIn(1, file.textLength)))
+                .range(TextRange(0, firstLineEnd.coerceIn(1, file.textLength)))
                 .create()
             return
         }
 
         // The reference implementation requires the first line to match exactly
         val version = header.version ?: return
-        if (version in UnpickHeaderMixin.SUPPORTED_VERSIONS && firstLine != "unpick v$version") {
+        val expectedFirstLine = "unpick v$version"
+        if (version in UnpickLanguage.SUPPORTED_VERSIONS && !firstLine.contentEquals(expectedFirstLine)) {
             holder.newAnnotation(
                 HighlightSeverity.ERROR,
-                MCDevBundle("minecraft.unpick.annotator.malformed_header", "unpick v$version"),
-            ).range(TextRange(0, firstLine.length)).create()
+                MCDevBundle("minecraft.unpick.annotator.malformed_header", expectedFirstLine),
+            ).range(TextRange(0, firstLineEnd)).create()
         }
     }
 
@@ -151,12 +158,20 @@ class UnpickAnnotator : Annotator {
             holder.error(MCDevBundle("minecraft.unpick.annotator.missing_version"), header.versionElement ?: header)
             return
         }
-        if (version !in UnpickHeaderMixin.SUPPORTED_VERSIONS) {
+        if (version !in UnpickLanguage.SUPPORTED_VERSIONS) {
             holder.newAnnotation(
                 HighlightSeverity.WARNING,
                 MCDevBundle("minecraft.unpick.annotator.unsupported_version", header.versionElement!!.text),
             ).range(header).create()
         }
+    }
+
+    private fun highlightAttributeName(attribute: UnpickGroupAttribute, holder: AnnotationHolder) {
+        val name = attribute.node.findChildByType(UnpickTypes.KEYWORD) ?: return
+        holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
+            .range(TextRange(attribute.textRange.startOffset, name.textRange.endOffset))
+            .textAttributes(UnpickSyntaxHighlighter.ATTRIBUTE)
+            .create()
     }
 
     private fun annotateDataType(element: UnpickDataType, holder: AnnotationHolder) {
@@ -165,7 +180,7 @@ class UnpickAnnotator : Annotator {
             holder.error(MCDevBundle("minecraft.unpick.annotator.unknown_data_type", element.text), element)
             return
         }
-        element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
+        holder.highlight(element, UnpickSyntaxHighlighter.DATA_TYPE)
         if (element.parent is UnpickGroupDefinition && !dataType.isValidGroupType) {
             holder.error(MCDevBundle("minecraft.unpick.annotator.invalid_group_data_type", element.text), element)
         }
@@ -177,7 +192,7 @@ class UnpickAnnotator : Annotator {
             holder.error(MCDevBundle("minecraft.unpick.annotator.unknown_format", element.text), element)
             return
         }
-        element.highlight(holder, UnpickSyntaxHighlighter.KEYWORD)
+        holder.highlight(element, UnpickSyntaxHighlighter.FORMAT)
         val dataType = PsiTreeUtil.getParentOfType(element, UnpickGroupDefinition::class.java)?.dataType ?: return
         if (dataType.dataType?.isValidGroupType == true && !format.isApplicableTo(dataType.dataType!!)) {
             holder.error(
@@ -241,7 +256,7 @@ class UnpickAnnotator : Annotator {
         newAnnotation(HighlightSeverity.ERROR, message).range(element).create()
     }
 
-    private fun PsiElement.highlight(holder: AnnotationHolder, key: TextAttributesKey) {
-        holder.newSilentAnnotation(HighlightSeverity.INFORMATION).range(this).textAttributes(key).create()
+    private fun AnnotationHolder.highlight(element: PsiElement, key: TextAttributesKey) {
+        newSilentAnnotation(HighlightSeverity.INFORMATION).range(element).textAttributes(key).create()
     }
 }

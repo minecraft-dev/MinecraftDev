@@ -1,26 +1,4 @@
-- I have updated the unpick spec to clarify that wildcard field expressions only match constant fields. Update the code to comply with this clarification.
-- `UpickValue.toJavaString()` does not handle the case where the value is a `PsiType`. In this case, you should make it return the same result as if `Class.toString()` were called on the value if it were a `Class`.
-- In `Evaluation.evaluateField`, `isNullInitializer` for string values isn't enough, as the string constant could be `null` due to being initialized to another string constant which is `null`.
-- What's the logic behind class values being able to be `PsiField` as well? If you are unable to resolve what the field value is for whatever reason, return an unknown value.
-- `UnpickValue.convertTo` should probably throw an exception if it's inconvertible. When you apply this change, check the call sites to make sure they properly handle the case where it's inconvertible. Maybe you should add a `canConvertTo` utility if it needs checking.
-- You could make `UnpickValue` a data class, which would avoid you needing to implement `equals`, `hashCode`, and `toString`.
-- Throughout your changes there are companion objects in IDE extension implementations which generate a warning in IntelliJ. Resolve these warnings by converting them to named objects, as we do in the rest of the project. Add this to your memory that this needs to be done in future.
-- Inner class references indeed don't work as you predicted. Find a way to fix this.
-- The error message in DuplicateUnpickConstantInspection is a bit off in the case of wildcard fields. It assumes that the value of the wildcard field expression is the final value of the expression.
-- `UnpickDescriptors` is mostly unnecessary since we have ASM on the classpath. They can be validated with a simple regex (I think we already do this somewhere in the project) before being passed on to ASM.
-- `UnpickClassReference.getVariants`, where it uses `outer.innerClasses`, does not take into account local or anonymous classes. Fix this.
-- `UnpickBinaryExpressionMixin` could use properties rather than getter methods.
-- It feels like `UnpickHeaderMixin.SUPPORTED_VERSIONS` can live in a better location.
-- `UnpickAnnotator.annotateHeader` converts the whole file to a string, which is very inefficient.
-- In `UnpickAnnotator`, it's a bit weird that `error` and `highlight` are structured differently with different receivers.
-- `UnpickCompletionContributor.fillCompletionVariants` converts the whole file to a string, which is very inefficient.
-- Look to see if there's a built-in replacement for `UnpickLiterals.unquote` (there might not be).
-- I want some changes to the highlighting. Some of these may just be a problem in the preview in the color settings menu, some may be real issues:
-  - I want the attribute highlight to cover the attribute name, not just the `@` symbol.
-  - I want there to be a separate highlight color for data types.
-  - I want there to be a separate highlight color for group formats.
-  - I want the group name color to inherit from enum definitions/references rather than constants.
-  - I want descriptors to default to a different color than strings.
-- Auto-completion of the owner class in field expressions doesn't work
-- Auto-completion of classes should allow the user to type the simple name of the class, and then complete to the fully-qualified name.
-- Docs are in Markdown Javadoc format. What would it take to be able to reuse the highlighting, completion features, etc, of that? Unless it's simple, don't implement it, just answer the question.
+- In `UnpickCompletionContributor`, it won't complete if `#` is in the line, even if that `#` is inside a string or char token.
+- In `UnpickExpressionEvaluator.constantValue`, check if `field.computeConstantValue` is contractually guaranteed to return a value of the field's type, or `null`. If it is, the conversion below it can be elided. If not, you can still use `TypeConversionUtil.computeCastTo` to simplify this code and avoid the `when` statement.
+- `UnpickDescriptors` doesn't contain anything specific to unpick. The stuff inside could be moved to generic ASM utilities.
+- `UnpickClassReference.innerClassNames` could maybe also be a more generic utility, next to the other related utilities.

@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 
 import com.demonwav.mcdev.platform.minecraft.unpick.UnpickParserDefinition.TokenSets
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
+import com.intellij.ide.highlighter.JavaHighlightingColors
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -58,7 +59,10 @@ class UnpickSyntaxHighlighter : SyntaxHighlighterBase() {
         val STRING =
             TextAttributesKey.createTextAttributesKey("UNPICK_STRING", DefaultLanguageHighlighterColors.STRING)
         val DESCRIPTOR =
-            TextAttributesKey.createTextAttributesKey("UNPICK_DESCRIPTOR", DefaultLanguageHighlighterColors.STRING)
+            TextAttributesKey.createTextAttributesKey(
+                "UNPICK_DESCRIPTOR",
+                DefaultLanguageHighlighterColors.STATIC_METHOD,
+            )
         val OPERATOR =
             TextAttributesKey.createTextAttributesKey(
                 "UNPICK_OPERATOR",
@@ -89,8 +93,12 @@ class UnpickSyntaxHighlighter : SyntaxHighlighterBase() {
             TextAttributesKey.createTextAttributesKey("UNPICK_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
 
         // Only applied by the annotator
+        val DATA_TYPE =
+            TextAttributesKey.createTextAttributesKey("UNPICK_DATA_TYPE", DefaultLanguageHighlighterColors.KEYWORD)
+        val FORMAT =
+            TextAttributesKey.createTextAttributesKey("UNPICK_FORMAT", DefaultLanguageHighlighterColors.CONSTANT)
         val GROUP_NAME =
-            TextAttributesKey.createTextAttributesKey("UNPICK_GROUP_NAME", DefaultLanguageHighlighterColors.CONSTANT)
+            TextAttributesKey.createTextAttributesKey("UNPICK_GROUP_NAME", JavaHighlightingColors.ENUM_NAME_ATTRIBUTES)
         val CLASS_NAME =
             TextAttributesKey.createTextAttributesKey(
                 "UNPICK_CLASS_NAME",
@@ -104,7 +112,7 @@ class UnpickSyntaxHighlighter : SyntaxHighlighterBase() {
         val METHOD_NAME =
             TextAttributesKey.createTextAttributesKey(
                 "UNPICK_METHOD_NAME",
-                DefaultLanguageHighlighterColors.STATIC_METHOD,
+                DefaultLanguageHighlighterColors.FUNCTION_CALL,
             )
 
         private val KEYWORD_KEYS = arrayOf(KEYWORD)

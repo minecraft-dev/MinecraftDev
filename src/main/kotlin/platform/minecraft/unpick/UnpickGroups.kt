@@ -37,7 +37,7 @@ object UnpickGroups {
      * Finds all definitions of the group with the given name, or of the default group if [name] is `null`.
      */
     fun findDefinitions(context: PsiElement, name: String?): List<UnpickGroupDefinition> {
-        return findFiles(context, name ?: UnpickGroupIndex.DEFAULT_GROUP_KEY).flatMap { file ->
+        return findFiles(context, name ?: UnpickGroupIndex.Util.DEFAULT_GROUP_KEY).flatMap { file ->
             file.groupDefinitions.filter { it.name == name }
         }
     }
@@ -55,10 +55,10 @@ object UnpickGroups {
         val index = FileBasedIndex.getInstance()
         val result = HashSet<String>()
         index.processAllKeys(
-            UnpickGroupIndex.NAME,
+            UnpickGroupIndex.Util.NAME,
             { key ->
-                if (key != UnpickGroupIndex.DEFAULT_GROUP_KEY && key !in result) {
-                    if (index.getContainingFiles(UnpickGroupIndex.NAME, key, scope).isNotEmpty()) {
+                if (key != UnpickGroupIndex.Util.DEFAULT_GROUP_KEY && key !in result) {
+                    if (index.getContainingFiles(UnpickGroupIndex.Util.NAME, key, scope).isNotEmpty()) {
                         result += key
                     }
                 }
@@ -78,7 +78,8 @@ object UnpickGroups {
             return listOfNotNull(ownFile)
         }
         val psiManager = PsiManager.getInstance(project)
-        val files = FileBasedIndex.getInstance().getContainingFiles(UnpickGroupIndex.NAME, key, searchScope(context))
+        val files = FileBasedIndex.getInstance()
+            .getContainingFiles(UnpickGroupIndex.Util.NAME, key, searchScope(context))
         val result = files.mapNotNull { psiManager.findFile(it) as? UnpickFile }.toMutableList()
         if (ownFile != null && ownFile !in result) {
             result += ownFile

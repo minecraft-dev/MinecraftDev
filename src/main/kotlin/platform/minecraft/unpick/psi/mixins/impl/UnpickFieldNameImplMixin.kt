@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.impl
 
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickClassName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldExpression
 import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElementFactory
 import com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins.UnpickFieldNameMixin
 import com.demonwav.mcdev.util.cached
@@ -29,6 +30,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiReference
@@ -52,10 +54,21 @@ abstract class UnpickFieldNameImplMixin(node: ASTNode) : ASTWrapperPsiElement(no
     override fun resolve(): PsiElement? = resolveField()
 
     override fun getVariants(): Array<Any> {
-        val owner = ownerClassName?.resolveClass() ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-        return owner.allFields.map { field ->
+        val ownerClassName = ownerClassName ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
+        val fields = ownerClassName.resolveClass()?.allFields.orEmpty().map { field ->
             LookupElementBuilder.create(field).withTypeText(field.type.presentableText)
-        }.toTypedArray()
+        }
+        // While the owner of a field expression is being typed, its last part is parsed as the field name, and the
+        // rest is parsed as the owner even though it may be a package
+        val packageMembers = if (parent is UnpickFieldExpression) {
+            val psiPackage = JavaPsiFacade.getInstance(project).findPackage(ownerClassName.qualifiedName)
+            val scope = resolveScope
+            psiPackage?.getSubPackages(scope).orEmpty().map(LookupElementBuilder::create) +
+                psiPackage?.getClasses(scope).orEmpty().map(LookupElementBuilder::create)
+        } else {
+            emptyList()
+        }
+        return (fields + packageMembers).toTypedArray()
     }
 
     override fun getRangeInElement(): TextRange = TextRange(0, textLength)

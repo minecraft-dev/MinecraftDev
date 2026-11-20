@@ -35,7 +35,7 @@ import com.intellij.util.io.KeyDescriptor
  * Indexes the names of the groups defined in each unpick file. The default group is indexed under the empty string.
  */
 class UnpickGroupIndex : ScalarIndexExtension<String>() {
-    override fun getName() = NAME
+    override fun getName() = Util.NAME
 
     override fun getVersion() = 1
 
@@ -50,11 +50,11 @@ class UnpickGroupIndex : ScalarIndexExtension<String>() {
     private object Indexer : DataIndexer<String, Void?, FileContent> {
         override fun map(inputData: FileContent): Map<String, Void?> {
             val file = inputData.psiFile as? UnpickFile ?: return emptyMap()
-            return file.groupDefinitions.associate { (it.name ?: DEFAULT_GROUP_KEY) to null }
+            return file.groupDefinitions.associate { (it.name ?: Util.DEFAULT_GROUP_KEY) to null }
         }
     }
 
-    companion object {
+    object Util {
         val NAME = ID.create<String, Void?>("mcdev.UnpickGroupIndex")
 
         const val DEFAULT_GROUP_KEY = ""

@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.unpick.psi.mixins
 
+import com.demonwav.mcdev.platform.minecraft.unpick.UnpickLanguage
 import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement
 
 interface UnpickHeaderMixin : UnpickElement {
@@ -29,9 +30,5 @@ interface UnpickHeaderMixin : UnpickElement {
     val version: Int?
 
     val isSupportedVersion: Boolean
-        get() = version.let { it == null || it in SUPPORTED_VERSIONS }
-
-    companion object {
-        val SUPPORTED_VERSIONS = 3..4
-    }
+        get() = version.let { it == null || it in UnpickLanguage.SUPPORTED_VERSIONS }
 }

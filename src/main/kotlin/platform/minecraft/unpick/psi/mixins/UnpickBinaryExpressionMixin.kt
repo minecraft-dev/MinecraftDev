@@ -26,9 +26,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IElementType
 
 interface UnpickBinaryExpressionMixin : UnpickElement {
-    fun getLeft(): UnpickExpression
+    val left: UnpickExpression
 
-    fun getRight(): UnpickExpression?
+    val right: UnpickExpression?
 
     val operatorToken: PsiElement
 

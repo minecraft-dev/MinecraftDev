@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.framework.ProjectBuilderTest
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -36,6 +37,33 @@ class UnpickAnnotatorTest : ProjectBuilderTest() {
             unpick("test.unpick", code)
         }
         fixture.checkHighlighting(true, false, false)
+    }
+
+    @Test
+    @DisplayName("Semantic Highlighting")
+    fun semanticHighlighting() {
+        buildProject {
+            unpick(
+                "test.unpick",
+                """
+                unpick v4
+                group int g
+                    @scope class Foo
+                    @format hex
+                    1
+                """,
+            )
+        }
+        val highlights = fixture.doHighlighting()
+            .filter { it.forcedTextAttributesKey != null }
+            .associate { it.text to it.forcedTextAttributesKey }
+        Assertions.assertEquals(UnpickSyntaxHighlighter.ATTRIBUTE, highlights["@scope"])
+        Assertions.assertEquals(UnpickSyntaxHighlighter.ATTRIBUTE, highlights["@format"])
+        Assertions.assertEquals(UnpickSyntaxHighlighter.KEYWORD, highlights["class"])
+        Assertions.assertEquals(UnpickSyntaxHighlighter.DATA_TYPE, highlights["int"])
+        Assertions.assertEquals(UnpickSyntaxHighlighter.FORMAT, highlights["hex"])
+        Assertions.assertEquals(UnpickSyntaxHighlighter.GROUP_NAME, highlights["g"])
+        Assertions.assertFalse("scope" in highlights)
     }
 
     @Test

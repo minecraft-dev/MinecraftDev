@@ -22,6 +22,7 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
+import com.intellij.codeInsight.CodeInsightUtilCore
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.annotations.Nls
 
@@ -164,49 +165,8 @@ object UnpickLiterals {
      */
     private fun unquote(text: String): String? {
         val result = StringBuilder(text.length - 2)
-        var i = 1
-        val end = text.length - 1
-        while (i < end) {
-            val c = text[i]
-            if (c != '\\') {
-                result.append(c)
-                i++
-                continue
-            }
-            i++
-            if (i >= end) {
-                return null
-            }
-            when (val escape = text[i]) {
-                'b' -> result.append('\b')
-                't' -> result.append('\t')
-                'n' -> result.append('\n')
-                'f' -> result.append('\u000c')
-                'r' -> result.append('\r')
-                '"', '\'', '\\' -> result.append(escape)
-                'u' -> {
-                    while (i < end && text[i] == 'u') {
-                        i++
-                    }
-                    if (i + 4 > end) {
-                        return null
-                    }
-                    val code = text.substring(i, i + 4).toIntOrNull(16) ?: return null
-                    result.append(code.toChar())
-                    i += 3
-                }
-                in '0'..'7' -> {
-                    val maxCount = if (escape <= '3') 3 else 2
-                    var count = 0
-                    while (count < maxCount && i + count < end && text[i + count] in '0'..'7') {
-                        count++
-                    }
-                    result.append(text.substring(i, i + count).toInt(8).toChar())
-                    i += count - 1
-                }
-                else -> return null
-            }
-            i++
+        if (!CodeInsightUtilCore.parseStringCharacters(text.substring(1, text.length - 1), result, null)) {
+            return null
         }
         return result.toString()
     }

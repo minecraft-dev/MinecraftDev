@@ -21,23 +21,41 @@
 package com.demonwav.mcdev.platform.minecraft.unpick.eval
 
 import com.demonwav.mcdev.platform.minecraft.unpick.DataType
-import com.intellij.psi.PsiField
+import com.demonwav.mcdev.util.ClassNameResolutionFailedException
+import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.fullQualifiedName
+import com.intellij.psi.PsiArrayType
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
 
 /**
  * The result of evaluating an unpick expression.
  *
  * The [value] is represented as a Kotlin [Byte], [Short], [Char], [Int], [Long], [Float], [Double] or [String] for the
- * corresponding data types, or `null` for a `null` `String` or `Class` constant. A `Class` constant is represented by
- * the [PsiType] it refers to if that can be determined, or otherwise by the [PsiField] it was read from.
+ * corresponding data types, as the [PsiType] referred to by a `Class` constant, or as `null` for a `null` `String` or
+ * `Class` constant.
  *
  * If [isKnown] is false then only the type of the expression is known, not its value.
  */
-class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = true) {
+data class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = true) {
 
+    /**
+     * Whether this value can be converted to [target] by [convertTo].
+     */
+    fun canConvertTo(target: DataType) = target == type || type.isPrimitive && target.isPrimitive
+
+    /**
+     * Converts this value to [target], as a Java cast would. Throws an [IllegalArgumentException] if the value cannot
+     * be converted, which can be checked with [canConvertTo].
+     */
     fun convertTo(target: DataType): UnpickValue {
-        if (target == type || !isKnown || !type.isPrimitive || !target.isPrimitive) {
-            return UnpickValue(target, value, isKnown)
+        require(canConvertTo(target)) { "Cannot convert $type to $target" }
+        if (target == type) {
+            return this
+        }
+        if (!isKnown) {
+            return unknown(target)
         }
         return UnpickValue(target, convert(value!!, target))
     }
@@ -48,14 +66,9 @@ class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = tr
         else -> throw IllegalStateException("Not an integral value: $value")
     }
 
-    fun asDouble(): Double = when (value) {
-        is Char -> value.code.toDouble()
-        is Number -> value.toDouble()
-        else -> throw IllegalStateException("Not a numeric value: $value")
-    }
-
     /**
-     * Converts the value to a string the same way Java string concatenation would.
+     * Converts the value to a string the same way Java string concatenation would, or returns `null` if that can't be
+     * determined.
      */
     fun toJavaString(): String? {
         if (!isKnown) {
@@ -66,6 +79,7 @@ class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = tr
             is String -> value
             is Char -> value.toString()
             is Number -> value.toString()
+            is PsiType -> classToString(value)
             else -> null
         }
     }
@@ -81,21 +95,39 @@ class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = tr
             is Long -> "${value}L"
             is Float -> "${value}f"
             is PsiType -> value.presentableText + ".class"
-            is PsiField -> value.containingClass?.name + "." + value.name
             else -> value.toString()
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        return other is UnpickValue && other.isKnown && isKnown && other.type == type && other.value == value
-    }
-
-    override fun hashCode() = 31 * type.hashCode() + value.hashCode()
-
-    override fun toString() = "UnpickValue(type=$type, value=$value, isKnown=$isKnown)"
-
     companion object {
         fun unknown(type: DataType) = UnpickValue(type, null, isKnown = false)
+
+        /**
+         * Returns the result of calling `toString()` on the `Class` object for [type], or `null` if it can't be
+         * determined.
+         */
+        private fun classToString(type: PsiType): String? {
+            return try {
+                when (type) {
+                    is PsiPrimitiveType -> type.name
+                    is PsiArrayType -> if ((type.deepComponentType as? PsiClassType)?.resolve() == null &&
+                        type.deepComponentType !is PsiPrimitiveType
+                    ) {
+                        null
+                    } else {
+                        "class " + type.descriptor.replace('/', '.')
+                    }
+                    is PsiClassType -> {
+                        val psiClass = type.resolve() ?: return null
+                        val name = psiClass.fullQualifiedName ?: return null
+                        if (psiClass.isInterface) "interface $name" else "class $name"
+                    }
+                    else -> null
+                }
+            } catch (_: ClassNameResolutionFailedException) {
+                null
+            }
+        }
 
         private fun convert(value: Any, target: DataType): Any {
             if (value is Float || value is Double) {

@@ -43,6 +43,7 @@ import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiReferenceExpression
+import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
@@ -137,15 +138,92 @@ object UnpickExpressionEvaluator {
                 return@filter false
             }
             val fieldType = DataType.fromPsiType(field.type) ?: return@filter false
-            if (explicitType != null) {
+            val typeMatches = if (explicitType != null) {
                 fieldType == explicitType
             } else {
                 groupType != null && fieldType.canWidenTo(groupType)
             }
+            typeMatches && constantValue(field, fieldType) != null
         }
     }
 
-    private const val MAX_CLASS_FIELD_DEPTH = 8
+    /**
+     * Returns the value of a constant field of the given type, or `null` if the field isn't a constant. A constant
+     * field is final and initialized to a compile-time constant (JLS 15.29), `null`, a class literal or another
+     * constant field.
+     *
+     * If the field is compiled and has no source, `null` and `Class` constants can't be distinguished from
+     * non-constant fields, so an unknown value is returned for them.
+     */
+    fun constantValue(field: PsiField, type: DataType): UnpickValue? = constantValue(field, type, 0)
+
+    private fun constantValue(field: PsiField, type: DataType, depth: Int): UnpickValue? {
+        if (!field.hasModifierProperty(PsiModifier.FINAL)) {
+            return null
+        }
+        if (type.isPrimitive) {
+            val value = field.computeConstantValue()
+            val valueType = when (value) {
+                is Byte -> DataType.BYTE
+                is Short -> DataType.SHORT
+                is Char -> DataType.CHAR
+                is Int -> DataType.INT
+                is Long -> DataType.LONG
+                is Float -> DataType.FLOAT
+                is Double -> DataType.DOUBLE
+                else -> return null
+            }
+            return UnpickValue(valueType, value).convertTo(type)
+        }
+        if (type == DataType.STRING) {
+            (field.computeConstantValue() as? String)?.let { return UnpickValue(DataType.STRING, it) }
+        } else {
+            primitiveClassConstant(field)?.let { return UnpickValue(DataType.CLASS, it) }
+        }
+
+        val sourceField = field.navigationElement as? PsiField ?: field
+        if (sourceField is PsiCompiledElement) {
+            return UnpickValue.unknown(type)
+        }
+        return when (val initializer = PsiUtil.skipParenthesizedExprDown(sourceField.initializer)) {
+            is PsiLiteralExpression -> if (initializer.firstChild.elementType == JavaTokenType.NULL_KEYWORD) {
+                UnpickValue(type, null)
+            } else {
+                null
+            }
+            is PsiClassObjectAccessExpression -> if (type == DataType.CLASS) {
+                UnpickValue(DataType.CLASS, initializer.operand.type)
+            } else {
+                null
+            }
+            is PsiReferenceExpression -> {
+                val referenced = initializer.resolve() as? PsiField
+                if (referenced != null && depth < MAX_FIELD_DEPTH && DataType.fromPsiType(referenced.type) == type) {
+                    constantValue(referenced, type, depth + 1)
+                } else {
+                    null
+                }
+            }
+            else -> null
+        }
+    }
+
+    /**
+     * The `TYPE` fields of the boxed types are the class objects of the primitive types.
+     */
+    private fun primitiveClassConstant(field: PsiField): PsiType? {
+        val containingClass = field.containingClass ?: return null
+        if (field.name != "TYPE") {
+            return null
+        }
+        if (containingClass.qualifiedName == CommonClassNames.JAVA_LANG_VOID) {
+            return PsiTypes.voidType()
+        }
+        val boxedType = JavaPsiFacade.getElementFactory(field.project).createType(containingClass)
+        return PsiPrimitiveType.getUnboxedType(boxedType)
+    }
+
+    private const val MAX_FIELD_DEPTH = 8
 
     private class Evaluation(
         private val groupType: DataType?,
@@ -220,18 +298,16 @@ object UnpickExpressionEvaluator {
             if (operand == null) {
                 return null
             }
-            if (!target.isPrimitive || !operand.type.isPrimitive) {
-                if (target != operand.type) {
-                    typeProblem(expression, "minecraft.unpick.eval.bad_cast", operand.type.keyword, target.keyword)
-                    return null
-                }
+            if (!operand.canConvertTo(target)) {
+                typeProblem(expression, "minecraft.unpick.eval.bad_cast", operand.type.keyword, target.keyword)
+                return null
             }
             return operand.convertTo(target)
         }
 
         private fun evaluateBinary(expression: UnpickBinaryExpressionMixin): UnpickValue? {
-            val left = evaluate(expression.getLeft())
-            val right = evaluate(expression.getRight())
+            val left = evaluate(expression.left)
+            val right = evaluate(expression.right)
             if (left == null || right == null) {
                 return null
             }
@@ -272,8 +348,7 @@ object UnpickExpressionEvaluator {
                     return UnpickValue.unknown(resultType)
                 }
                 val distance = right.asLong().toInt()
-                val value = left.convertTo(resultType).value
-                return when (value) {
+                return when (val value = left.convertTo(resultType).value) {
                     is Int -> UnpickValue(
                         DataType.INT,
                         when (operator) {
@@ -305,7 +380,7 @@ object UnpickExpressionEvaluator {
                 right.asLong() == 0L
             ) {
                 problems += UnpickProblem.DivisionByZero(
-                    expression.getRight() ?: expression,
+                    expression.right ?: expression,
                     MCDevBundle("minecraft.unpick.eval.division_by_zero"),
                 )
                 return UnpickValue.unknown(resultType)
@@ -387,80 +462,16 @@ object UnpickExpressionEvaluator {
                 )
             }
 
-            return when (fieldType) {
-                DataType.CLASS -> evaluateClassField(field)
-                DataType.STRING -> {
-                    val value = field.computeConstantValue()
-                    when {
-                        value is String -> UnpickValue(DataType.STRING, value)
-                        isNullInitializer(field) -> UnpickValue(DataType.STRING, null)
-                        // Compiled fields initialized to null have no constant value to tell us that
-                        field is PsiCompiledElement -> UnpickValue.unknown(DataType.STRING)
-                        else -> {
-                            fieldProblem(nameElement, "minecraft.unpick.eval.field_not_constant", name)
-                            UnpickValue.unknown(DataType.STRING)
-                        }
-                    }
-                }
-                else -> {
-                    val value = field.computeConstantValue()
-                    val valueType = when (value) {
-                        is Byte -> DataType.BYTE
-                        is Short -> DataType.SHORT
-                        is Char -> DataType.CHAR
-                        is Int -> DataType.INT
-                        is Long -> DataType.LONG
-                        is Float -> DataType.FLOAT
-                        is Double -> DataType.DOUBLE
-                        else -> null
-                    }
-                    if (valueType != null) {
-                        UnpickValue(valueType, value).convertTo(fieldType)
-                    } else {
-                        fieldProblem(nameElement, "minecraft.unpick.eval.field_not_constant", name)
-                        UnpickValue.unknown(fieldType)
-                    }
-                }
+            val value = constantValue(field, fieldType)
+            if (value == null) {
+                fieldProblem(nameElement, "minecraft.unpick.eval.field_not_constant", name)
+                return UnpickValue.unknown(fieldType)
             }
-        }
-
-        private fun isNullInitializer(field: PsiField): Boolean {
-            val initializer = PsiUtil.skipParenthesizedExprDown(field.initializer)
-            return initializer is PsiLiteralExpression &&
-                initializer.firstChild.elementType == JavaTokenType.NULL_KEYWORD
-        }
-
-        private fun evaluateClassField(field: PsiField, depth: Int = 0): UnpickValue {
-            // The TYPE fields of the boxed types are the class objects of the primitive types
-            val containingClass = field.containingClass
-            if (field.name == "TYPE" && containingClass != null) {
-                if (containingClass.qualifiedName == CommonClassNames.JAVA_LANG_VOID) {
-                    return UnpickValue(DataType.CLASS, PsiTypes.voidType())
-                }
-                val boxedType = JavaPsiFacade.getElementFactory(field.project).createType(containingClass)
-                PsiPrimitiveType.getUnboxedType(boxedType)?.let { return UnpickValue(DataType.CLASS, it) }
+            // A wildcard without an explicit data type has the data type of the group
+            if (expression.isWildcard && explicitType == null && groupType != null && value.canConvertTo(groupType)) {
+                return value.convertTo(groupType)
             }
-            return when (val initializer = PsiUtil.skipParenthesizedExprDown(field.initializer)) {
-                is PsiClassObjectAccessExpression -> UnpickValue(DataType.CLASS, initializer.operand.type)
-                // Follow references to other class constants, such as Integer.TYPE
-                is PsiReferenceExpression -> {
-                    val referenced = initializer.resolve() as? PsiField
-                    if (referenced != null && depth < MAX_CLASS_FIELD_DEPTH &&
-                        DataType.fromPsiType(referenced.type) == DataType.CLASS
-                    ) {
-                        evaluateClassField(referenced, depth + 1).takeUnless { it.value is PsiField }
-                            ?: UnpickValue(DataType.CLASS, field)
-                    } else {
-                        UnpickValue(DataType.CLASS, field)
-                    }
-                }
-                is PsiLiteralExpression -> if (isNullInitializer(field)) {
-                    UnpickValue(DataType.CLASS, null)
-                } else {
-                    UnpickValue(DataType.CLASS, field)
-                }
-                else -> UnpickValue(DataType.CLASS, field)
-            }
+            return value
         }
 
         private fun unaryPromote(type: DataType): DataType {

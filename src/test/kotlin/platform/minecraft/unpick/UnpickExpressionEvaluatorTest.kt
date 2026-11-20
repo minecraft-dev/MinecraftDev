@@ -55,6 +55,23 @@ class UnpickExpressionEvaluatorTest : BaseMinecraftTest() {
                     public static final Class<?> INT_TYPE = Integer.TYPE;
                     public static final Class<?> STRING_CLASS = String.class;
                     public static final String NULL_STRING = null;
+                    public static final String ALIAS_NULL_STRING = NULL_STRING;
+                    public static final Class<?> IFACE_CLASS = Iface.class;
+                    public static final Class<?> ARRAY_CLASS = String[].class;
+                    public static final Class<?> NOT_CONSTANT_CLASS = Wild.class.getClass();
+                    public static int notFinal = 6;
+                    public static final int NOT_CONSTANT = Integer.parseInt("7");
+                }
+                """,
+                configure = false,
+                allowAst = true,
+            )
+            java(
+                "com/example/Iface.java",
+                """
+                package com.example;
+
+                public interface Iface {
                 }
                 """,
                 configure = false,
@@ -63,10 +80,14 @@ class UnpickExpressionEvaluatorTest : BaseMinecraftTest() {
         }
     }
 
-    private fun evaluate(type: String, expression: String): List<Any?> {
+    private fun evaluateWithProblems(type: String, expression: String): UnpickExpressionEvaluator.Result {
         val file = fixture.configureByText("test.unpick", "unpick v4\ngroup $type\n    $expression\n")
         val constant = PsiTreeUtil.findChildOfType(file, UnpickGroupConstant::class.java)!!
-        val result = UnpickExpressionEvaluator.evaluate(constant)
+        return UnpickExpressionEvaluator.evaluate(constant)
+    }
+
+    private fun evaluate(type: String, expression: String): List<Any?> {
+        val result = evaluateWithProblems(type, expression)
         Assertions.assertEquals(emptyList<String>(), result.problems.map { it.message }, expression)
         return result.values.map { it.value.value }
     }
@@ -119,6 +140,17 @@ class UnpickExpressionEvaluatorTest : BaseMinecraftTest() {
         assertValue("x1.0", "\"x\" + 1.0f", "String")
         assertValue("ss", "com.example.Wild.S + com.example.Wild.S", "String")
         assertValue(null, "com.example.Wild.NULL_STRING", "String")
+        assertValue(null, "com.example.Wild.ALIAS_NULL_STRING", "String")
+        assertValue("anull", "\"a\" + com.example.Wild.ALIAS_NULL_STRING", "String")
+    }
+
+    @Test
+    @DisplayName("Class Concatenation")
+    fun classConcatenation() {
+        assertValue("int", "\"\" + com.example.Wild.INT_TYPE", "String")
+        assertValue("class java.lang.String", "\"\" + com.example.Wild.STRING_CLASS", "String")
+        assertValue("interface com.example.Iface", "\"\" + com.example.Wild.IFACE_CLASS", "String")
+        assertValue("class [Ljava.lang.String;", "\"\" + com.example.Wild.ARRAY_CLASS", "String")
     }
 
     @Test
@@ -129,13 +161,23 @@ class UnpickExpressionEvaluatorTest : BaseMinecraftTest() {
             "java.lang.String",
             (evaluate("Class", "com.example.Wild.STRING_CLASS").single() as PsiType).canonicalText,
         )
+
+        val result = evaluateWithProblems("Class", "com.example.Wild.NOT_CONSTANT_CLASS")
+        Assertions.assertEquals(
+            listOf("Field 'NOT_CONSTANT_CLASS' is not initialized to a compile-time constant"),
+            result.problems.map { it.message },
+        )
+        Assertions.assertFalse(result.values.single().value.isKnown)
     }
 
     @Test
     @DisplayName("Wildcards")
     fun wildcards() {
-        Assertions.assertEquals(listOf<Any>(1, 2, 5.toByte()), evaluate("int", "com.example.Wild.*"))
-        Assertions.assertEquals(listOf<Any>(1, 2, 3L, 5.toByte()), evaluate("long", "com.example.Wild.*"))
+        // Wildcards only match constant fields, and have the type of the group
+        Assertions.assertEquals(listOf(1, 2, 5), evaluate("int", "com.example.Wild.*"))
+        Assertions.assertEquals(listOf(1L, 2L, 3L, 5L), evaluate("long", "com.example.Wild.*"))
+        Assertions.assertEquals(listOf(5.toByte()), evaluate("int", "com.example.Wild.*:byte"))
+        Assertions.assertEquals(listOf("s", null, null), evaluate("String", "com.example.Wild.*"))
         Assertions.assertEquals(listOf(3L), evaluate("long", "com.example.Wild.*:long"))
         Assertions.assertEquals(listOf(4), evaluate("int", "com.example.Wild.*:instance"))
         Assertions.assertEquals(listOf(11, 12, 15), evaluate("int", "com.example.Wild.* + 10"))

@@ -235,6 +235,9 @@ class UnpickInspectionsTest : BaseMinecraftTest() {
         group long
             <warning descr="Constant evaluates to 2L, which is also the value of '1 + 1'">2</warning>
             <warning descr="Constant evaluates to 2L, which is also the value of '2'">1 + 1</warning>
+        group int W
+            <warning descr="Constant evaluates to 7 when the wildcard is expanded to 'Inner.VALUE', which is also the value of 'com.example.Constants${'$'}Inner.CHAR - 92'">com.example.Constants${'$'}Inner.*</warning>
+            <warning descr="Constant evaluates to 7 when the wildcard is expanded to 'Inner.CHAR', which is also the value of 'com.example.Constants${'$'}Inner.VALUE'">com.example.Constants${'$'}Inner.* - 92</warning>
         """,
     )
 

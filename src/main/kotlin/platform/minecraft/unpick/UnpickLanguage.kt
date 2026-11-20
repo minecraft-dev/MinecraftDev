@@ -24,6 +24,11 @@ import com.intellij.lang.Language
 import java.io.Serial
 
 object UnpickLanguage : Language("Unpick") {
+    /**
+     * The versions of the unpick format that are supported. The lexer must be kept in sync with this.
+     */
+    val SUPPORTED_VERSIONS = 3..4
+
     @Serial
     private fun readResolve(): Any = UnpickLanguage
 }

@@ -624,6 +624,7 @@
         <lang.documentationProvider language="Unpick" implementationClass="com.demonwav.mcdev.platform.minecraft.unpick.UnpickDocumentationProvider"/>
         <renamePsiElementProcessor implementation="com.demonwav.mcdev.platform.minecraft.unpick.UnpickRenameGroupProcessor"/>
         <fileBasedIndex implementation="com.demonwav.mcdev.platform.minecraft.unpick.index.UnpickGroupIndex"/>
+        <referencesSearch implementation="com.demonwav.mcdev.platform.minecraft.unpick.UnpickInnerClassReferencesSearcher"/>
 
         <moduleService serviceImplementation="com.demonwav.mcdev.platform.minecraft.MinecraftModuleSettings"/>
 

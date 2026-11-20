@@ -36,22 +36,22 @@ class UnpickColorSettingsPage : ColorSettingsPage {
         unpick v4
 
         #: Colors in ARGB format
-        group int <group>ARGBColor</group>
-            @format hex
+        group <type>int</type> <group>ARGBColor</group>
+            <attribute>@format</attribute> <format>hex</format>
             <class>net.minecraft.util.CommonColors</class>.<field>WHITE</field>
             <class>net.minecraft.util.CommonColors</class>.<field>BLACK</field>
 
         # apply to floats in the default group globally
-        group float
-            @strict
+        group <type>float</type>
+            <attribute>@strict</attribute>
             <class>net.minecraft.util.Mth</class>.<field>PI</field> / 3
 
-        group int
-            @scope class <class>net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket</class>
-            (int) <class>net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket</class>.<field>MAX_PAYLOAD_SIZE</field>:long
+        group <type>int</type>
+            <attribute>@scope</attribute> <keyword>class</keyword> <class>net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket</class>
+            (<type>int</type>) <class>net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket</class>.<field>MAX_PAYLOAD_SIZE</field>:<type>long</type>
 
         target_method <class>net.minecraft.client.gui.GuiGraphics</class> <method>fill</method> (IIIII)V
-            param 4 <group>ARGBColor</group>
+            <keyword>param</keyword> 4 <group>ARGBColor</group>
         target_field <class>net.minecraft.core.particles.ColorParticleOption</class> <field>color</field> I <group>ARGBColor</group>
         target_annotation <class>net.minecraft.world.level.block.Block$UpdateFlags</class> <group>SetBlockFlag</group>
         """.trimIndent()
@@ -63,6 +63,10 @@ class UnpickColorSettingsPage : ColorSettingsPage {
 
     private object Const {
         val TAGS = mapOf(
+            "keyword" to UnpickSyntaxHighlighter.KEYWORD,
+            "attribute" to UnpickSyntaxHighlighter.ATTRIBUTE,
+            "type" to UnpickSyntaxHighlighter.DATA_TYPE,
+            "format" to UnpickSyntaxHighlighter.FORMAT,
             "group" to UnpickSyntaxHighlighter.GROUP_NAME,
             "class" to UnpickSyntaxHighlighter.CLASS_NAME,
             "field" to UnpickSyntaxHighlighter.FIELD_NAME,
@@ -77,6 +81,14 @@ class UnpickColorSettingsPage : ColorSettingsPage {
             AttributesDescriptor(
                 MCDevBundle.pointer("minecraft.unpick.color_settings.attribute"),
                 UnpickSyntaxHighlighter.ATTRIBUTE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.unpick.color_settings.data_type"),
+                UnpickSyntaxHighlighter.DATA_TYPE,
+            ),
+            AttributesDescriptor(
+                MCDevBundle.pointer("minecraft.unpick.color_settings.format"),
+                UnpickSyntaxHighlighter.FORMAT,
             ),
             AttributesDescriptor(
                 MCDevBundle.pointer("minecraft.unpick.color_settings.group_name"),

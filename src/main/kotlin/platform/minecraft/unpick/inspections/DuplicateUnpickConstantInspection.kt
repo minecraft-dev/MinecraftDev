@@ -25,12 +25,14 @@ import com.demonwav.mcdev.platform.minecraft.unpick.UnpickGroups
 import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickExpressionEvaluator
 import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickExpressionEvaluator.EvaluatedConstant
 import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickValue
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldExpression
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupDefinition
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickVisitor
 import com.demonwav.mcdev.util.equivalentTo
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.util.PsiTreeUtil
 
 class DuplicateUnpickConstantInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
@@ -67,22 +69,21 @@ class DuplicateUnpickConstantInspection : LocalInspectionTool() {
                         }
                         val value = evaluated.value.convertTo(groupType)
                         val other = byValue[value]?.firstOrNull { !it.isSameAs(evaluated) } ?: continue
-                        val description = describe(evaluated)
-                        val otherDescription = describeOther(other)
+                        val wildcardField = evaluated.wildcardField
                         holder.registerProblem(
                             constant,
-                            if (description == null) {
+                            if (wildcardField == null) {
                                 MCDevBundle(
                                     "inspection.duplicate_unpick_constant.message",
                                     value.toDisplayString(),
-                                    otherDescription,
+                                    other.expandedText(),
                                 )
                             } else {
                                 MCDevBundle(
                                     "inspection.duplicate_unpick_constant.wildcard_message",
-                                    description,
                                     value.toDisplayString(),
-                                    otherDescription,
+                                    "${wildcardField.containingClass?.name}.${wildcardField.name}",
+                                    other.expandedText(),
                                 )
                             },
                         )
@@ -95,14 +96,15 @@ class DuplicateUnpickConstantInspection : LocalInspectionTool() {
             }
 
             /**
-             * Describes the field a wildcard was expanded to, or returns `null` if this isn't a wildcard constant.
+             * Returns the text of the constant, with the wildcard replaced by the field it was expanded to.
              */
-            private fun describe(constant: EvaluatedConstant): String? {
-                val field = constant.wildcardField ?: return null
-                return "${field.containingClass?.name}.${field.name}"
+            private fun EvaluatedConstant.expandedText(): String {
+                val field = wildcardField ?: return constant.text
+                val wildcard = PsiTreeUtil.findChildrenOfType(constant, UnpickFieldExpression::class.java)
+                    .firstNotNullOfOrNull { it.wildcardElement }
+                    ?: return constant.text
+                return wildcard.textRange.shiftLeft(constant.textRange.startOffset).replace(constant.text, field.name)
             }
-
-            private fun describeOther(constant: EvaluatedConstant) = describe(constant) ?: constant.constant.text
 
             private fun scopeKey(definition: UnpickGroupDefinition): Set<String> {
                 return definition.scopes.mapTo(HashSet()) { scope -> scope.text.split(Regex("\\s+")).joinToString(" ") }
