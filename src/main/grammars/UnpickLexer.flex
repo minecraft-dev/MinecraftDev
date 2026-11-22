@@ -20,6 +20,7 @@
 
 package com.demonwav.mcdev.platform.minecraft.unpick.gen;
 
+import com.demonwav.mcdev.platform.minecraft.unpick.UnpickLanguage;
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
 import static com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes.*;
@@ -199,7 +200,14 @@ SPACE=[ \t\f]+
                                                     if (!seenVersion) {
                                                         seenVersion = true;
                                                         String version = yytext().toString();
-                                                        supportedVersion = version.equals("v3") || version.equals("v4");
+                                                        supportedVersion = false;
+                                                        if (version.startsWith("v")) {
+                                                            try {
+                                                                int versionNumber = Integer.parseInt(version.substring(1));
+                                                                supportedVersion = UnpickLanguage.INSTANCE.getSUPPORTED_VERSIONS().contains(versionNumber);
+                                                            } catch (NumberFormatException ignored) {
+                                                            }
+                                                        }
                                                     }
                                                     return IDENTIFIER;
                                                 }
