@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -100,6 +100,22 @@ private fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
         else -> throw IllegalArgumentException("Unsupported PsiType: $this")
     }
 }
+
+private const val FIELD_DESCRIPTOR = "\\[*(?:[BCDFIJSZ]|L[^.;\\[()]+;)"
+private val FIELD_DESCRIPTOR_REGEX = Regex(FIELD_DESCRIPTOR)
+private val METHOD_DESCRIPTOR_REGEX = Regex("\\((?:$FIELD_DESCRIPTOR)*\\)(?:V|$FIELD_DESCRIPTOR)")
+
+/**
+ * Whether [descriptor] is a structurally valid JVM field descriptor (JVMS 4.3.2), which can be parsed with ASM's
+ * [org.objectweb.asm.Type].
+ */
+fun isValidFieldDescriptor(descriptor: String) = FIELD_DESCRIPTOR_REGEX.matches(descriptor)
+
+/**
+ * Whether [descriptor] is a structurally valid JVM method descriptor (JVMS 4.3.3), which can be parsed with ASM's
+ * [org.objectweb.asm.Type].
+ */
+fun isValidMethodDescriptor(descriptor: String) = METHOD_DESCRIPTOR_REGEX.matches(descriptor)
 
 fun parseClassDescriptor(descriptor: String): String {
     val internalName = descriptor.substring(1, descriptor.length - 1)

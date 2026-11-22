@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.platform.minecraft.unpick
 
 import com.demonwav.mcdev.asset.PlatformAssets
+import com.demonwav.mcdev.platform.minecraft.unpick.UnpickParserDefinition.TokenSets
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.findMethodsByInternalName
 import com.demonwav.mcdev.util.findQualifiedClass
@@ -55,13 +56,15 @@ class UnpickCompletionContributor : CompletionContributor() {
             return
         }
         val file = parameters.originalFile as? UnpickFile ?: return
+        // Nothing can be completed inside comments and literals
+        val tokenType = parameters.position.node.elementType
+        if (tokenType in TokenSets.COMMENTS || tokenType in TokenSets.STRINGS) {
+            return
+        }
         val text = file.viewProvider.contents
         val offset = parameters.offset.coerceAtMost(text.length)
         val lineStart = text.lastIndexOf('\n', offset - 1) + 1
         val line = text.substring(lineStart, offset)
-        if ('#' in line) {
-            return
-        }
 
         if (lineStart == 0) {
             if (file.header == null && Const.HEADER_PREFIX.matches(line)) {

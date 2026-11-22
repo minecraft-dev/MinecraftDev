@@ -22,9 +22,8 @@ package com.demonwav.mcdev.platform.minecraft.unpick.psi
 
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickClassName
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
-import com.demonwav.mcdev.util.anonymousClasses
 import com.demonwav.mcdev.util.findQualifiedClass
-import com.demonwav.mcdev.util.localClasses
+import com.demonwav.mcdev.util.namedAndUnnamedInnerClasses
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.JavaPsiFacade
@@ -68,7 +67,8 @@ class UnpickClassReference(
         val isInnerClass = targetName.lastIndexOf('$') > targetName.lastIndexOf('.')
         if (isInnerClass) {
             val outer = findQualifiedClass(parentName, element) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
-            return innerClassNames(outer).map { (name, psiClass) -> LookupElementBuilder.create(psiClass, name) }
+            return outer.namedAndUnnamedInnerClasses
+                .map { (name, psiClass) -> LookupElementBuilder.create(psiClass, name) }
                 .toTypedArray()
         }
         val parentPackage = facade.findPackage(parentName) ?: return ArrayUtil.EMPTY_OBJECT_ARRAY
@@ -80,22 +80,6 @@ class UnpickClassReference(
             parentPackage.getClasses(scope).mapNotNull { it.name }.map { LookupElementBuilder.create(it) }
         }
         return (packages + classes).toTypedArray()
-    }
-
-    /**
-     * Returns the binary names of the classes directly inside [outer] relative to it, including local and anonymous
-     * classes, together with the classes they name.
-     */
-    private fun innerClassNames(outer: PsiClass): List<Pair<String, PsiClass>> {
-        val named = outer.innerClasses.mapNotNull { innerClass -> innerClass.name?.let { it to innerClass } }
-        val localIndices = HashMap<String, Int>()
-        val local = outer.localClasses.mapNotNull { localClass ->
-            val name = localClass.name ?: return@mapNotNull null
-            val index = localIndices.merge(name, 1, Int::plus)
-            "$index$name" to localClass
-        }
-        val anonymous = outer.anonymousClasses.mapIndexed { index, anonymousClass -> "${index + 1}" to anonymousClass }
-        return named + local + anonymous
     }
 
     override fun handleElementRename(newElementName: String): PsiElement {

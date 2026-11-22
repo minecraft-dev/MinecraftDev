@@ -22,7 +22,6 @@ package com.demonwav.mcdev.platform.minecraft.unpick.inspections
 
 import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.platform.minecraft.unpick.DataType
-import com.demonwav.mcdev.platform.minecraft.unpick.UnpickDescriptors
 import com.demonwav.mcdev.platform.minecraft.unpick.UnpickLiterals
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupRef
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotation
@@ -30,6 +29,8 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetField
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickVisitor
 import com.demonwav.mcdev.util.descriptor
+import com.demonwav.mcdev.util.isValidFieldDescriptor
+import com.demonwav.mcdev.util.isValidMethodDescriptor
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
@@ -39,7 +40,7 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
         object : UnpickVisitor() {
             override fun visitTargetMethod(element: UnpickTargetMethod) {
-                val descriptor = element.methodDescriptor?.text?.takeIf(UnpickDescriptors::isValidMethod) ?: return
+                val descriptor = element.methodDescriptor?.text?.takeIf(::isValidMethodDescriptor) ?: return
                 val parameters = Type.getArgumentTypes(descriptor)
                 val returnType = Type.getReturnType(descriptor)
 
@@ -91,7 +92,7 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
             override fun visitTargetField(element: UnpickTargetField) {
                 val descriptorElement = element.fieldDescriptor ?: return
                 val descriptor = descriptorElement.text
-                if (!UnpickDescriptors.isValidField(descriptor)) {
+                if (!isValidFieldDescriptor(descriptor)) {
                     return
                 }
                 val type = Type.getType(descriptor)

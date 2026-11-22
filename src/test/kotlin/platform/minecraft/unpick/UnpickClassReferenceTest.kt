@@ -190,4 +190,31 @@ class UnpickClassReferenceTest : BaseMinecraftTest() {
             fixture.editor.document.text,
         )
     }
+
+    @Test
+    @DisplayName("Completion After Hash In String")
+    fun completionAfterHashInString() {
+        complete("unpick v4\ngroup String\n    \"a#b\" + Inne<caret>\n")
+        if (!fixture.editor.document.text.contains("com.example.Outer\$Middle\$Inner")) {
+            fixture.lookup?.let { lookup ->
+                fixture.lookup.currentItem = lookup.items.first { it.lookupString.endsWith("Inner") }
+                fixture.finishLookup('\n')
+            }
+        }
+        Assertions.assertTrue(
+            fixture.editor.document.text.contains("\"a#b\" + com.example.Outer\$Middle\$Inner"),
+            fixture.editor.document.text,
+        )
+    }
+
+    @Test
+    @DisplayName("No Completion In Comments And Literals")
+    fun noCompletionInCommentsAndLiterals() {
+        for (line in listOf("1 # Inne<caret>", "\"Inne<caret>\"")) {
+            val text = "unpick v4\ngroup String\n    $line\n"
+            val lookups = complete(text)
+            Assertions.assertEquals(emptyList<String>(), lookups)
+            Assertions.assertEquals(text.replace("<caret>", ""), fixture.editor.document.text)
+        }
+    }
 }

@@ -50,6 +50,7 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtil
+import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.psi.util.elementType
 
 /**
@@ -143,37 +144,29 @@ object UnpickExpressionEvaluator {
             } else {
                 groupType != null && fieldType.canWidenTo(groupType)
             }
-            typeMatches && constantValue(field, fieldType) != null
+            typeMatches && constantValue(field) != null
         }
     }
 
     /**
-     * Returns the value of a constant field of the given type, or `null` if the field isn't a constant. A constant
-     * field is final and initialized to a compile-time constant (JLS 15.29), `null`, a class literal or another
-     * constant field.
+     * Returns the value of a constant field, or `null` if the field isn't a constant or its type isn't a [DataType].
+     * A constant field is final and initialized to a compile-time constant (JLS 15.29), `null`, a class literal or
+     * another constant field.
      *
      * If the field is compiled and has no source, `null` and `Class` constants can't be distinguished from
      * non-constant fields, so an unknown value is returned for them.
      */
-    fun constantValue(field: PsiField, type: DataType): UnpickValue? = constantValue(field, type, 0)
+    fun constantValue(field: PsiField): UnpickValue? = constantValue(field, 0)
 
-    private fun constantValue(field: PsiField, type: DataType, depth: Int): UnpickValue? {
+    private fun constantValue(field: PsiField, depth: Int): UnpickValue? {
+        val type = DataType.fromPsiType(field.type) ?: return null
         if (!field.hasModifierProperty(PsiModifier.FINAL)) {
             return null
         }
         if (type.isPrimitive) {
-            val value = field.computeConstantValue()
-            val valueType = when (value) {
-                is Byte -> DataType.BYTE
-                is Short -> DataType.SHORT
-                is Char -> DataType.CHAR
-                is Int -> DataType.INT
-                is Long -> DataType.LONG
-                is Float -> DataType.FLOAT
-                is Double -> DataType.DOUBLE
-                else -> return null
-            }
-            return UnpickValue(valueType, value).convertTo(type)
+            // Java's implementations return a value of the field's type, but this isn't guaranteed for all languages
+            val value = TypeConversionUtil.computeCastTo(field.computeConstantValue(), field.type) ?: return null
+            return UnpickValue(type, value)
         }
         if (type == DataType.STRING) {
             (field.computeConstantValue() as? String)?.let { return UnpickValue(DataType.STRING, it) }
@@ -199,7 +192,7 @@ object UnpickExpressionEvaluator {
             is PsiReferenceExpression -> {
                 val referenced = initializer.resolve() as? PsiField
                 if (referenced != null && depth < MAX_FIELD_DEPTH && DataType.fromPsiType(referenced.type) == type) {
-                    constantValue(referenced, type, depth + 1)
+                    constantValue(referenced, depth + 1)
                 } else {
                     null
                 }
@@ -462,7 +455,7 @@ object UnpickExpressionEvaluator {
                 )
             }
 
-            val value = constantValue(field, fieldType)
+            val value = constantValue(field)
             if (value == null) {
                 fieldProblem(nameElement, "minecraft.unpick.eval.field_not_constant", name)
                 return UnpickValue.unknown(fieldType)

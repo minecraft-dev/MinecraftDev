@@ -42,6 +42,8 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotati
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickUnknownAttribute
+import com.demonwav.mcdev.util.isValidFieldDescriptor
+import com.demonwav.mcdev.util.isValidMethodDescriptor
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
@@ -116,10 +118,10 @@ class UnpickAnnotator : Annotator {
                 UnpickTypes.KEYWORD -> if (element.parent !is UnpickGroupAttribute) {
                     holder.highlight(element, UnpickSyntaxHighlighter.KEYWORD)
                 }
-                UnpickTypes.METHOD_DESCRIPTOR -> if (!UnpickDescriptors.isValidMethod(element.text)) {
+                UnpickTypes.METHOD_DESCRIPTOR -> if (!isValidMethodDescriptor(element.text)) {
                     holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_method"), element)
                 }
-                UnpickTypes.FIELD_DESCRIPTOR -> if (!UnpickDescriptors.isValidField(element.text)) {
+                UnpickTypes.FIELD_DESCRIPTOR -> if (!isValidFieldDescriptor(element.text)) {
                     holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_field"), element)
                 }
             }

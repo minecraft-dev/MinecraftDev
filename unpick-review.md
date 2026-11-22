@@ -1,4 +1,0 @@
-- In `UnpickCompletionContributor`, it won't complete if `#` is in the line, even if that `#` is inside a string or char token.
-- In `UnpickExpressionEvaluator.constantValue`, check if `field.computeConstantValue` is contractually guaranteed to return a value of the field's type, or `null`. If it is, the conversion below it can be elided. If not, you can still use `TypeConversionUtil.computeCastTo` to simplify this code and avoid the `when` statement.
-- `UnpickDescriptors` doesn't contain anything specific to unpick. The stuff inside could be moved to generic ASM utilities.
-- `UnpickClassReference.innerClassNames` could maybe also be a more generic utility, next to the other related utilities.
