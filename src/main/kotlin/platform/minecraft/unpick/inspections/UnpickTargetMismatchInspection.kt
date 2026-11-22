@@ -29,7 +29,7 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetField
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickVisitor
 import com.demonwav.mcdev.util.descriptor
-import com.demonwav.mcdev.util.isValidFieldDescriptor
+import com.demonwav.mcdev.util.isValidTypeDescriptor
 import com.demonwav.mcdev.util.isValidMethodDescriptor
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
@@ -92,7 +92,7 @@ class UnpickTargetMismatchInspection : LocalInspectionTool() {
             override fun visitTargetField(element: UnpickTargetField) {
                 val descriptorElement = element.fieldDescriptor ?: return
                 val descriptor = descriptorElement.text
-                if (!isValidFieldDescriptor(descriptor)) {
+                if (!isValidTypeDescriptor(descriptor)) {
                     return
                 }
                 val type = Type.getType(descriptor)

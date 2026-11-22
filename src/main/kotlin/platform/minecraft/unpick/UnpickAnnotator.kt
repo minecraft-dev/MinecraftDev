@@ -42,7 +42,7 @@ import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotati
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetMethod
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickUnknownAttribute
-import com.demonwav.mcdev.util.isValidFieldDescriptor
+import com.demonwav.mcdev.util.isValidTypeDescriptor
 import com.demonwav.mcdev.util.isValidMethodDescriptor
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
@@ -121,7 +121,7 @@ class UnpickAnnotator : Annotator {
                 UnpickTypes.METHOD_DESCRIPTOR -> if (!isValidMethodDescriptor(element.text)) {
                     holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_method"), element)
                 }
-                UnpickTypes.FIELD_DESCRIPTOR -> if (!isValidFieldDescriptor(element.text)) {
+                UnpickTypes.FIELD_DESCRIPTOR -> if (!isValidTypeDescriptor(element.text)) {
                     holder.error(MCDevBundle("minecraft.unpick.descriptor.invalid_field"), element)
                 }
             }

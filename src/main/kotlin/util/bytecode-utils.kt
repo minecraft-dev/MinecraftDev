@@ -101,19 +101,17 @@ private fun PsiType.appendDescriptor(builder: StringBuilder): StringBuilder {
     }
 }
 
-private const val FIELD_DESCRIPTOR = "\\[*(?:[BCDFIJSZ]|L[^.;\\[()]+;)"
-private val FIELD_DESCRIPTOR_REGEX = Regex(FIELD_DESCRIPTOR)
-private val METHOD_DESCRIPTOR_REGEX = Regex("\\((?:$FIELD_DESCRIPTOR)*\\)(?:V|$FIELD_DESCRIPTOR)")
+private const val TYPE_DESCRIPTOR = "\\[*(?:[BCDFIJSZ]|L[^.;\\[()]+;)"
+private val TYPE_DESCRIPTOR_REGEX = Regex(TYPE_DESCRIPTOR)
+private val METHOD_DESCRIPTOR_REGEX = Regex("\\((?:$TYPE_DESCRIPTOR)*\\)(?:V|$TYPE_DESCRIPTOR)")
 
 /**
- * Whether [descriptor] is a structurally valid JVM field descriptor (JVMS 4.3.2), which can be parsed with ASM's
- * [org.objectweb.asm.Type].
+ * Whether [descriptor] is a structurally valid JVM type descriptor (JVMS 4.3.2). `V` is not accepted by this method.
  */
-fun isValidFieldDescriptor(descriptor: String) = FIELD_DESCRIPTOR_REGEX.matches(descriptor)
+fun isValidTypeDescriptor(descriptor: String) = TYPE_DESCRIPTOR_REGEX.matches(descriptor)
 
 /**
- * Whether [descriptor] is a structurally valid JVM method descriptor (JVMS 4.3.3), which can be parsed with ASM's
- * [org.objectweb.asm.Type].
+ * Whether [descriptor] is a structurally valid JVM method descriptor (JVMS 4.3.3)
  */
 fun isValidMethodDescriptor(descriptor: String) = METHOD_DESCRIPTOR_REGEX.matches(descriptor)
 
