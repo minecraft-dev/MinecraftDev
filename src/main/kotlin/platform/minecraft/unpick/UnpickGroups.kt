@@ -28,9 +28,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
 
-/**
- * Lookup of group definitions across all unpick files visible from a given element.
- */
 object UnpickGroups {
 
     /**

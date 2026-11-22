@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickExpressionEvaluator
+import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickValue
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupConstant
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
@@ -181,5 +182,13 @@ class UnpickExpressionEvaluatorTest : BaseMinecraftTest() {
         Assertions.assertEquals(listOf(3L), evaluate("long", "com.example.Wild.*:long"))
         Assertions.assertEquals(listOf(4), evaluate("int", "com.example.Wild.*:instance"))
         Assertions.assertEquals(listOf(11, 12, 15), evaluate("int", "com.example.Wild.* + 10"))
+    }
+
+    @Test
+    @DisplayName("Display Strings")
+    fun displayStrings() {
+        Assertions.assertEquals("\"a\\\"b\\n\\u0001\"", UnpickValue(DataType.STRING, "a\"b\n\u0001").toDisplayString())
+        Assertions.assertEquals("'\\''", UnpickValue(DataType.CHAR, '\'').toDisplayString())
+        Assertions.assertEquals("'\\t'", UnpickValue(DataType.CHAR, '\t').toDisplayString())
     }
 }

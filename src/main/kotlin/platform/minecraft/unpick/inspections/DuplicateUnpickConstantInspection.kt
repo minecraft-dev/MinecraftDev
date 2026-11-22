@@ -28,6 +28,7 @@ import com.demonwav.mcdev.platform.minecraft.unpick.eval.UnpickValue
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldExpression
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupDefinition
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickVisitor
+import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElementFactory
 import com.demonwav.mcdev.util.equivalentTo
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemsHolder
@@ -100,10 +101,12 @@ class DuplicateUnpickConstantInspection : LocalInspectionTool() {
              */
             private fun EvaluatedConstant.expandedText(): String {
                 val field = wildcardField ?: return constant.text
-                val wildcard = PsiTreeUtil.findChildrenOfType(constant, UnpickFieldExpression::class.java)
+                val copy = constant.copy()
+                val wildcard = PsiTreeUtil.findChildrenOfType(copy, UnpickFieldExpression::class.java)
                     .firstNotNullOfOrNull { it.wildcardElement }
                     ?: return constant.text
-                return wildcard.textRange.shiftLeft(constant.textRange.startOffset).replace(constant.text, field.name)
+                wildcard.replace(UnpickElementFactory.createFieldName(constant.project, field.name))
+                return copy.text
             }
 
             private fun scopeKey(definition: UnpickGroupDefinition): Set<String> {

@@ -31,9 +31,6 @@ import com.intellij.util.indexing.ScalarIndexExtension
 import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 
-/**
- * Indexes the names of the groups defined in each unpick file. The default group is indexed under the empty string.
- */
 class UnpickGroupIndex : ScalarIndexExtension<String>() {
     override fun getName() = Util.NAME
 

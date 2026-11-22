@@ -53,14 +53,11 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.psi.util.elementType
 
-/**
- * Evaluates group constants according to the semantics of the Java language, as required by the unpick spec.
- */
 object UnpickExpressionEvaluator {
 
     /**
-     * A value produced by a group constant. For a wildcard constant, [wildcardField] is the field the wildcard was
-     * expanded to.
+     * A value produced by a group constant. If the expression contained a wildcard, [wildcardField] is the field the
+     * wildcard was expanded to.
      */
     class EvaluatedConstant(val constant: UnpickGroupConstant, val value: UnpickValue, val wildcardField: PsiField?)
 
@@ -127,10 +124,7 @@ object UnpickExpressionEvaluator {
         )
     }
 
-    /**
-     * Finds the fields matching a wildcard field expression, as defined by the unpick spec.
-     */
-    fun findWildcardFields(expression: UnpickFieldExpression, groupType: DataType?): List<PsiField> {
+    private fun findWildcardFields(expression: UnpickFieldExpression, groupType: DataType?): List<PsiField> {
         val psiClass = expression.className.resolveClass() ?: return emptyList()
         val explicitType = expression.explicitDataType?.dataType
         val isStatic = !expression.isInstance
@@ -149,9 +143,7 @@ object UnpickExpressionEvaluator {
     }
 
     /**
-     * Returns the value of a constant field, or `null` if the field isn't a constant or its type isn't a [DataType].
-     * A constant field is final and initialized to a compile-time constant (JLS 15.29), `null`, a class literal or
-     * another constant field.
+     * Returns the value of a constant field, as defined by the unpick spec.
      *
      * If the field is compiled and has no source, `null` and `Class` constants can't be distinguished from
      * non-constant fields, so an unknown value is returned for them.

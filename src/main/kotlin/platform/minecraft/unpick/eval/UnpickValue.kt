@@ -24,6 +24,7 @@ import com.demonwav.mcdev.platform.minecraft.unpick.DataType
 import com.demonwav.mcdev.util.ClassNameResolutionFailedException
 import com.demonwav.mcdev.util.descriptor
 import com.demonwav.mcdev.util.fullQualifiedName
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiArrayType
 import com.intellij.psi.PsiClassType
 import com.intellij.psi.PsiPrimitiveType
@@ -40,14 +41,10 @@ import com.intellij.psi.PsiType
  */
 data class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean = true) {
 
-    /**
-     * Whether this value can be converted to [target] by [convertTo].
-     */
     fun canConvertTo(target: DataType) = target == type || type.isPrimitive && target.isPrimitive
 
     /**
-     * Converts this value to [target], as a Java cast would. Throws an [IllegalArgumentException] if the value cannot
-     * be converted, which can be checked with [canConvertTo].
+     * Converts this value to [target], as a Java cast would.
      */
     fun convertTo(target: DataType): UnpickValue {
         require(canConvertTo(target)) { "Cannot convert $type to $target" }
@@ -71,16 +68,10 @@ data class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean
      * determined.
      */
     fun toJavaString(): String? {
-        if (!isKnown) {
-            return null
-        }
-        return when (value) {
-            null -> "null"
-            is String -> value
-            is Char -> value.toString()
-            is Number -> value.toString()
-            is PsiType -> classToString(value)
-            else -> null
+        return when {
+            !isKnown -> null
+            value is PsiType -> classToString(value)
+            else -> value.toString()
         }
     }
 
@@ -90,8 +81,8 @@ data class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean
     fun toDisplayString(): String {
         return when (value) {
             null -> "null"
-            is String -> "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
-            is Char -> "'$value'"
+            is String -> "\"" + StringUtil.escapeStringCharacters(value) + "\""
+            is Char -> "'" + StringUtil.escapeCharCharacters(value.toString()) + "'"
             is Long -> "${value}L"
             is Float -> "${value}f"
             is PsiType -> value.presentableText + ".class"
@@ -103,8 +94,7 @@ data class UnpickValue(val type: DataType, val value: Any?, val isKnown: Boolean
         fun unknown(type: DataType) = UnpickValue(type, null, isKnown = false)
 
         /**
-         * Returns the result of calling `toString()` on the `Class` object for [type], or `null` if it can't be
-         * determined.
+         * Mimics [Class.toString]
          */
         private fun classToString(type: PsiType): String? {
             return try {

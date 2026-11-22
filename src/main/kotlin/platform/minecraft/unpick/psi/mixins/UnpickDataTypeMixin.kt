@@ -24,8 +24,5 @@ import com.demonwav.mcdev.platform.minecraft.unpick.DataType
 import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement
 
 interface UnpickDataTypeMixin : UnpickElement {
-    /**
-     * The data type named by this element, or `null` if it doesn't name a data type.
-     */
     val dataType: DataType?
 }

@@ -24,9 +24,6 @@ import com.demonwav.mcdev.platform.minecraft.unpick.UnpickLanguage
 import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement
 
 interface UnpickHeaderMixin : UnpickElement {
-    /**
-     * The declared version number, which may not be a supported version, or `null` if it is missing or malformed.
-     */
     val version: Int?
 
     val isSupportedVersion: Boolean

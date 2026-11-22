@@ -54,9 +54,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import org.jetbrains.annotations.Nls
 
-/**
- * Reports the errors that the reference unpick reader would reject a file for, and adds semantic highlighting.
- */
 class UnpickAnnotator : Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {

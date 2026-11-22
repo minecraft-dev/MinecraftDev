@@ -33,9 +33,6 @@ class UnpickFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, Unp
     val header: UnpickHeader?
         get() = firstChild as? UnpickHeader
 
-    /**
-     * The version of the unpick format declared in the header, or `null` if the header is missing or malformed.
-     */
     val version: Int?
         get() = header?.version
 

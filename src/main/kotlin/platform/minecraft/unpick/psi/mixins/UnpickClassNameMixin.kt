@@ -24,9 +24,6 @@ import com.demonwav.mcdev.platform.minecraft.unpick.psi.UnpickElement
 import com.intellij.psi.PsiClass
 
 interface UnpickClassNameMixin : UnpickElement {
-    /**
-     * The binary name of the class, without any whitespace.
-     */
     val qualifiedName: String
 
     fun resolveClass(): PsiClass?

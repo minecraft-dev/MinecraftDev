@@ -38,8 +38,5 @@ interface UnpickGroupDefinitionMixin : UnpickElement, PsiNameIdentifierOwner, Na
 
     val format: GroupFormat?
 
-    /**
-     * The contents of the `#:` doc comments directly preceding this group definition, or `null` if there are none.
-     */
     val docComment: String?
 }

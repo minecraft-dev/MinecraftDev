@@ -25,7 +25,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 
 /**
- * A group may be defined in several places, renaming one definition renames all of them.
+ * A group may be defined in several places, renames all of them if one of them is renamed.
  */
 class UnpickRenameGroupProcessor : RenamePsiElementProcessor() {
     override fun canProcessElement(element: PsiElement) = element is UnpickGroupDefinition && element.name != null

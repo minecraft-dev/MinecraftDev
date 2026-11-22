@@ -29,7 +29,7 @@ interface UnpickFieldExpressionMixin : UnpickElement {
     val wildcardElement: PsiElement?
 
     /**
-     * Whether this field expression has the `:instance` suffix and so refers to a non-static field.
+     * Whether this field expression has the `:instance` suffix.
      */
     val isInstance: Boolean
 }

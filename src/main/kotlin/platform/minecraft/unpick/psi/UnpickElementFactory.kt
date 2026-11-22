@@ -23,7 +23,9 @@ package com.demonwav.mcdev.platform.minecraft.unpick.psi
 import com.demonwav.mcdev.platform.minecraft.unpick.UnpickFile
 import com.demonwav.mcdev.platform.minecraft.unpick.UnpickFileType
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickClassName
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickFieldName
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetAnnotation
+import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTargetField
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickTypes
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -50,5 +52,13 @@ object UnpickElementFactory {
             UnpickTargetAnnotation::class.java,
         )!!
         return annotation.className!!
+    }
+
+    fun createFieldName(project: Project, name: String): UnpickFieldName {
+        val targetField = PsiTreeUtil.findChildOfType(
+            createFile(project, "unpick v4\ntarget_field a.A $name I G"),
+            UnpickTargetField::class.java,
+        )!!
+        return targetField.fieldName!!
     }
 }

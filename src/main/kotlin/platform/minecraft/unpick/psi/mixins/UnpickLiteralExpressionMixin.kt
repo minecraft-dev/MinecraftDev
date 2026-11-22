@@ -30,9 +30,6 @@ interface UnpickLiteralExpressionMixin : UnpickElement {
      */
     val isNegated: Boolean
 
-    /**
-     * The type of this literal, or `null` if it is malformed.
-     */
     val dataType: DataType?
 
     val parseResult: UnpickLiterals.Result

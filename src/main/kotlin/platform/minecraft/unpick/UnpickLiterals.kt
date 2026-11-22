@@ -52,9 +52,6 @@ object UnpickLiterals {
         }
     }
 
-    /**
-     * Parses an integer literal such as a parameter index, returning `null` if it is invalid.
-     */
     fun parseInt(text: String): Int? = (parseInt(text, false) as? Result.Value)?.value as? Int
 
     fun dataTypeOf(tokenType: IElementType): DataType? {
@@ -69,14 +66,14 @@ object UnpickLiterals {
         }
     }
 
-    private data class Radix(val digits: String, val radix: Int)
+    private data class NumberWithRadix(val digits: String, val radix: Int)
 
-    private fun splitRadix(text: String): Radix {
+    private fun splitRadix(text: String): NumberWithRadix {
         return when {
-            text.startsWith("0x") || text.startsWith("0X") -> Radix(text.substring(2), 16)
-            text.startsWith("0b") || text.startsWith("0B") -> Radix(text.substring(2), 2)
-            text.startsWith("0") && text.length > 1 -> Radix(text.substring(1), 8)
-            else -> Radix(text, 10)
+            text.startsWith("0x") || text.startsWith("0X") -> NumberWithRadix(text.substring(2), 16)
+            text.startsWith("0b") || text.startsWith("0B") -> NumberWithRadix(text.substring(2), 2)
+            text.startsWith("0") && text.length > 1 -> NumberWithRadix(text.substring(1), 8)
+            else -> NumberWithRadix(text, 10)
         }
     }
 
