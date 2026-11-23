@@ -21,77 +21,71 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.util.McdevHttp
+import com.demonwav.mcdev.util.fetchCatching
+import com.demonwav.mcdev.util.fetchOrNull
+import com.demonwav.mcdev.util.loggerForTopLevel
 import java.io.IOException
+import java.io.InputStream
 import java.util.function.Predicate
 import javax.xml.stream.XMLInputFactory
-import javax.xml.stream.events.XMLEvent
+import javax.xml.stream.XMLStreamConstants
+import javax.xml.stream.XMLStreamException
 
-@Throws(IOException::class)
+private val LOGGER = loggerForTopLevel()
+
+/**
+ * Returns the versions in the Maven metadata at [url] that match [filter], or a failure after logging a warning if
+ * the download or parse fails.
+ */
 suspend fun collectMavenVersions(
     url: String,
     headers: Map<String, String> = emptyMap(),
     filter: Predicate<String> = Predicate { true }
+): Result<List<String>> = fetchCatching(LOGGER, url) { fetchMavenVersions(url, headers, filter) }
+
+/**
+ * Like [collectMavenVersions], but throws on failure.
+ */
+@Throws(IOException::class, XMLStreamException::class)
+internal suspend fun fetchMavenVersions(
+    url: String,
+    headers: Map<String, String> = emptyMap(),
+    filter: Predicate<String> = Predicate { true }
 ): List<String> = McdevHttp.get(url, headers).suspend().connect {
-    val result = mutableListOf<String>()
-    inputStream.use { stream ->
-        val inputFactory = XMLInputFactory.newInstance()
-
-        @Suppress("UNCHECKED_CAST")
-        val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-        for (event in reader) {
-            if (!event.isStartElement) {
-                continue
-            }
-            val start = event.asStartElement()
-            val name = start.name.localPart
-            if (name != "version") {
-                continue
-            }
-
-            val versionEvent = reader.next()
-            if (!versionEvent.isCharacters) {
-                continue
-            }
-
-            val version = versionEvent.asCharacters().data
-            if (filter.test(version)) {
-                result += version
-            }
-        }
-    }
-
-    result
+    inputStream.use { stream -> readElementTexts(stream, "version").filter(filter::test) }
 }
 
-@Throws(IOException::class)
-suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String> = McdevHttp.get(url).suspend().connect {
-    val result = mutableListOf<String>()
-    inputStream.use { stream ->
-        val inputFactory = XMLInputFactory.newInstance()
+/**
+ * Returns the entries of the directory listing at [url], or null after logging a warning if the download or parse
+ * fails. Directories end with `/`.
+ */
+suspend fun scrapeArtifactoryDirectoryListing(url: String): List<String>? =
+    fetchOrNull(LOGGER, url) { fetchArtifactoryDirectoryListing(url) }
 
-        @Suppress("UNCHECKED_CAST")
-        val reader = inputFactory.createXMLEventReader(stream) as Iterator<XMLEvent>
-        for (event in reader) {
-            if (!event.isStartElement) {
-                continue
-            }
-            val start = event.asStartElement()
-            val name = start.name.localPart
-            if (name != "a") {
-                continue
-            }
+/**
+ * Like [scrapeArtifactoryDirectoryListing], but throws on failure.
+ */
+@Throws(IOException::class, XMLStreamException::class)
+internal suspend fun fetchArtifactoryDirectoryListing(url: String): List<String> = McdevHttp.get(url).suspend().connect {
+    inputStream.use { stream -> readElementTexts(stream, "a").filter { it != "../" } }
+}
 
-            val childPathEvent = reader.next()
-            if (!childPathEvent.isCharacters) {
-                continue
-            }
-
-            val childPath = childPathEvent.asCharacters().data
-            if (childPath != "../") {
-                result += childPath
+private fun readElementTexts(stream: InputStream, element: String): List<String> {
+    val factory = XMLInputFactory.newInstance()
+    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false)
+    val reader = factory.createXMLStreamReader(stream)
+    try {
+        val result = mutableListOf<String>()
+        while (reader.hasNext()) {
+            if (reader.next() == XMLStreamConstants.START_ELEMENT && reader.localName == element) {
+                val text = reader.elementText.trim()
+                if (text.isNotEmpty()) {
+                    result += text
+                }
             }
         }
+        return result
+    } finally {
+        reader.close()
     }
-
-    result
 }

@@ -21,6 +21,7 @@
 package com.demonwav.mcdev.creator
 
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.fetchOrNull
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.util.io.HttpRequests
 
@@ -33,48 +34,52 @@ class ParchmentVersion private constructor(val mcVersion: SemanticVersion, val p
     companion object {
         private val LOGGER = logger<ParchmentVersion>()
 
-        suspend fun downloadData(limit: Int = 50): List<ParchmentVersion> {
+        private const val BASE_URL = "https://maven.parchmentmc.org/org/parchmentmc/data/"
+
+        /**
+         * Returns up to [limit] Parchment versions, newest Minecraft version first, or null after logging a warning if
+         * none could be downloaded. A Minecraft version whose versions fail to download is left out with a warning.
+         */
+        suspend fun downloadData(limit: Int = 50): List<ParchmentVersion>? {
             val versions = mutableListOf<ParchmentVersion>()
-            val mcVersions = collectSupportedMcVersions() ?: return emptyList()
+            val mcVersions = collectSupportedMcVersions() ?: return null
             for (mcVersion in mcVersions) {
-                val url = "https://maven.parchmentmc.org/org/parchmentmc/data/parchment-$mcVersion/maven-metadata.xml"
-                try {
-                    collectMavenVersions(url)
-                        .mapTo(versions) { ParchmentVersion(mcVersion, it) }
-                    if (versions.size > limit) {
-                        return versions.subList(0, limit)
+                val url = "${BASE_URL}parchment-$mcVersion/maven-metadata.xml"
+                val found = fetchOrNull(LOGGER, url) {
+                    try {
+                        fetchMavenVersions(url)
+                    } catch (e: HttpRequests.HttpStatusException) {
+                        // Some listed Minecraft versions have no Parchment release
+                        if (e.statusCode != 404) {
+                            throw e
+                        }
+                        null
                     }
-                } catch (e: Exception) {
-                    if (e !is HttpRequests.HttpStatusException) {
-                        LOGGER.error("Failed to retrieve Parchment version data from $url", e)
-                    }
+                } ?: continue
+                found.mapTo(versions) { ParchmentVersion(mcVersion, it) }
+                if (versions.size >= limit) {
+                    return versions.subList(0, limit)
                 }
             }
 
+            if (versions.isEmpty()) {
+                LOGGER.warn("No Parchment versions found at $BASE_URL")
+                return null
+            }
             return versions
         }
 
         private suspend fun collectSupportedMcVersions(): List<SemanticVersion>? {
-            try {
-                val baseUrl = "https://maven.parchmentmc.org/org/parchmentmc/data/"
-                val scrapeArtifactoryDirectoryListing = scrapeArtifactoryDirectoryListing(baseUrl)
-                return scrapeArtifactoryDirectoryListing
-                    .asReversed()
-                    .asSequence()
-                    .filter { it.startsWith("parchment-") }
-                    .mapNotNull {
-                        val mcVersion = it.removePrefix("parchment-").removeSuffix("/")
-                        SemanticVersion.tryParse(mcVersion)
-                    }
-                    .toList()
-            } catch (e: Exception) {
-                if (e is HttpRequests.HttpStatusException) {
-                    return null
+            val listing = scrapeArtifactoryDirectoryListing(BASE_URL) ?: return null
+            return listing
+                .asSequence()
+                .filter { it.startsWith("parchment-") }
+                .mapNotNull {
+                    val mcVersion = it.removePrefix("parchment-").removeSuffix("/")
+                    SemanticVersion.tryParse(mcVersion)
                 }
-                LOGGER.error("Failed to list supported Parchment Minecraft versions", e)
-            }
-
-            return null
+                .sortedDescending()
+                .toList()
         }
     }
 }

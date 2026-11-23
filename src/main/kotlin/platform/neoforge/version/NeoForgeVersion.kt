@@ -22,8 +22,8 @@ package com.demonwav.mcdev.platform.neoforge.version
 
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.noVersionsFound
 import com.intellij.openapi.diagnostic.logger
-import java.io.IOException
 
 class NeoForgeVersion private constructor(val versions: List<String>) {
 
@@ -68,15 +68,16 @@ class NeoForgeVersion private constructor(val versions: List<String>) {
             }
         }
 
-        suspend fun downloadData(): NeoForgeVersion? {
-            try {
-                val url = "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
-                val versions = collectMavenVersions(url)
-                return NeoForgeVersion(versions)
-            } catch (e: IOException) {
-                LOGGER.error("Failed to retrieve NeoForge version data", e)
+        /**
+         * Returns the NeoForge versions, or a failure after logging a warning if the download fails or finds none.
+         */
+        suspend fun downloadData(): Result<NeoForgeVersion> {
+            val url = "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
+            val versions = collectMavenVersions(url).getOrElse { return Result.failure(it) }
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "NeoForge", url)
             }
-            return null
+            return Result.success(NeoForgeVersion(versions))
         }
     }
 }

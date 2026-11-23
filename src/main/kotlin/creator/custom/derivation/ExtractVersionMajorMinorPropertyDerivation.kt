@@ -35,10 +35,9 @@ open class ExtractVersionMajorMinorPropertyDerivation : PreparedDerivation {
         }
 
         val (part1, part2) = from.parts
-        if (part1 is SemanticVersion.Companion.VersionPart.ReleasePart &&
-            part2 is SemanticVersion.Companion.VersionPart.ReleasePart
-        ) {
-            return SemanticVersion(listOf(part1, part2))
+        if (part1.isReleasePart && (part2.isReleasePart || part2.isPreReleasePart)) {
+            val releasePart2 = if (part2.isPreReleasePart) part2.asReleasePart() else part2
+            return SemanticVersion(listOf(part1, releasePart2))
         }
 
         return SemanticVersion(emptyList())

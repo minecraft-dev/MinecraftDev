@@ -29,14 +29,13 @@ import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.getOrLogException
+import com.demonwav.mcdev.util.noVersionsFound
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.ui.ComboboxSpeedSearch
-import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.util.ui.AsyncProcessIcon
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,8 +52,7 @@ class MavenArtifactVersionCreatorProperty(
 
     override val graphProperty: GraphProperty<SemanticVersion> = graph.property(SemanticVersion(emptyList()))
     private val versionsProperty = graph.property<Set<SemanticVersion>>(emptySet())
-    private val loadingVersionsProperty = graph.property(true)
-    private val loadingVersionsStatusProperty = graph.property("")
+    internal val downloadStatus = VersionDownloadStatus(graph)
 
     override fun buildUi(panel: Panel) {
         panel.row(descriptor.translatedLabel) {
@@ -63,11 +61,7 @@ class MavenArtifactVersionCreatorProperty(
                 .enabled(descriptor.editable != false)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            cell(AsyncProcessIcon(makeStorageKey("progress")))
-                .visibleIf(loadingVersionsProperty)
-            label("").applyToComponent { foreground = JBColor.RED }
-                .bindText(loadingVersionsStatusProperty)
-                .visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, makeStorageKey("progress"))
 
             versionsProperty.afterChange { versions ->
                 combobox.component.removeAllItems()
@@ -126,14 +120,13 @@ class MavenArtifactVersionCreatorProperty(
         ) { result ->
             result.onSuccess { versions ->
                 versionsProperty.set(versions.toSet())
-                loadingVersionsProperty.set(false)
-            }.onFailure { exception ->
-                loadingVersionsStatusProperty.set(exception.message ?: exception.javaClass.simpleName)
-            }
+                downloadStatus.succeeded()
+            }.onFailure(downloadStatus::failed)
         }
     }
 
     companion object {
+        private val LOGGER = logger<MavenArtifactVersionCreatorProperty>()
 
         private val versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
 
@@ -163,19 +156,19 @@ class MavenArtifactVersionCreatorProperty(
             scope.launch(Dispatchers.Default) {
                 val result = withContext(Dispatchers.IO) {
                     val headers = CreatorCredentials.findMavenRepoAuthHeaders(url)
-                    runCatching { collectMavenVersions(url, headers) }
+                    collectMavenVersions(url, headers)
                 }.map { result ->
-                    val versions = result.asSequence()
+                    result.asSequence()
                         .filter(rawVersionFilter)
                         .mapNotNull(SemanticVersion::tryParse)
                         .filter(versionFilter)
                         .sortedDescending()
                         .take(limit)
                         .toList()
-
-                    versionsCache[cacheKey] = versions
-                    versions
+                }.let { result ->
+                    if (result.getOrNull()?.isEmpty() == true) noVersionsFound(LOGGER, "matching", url) else result
                 }
+                result.onSuccess { versionsCache[cacheKey] = it }
 
                 withContext(context.uiContext) {
                     uiCallback(result)

@@ -32,6 +32,8 @@ import com.demonwav.mcdev.platform.fabric.util.FabricVersions
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.noVersionsFound
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.util.and
 import com.intellij.openapi.observable.util.bindBooleanStorage
@@ -43,7 +45,6 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -67,7 +68,7 @@ class FabricVersionsCreatorProperty(
     )
     private val defaultValue = createDefaultValue(descriptor.default)
 
-    private val loadingVersionsProperty = graph.property(true)
+    internal val downloadStatus = VersionDownloadStatus(graph)
     override val graphProperty: GraphProperty<FabricVersionsModel> = graph.property(defaultValue)
     var model: FabricVersionsModel by graphProperty
 
@@ -136,9 +137,8 @@ class FabricVersionsCreatorProperty(
 
     override fun buildUi(panel: Panel) {
         panel.row("") {
-            cell(AsyncProcessIcon("FabricVersions download"))
-            label(MCDevBundle("creator.ui.versions_download.label"))
-        }.visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, "FabricVersions download", loadingLabel = true)
+        }.visibleIf(downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionModel)
@@ -151,7 +151,7 @@ class FabricVersionsCreatorProperty(
             checkBox(MCDevBundle("creator.ui.show_snapshots.label"))
                 .bindSelected(showMcSnapshotsProperty)
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.loom_version.label")) {
             comboBox(loomVersionModel)
@@ -160,7 +160,7 @@ class FabricVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.loader_version.label")) {
             comboBox(loaderVersionModel)
@@ -169,7 +169,7 @@ class FabricVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.yarn_version.label")) {
             comboBox(yarnVersionModel)
@@ -186,7 +186,7 @@ class FabricVersionsCreatorProperty(
                 .visibleIf(yarnHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty and usesMappingsProperty)
+            .visibleIf(!downloadStatus.loading and usesMappingsProperty)
 
         panel.row(MCDevBundle("creator.ui.fabricapi_version.label")) {
             comboBox(fabricApiVersionModel)
@@ -202,7 +202,7 @@ class FabricVersionsCreatorProperty(
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -221,7 +221,12 @@ class FabricVersionsCreatorProperty(
             updateFabricApiVersions()
         }
 
-        downloadVersion(context) {
+        downloadVersions(context) { failure ->
+            if (failure != null) {
+                downloadStatus.failed(failure)
+                return@downloadVersions
+            }
+
             val fabricVersions = fabricVersions
             if (fabricVersions != null) {
                 loaderVersionModel.removeAllElements()
@@ -242,7 +247,7 @@ class FabricVersionsCreatorProperty(
                 loomVersionProperty.set(defaultValue)
             }
 
-            loadingVersionsProperty.set(false)
+            downloadStatus.succeeded()
         }
     }
 
@@ -302,45 +307,66 @@ class FabricVersionsCreatorProperty(
     }
 
     companion object {
-        private var hasDownloadedVersions = false
+        private val LOGGER = logger<FabricVersionsCreatorProperty>()
+        private const val LOOM_URL = "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml"
 
+        // Each part is kept once downloaded, so a later creator only downloads the parts that failed
+        @Volatile
         private var fabricVersions: FabricVersions? = null
+
+        @Volatile
         private var loomVersions: List<SemanticVersion>? = null
+
+        @Volatile
         private var fabricApiVersions: FabricApiVersions? = null
 
+        private val hasAllVersions: Boolean
+            get() = fabricVersions != null && loomVersions != null && fabricApiVersions != null
+
         internal fun clearCache() {
-            hasDownloadedVersions = false
             fabricVersions = null
             loomVersions = null
             fabricApiVersions = null
         }
 
-        private fun downloadVersion(context: CreatorContext, uiCallback: () -> Unit) {
-            if (hasDownloadedVersions) {
-                uiCallback()
+        private fun downloadVersions(context: CreatorContext, uiCallback: (failure: VersionPartFailure?) -> Unit) {
+            if (hasAllVersions) {
+                uiCallback(null)
                 return
             }
 
             val scope = context.childScope("FabricVersionsCreatorProperty")
             scope.launch(Dispatchers.Default) {
-                awaitAll(
-                    asyncIO { FabricVersions.downloadData().also { fabricVersions = it } },
+                val failure = awaitAll(
                     asyncIO {
-                        collectMavenVersions(
-                            "https://maven.fabricmc.net/net/fabricmc/fabric-loom/maven-metadata.xml"
-                        ).mapNotNull(SemanticVersion::tryParse)
-                            .sortedDescending()
-                            .also { loomVersions = it }
+                        downloadPart("Fabric", fabricVersions, { fabricVersions = it }) {
+                            FabricVersions.downloadData()
+                        }
                     },
-                    asyncIO { FabricApiVersions.downloadData().also { fabricApiVersions = it } },
-                )
-
-                hasDownloadedVersions = true
+                    asyncIO {
+                        downloadPart("Fabric Loom", loomVersions, { loomVersions = it }) { downloadLoomVersions() }
+                    },
+                    asyncIO {
+                        downloadPart("Fabric API", fabricApiVersions, { fabricApiVersions = it }) {
+                            FabricApiVersions.downloadData()
+                        }
+                    },
+                ).firstNotNullOfOrNull { it }
 
                 withContext(context.uiContext) {
-                    uiCallback()
+                    uiCallback(failure)
                 }
             }
+        }
+
+        private suspend fun downloadLoomVersions(): Result<List<SemanticVersion>> {
+            val versions = collectMavenVersions(LOOM_URL).getOrElse { return Result.failure(it) }
+                .mapNotNull(SemanticVersion::tryParse)
+                .sortedDescending()
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "Fabric Loom", LOOM_URL)
+            }
+            return Result.success(versions)
         }
     }
 

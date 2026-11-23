@@ -20,11 +20,14 @@
 
 package com.demonwav.mcdev.platform.architectury
 
-import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.fromJson
 import com.demonwav.mcdev.util.McdevHttp
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.fetchCatching
+import com.demonwav.mcdev.util.noVersionsFound
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.intellij.openapi.diagnostic.logger
+import java.io.IOException
 
 class ArchitecturyVersion private constructor(
     val versions: Map<SemanticVersion, List<SemanticVersion>>,
@@ -42,36 +45,45 @@ class ArchitecturyVersion private constructor(
     )
 
     companion object {
+        private val LOGGER = logger<ArchitecturyVersion>()
+        private const val URL = "https://api.modrinth.com/v2/project/architectury-api/version"
 
-        suspend fun downloadData(): ArchitecturyVersion? {
-            try {
-                val url = "https://api.modrinth.com/v2/project/architectury-api/version"
-                val response = McdevHttp.getString(url)
-
-                val data = Gson().fromJson<List<ModrinthVersionApi>>(response)
-
-                val apiVersionMap = HashMap<SemanticVersion, HashSet<SemanticVersion>>()
-
-                for (version in data) {
-                    val apiVersion = SemanticVersion.parse(version.versionNumber.substringBeforeLast('+'))
-
-                    for (gameVersion in version.gameVersions) {
-                        val parsed = SemanticVersion.tryParse(gameVersion) ?: continue
-                        val set = apiVersionMap.computeIfAbsent(parsed) { HashSet() }
-                        set += apiVersion
-                    }
-                }
-
-                val apiVersionMapList = HashMap<SemanticVersion, List<SemanticVersion>>()
-                for ((mcVersion, archList) in apiVersionMap.entries) {
-                    apiVersionMapList[mcVersion] = archList.sortedDescending()
-                }
-
-                return ArchitecturyVersion(apiVersionMapList)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return null
+        /**
+         * Returns the Architectury API versions by Minecraft version, or a failure after logging a warning if the
+         * download fails or finds none.
+         */
+        suspend fun downloadData(): Result<ArchitecturyVersion> {
+            val versions = fetchCatching(LOGGER, URL) { parse(McdevHttp.getString(URL)) }
+                .getOrElse { return Result.failure(it) }
+            if (versions.versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "Architectury API", URL)
             }
+            return Result.success(versions)
+        }
+
+        private fun parse(response: String): ArchitecturyVersion {
+            // Gson gives null for an empty body
+            val data: Array<ModrinthVersionApi> = Gson().fromJson(response, Array<ModrinthVersionApi>::class.java)
+                ?: throw IOException("Unexpected Architectury API version data")
+
+            val apiVersionMap = HashMap<SemanticVersion, HashSet<SemanticVersion>>()
+
+            for (version in data) {
+                val apiVersion = SemanticVersion.parse(version.versionNumber.substringBeforeLast('+'))
+
+                for (gameVersion in version.gameVersions) {
+                    val parsed = SemanticVersion.tryParse(gameVersion) ?: continue
+                    val set = apiVersionMap.computeIfAbsent(parsed) { HashSet() }
+                    set += apiVersion
+                }
+            }
+
+            val apiVersionMapList = HashMap<SemanticVersion, List<SemanticVersion>>()
+            for ((mcVersion, archList) in apiVersionMap.entries) {
+                apiVersionMapList[mcVersion] = archList.sortedDescending()
+            }
+
+            return ArchitecturyVersion(apiVersionMapList)
         }
     }
 }

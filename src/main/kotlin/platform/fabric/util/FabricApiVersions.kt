@@ -20,10 +20,11 @@
 
 package com.demonwav.mcdev.platform.fabric.util
 
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.McdevHttp
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.fetchCatching
+import com.demonwav.mcdev.util.noVersionsFound
 import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 
@@ -33,45 +34,46 @@ class FabricApiVersions(val versions: List<Version>) {
     class Version(val gameVersions: List<String>, val version: SemanticVersion)
 
     companion object {
-        suspend fun downloadData(): FabricApiVersions? {
-            try {
-                val url = "https://api.modrinth.com/v2/project/P7dR8mSH/version"
-                val text = McdevHttp.getString(url)
+        private const val URL = "https://api.modrinth.com/v2/project/P7dR8mSH/version"
 
-                val versions = mutableListOf<Version>()
-                val json = JsonParser.parseString(text)?.asJsonArray ?: return null
-                versionLoop@
-                for (ver in json) {
-                    val version = ver?.asJsonObject ?: return null
-                    val files = version["files"]?.asJsonArray ?: return null
-                    for (file in files) {
-                        val fileObj = file?.asJsonObject ?: return null
-                        val filename = fileObj["filename"]?.asString ?: return null
-                        if (!filename.startsWith("fabric-api-")) {
-                            continue@versionLoop
-                        }
-                    }
-                    val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse)
-                        ?: return null
-                    val gameVersions = version["game_versions"]?.asJsonArray ?: return null
-                    val gameVersionsList = mutableListOf<String>()
-                    for (gameVer in gameVersions) {
-                        val gameVersion = gameVer?.asString ?: return null
-                        gameVersionsList += gameVersion
-                    }
-                    versions += Version(gameVersionsList, versionNumber)
-                }
-                return FabricApiVersions(versions)
-            } catch (e: IOException) {
-                LOGGER.error(e)
-            } catch (e: JsonSyntaxException) {
-                LOGGER.error(e)
-            } catch (e: IllegalStateException) {
-                LOGGER.error(e)
-            } catch (e: UnsupportedOperationException) {
-                LOGGER.error(e)
+        /**
+         * Returns the Fabric API versions, or a failure after logging a warning if the download fails or finds none.
+         */
+        suspend fun downloadData(): Result<FabricApiVersions> {
+            val versions = fetchCatching(LOGGER, URL) {
+                parse(McdevHttp.getString(URL)) ?: throw IOException("Unexpected Fabric API version data")
+            }.getOrElse { return Result.failure(it) }
+            if (versions.versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "Fabric API", URL)
             }
-            return null
+            return Result.success(versions)
+        }
+
+        private fun parse(text: String): FabricApiVersions? {
+            val versions = mutableListOf<Version>()
+            val json = JsonParser.parseString(text)?.asJsonArray ?: return null
+            versionLoop@
+            for (ver in json) {
+                val version = ver?.asJsonObject ?: return null
+                val files = version["files"]?.asJsonArray ?: return null
+                for (file in files) {
+                    val fileObj = file?.asJsonObject ?: return null
+                    val filename = fileObj["filename"]?.asString ?: return null
+                    if (!filename.startsWith("fabric-api-")) {
+                        continue@versionLoop
+                    }
+                }
+                val versionNumber = version["version_number"]?.asString?.let(SemanticVersion::tryParse)
+                    ?: return null
+                val gameVersions = version["game_versions"]?.asJsonArray ?: return null
+                val gameVersionsList = mutableListOf<String>()
+                for (gameVer in gameVersions) {
+                    val gameVersion = gameVer?.asString ?: return null
+                    gameVersionsList += gameVersion
+                }
+                versions += Version(gameVersionsList, versionNumber)
+            }
+            return FabricApiVersions(versions)
         }
     }
 }

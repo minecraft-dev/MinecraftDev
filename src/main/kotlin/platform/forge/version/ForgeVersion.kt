@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,9 +22,9 @@ package com.demonwav.mcdev.platform.forge.version
 
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.noVersionsFound
 import com.demonwav.mcdev.util.sortVersions
 import com.intellij.openapi.diagnostic.logger
-import java.io.IOException
 
 class ForgeVersion private constructor(val versions: List<String>) {
 
@@ -62,15 +62,17 @@ class ForgeVersion private constructor(val versions: List<String>) {
     companion object {
         private val LOGGER = logger<ForgeVersion>()
 
-        suspend fun downloadData(): ForgeVersion? {
-            try {
-                val url = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
-                val versions = collectMavenVersions(url) { version -> version.indexOf('-') != -1 }
-                return ForgeVersion(versions)
-            } catch (e: IOException) {
-                LOGGER.error("Failed to retrieve Forge version data", e)
+        /**
+         * Returns every Forge version, or a failure after logging a warning if the download fails or finds none.
+         */
+        suspend fun downloadData(): Result<ForgeVersion> {
+            val url = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
+            val versions = collectMavenVersions(url) { version -> version.indexOf('-') != -1 }
+                .getOrElse { return Result.failure(it) }
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "Forge", url)
             }
-            return null
+            return Result.success(ForgeVersion(versions))
         }
     }
 }

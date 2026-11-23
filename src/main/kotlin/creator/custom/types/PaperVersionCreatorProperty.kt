@@ -24,18 +24,18 @@ import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
 import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.update.PluginUtil
+import com.demonwav.mcdev.util.McdevHttp
 import com.demonwav.mcdev.util.MinecraftVersions
 import com.demonwav.mcdev.util.SemanticVersion
-import com.demonwav.mcdev.util.McdevHttp
+import com.demonwav.mcdev.util.fetchOrNull
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.ui.ComboboxSpeedSearch
-import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.util.io.HttpRequests
-import com.intellij.util.ui.AsyncProcessIcon
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -47,49 +47,56 @@ open class PaperVersionCreatorProperty(
 ) : SemanticVersionCreatorProperty(descriptor, context) {
 
     companion object {
+        private val LOGGER = logger<PaperVersionCreatorProperty>()
+        private const val URL = "https://fill.papermc.io/v3/projects/paper"
+
+        @Volatile
         private var paperVersions: List<SemanticVersion>? = null
 
         internal fun clearCache() {
             paperVersions = null
         }
 
-        suspend fun getPaperVersions(): List<SemanticVersion> {
+        /**
+         * Returns the Paper release versions from 1.18.2 on, newest first, or null after logging a warning if the
+         * download fails or finds none.
+         */
+        suspend fun getPaperVersions(): List<SemanticVersion>? {
             paperVersions?.let { return it }
 
-            val body = try {
-                McdevHttp.get("https://fill.papermc.io/v3/projects/paper") {
+            val versions = fetchOrNull(LOGGER, URL) {
+                val body = McdevHttp.get(URL) {
                     userAgent("minecraft-dev/${PluginUtil.pluginVersion} (https://github.com/minecraft-dev/MinecraftDev)")
                 }.suspend().connect { readString() }
-            } catch (_: HttpRequests.HttpStatusException) {
-                null
-            }
-            if (body != null) {
-                val element = Json.parseToJsonElement(body)
-                val result = element.jsonObject["versions"]?.jsonObject?.values
-                    ?.asSequence()
-                    ?.flatMap { it.jsonArray }
-                    ?.map { it.jsonPrimitive.content }
-                    ?.mapNotNull { SemanticVersion.tryParse(it) }
-                    // only release versions
-                    ?.filter { ver -> ver.parts.all { it is SemanticVersion.Companion.VersionPart.ReleasePart } }
-                    // nothing lower than 1.18.2 should be selectable
-                    ?.filter { it >= MinecraftVersions.MC1_18_2 }
-                    ?.toList()
-                    ?.sortedDescending()
-
-                if (result != null) {
-                    paperVersions = result
-                    return result
-                }
+                parse(body)
+            } ?: return null
+            if (versions.isEmpty()) {
+                LOGGER.warn("No Paper versions found at $URL")
+                return null
             }
 
-            return emptyList()
+            paperVersions = versions
+            return versions
+        }
+
+        private fun parse(body: String): List<SemanticVersion> {
+            val groups = Json.parseToJsonElement(body).jsonObject["versions"]?.jsonObject
+                ?: throw IOException("Unexpected Paper version data")
+            return groups.values.asSequence()
+                .flatMap { it.jsonArray }
+                .map { it.jsonPrimitive.content }
+                .mapNotNull { SemanticVersion.tryParse(it) }
+                // only release versions
+                .filter { ver -> ver.parts.all { it.isReleasePart } }
+                // nothing lower than 1.18.2 should be selectable
+                .filter { it >= MinecraftVersions.MC1_18_2 }
+                .sortedDescending()
+                .toList()
         }
     }
 
+    internal val downloadStatus = VersionDownloadStatus(graph)
     private val versionsProperty = graph.property<Set<SemanticVersion>>(emptySet())
-    private val loadingVersionsProperty = graph.property(true)
-    private val loadingVersionsStatusProperty = graph.property("")
 
     override fun buildUi(panel: Panel) {
         panel.row(descriptor.translatedLabel) {
@@ -98,11 +105,7 @@ open class PaperVersionCreatorProperty(
                 .enabled(descriptor.editable != false)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            cell(AsyncProcessIcon(makeStorageKey("progress")))
-                .visibleIf(loadingVersionsProperty)
-            label("").applyToComponent { foreground = JBColor.RED }
-                .bindText(loadingVersionsStatusProperty)
-                .visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, makeStorageKey("progress"))
 
             versionsProperty.afterChange { versions ->
                 combobox.component.removeAllItems()
@@ -118,8 +121,14 @@ open class PaperVersionCreatorProperty(
         val scope = context.childScope("PaperVersionCreatorProperty")
         scope.launch(Dispatchers.Default) {
             val result = getPaperVersions()
-            versionsProperty.set(result.toSet())
-            loadingVersionsProperty.set(false)
+            withContext(context.uiContext) {
+                if (result == null) {
+                    downloadStatus.failed()
+                } else {
+                    versionsProperty.set(result.toSet())
+                    downloadStatus.succeeded()
+                }
+            }
         }
     }
 

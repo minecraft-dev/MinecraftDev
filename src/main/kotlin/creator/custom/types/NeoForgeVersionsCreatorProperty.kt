@@ -29,7 +29,7 @@ import com.demonwav.mcdev.creator.custom.TemplateValidationReporter
 import com.demonwav.mcdev.creator.custom.model.NeoForgeVersions
 import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
 import com.demonwav.mcdev.platform.neoforge.version.NeoGradleVersion
-import com.demonwav.mcdev.platform.neoforge.version.platform.neoforge.version.NeoModDevVersion
+import com.demonwav.mcdev.platform.neoforge.version.NeoModDevVersion
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
 import com.intellij.openapi.observable.properties.GraphProperty
@@ -39,7 +39,6 @@ import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -55,7 +54,7 @@ class NeoForgeVersionsCreatorProperty(
 
     private val defaultValue = createDefaultValue(descriptor.default)
 
-    private val loadingVersionsProperty = graph.property(true)
+    internal val downloadStatus = VersionDownloadStatus(graph)
     override val graphProperty: GraphProperty<NeoForgeVersions> = graph.property(defaultValue)
     var versions: NeoForgeVersions by graphProperty
 
@@ -95,9 +94,8 @@ class NeoForgeVersionsCreatorProperty(
 
     override fun buildUi(panel: Panel) {
         panel.row("") {
-            cell(AsyncProcessIcon("NeoForgeVersions download"))
-            label(MCDevBundle("creator.ui.versions_download.label"))
-        }.visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, "NeoForgeVersions download", loadingLabel = true)
+        }.visibleIf(downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionsModel)
@@ -113,7 +111,7 @@ class NeoForgeVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -125,7 +123,7 @@ class NeoForgeVersionsCreatorProperty(
             }
 
             previousMcVersion = mcVersion
-            val availableNfVersions = nfVersion!!.getNeoForgeVersions(mcVersion)
+            val availableNfVersions = nfVersion?.getNeoForgeVersions(mcVersion).orEmpty()
                 .take(descriptor.limit ?: 50)
             nfVersionsModel.removeAllElements()
             nfVersionsModel.addAll(availableNfVersions)
@@ -133,8 +131,16 @@ class NeoForgeVersionsCreatorProperty(
         }
 
         val mcVersionFilter = descriptor.parameters?.get("mcVersionFilter") as? String
-        downloadVersion(context, mcVersionFilter) {
-            val mcVersions = mcVersions ?: return@downloadVersion
+        downloadVersions(context) { failure ->
+            if (failure != null) {
+                downloadStatus.failed(failure)
+                return@downloadVersions
+            }
+
+            val mcVersions = nfVersion?.sortedMcVersions.orEmpty().filter { version ->
+                mcVersionFilter == null ||
+                    TemplateEvaluator.condition(mapOf("MC_VERSION" to version), mcVersionFilter).getOrDefault(true)
+            }
 
             mcVersionsModel.removeAllElements()
             mcVersionsModel.addAll(mcVersions)
@@ -142,63 +148,60 @@ class NeoForgeVersionsCreatorProperty(
             val selectedMcVersion = when {
                 mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
                 defaultValue.minecraft in mcVersions -> defaultValue.minecraft
-                else -> mcVersions.first()
+                else -> mcVersions.firstOrNull() ?: emptyVersion
             }
             mcVersionProperty.set(selectedMcVersion)
 
             ngVersionProperty.set(ngVersion?.versions?.firstOrNull() ?: emptyVersion)
             mdVersionProperty.set(mdVersion?.versions?.firstOrNull() ?: emptyVersion)
 
-            loadingVersionsProperty.set(false)
+            downloadStatus.succeeded()
         }
     }
 
     companion object {
 
-        private var hasDownloadedVersions = false
-
+        // Each part is kept once downloaded, so a later creator only downloads the parts that failed
+        @Volatile
         private var nfVersion: NeoForgeVersion? = null
+
+        @Volatile
         private var ngVersion: NeoGradleVersion? = null
+
+        @Volatile
         private var mdVersion: NeoModDevVersion? = null
-        private var mcVersions: List<SemanticVersion>? = null
+
+        private val hasAllVersions: Boolean
+            get() = nfVersion != null && ngVersion != null && mdVersion != null
 
         internal fun clearCache() {
-            hasDownloadedVersions = false
             nfVersion = null
             ngVersion = null
             mdVersion = null
-            mcVersions = null
         }
 
-        private fun downloadVersion(context: CreatorContext, mcVersionFilter: String?, uiCallback: () -> Unit) {
-            if (hasDownloadedVersions) {
-                uiCallback()
+        private fun downloadVersions(context: CreatorContext, uiCallback: (failure: VersionPartFailure?) -> Unit) {
+            if (hasAllVersions) {
+                uiCallback(null)
                 return
             }
 
             val scope = context.childScope("NeoForgeVersionsCreatorProperty")
             scope.launch(Dispatchers.Default) {
-                awaitAll(
-                    asyncIO { NeoForgeVersion.downloadData().also { nfVersion = it } },
-                    asyncIO { NeoGradleVersion.downloadData().also { ngVersion = it } },
-                    asyncIO { NeoModDevVersion.downloadData().also { mdVersion = it } },
-                )
-
-                mcVersions = nfVersion?.sortedMcVersions?.let { mcVersion ->
-                    if (mcVersionFilter != null) {
-                        mcVersion.filter { version ->
-                            val conditionProps = mapOf("MC_VERSION" to version)
-                            TemplateEvaluator.condition(conditionProps, mcVersionFilter).getOrDefault(true)
-                        }
-                    } else {
-                        mcVersion
-                    }
-                }
-
-                hasDownloadedVersions = true
+                val failure = awaitAll(
+                    asyncIO {
+                        downloadPart("NeoForge", nfVersion, { nfVersion = it }) { NeoForgeVersion.downloadData() }
+                    },
+                    asyncIO {
+                        downloadPart("NeoGradle", ngVersion, { ngVersion = it }) { NeoGradleVersion.downloadData() }
+                    },
+                    asyncIO {
+                        downloadPart("ModDevGradle", mdVersion, { mdVersion = it }) { NeoModDevVersion.downloadData() }
+                    },
+                ).firstNotNullOfOrNull { it }
 
                 withContext(context.uiContext) {
-                    uiCallback()
+                    uiCallback(failure)
                 }
             }
         }

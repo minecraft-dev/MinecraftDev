@@ -32,7 +32,7 @@ class FetchPaperDependencyVersionForMcVersion : PreparedDerivation {
     override fun derive(parentValues: List<Any?>): Any {
         val version = parentValues[0] as SemanticVersion
         if (version < MinecraftVersions.MC26_1) {
-            return "${version}-R0.1-SNAPSHOT";
+            return "${version}-R0.1-SNAPSHOT"
         }
 
         val isMaven = (parentValues[1] as String) == "Maven"

@@ -21,10 +21,11 @@
 package com.demonwav.mcdev.platform.fabric.util
 
 import com.demonwav.mcdev.creator.custom.model.TemplateApi
-import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.McdevHttp
+import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.fetchCatching
+import com.demonwav.mcdev.util.noVersionsFound
 import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import com.intellij.openapi.diagnostic.logger
 import java.io.IOException
 
@@ -41,50 +42,52 @@ class FabricVersions(val game: List<Game>, val mappings: List<Mappings>, val loa
     }
 
     companion object {
-        suspend fun downloadData(): FabricVersions? {
-            try {
-                val url = "https://meta.fabricmc.net/v2/versions"
-                val text = McdevHttp.getString(url)
+        private const val URL = "https://meta.fabricmc.net/v2/versions"
 
-                val gameList = mutableListOf<Game>()
-                val mappingsList = mutableListOf<Mappings>()
-                val loaderList = mutableListOf<SemanticVersion>()
-                val json = JsonParser.parseString(text)?.asJsonObject ?: return null
-
-                val game = json["game"]?.asJsonArray ?: return null
-                for (version in game) {
-                    val versionObj = version?.asJsonObject ?: return null
-                    val gameVer = versionObj["version"]?.asString ?: return null
-                    val stable = versionObj["stable"]?.asBoolean ?: return null
-                    gameList += Game(gameVer, stable)
-                }
-
-                val mappings = json["mappings"]?.asJsonArray ?: return null
-                for (mapping in mappings) {
-                    val mappingObj = mapping?.asJsonObject ?: return null
-                    val gameVersion = mappingObj["gameVersion"]?.asString ?: return null
-                    val version = mappingObj["version"]?.asString ?: return null
-                    val build = mappingObj["build"]?.asInt ?: return null
-                    mappingsList += Mappings(gameVersion, YarnVersion(version, build))
-                }
-
-                val loaders = json["loader"]?.asJsonArray ?: return null
-                for (loader in loaders) {
-                    val loaderObj = loader?.asJsonObject ?: return null
-                    val version = loaderObj["version"]?.asString?.let(SemanticVersion::tryParse) ?: return null
-                    loaderList += version
-                }
-                return FabricVersions(gameList, mappingsList, loaderList)
-            } catch (e: IOException) {
-                LOGGER.error(e)
-            } catch (e: JsonSyntaxException) {
-                LOGGER.error(e)
-            } catch (e: IllegalStateException) {
-                LOGGER.error(e)
-            } catch (e: UnsupportedOperationException) {
-                LOGGER.error(e)
+        /**
+         * Returns the Fabric game, Yarn and loader versions, or a failure after logging a warning if the download
+         * fails or finds no game versions.
+         */
+        suspend fun downloadData(): Result<FabricVersions> {
+            val versions = fetchCatching(LOGGER, URL) {
+                parse(McdevHttp.getString(URL)) ?: throw IOException("Unexpected Fabric version data")
+            }.getOrElse { return Result.failure(it) }
+            if (versions.game.isEmpty()) {
+                return noVersionsFound(LOGGER, "Fabric game", URL)
             }
-            return null
+            return Result.success(versions)
+        }
+
+        private fun parse(text: String): FabricVersions? {
+            val gameList = mutableListOf<Game>()
+            val mappingsList = mutableListOf<Mappings>()
+            val loaderList = mutableListOf<SemanticVersion>()
+            val json = JsonParser.parseString(text)?.asJsonObject ?: return null
+
+            val game = json["game"]?.asJsonArray ?: return null
+            for (version in game) {
+                val versionObj = version?.asJsonObject ?: return null
+                val gameVer = versionObj["version"]?.asString ?: return null
+                val stable = versionObj["stable"]?.asBoolean ?: return null
+                gameList += Game(gameVer, stable)
+            }
+
+            val mappings = json["mappings"]?.asJsonArray ?: return null
+            for (mapping in mappings) {
+                val mappingObj = mapping?.asJsonObject ?: return null
+                val gameVersion = mappingObj["gameVersion"]?.asString ?: return null
+                val version = mappingObj["version"]?.asString ?: return null
+                val build = mappingObj["build"]?.asInt ?: return null
+                mappingsList += Mappings(gameVersion, YarnVersion(version, build))
+            }
+
+            val loaders = json["loader"]?.asJsonArray ?: return null
+            for (loader in loaders) {
+                val loaderObj = loader?.asJsonObject ?: return null
+                val version = loaderObj["version"]?.asString?.let(SemanticVersion::tryParse) ?: return null
+                loaderList += version
+            }
+            return FabricVersions(gameList, mappingsList, loaderList)
         }
     }
 }

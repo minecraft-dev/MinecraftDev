@@ -54,6 +54,8 @@ class ParchmentCreatorProperty(
 
     private var availableParchmentVersions: List<ParchmentVersion> = emptyList()
 
+    internal val downloadStatus = VersionDownloadStatus(graph)
+
     private val useParchmentProperty = graphProperty.transform({ it.use }, { versions.copy(use = it) })
     private val versionProperty = graphProperty.transform({ it.version }, { versions.copy(version = it) })
     private val versionsModel = DefaultComboBoxModel<SemanticVersion>()
@@ -93,35 +95,41 @@ class ParchmentCreatorProperty(
     }
 
     override fun buildUi(panel: Panel) {
+        val editable = descriptor.editable != false
+        val parchmentEnabled = useParchmentProperty.transform { it && editable }
+
         panel.row(descriptor.translatedLabel) {
             @Suppress("DialogTitleCapitalization")
             checkBox(MCDevBundle("creator.ui.parchment.use.label"))
                 .bindSelected(useParchmentProperty)
+                .enabled(editable)
 
             comboBox(mcVersionsModel)
                 .bindItem(mcVersionProperty)
-                .enabledIf(useParchmentProperty)
+                .enabledIf(parchmentEnabled)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
             comboBox(versionsModel)
                 .bindItem(versionProperty)
-                .enabledIf(useParchmentProperty)
+                .enabledIf(parchmentEnabled)
                 .validationOnInput(BuiltinValidations.nonEmptyVersion)
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
-        }.enabled(descriptor.editable != false)
+
+            downloadStatus(downloadStatus, makeStorageKey("progress"))
+        }
 
         panel.row(MCDevBundle("creator.ui.parchment.include.label")) {
             checkBox(MCDevBundle("creator.ui.parchment.include.older_mc_versions"))
                 .bindSelected(includeOlderMcVersionsProperty)
-                .enabledIf(useParchmentProperty)
+                .enabledIf(parchmentEnabled)
 
             checkBox(MCDevBundle("creator.ui.parchment.include.snapshots"))
                 .bindSelected(includeSnapshotsProperty)
-                .enabledIf(useParchmentProperty)
-        }.enabled(descriptor.editable != false)
+                .enabledIf(parchmentEnabled)
+        }
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -168,8 +176,13 @@ class ParchmentCreatorProperty(
             refreshVersionsLists()
         }
 
-        downloadVersions(context) {
-            refreshVersionsLists()
+        downloadVersions(context) { success ->
+            if (success) {
+                refreshVersionsLists()
+                downloadStatus.succeeded()
+            } else {
+                downloadStatus.failed()
+            }
         }
     }
 
@@ -244,7 +257,7 @@ class ParchmentCreatorProperty(
         // Ensures we get no trailing .0 for the first major version (1.21.0 -> 1.21)
         // This is required because otherwise those versions won't be properly compared against Parchment's
         val normalizedVersion = version.parts.dropLastWhile { part ->
-            part is SemanticVersion.Companion.VersionPart.ReleasePart && part.version == 0
+            part.isReleasePart && part.version == 0
         }
 
         return SemanticVersion(normalizedVersion)
@@ -252,30 +265,28 @@ class ParchmentCreatorProperty(
 
     companion object {
 
-        private var hasDownloadedVersions = false
-
+        @Volatile
         private var allParchmentVersions: List<ParchmentVersion>? = null
 
         internal fun clearCache() {
-            hasDownloadedVersions = false
             allParchmentVersions = null
         }
 
-        private fun downloadVersions(context: CreatorContext, uiCallback: () -> Unit) {
-            if (hasDownloadedVersions) {
-                uiCallback()
+        private fun downloadVersions(context: CreatorContext, uiCallback: (success: Boolean) -> Unit) {
+            if (allParchmentVersions != null) {
+                uiCallback(true)
                 return
             }
 
             val scope = context.childScope("ParchmentCreatorProperty")
             scope.launch(Dispatchers.IO) {
-                allParchmentVersions = ParchmentVersion.downloadData()
-                    .sortedByDescending(ParchmentVersion::parchmentVersion)
-
-                hasDownloadedVersions = true
+                val downloaded = ParchmentVersion.downloadData()
+                if (downloaded != null) {
+                    allParchmentVersions = downloaded
+                }
 
                 withContext(context.uiContext) {
-                    uiCallback()
+                    uiCallback(downloaded != null)
                 }
             }
         }

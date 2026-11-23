@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -25,6 +25,7 @@ import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.PreReleaseP
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.ReleasePart
 import com.demonwav.mcdev.util.SemanticVersion.Companion.VersionPart.TextPart
 import java.net.URLDecoder
+import kotlin.contracts.contract
 
 /**
  * Represents a comparable and generalised "semantic version".
@@ -101,7 +102,7 @@ class SemanticVersion(
         fun tryParse(value: String): SemanticVersion? {
             return try {
                 parse(value)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         }
@@ -197,6 +198,28 @@ class SemanticVersion(
         sealed class VersionPart : Comparable<VersionPart> {
             abstract val versionString: String
 
+            val isReleasePart: Boolean
+                get() {
+                    contract {
+                        returns(true) implies (this@VersionPart is ReleasePart)
+                    }
+                    return this is ReleasePart
+                }
+            val isTextPart: Boolean
+                get() {
+                    contract {
+                        returns(true) implies (this@VersionPart is TextPart)
+                    }
+                    return this is TextPart
+                }
+            val isPreReleasePart: Boolean
+                get() {
+                    contract {
+                        returns(true) implies (this@VersionPart is PreReleasePart)
+                    }
+                    return this is PreReleasePart
+                }
+
             data class ReleasePart(val version: Int, override val versionString: String) : VersionPart() {
                 override fun compareTo(other: VersionPart) =
                     when (other) {
@@ -236,6 +259,10 @@ class SemanticVersion(
                 val subParts: List<VersionPart>,
                 override val versionString: String,
             ) : VersionPart() {
+
+                fun asReleasePart(): ReleasePart {
+                    return ReleasePart(version, version.toString())
+                }
 
                 override fun compareTo(other: VersionPart): Int =
                     when (other) {

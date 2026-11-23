@@ -36,7 +36,6 @@ import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +50,7 @@ class ForgeVersionsCreatorProperty(
 
     private val defaultValue = createDefaultValue(descriptor.default)
 
-    private val loadingVersionsProperty = graph.property(true)
+    internal val downloadStatus = VersionDownloadStatus(graph)
     override val graphProperty: GraphProperty<ForgeVersions> = graph.property(defaultValue)
     var versions: ForgeVersions by graphProperty
 
@@ -89,9 +88,8 @@ class ForgeVersionsCreatorProperty(
 
     override fun buildUi(panel: Panel) {
         panel.row("") {
-            cell(AsyncProcessIcon("ForgeVersions download"))
-            label(MCDevBundle("creator.ui.versions_download.label"))
-        }.visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, "ForgeVersions download", loadingLabel = true)
+        }.visibleIf(downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionsModel)
@@ -107,7 +105,7 @@ class ForgeVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -119,7 +117,7 @@ class ForgeVersionsCreatorProperty(
             }
 
             previousMcVersion = mcVersion
-            val availableForgeVersions = forgeVersion!!.getForgeVersions(mcVersion)
+            val availableForgeVersions = forgeVersion?.getForgeVersions(mcVersion).orEmpty()
                 .take(descriptor.limit ?: 50)
             forgeVersionsModel.removeAllElements()
             forgeVersionsModel.addAll(availableForgeVersions)
@@ -148,10 +146,13 @@ class ForgeVersionsCreatorProperty(
             }
         }
 
-        downloadVersions(context) {
-            reloadMinecraftVersions()
-
-            loadingVersionsProperty.set(false)
+        downloadVersions(context) { failure ->
+            if (failure == null) {
+                reloadMinecraftVersions()
+                downloadStatus.succeeded()
+            } else {
+                downloadStatus.failed(failure)
+            }
         }
     }
 
@@ -176,35 +177,32 @@ class ForgeVersionsCreatorProperty(
         val selectedMcVersion = when {
             mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
             defaultValue.minecraft in mcVersions -> defaultValue.minecraft
-            else -> mcVersions.first()
+            else -> mcVersions.firstOrNull() ?: emptyVersion
         }
         mcVersionProperty.set(selectedMcVersion)
     }
 
     companion object {
-        private var hasDownloadedVersions = false
-
+        @Volatile
         private var forgeVersion: ForgeVersion? = null
 
         internal fun clearCache() {
-            hasDownloadedVersions = false
             forgeVersion = null
         }
 
-        private fun downloadVersions(context: CreatorContext, uiCallback: () -> Unit) {
-            if (hasDownloadedVersions) {
-                uiCallback()
+        private fun downloadVersions(context: CreatorContext, uiCallback: (failure: Throwable?) -> Unit) {
+            if (forgeVersion != null) {
+                uiCallback(null)
                 return
             }
 
             val scope = context.childScope("ForgeVersionsCreatorProperty")
             scope.launch(Dispatchers.IO) {
-                forgeVersion = ForgeVersion.downloadData()
-
-                hasDownloadedVersions = true
+                val downloaded = ForgeVersion.downloadData()
+                downloaded.onSuccess { forgeVersion = it }
 
                 withContext(context.uiContext) {
-                    uiCallback()
+                    uiCallback(downloaded.exceptionOrNull())
                 }
             }
         }

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,33 +18,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.demonwav.mcdev.platform.neoforge.version.platform.neoforge.version
+package com.demonwav.mcdev.platform.neoforge.version
 
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.noVersionsFound
 import com.intellij.openapi.diagnostic.logger
-import java.io.IOException
 
 class NeoModDevVersion private constructor(val versions: List<SemanticVersion>) {
 
     companion object {
         private val LOGGER = logger<NeoModDevVersion>()
 
-        suspend fun downloadData(): NeoModDevVersion? {
-            try {
-                val url = "https://maven.neoforged.net/releases/net/neoforged/moddev" +
-                    "/net.neoforged.moddev.gradle.plugin/maven-metadata.xml"
-                val versions = collectMavenVersions(url)
-                    .asSequence()
-                    .mapNotNull(SemanticVersion.Companion::tryParse)
-                    .sortedDescending()
-                    .take(50)
-                    .toList()
-                return NeoModDevVersion(versions)
-            } catch (e: IOException) {
-                LOGGER.error("Failed to retrieve NeoForged ModDev version data", e)
+        /**
+         * Returns the ModDevGradle versions, or a failure after logging a warning if the download fails or finds none.
+         */
+        suspend fun downloadData(): Result<NeoModDevVersion> {
+            val url = "https://maven.neoforged.net/releases/net/neoforged/moddev" +
+                "/net.neoforged.moddev.gradle.plugin/maven-metadata.xml"
+            val versions = collectMavenVersions(url).getOrElse { return Result.failure(it) }.asSequence()
+                .mapNotNull(SemanticVersion.Companion::tryParse)
+                .sortedDescending()
+                .take(50)
+                .toList()
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "ModDevGradle", url)
             }
-            return null
+            return Result.success(NeoModDevVersion(versions))
         }
     }
 }

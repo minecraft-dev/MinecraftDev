@@ -21,10 +21,14 @@
 package com.demonwav.mcdev.util
 
 import com.demonwav.mcdev.update.PluginUtil
+import com.intellij.openapi.diagnostic.ControlFlowException
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.io.HttpRequests
 import com.intellij.util.io.RequestBuilder
+import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
+import java.util.concurrent.CancellationException
 import kotlin.collections.iterator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -128,4 +132,40 @@ object McdevHttp {
             request.connect(read)
         }
     }
+}
+
+/**
+ * Runs a download in [block] and returns its result. Any failure is logged to [logger] as a warning, naming [what] was
+ * being downloaded, and gives null. Cancellation always propagates.
+ */
+inline fun <T> fetchOrNull(logger: Logger, what: String, block: () -> T?): T? =
+    fetchCatching(logger, what, block).getOrNull()
+
+/**
+ * Like [fetchOrNull], but a failure is returned as a failed [Result] so callers can show its cause.
+ */
+inline fun <T> fetchCatching(logger: Logger, what: String, block: () -> T): Result<T> {
+    return try {
+        Result.success(block())
+    } catch (e: Exception) {
+        if (e is CancellationException || e is ControlFlowException) {
+            throw e
+        }
+        logger.warn("Failed to download $what", e)
+        Result.failure(e)
+    }
+}
+
+/**
+ * A download that succeeded but found no versions.
+ */
+class NoVersionsFoundException(message: String) : IOException(message)
+
+/**
+ * Logs a warning to [logger] and returns a [NoVersionsFoundException] failure for the [what] versions at [url].
+ */
+fun noVersionsFound(logger: Logger, what: String, url: String): Result<Nothing> {
+    val e = NoVersionsFoundException("No $what versions found at $url")
+    logger.warn(e.message)
+    return Result.failure(e)
 }

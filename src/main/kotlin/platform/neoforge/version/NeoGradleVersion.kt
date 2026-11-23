@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -22,28 +22,28 @@ package com.demonwav.mcdev.platform.neoforge.version
 
 import com.demonwav.mcdev.creator.collectMavenVersions
 import com.demonwav.mcdev.util.SemanticVersion
+import com.demonwav.mcdev.util.noVersionsFound
 import com.intellij.openapi.diagnostic.logger
-import java.io.IOException
 
 class NeoGradleVersion private constructor(val versions: List<SemanticVersion>) {
 
     companion object {
         private val LOGGER = logger<NeoGradleVersion>()
 
-        suspend fun downloadData(): NeoGradleVersion? {
-            try {
-                val url = "https://maven.neoforged.net/releases/net/neoforged/gradle/userdev/maven-metadata.xml"
-                val versions = collectMavenVersions(url)
-                    .asSequence()
-                    .mapNotNull(SemanticVersion.Companion::tryParse)
-                    .sortedDescending()
-                    .take(50)
-                    .toList()
-                return NeoGradleVersion(versions)
-            } catch (e: IOException) {
-                LOGGER.error("Failed to retrieve NeoForge version data", e)
+        /**
+         * Returns the NeoGradle versions, or a failure after logging a warning if the download fails or finds none.
+         */
+        suspend fun downloadData(): Result<NeoGradleVersion> {
+            val url = "https://maven.neoforged.net/releases/net/neoforged/gradle/userdev/maven-metadata.xml"
+            val versions = collectMavenVersions(url).getOrElse { return Result.failure(it) }.asSequence()
+                .mapNotNull(SemanticVersion.Companion::tryParse)
+                .sortedDescending()
+                .take(50)
+                .toList()
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "NeoGradle", url)
             }
-            return null
+            return Result.success(NeoGradleVersion(versions))
         }
     }
 }

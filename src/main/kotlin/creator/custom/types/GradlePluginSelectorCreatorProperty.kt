@@ -31,18 +31,17 @@ import com.demonwav.mcdev.creator.custom.model.TemplateApi
 import com.demonwav.mcdev.creator.custom.types.GradlePluginSelectorCreatorProperty.Holder
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.getOrLogException
+import com.demonwav.mcdev.util.noVersionsFound
 import com.demonwav.mcdev.util.toBooleanLenient
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.util.transform
 import com.intellij.ui.ComboboxSpeedSearch
-import com.intellij.ui.JBColor
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
-import com.intellij.ui.dsl.builder.bindText
-import com.intellij.util.ui.AsyncProcessIcon
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,8 +51,7 @@ class GradlePluginSelectorCreatorProperty(
     descriptor: TemplatePropertyDescriptor,
     context: CreatorContext
 ) : CreatorProperty<Holder>(descriptor, context, Holder::class.java) {
-    private val loadingVersionsProperty = graph.property(true)
-    private val loadingVersionsStatusProperty = graph.property("")
+    internal val downloadStatus = VersionDownloadStatus(graph)
 
     private val defaultValue = createDefaultValue(descriptor.default)
 
@@ -108,11 +106,7 @@ class GradlePluginSelectorCreatorProperty(
                 combobox.comment(descriptor.translate(warning))
             }
 
-            cell(AsyncProcessIcon(makeStorageKey("progress")))
-                .visibleIf(loadingVersionsProperty)
-            label("").applyToComponent { foreground = JBColor.RED }
-                .bindText(loadingVersionsStatusProperty)
-                .visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, makeStorageKey("progress"))
 
             versionsModel.afterChange { versions ->
                 combobox.component.removeAllItems()
@@ -171,16 +165,14 @@ class GradlePluginSelectorCreatorProperty(
             descriptor.limit ?: 50
         ) { result ->
             result.onSuccess { versions ->
-                val set = versions.toSet()
-                versionsModel.set(set)
-                loadingVersionsProperty.set(false)
-            }.onFailure { exception ->
-                loadingVersionsStatusProperty.set(exception.message ?: exception.javaClass.simpleName)
-            }
+                versionsModel.set(versions.toSet())
+                downloadStatus.succeeded()
+            }.onFailure(downloadStatus::failed)
         }
     }
 
     companion object {
+        private val LOGGER = logger<GradlePluginSelectorCreatorProperty>()
 
         private val versionsCache = ConcurrentHashMap<String, List<SemanticVersion>>()
 
@@ -210,19 +202,19 @@ class GradlePluginSelectorCreatorProperty(
             scope.launch(Dispatchers.Default) {
                 val result = withContext(Dispatchers.IO) {
                     val headers = CreatorCredentials.findMavenRepoAuthHeaders(url)
-                    runCatching { collectMavenVersions(url, headers) }
+                    collectMavenVersions(url, headers)
                 }.map { result ->
-                    val versions = result.asSequence()
+                    result.asSequence()
                         .filter(rawVersionFilter)
                         .mapNotNull(SemanticVersion::tryParse)
                         .filter(versionFilter)
                         .sortedDescending()
                         .take(limit)
                         .toList()
-
-                    versionsCache[cacheKey] = versions
-                    versions
+                }.let { result ->
+                    if (result.getOrNull()?.isEmpty() == true) noVersionsFound(LOGGER, "matching", url) else result
                 }
+                result.onSuccess { versionsCache[cacheKey] = it }
 
                 withContext(context.uiContext) {
                     uiCallback(result)

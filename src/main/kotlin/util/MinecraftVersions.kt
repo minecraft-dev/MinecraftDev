@@ -73,9 +73,10 @@ object MinecraftVersions {
      */
     fun nextMajorVersion(minecraftVersion: SemanticVersion): String {
         val first = minecraftVersion.parts.getOrNull(0)?.versionString ?: "1"
-        val mcNext = when (val part = minecraftVersion.parts.getOrNull(1)) {
-            is SemanticVersion.Companion.VersionPart.ReleasePart -> (part.version + 1).toString()
-            null -> "?"
+        val part = minecraftVersion.parts.getOrNull(1)
+        val mcNext = when {
+            part == null -> "?"
+            part.isReleasePart -> (part.version + 1).toString()
             else -> part.versionString
         }
         return "$first.$mcNext"

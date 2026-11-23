@@ -20,7 +20,6 @@
 
 package com.demonwav.mcdev.creator.custom.types
 
-import com.demonwav.mcdev.asset.MCDevBundle
 import com.demonwav.mcdev.creator.custom.BuiltinValidations
 import com.demonwav.mcdev.creator.custom.CreatorContext
 import com.demonwav.mcdev.creator.custom.TemplatePropertyDescriptor
@@ -31,7 +30,6 @@ import com.demonwav.mcdev.util.SemanticVersion
 import com.intellij.ui.ComboboxSpeedSearch
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +47,7 @@ class FabricGameVersionCreatorProperty(
     context: CreatorContext
 ) : SemanticVersionCreatorProperty(descriptor, context) {
 
-    private val loadingVersionsProperty = graph.property(true)
+    internal val downloadStatus = VersionDownloadStatus(graph)
     private val versionsModel = DefaultComboBoxModel<SemanticVersion>()
 
     override fun buildUi(panel: Panel) {
@@ -61,10 +59,7 @@ class FabricGameVersionCreatorProperty(
                 .enabled(descriptor.editable != false)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
 
-            cell(AsyncProcessIcon(makeStorageKey("progress")))
-                .visibleIf(loadingVersionsProperty)
-            label(MCDevBundle("creator.ui.versions_download.label"))
-                .visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, makeStorageKey("progress"), loadingLabel = true)
         }.propertyVisibility()
     }
 
@@ -73,8 +68,12 @@ class FabricGameVersionCreatorProperty(
 
         val scope = context.childScope("FabricGameVersionCreatorProperty")
         scope.launch(Dispatchers.Default) {
-            val versions = getGameVersions()
+            val result = getGameVersions()
             withContext(context.uiContext) {
+                val versions = result.getOrElse {
+                    downloadStatus.failed(it)
+                    return@withContext
+                }
                 versionsModel.removeAllElements()
                 versionsModel.addAll(versions.all)
                 if (graphProperty.get() !in versions.all) {
@@ -83,23 +82,23 @@ class FabricGameVersionCreatorProperty(
                 // Clearing the model also cleared its selection, which won't be restored by the binding if the
                 // property kept its (remembered) value
                 versionsModel.selectedItem = graphProperty.get()
-                loadingVersionsProperty.set(false)
+                downloadStatus.succeeded()
             }
         }
     }
 
     companion object {
+        @Volatile
         private var gameVersions: GameVersions? = null
 
         internal fun clearCache() {
             gameVersions = null
         }
 
-        private suspend fun getGameVersions(): GameVersions {
-            gameVersions?.let { return it }
+        private suspend fun getGameVersions(): Result<GameVersions> {
+            gameVersions?.let { return Result.success(it) }
 
-            val fabricVersions = FabricVersions.downloadData()
-                ?: return GameVersions(emptyList(), null)
+            val fabricVersions = FabricVersions.downloadData().getOrElse { return Result.failure(it) }
             val stableVersions = fabricVersions.game.asSequence()
                 .filter { it.stable }
                 .mapNotNull { SemanticVersion.tryParse(it.version) }
@@ -112,8 +111,9 @@ class FabricGameVersionCreatorProperty(
             val latestSnapshot = fabricVersions.game.firstOrNull()
                 ?.takeUnless { it.stable }
                 ?.let { SemanticVersion.tryParse(it.version) }
-            return GameVersions(listOfNotNull(latestSnapshot) + stableVersions, stableVersions.firstOrNull())
-                .also { gameVersions = it }
+            val versions = GameVersions(listOfNotNull(latestSnapshot) + stableVersions, stableVersions.firstOrNull())
+            gameVersions = versions
+            return Result.success(versions)
         }
     }
 

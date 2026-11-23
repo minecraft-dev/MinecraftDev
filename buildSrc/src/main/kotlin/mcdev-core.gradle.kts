@@ -69,7 +69,7 @@ kotlin {
         languageVersion = KotlinVersion.KOTLIN_2_2
         apiVersion = KotlinVersion.KOTLIN_2_2
         jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
-        freeCompilerArgs = listOf("-Xjdk-release=21")
+        freeCompilerArgs = listOf("-Xjdk-release=21", "-Xallow-contracts-on-more-functions")
         optIn.add("kotlin.contracts.ExperimentalContracts")
     }
 }

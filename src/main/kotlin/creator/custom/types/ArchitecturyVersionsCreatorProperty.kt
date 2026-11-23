@@ -35,6 +35,8 @@ import com.demonwav.mcdev.platform.forge.version.ForgeVersion
 import com.demonwav.mcdev.platform.neoforge.version.NeoForgeVersion
 import com.demonwav.mcdev.util.SemanticVersion
 import com.demonwav.mcdev.util.asyncIO
+import com.demonwav.mcdev.util.noVersionsFound
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.observable.properties.GraphProperty
 import com.intellij.openapi.observable.util.not
 import com.intellij.openapi.observable.util.transform
@@ -44,7 +46,6 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindItem
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.util.application
-import com.intellij.util.ui.AsyncProcessIcon
 import javax.swing.DefaultComboBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
@@ -72,7 +73,7 @@ class ArchitecturyVersionsCreatorProperty(
     )
     private val defaultValue = createDefaultValue(descriptor.default)
 
-    private val loadingVersionsProperty = graph.property(true)
+    internal val downloadStatus = VersionDownloadStatus(graph)
     override val graphProperty: GraphProperty<ArchitecturyVersionsModel> = graph.property(defaultValue)
     var model: ArchitecturyVersionsModel by graphProperty
 
@@ -162,9 +163,8 @@ class ArchitecturyVersionsCreatorProperty(
 
     override fun buildUi(panel: Panel) {
         panel.row("") {
-            cell(AsyncProcessIcon("ArchitecturyVersions download"))
-            label(MCDevBundle("creator.ui.versions_download.label"))
-        }.visibleIf(loadingVersionsProperty)
+            downloadStatus(downloadStatus, "ArchitecturyVersions download", loadingLabel = true)
+        }.visibleIf(downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.mc_version.label")) {
             comboBox(mcVersionModel)
@@ -173,7 +173,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.architectury.forge_version.label")) {
             comboBox(forgeVersionsModel)
@@ -182,7 +182,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
                 .component
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.architectury.neoforge_version.label")) {
             comboBox(nfVersionsModel)
@@ -191,7 +191,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .also { ComboboxSpeedSearch.installOn(it.component) }
                 .component
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         //
         // panel.row("Loom Version:") {
@@ -209,7 +209,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .validationOnApply(BuiltinValidations.nonEmptyVersion)
                 .also { ComboboxSpeedSearch.installOn(it.component) }
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
 
         // Official mappings forced currently, yarn mappings are not handled yet
         // panel.row("Yarn Version:") {
@@ -241,7 +241,7 @@ class ArchitecturyVersionsCreatorProperty(
             label(MCDevBundle("creator.ui.warn.no_fabricapi_to_mc_match"))
                 .visibleIf(fabricApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
-        }.visibleIf(!loadingVersionsProperty)
+        }.visibleIf(!downloadStatus.loading)
 
         panel.row(MCDevBundle("creator.ui.architectury.api_version.label")) {
             comboBox(architecturyApiVersionModel)
@@ -257,7 +257,7 @@ class ArchitecturyVersionsCreatorProperty(
                 .visibleIf(architecturyApiHasMatchingGameVersion.not())
                 .component.foreground = JBColor.YELLOW
         }.enabled(descriptor.editable != false)
-            .visibleIf(!loadingVersionsProperty)
+            .visibleIf(!downloadStatus.loading)
     }
 
     override fun setupProperty(reporter: TemplateValidationReporter) {
@@ -278,7 +278,12 @@ class ArchitecturyVersionsCreatorProperty(
             updateArchitecturyApiVersions()
         }
 
-        downloadVersions(context) {
+        downloadVersions(context) { failure ->
+            if (failure != null) {
+                downloadStatus.failed(failure)
+                return@downloadVersions
+            }
+
             val fabricVersions = fabricVersions
             if (fabricVersions != null) {
                 loaderVersionModel.removeAllElements()
@@ -291,7 +296,7 @@ class ArchitecturyVersionsCreatorProperty(
                 loomVersionModel.removeAllElements()
                 loomVersionModel.addAll(loomVersions)
                 val defaultValue = loomVersions.find {
-                    it.parts.any { p -> p is SemanticVersion.Companion.VersionPart.PreReleasePart }
+                    it.parts.any { p -> p.isPreReleasePart }
                 } ?: loomVersions.firstOrNull() ?: emptyVersion
 
                 loomVersionProperty.set(defaultValue)
@@ -299,7 +304,7 @@ class ArchitecturyVersionsCreatorProperty(
 
             updateMcVersionsList()
 
-            loadingVersionsProperty.set(false)
+            downloadStatus.succeeded()
         }
     }
 
@@ -314,7 +319,7 @@ class ArchitecturyVersionsCreatorProperty(
         val selectedMcVersion = when {
             mcVersionProperty.get() in mcVersions -> mcVersionProperty.get()
             defaultValue.minecraft in mcVersions -> defaultValue.minecraft
-            else -> mcVersions.first()
+            else -> mcVersions.firstOrNull() ?: emptyVersion
         }
         mcVersionProperty.set(selectedMcVersion)
     }
@@ -336,7 +341,7 @@ class ArchitecturyVersionsCreatorProperty(
             }
         }
 
-        val availableForgeVersions = forgeVersions!!.getForgeVersions(mcVersion)
+        val availableForgeVersions = forgeVersions?.getForgeVersions(mcVersion).orEmpty()
             .take(descriptor.limit ?: 50)
         forgeVersionsModel.removeAllElements()
         forgeVersionsModel.addAll(availableForgeVersions)
@@ -360,7 +365,7 @@ class ArchitecturyVersionsCreatorProperty(
             }
         }
 
-        val availableNeoForgeVersions = neoForgeVersions!!.getNeoForgeVersions(mcVersion)
+        val availableNeoForgeVersions = neoForgeVersions?.getNeoForgeVersions(mcVersion).orEmpty()
             .take(descriptor.limit ?: 50)
         nfVersionsModel.removeAllElements()
         nfVersionsModel.addAll(availableNeoForgeVersions)
@@ -422,17 +427,34 @@ class ArchitecturyVersionsCreatorProperty(
     }
 
     companion object {
-        private var hasDownloadedVersions = false
+        private val LOGGER = logger<ArchitecturyVersionsCreatorProperty>()
+        private const val LOOM_URL =
+            "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
 
+        // Each part is kept once downloaded, so a later creator only downloads the parts that failed
+        @Volatile
         private var forgeVersions: ForgeVersion? = null
+
+        @Volatile
         private var neoForgeVersions: NeoForgeVersion? = null
+
+        @Volatile
         private var fabricVersions: FabricVersions? = null
+
+        @Volatile
         private var loomVersions: List<SemanticVersion>? = null
+
+        @Volatile
         private var fabricApiVersions: FabricApiVersions? = null
+
+        @Volatile
         private var architecturyVersions: ArchitecturyVersion? = null
 
+        private val hasAllVersions: Boolean
+            get() = forgeVersions != null && neoForgeVersions != null && fabricVersions != null &&
+                loomVersions != null && fabricApiVersions != null && architecturyVersions != null
+
         internal fun clearCache() {
-            hasDownloadedVersions = false
             forgeVersions = null
             neoForgeVersions = null
             fabricVersions = null
@@ -441,37 +463,62 @@ class ArchitecturyVersionsCreatorProperty(
             architecturyVersions = null
         }
 
-        private fun downloadVersions(context: CreatorContext, completeCallback: () -> Unit) {
-            if (hasDownloadedVersions) {
-                completeCallback()
+        private fun downloadVersions(
+            context: CreatorContext,
+            completeCallback: (failure: VersionPartFailure?) -> Unit,
+        ) {
+            if (hasAllVersions) {
+                completeCallback(null)
                 return
             }
 
             val scope = context.childScope("ArchitecturyVersionsCreatorProperty")
             scope.launch(Dispatchers.Default) {
-                awaitAll(
-                    asyncIO { ForgeVersion.downloadData().also { forgeVersions = it } },
-                    asyncIO { NeoForgeVersion.downloadData().also { neoForgeVersions = it } },
-                    asyncIO { FabricVersions.downloadData().also { fabricVersions = it } },
+                val failure = awaitAll(
                     asyncIO {
-                        collectMavenVersions(
-                            "https://maven.architectury.dev/dev/architectury/architectury-loom/maven-metadata.xml"
-                        ).also {
-                            loomVersions = it
-                                .mapNotNull(SemanticVersion::tryParse)
-                                .sortedDescending()
+                        downloadPart("Forge", forgeVersions, { forgeVersions = it }) { ForgeVersion.downloadData() }
+                    },
+                    asyncIO {
+                        downloadPart("NeoForge", neoForgeVersions, { neoForgeVersions = it }) {
+                            NeoForgeVersion.downloadData()
                         }
                     },
-                    asyncIO { FabricApiVersions.downloadData().also { fabricApiVersions = it } },
-                    asyncIO { ArchitecturyVersion.downloadData().also { architecturyVersions = it } },
-                )
-
-                hasDownloadedVersions = true
+                    asyncIO {
+                        downloadPart("Fabric", fabricVersions, { fabricVersions = it }) {
+                            FabricVersions.downloadData()
+                        }
+                    },
+                    asyncIO {
+                        downloadPart("Architectury Loom", loomVersions, { loomVersions = it }) {
+                            downloadLoomVersions()
+                        }
+                    },
+                    asyncIO {
+                        downloadPart("Fabric API", fabricApiVersions, { fabricApiVersions = it }) {
+                            FabricApiVersions.downloadData()
+                        }
+                    },
+                    asyncIO {
+                        downloadPart("Architectury API", architecturyVersions, { architecturyVersions = it }) {
+                            ArchitecturyVersion.downloadData()
+                        }
+                    },
+                ).firstNotNullOfOrNull { it }
 
                 withContext(context.uiContext) {
-                    completeCallback()
+                    completeCallback(failure)
                 }
             }
+        }
+
+        private suspend fun downloadLoomVersions(): Result<List<SemanticVersion>> {
+            val versions = collectMavenVersions(LOOM_URL).getOrElse { return Result.failure(it) }
+                .mapNotNull(SemanticVersion::tryParse)
+                .sortedDescending()
+            if (versions.isEmpty()) {
+                return noVersionsFound(LOGGER, "Architectury Loom", LOOM_URL)
+            }
+            return Result.success(versions)
         }
     }
 
