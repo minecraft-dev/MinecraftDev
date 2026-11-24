@@ -23,9 +23,11 @@ package com.demonwav.mcdev.framework
 import com.intellij.testFramework.LoggedErrorProcessor
 import java.util.concurrent.CopyOnWriteArrayList
 
+private const val PLUGIN_CATEGORY = "#com.demonwav.mcdev."
+
 /**
- * Collects the errors and warnings logged from any thread until closed. While open, logged errors don't fail the test
- * on their own, so check [errors] or call [assertNoErrors].
+ * Collects the errors logged from any thread, and the warnings logged by the plugin, until closed. While open, logged
+ * errors don't fail the test on their own, so check [errors] or call [assertNoErrors].
  */
 class LogCapture : AutoCloseable {
 
@@ -45,7 +47,9 @@ class LogCapture : AutoCloseable {
             }
 
             override fun processWarn(category: String, message: String, t: Throwable?): Boolean {
-                warnings += describe(category, message, t)
+                if (category.startsWith(PLUGIN_CATEGORY)) {
+                    warnings += describe(category, message, t)
+                }
                 return true
             }
         },

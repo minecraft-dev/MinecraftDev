@@ -340,6 +340,11 @@ tasks.test {
     // instead of reaching the real services
     systemProperty("mcdev.test.httpMock", "http://127.0.0.1:1")
 
+    val templatesDir = file("templates")
+    inputs.files(fileTree(templatesDir) { exclude(".git") }).withPropertyName("templates")
+    systemProperty("mcdev.test.templates", templatesDir.absolutePath)
+    systemProperty("mcdev.test.templatesFormatVersion", builtinTemplatesFormatVersion)
+
     jvmArgs(
         "-Dsun.io.useCanonCaches=false",
         "-Dsun.io.useCanonPrefixCache=false",
