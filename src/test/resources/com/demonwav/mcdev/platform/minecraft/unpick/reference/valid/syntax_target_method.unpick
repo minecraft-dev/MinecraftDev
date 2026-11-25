@@ -1,0 +1,11 @@
+unpick v3
+target_method foo.Bar baz ()V
+target_method foo.Bar baz ()V
+    param 0 a
+    param 1 b
+    param 69 c
+    return d
+target_method foo.Bar baz ()V
+    param 0 e
+target_method foo.Bar baz ()V
+    return f

@@ -1,0 +1,44 @@
+unpick v4
+
+# apply to floats in the default group globally
+group float
+    @strict # don't apply to double literals
+    net.minecraft.util.Mth.PI
+    net.minecraft.util.Mth.PI / 3
+
+# apply to strings in the default group globally
+group String
+    net.minecraft.SharedConstants.VERSION_STRING
+
+# an example of a wildcard field
+group int LevelEvents
+    net.minecraft.world.level.block.LevelEvent.*
+
+# apply to ints in the default group within the scope of ClientboundCustomPayloadPacket
+group int
+    @scope class net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket
+    net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket.MAX_PAYLOAD_SIZE
+
+# apply to ints with the group "ARGBColor"
+group int ARGBColor
+    @format hex # format unrecongized constants as hex
+    net.minecraft.util.CommonColors.WHITE
+    net.minecraft.util.CommonColors.BLACK
+
+# apply the group "ARGBColor" to ints flowing into the 5th parameter of of GuiGraphics.fill
+target_method net.minecraft.client.gui.GuiGraphics fill (IIIII)V
+    param 4 ARGBColor
+
+# apply the group "ARGBColor" to ints flowing from the return of ARGB.color
+target_method net.minecraft.util.ARGB color (IIII)I
+    return ARGBColor
+
+target_field net.minecraft.core.particles.ColorParticleOption color I ARGBColor
+
+# apply to ints with the group "SetBlockFlag"
+group int SetBlockFlag
+    @flags
+    net.minecraft.world.level.block.Block.UPDATE_ALL
+    net.minecraft.world.level.block.Block.UPDATE_NEIGHBORS
+
+target_annotation net.minecraft.world.level.block.Block$UpdateFlags SetBlockFlag

@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -259,6 +259,24 @@ val PsiElement.localClasses: List<PsiClass>
             }
         })
         return list
+    }
+
+/**
+ * The classes directly inside this class, including local and anonymous classes, paired with their binary names
+ * relative to this class (the part after the `$`). For example, the first local class named `Foo` is `1Foo`, and the
+ * second anonymous class is `2`.
+ */
+val PsiClass.namedAndUnnamedInnerClasses: List<Pair<String, PsiClass>>
+    get() {
+        val named = innerClasses.mapNotNull { innerClass -> innerClass.name?.let { it to innerClass } }
+        val localIndices = HashMap<String, Int>()
+        val local = localClasses.mapNotNull { localClass ->
+            val name = localClass.name ?: return@mapNotNull null
+            val index = localIndices.merge(name, 1, Int::plus)
+            "$index$name" to localClass
+        }
+        val anonymous = anonymousClasses.mapIndexed { index, anonymousClass -> "${index + 1}" to anonymousClass }
+        return named + local + anonymous
     }
 
 private val INNER_INDEX_AND_NAME_REGEX = "(\\d+)(\\w*)".toRegex()

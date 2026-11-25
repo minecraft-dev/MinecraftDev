@@ -1,0 +1,13 @@
+unpick v4
+group int g extra tokens
+    1 +
+    foo.Bar.BAZ
+    @format
+target_method foo.Bar
+    param 0 a
+    bogus
+    return b
+    stray indented line
+target_field foo.Bar baz I
+group
+    1

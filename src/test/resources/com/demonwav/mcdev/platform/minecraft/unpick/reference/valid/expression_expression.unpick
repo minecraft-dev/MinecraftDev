@@ -1,0 +1,22 @@
+unpick v3
+group int
+    1 - 2 + 3
+    0 | 1 << 2 / 3 % 4 + 5 >>> 6 >> 7 ^ 8 * 9 & 10 - 11
+    -0
+    ~0
+    1 + -2
+    (int) 1
+    (1)
+    (1 + 2)
+    1 * (2 + 3) / 4
+    (int) 1 + 2
+    foo.Bar.baz
+    foo.Bar.baz:instance
+    foo.Bar.baz:byte
+    foo.Bar.baz:instance:byte
+    (foo.Bar.baz)
+    Foo.bar
+    foo.Bar.*
+    foo.Bar.*:instance
+    foo.Bar.*:byte
+    foo.Bar.*:instance:byte

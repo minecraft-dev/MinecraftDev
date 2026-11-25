@@ -3,7 +3,7 @@
  *
  * https://mcdev.io/
  *
- * Copyright (C) 2025 minecraft-dev
+ * Copyright (C) 2026 minecraft-dev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -63,6 +63,12 @@ class ProjectBuilder(private val fixture: JavaCodeInsightTestFixture, private va
         configure: Boolean = true,
         allowAst: Boolean = false,
     ) = file(path, code, ".nbtt", configure, allowAst)
+    fun unpick(
+        path: String,
+        @Language("Unpick") code: String,
+        configure: Boolean = true,
+        allowAst: Boolean = false,
+    ) = file(path, code, ".unpick", configure, allowAst)
     fun json(
         path: String,
         @Language("JSON") code: String,

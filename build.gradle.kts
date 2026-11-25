@@ -424,6 +424,9 @@ val generateLangParser = parser("generateLangParser", "LangParser", "com/demonwa
 val generateMEExpressionLexer = lexer("generateMEExpressionLexer", "MEExpressionLexer", "com/demonwav/mcdev/platform/mixin/expression/gen")
 val generateMEExpressionParser = parser("generateMEExpressionParser", "MEExpressionParser", "com/demonwav/mcdev/platform/mixin/expression/gen")
 
+val generateUnpickLexer = lexer("generateUnpickLexer", "UnpickLexer", "com/demonwav/mcdev/platform/minecraft/unpick/gen")
+val generateUnpickParser = parser("generateUnpickParser", "UnpickParser", "com/demonwav/mcdev/platform/minecraft/unpick/gen")
+
 val generateTranslationTemplateLexer = lexer(
     "generateTranslationTemplateLexer",
     "TranslationTemplateLexer",
@@ -446,6 +449,8 @@ val generate = tasks.register("generate") {
         generateMEExpressionLexer,
         generateMEExpressionParser,
         generateTranslationTemplateLexer,
+        generateUnpickLexer,
+        generateUnpickParser,
     )
 }
 

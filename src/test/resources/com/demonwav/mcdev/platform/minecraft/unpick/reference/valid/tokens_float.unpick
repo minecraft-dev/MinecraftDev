@@ -1,0 +1,9 @@
+unpick v3
+group float
+    0.0f
+    1.0f
+    -2.0F
+    1.0e5f
+    1.0e-5F
+    1.0e10f
+    3.4028235e38F

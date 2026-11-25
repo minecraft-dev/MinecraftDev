@@ -1,0 +1,70 @@
+unpick v3
+group int
+group int
+    0
+group int g
+    @strict
+    0
+group long
+    0
+group long g
+    0
+group float
+    0
+    1.0
+group float g
+    0
+    1.0
+group double
+    0
+    1.0
+group double g
+    0
+    1.0
+group String
+    ""
+group String g
+    ""
+group Class
+    Foo.bar
+group Class g
+    Foo.bar
+group int g
+    @flags
+    0
+group long g
+    @flags
+    0
+group int a
+    @format decimal
+group long b
+    @format hex
+group int c
+    @format binary
+group long d
+    @format octal
+group int e
+    @format char
+group long f
+    @format decimal
+    0
+group float af
+    @format decimal
+group float bf
+    @format hex
+group double cf
+    @format decimal
+group double df
+    @format hex
+group int
+    @scope package foo.bar
+    0
+group int
+    @scope class foo.Bar
+    0
+group int
+    @scope method foo.Bar baz ()V
+    0
+group int
+    @scope package foo.bar
+    @scope package baz.quux

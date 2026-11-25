@@ -1,0 +1,12 @@
+unpick v3
+target_field foo.Bar baz B g
+target_field foo.Bar baz C g
+target_field foo.Bar baz D g
+target_field foo.Bar baz F g
+target_field foo.Bar baz I g
+target_field foo.Bar baz J g
+target_field foo.Bar baz S g
+target_field foo.Bar baz Z g
+target_field foo.Bar baz Ljava/lang/String; g
+target_field foo.Bar baz [I g
+target_field foo.Bar baz [[Ljava/lang/String; g

@@ -1,0 +1,4 @@
+unpick v3
+target_method foo.Bar baz ()V
+target_method foo.Bar <init> ()V
+target_method foo.Bar <clinit> ()V

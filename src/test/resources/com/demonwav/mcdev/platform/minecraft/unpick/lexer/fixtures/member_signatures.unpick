@@ -1,0 +1,12 @@
+unpick v4
+target_method foo.Bar baz (ILjava/lang/String;)V
+    param 0 a
+target_method foo . Bar < init > ()V
+target_method foo.Bar baz()V
+target_field foo.Bar$Baz quux [Ljava/lang/String;g
+target_field foo.Bar baz Ljava.lang.String; g # comment
+group int
+    @scope method foo.Bar baz (I)V
+    @ scope   method foo.Bar <clinit> ()V
+    @scope class foo.Bar
+    @scoped

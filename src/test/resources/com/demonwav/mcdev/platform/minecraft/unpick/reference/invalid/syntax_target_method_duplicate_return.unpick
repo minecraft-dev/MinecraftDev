@@ -1,0 +1,4 @@
+unpick v3
+target_method foo.Bar baz ()V
+    return a
+    return b

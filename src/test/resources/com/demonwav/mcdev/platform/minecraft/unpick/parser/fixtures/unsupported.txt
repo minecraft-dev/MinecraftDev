@@ -1,0 +1,7 @@
+Unpick File(0,25)
+  UnpickHeaderImpl(HEADER)(0,9)
+    PsiElement(unpick)('unpick')(0,6)
+    PsiWhiteSpace(' ')(6,7)
+    PsiElement(IDENTIFIER)('v2')(7,9)
+  PsiElement(NEWLINE)('\n')(9,10)
+  PsiElement(UNSUPPORTED_BODY)('group int\n    1')(10,25)
