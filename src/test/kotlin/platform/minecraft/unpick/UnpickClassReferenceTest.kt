@@ -23,8 +23,11 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 import com.demonwav.mcdev.framework.BaseMinecraftTest
 import com.demonwav.mcdev.framework.EdtInterceptor
 import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.refactoring.JavaRefactoringFactory
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -71,7 +74,6 @@ class UnpickClassReferenceTest : BaseMinecraftTest() {
                 unpick v4
                 group int
                     com.example.Outer${'$'}Middle${'$'}Inner.INNER_VALUE
-                    com.example.Outer.OUTER_VALUE
                 target_field com.example.Outer${'$'}Middle${'$'}Inner INNER_VALUE I Foo
                 """,
                 configure = false,
@@ -109,7 +111,7 @@ class UnpickClassReferenceTest : BaseMinecraftTest() {
     @Test
     @DisplayName("Find Usages Of Outer Class")
     fun findUsagesOfOuterClass() {
-        Assertions.assertEquals(3, usagesInUnpick("com.example.Outer").size)
+        Assertions.assertEquals(2, usagesInUnpick("com.example.Outer").size)
     }
 
     @Test
@@ -118,6 +120,66 @@ class UnpickClassReferenceTest : BaseMinecraftTest() {
         fixture.renameElement(findClass("com.example.Outer.Middle.Inner"), "Renamed")
         val text = fixture.tempDirFixture.getFile("usages.unpick")!!.let { fixture.psiManager.findFile(it)!!.text }
         Assertions.assertEquals(2, text.split("Outer\$Middle\$Renamed").size - 1, text)
+    }
+
+    @Test
+    @DisplayName("Move Outer Class Keeps Nested Class Names")
+    fun moveOuterClass() {
+        val file = fixture.addFileToProject(
+            "move.unpick",
+            """
+            unpick v4
+            group int
+                com.example.Outer.OUTER_VALUE
+                com.example.Outer${'$'}Middle${'$'}Inner.INNER_VALUE
+            target_field com.example.Outer${'$'}Middle${'$'}Inner INNER_VALUE I Foo
+            """.trimIndent(),
+        )
+
+        val factory = JavaRefactoringFactory.getInstance(project)
+        val destination = factory.createSourceFolderPreservingMoveDestination("com.other")
+        factory.createMoveClassesOrPackages(arrayOf(findClass("com.example.Outer")), destination).run()
+
+        Assertions.assertEquals(
+            """
+            unpick v4
+            group int
+                com.other.Outer.OUTER_VALUE
+                com.other.Outer${'$'}Middle${'$'}Inner.INNER_VALUE
+            target_field com.other.Outer${'$'}Middle${'$'}Inner INNER_VALUE I Foo
+            """.trimIndent(),
+            file.text,
+        )
+    }
+
+    @Test
+    @DisplayName("Move Field Updates Owner Class")
+    fun moveField() {
+        fixture.addClass("package com.example;\n\npublic class Other {\n}")
+        val file = fixture.addFileToProject(
+            "move_field.unpick",
+            """
+            unpick v4
+            group int
+                com.example.Outer.OUTER_VALUE
+            target_field com.example.Outer OUTER_VALUE I Foo
+            """.trimIndent(),
+        )
+
+        val field = findClass("com.example.Outer").findFieldByName("OUTER_VALUE", false)!!
+        JavaRefactoringFactory.getInstance(project)
+            .createMoveMembers(arrayOf<PsiMember>(field), "com.example.Other", PsiModifier.PUBLIC)
+            .run()
+
+        Assertions.assertEquals(
+            """
+            unpick v4
+            group int
+                com.example.Other.OUTER_VALUE
+            target_field com.example.Other OUTER_VALUE I Foo
+            """.trimIndent(),
+            file.text,
+        )
     }
 
     private fun complete(text: String): List<String> {

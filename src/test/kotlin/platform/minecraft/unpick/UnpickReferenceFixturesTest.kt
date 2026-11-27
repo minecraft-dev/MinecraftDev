@@ -61,7 +61,9 @@ class UnpickReferenceFixturesTest : ProjectBuilderTest() {
     @Test
     @DisplayName("Invalid Reference Fixtures")
     fun invalidFixtures() {
-        val failures = fixtures("invalid").mapNotNull { file ->
+        val files = fixtures("invalid")
+        Assertions.assertEquals(emptySet<String>(), EXPECTED_MESSAGES.keys - files.mapTo(HashSet()) { it.name })
+        val failures = files.mapNotNull { file ->
             val errors = errorsIn(file)
             val expected = EXPECTED_MESSAGES[file.name]
             when {
@@ -76,7 +78,7 @@ class UnpickReferenceFixturesTest : ProjectBuilderTest() {
     private companion object {
         val EXPECTED_MESSAGES = mapOf(
             "other_missing_header.unpick" to "Missing version marker, expected 'unpick v4' on the first line",
-            "whitespace_before_first_line.unpick" to
+            "whitespace_whitespace_before_first_line.unpick" to
                 "Missing version marker, expected 'unpick v4' on the first line",
             "whitespace_comment_on_first_line.unpick" to "The first line must be exactly 'unpick v3'",
             "syntax_target_annotation_unpick_v3.unpick" to "Target annotations require unpick v4",
