@@ -23,6 +23,7 @@ package com.demonwav.mcdev.platform.minecraft.unpick
 import com.demonwav.mcdev.platform.minecraft.unpick.gen.psi.UnpickGroupDefinition
 import com.demonwav.mcdev.platform.minecraft.unpick.index.UnpickGroupIndex
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
@@ -31,10 +32,10 @@ import com.intellij.util.indexing.FileBasedIndex
 object UnpickGroups {
 
     /**
-     * Finds all definitions of the group with the given name, or of the default group if [name] is `null`.
+     * Finds all definitions of the named group.
      */
-    fun findDefinitions(context: PsiElement, name: String?): List<UnpickGroupDefinition> {
-        return findFiles(context, name ?: UnpickGroupIndex.Util.DEFAULT_GROUP_KEY).flatMap { file ->
+    fun findDefinitions(context: PsiElement, name: String): List<UnpickGroupDefinition> {
+        return findFiles(context, listOf(UnpickGroupIndex.Util.nameKey(name))).flatMap { file ->
             file.groupDefinitions.filter { it.name == name }
         }
     }
@@ -54,9 +55,10 @@ object UnpickGroups {
         index.processAllKeys(
             UnpickGroupIndex.Util.NAME,
             { key ->
-                if (key != UnpickGroupIndex.Util.DEFAULT_GROUP_KEY && key !in result) {
+                val name = UnpickGroupIndex.Util.nameFromKey(key)
+                if (name != null && name !in result) {
                     if (index.getContainingFiles(UnpickGroupIndex.Util.NAME, key, scope).isNotEmpty()) {
-                        result += key
+                        result += name
                     }
                 }
                 true
@@ -68,18 +70,29 @@ object UnpickGroups {
         return result
     }
 
-    private fun findFiles(context: PsiElement, key: String): List<UnpickFile> {
+    /**
+     * Finds the files visible from [context] that have any of the given [UnpickGroupIndex] keys. The file containing
+     * [context] is always first. In dumb mode, only that file is returned.
+     */
+    fun findFiles(context: PsiElement, keys: Collection<String>): List<UnpickFile> {
         val project = context.project
         val ownFile = context.containingFile?.originalFile as? UnpickFile
         if (DumbService.isDumb(project)) {
             return listOfNotNull(ownFile)
         }
+        val index = FileBasedIndex.getInstance()
+        val scope = searchScope(context)
+        val virtualFiles = LinkedHashSet<VirtualFile>()
+        for (key in keys) {
+            virtualFiles += index.getContainingFiles(UnpickGroupIndex.Util.NAME, key, scope)
+        }
         val psiManager = PsiManager.getInstance(project)
-        val files = FileBasedIndex.getInstance()
-            .getContainingFiles(UnpickGroupIndex.Util.NAME, key, searchScope(context))
-        val result = files.mapNotNull { psiManager.findFile(it) as? UnpickFile }.toMutableList()
-        if (ownFile != null && ownFile !in result) {
-            result += ownFile
+        val result = listOfNotNull(ownFile).toMutableList()
+        for (file in virtualFiles) {
+            val psiFile = psiManager.findFile(file) as? UnpickFile ?: continue
+            if (psiFile != ownFile) {
+                result += psiFile
+            }
         }
         return result
     }
